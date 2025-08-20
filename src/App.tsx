@@ -8,7 +8,9 @@ import NotFound from "./pages/NotFound";
 import AddContact from "./pages/AddContact";
 import Login from "./pages/Login";
 import ContactDetail from "./pages/ContactDetail";
-import Groups from "./pages/Groups"; // New import for Groups page
+import Groups from "./pages/Groups";
+import Header from "./components/Header"; // Import Header
+import Footer from "./components/Footer"; // Import Footer
 import { SessionContextProvider, useSession } from "./integrations/supabase/auth.tsx";
 import React from "react";
 
@@ -30,15 +32,26 @@ const AuthRoutes = () => {
     <Routes>
       <Route path="/login" element={<Login />} />
       {session ? (
-        // Authenticated routes
-        <>
-          <Route path="/" element={<Index />} />
-          <Route path="/add-contact" element={<AddContact />} />
-          <Route path="/contacts/:id" element={<ContactDetail />} />
-          <Route path="/groups" element={<Groups />} /> {/* New route for Groups */}
-          {/* Catch-all for authenticated users for 404 */}
-          <Route path="*" element={<NotFound />} />
-        </>
+        // Authenticated routes with Header and Footer
+        <Route
+          path="/*" // Catch all authenticated routes
+          element={
+            <div className="flex flex-col min-h-screen">
+              <Header />
+              <main className="flex-grow">
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/add-contact" element={<AddContact />} />
+                  <Route path="/contacts/:id" element={<ContactDetail />} />
+                  <Route path="/groups" element={<Groups />} />
+                  {/* Catch-all for authenticated users for 404 */}
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </main>
+              <Footer />
+            </div>
+          }
+        />
       ) : (
         // Unauthenticated routes - redirect all non-login paths to login
         <Route path="*" element={<Navigate to="/login" replace />} />
