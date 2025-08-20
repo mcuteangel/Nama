@@ -2,15 +2,19 @@ import { MadeWithDyad } from "@/components/made-with-dyad";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, Search } from "lucide-react";
+import { PlusCircle, Search, Users } from "lucide-react"; // Import Users icon
 import ContactList from "@/components/ContactList";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { useNavigate } from "react-router-dom";
 
 const Contacts = () => {
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate();
 
   const handleAddContactClick = () => {
-    navigate("/add-contact"); // Navigate to the new add-contact page
+    navigate("/add-contact");
+  };
+
+  const handleManageGroupsClick = () => {
+    navigate("/groups"); // Navigate to the groups management page
   };
 
   return (
@@ -35,11 +39,18 @@ const Contacts = () => {
               <Search className="absolute inset-inline-start-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400" size={20} />
             </div>
             <Button
-              onClick={handleAddContactClick} // Add onClick handler
+              onClick={handleAddContactClick}
               className="flex items-center gap-2 px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-md transition-all duration-300 transform hover:scale-105"
             >
               <PlusCircle size={20} />
               افزودن مخاطب جدید
+            </Button>
+            <Button
+              onClick={handleManageGroupsClick} // New button for groups
+              className="flex items-center gap-2 px-6 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-semibold shadow-md transition-all duration-300 transform hover:scale-105"
+            >
+              <Users size={20} />
+              مدیریت گروه‌ها
             </Button>
           </div>
 
