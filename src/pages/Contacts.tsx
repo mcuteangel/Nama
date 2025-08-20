@@ -2,7 +2,7 @@ import { MadeWithDyad } from "@/components/made-with-dyad";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, Search, Users } from "lucide-react"; // Import Users icon
+import { PlusCircle, Search } from "lucide-react"; // Remove Users icon
 import ContactList from "@/components/ContactList";
 import { useNavigate } from "react-router-dom";
 
@@ -11,10 +11,6 @@ const Contacts = () => {
 
   const handleAddContactClick = () => {
     navigate("/add-contact");
-  };
-
-  const handleManageGroupsClick = () => {
-    navigate("/groups"); // Navigate to the groups management page
   };
 
   return (
@@ -44,13 +40,6 @@ const Contacts = () => {
             >
               <PlusCircle size={20} />
               افزودن مخاطب جدید
-            </Button>
-            <Button
-              onClick={handleManageGroupsClick} // New button for groups
-              className="flex items-center gap-2 px-6 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-semibold shadow-md transition-all duration-300 transform hover:scale-105"
-            >
-              <Users size={20} />
-              مدیریت گروه‌ها
             </Button>
           </div>
 

@@ -9,16 +9,18 @@ import AddContact from "./pages/AddContact";
 import Login from "./pages/Login";
 import ContactDetail from "./pages/ContactDetail";
 import Groups from "./pages/Groups";
-import Header from "./components/Header"; // Import Header
-import Footer from "./components/Footer"; // Import Footer
+import Footer from "./components/Footer";
+import Sidebar from "./components/Sidebar"; // Import Sidebar
 import { SessionContextProvider, useSession } from "./integrations/supabase/auth.tsx";
 import React from "react";
+import { useIsMobile } from "./hooks/use-mobile"; // Import useIsMobile
 
 const queryClient = new QueryClient();
 
 // Component to handle authentication-based routing
 const AuthRoutes = () => {
   const { session, isLoading } = useSession();
+  const isMobile = useIsMobile();
 
   if (isLoading) {
     return (
@@ -32,23 +34,25 @@ const AuthRoutes = () => {
     <Routes>
       <Route path="/login" element={<Login />} />
       {session ? (
-        // Authenticated routes with Header and Footer
+        // Authenticated routes with Sidebar and Footer
         <Route
           path="/*" // Catch all authenticated routes
           element={
             <div className="flex flex-col min-h-screen">
-              <Header />
-              <main className="flex-grow">
-                <Routes>
-                  <Route path="/" element={<Index />} />
-                  <Route path="/add-contact" element={<AddContact />} />
-                  <Route path="/contacts/:id" element={<ContactDetail />} />
-                  <Route path="/groups" element={<Groups />} />
-                  {/* Catch-all for authenticated users for 404 */}
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </main>
-              <Footer />
+              <Sidebar /> {/* Render Sidebar */}
+              <div className={`flex-grow ${!isMobile ? 'mr-64' : 'mt-[72px]'}`}> {/* Adjust margin for sidebar on desktop, padding for mobile header */}
+                <main>
+                  <Routes>
+                    <Route path="/" element={<Index />} />
+                    <Route path="/add-contact" element={<AddContact />} />
+                    <Route path="/contacts/:id" element={<ContactDetail />} />
+                    <Route path="/groups" element={<Groups />} />
+                    {/* Catch-all for authenticated users for 404 */}
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </main>
+                <Footer />
+              </div>
             </div>
           }
         />
