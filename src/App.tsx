@@ -7,7 +7,7 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import AddContact from "./pages/AddContact";
 import Login from "./pages/Login";
-import { SessionContextProvider, useSession } from "./integrations/supabase/auth";
+import { SessionContextProvider, useSession } from "./integrations/supabase/auth.tsx"; // Updated import path
 
 const queryClient = new QueryClient();
 

@@ -9,7 +9,7 @@ interface SessionContextType {
 
 const SessionContext = createContext<SessionContextType | undefined>(undefined);
 
-export function SessionContextProvider({ children }: { children: React.ReactNode }) {
+export const SessionContextProvider = ({ children }: { children: React.ReactNode }): JSX.Element => {
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -31,14 +31,12 @@ export function SessionContextProvider({ children }: { children: React.ReactNode
     };
   }, []);
 
-  const contextValue = { session, isLoading };
-
   return (
-    <SessionContext.Provider value={contextValue}>
+    <SessionContext.Provider value={{ session: session, isLoading: isLoading }}>
       {children}
     </SessionContext.Provider>
   );
-}
+};
 
 export const useSession = () => {
   const context = useContext(SessionContext);
