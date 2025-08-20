@@ -44,7 +44,7 @@ const Login = () => {
             },
           }}
           theme="light" // استفاده از تم روشن
-          view="sign_in" // فقط فرم ورود نمایش داده شود (ثبت‌نام غیرفعال)
+          view="sign_in" // فقط فرم ورود نمایش داده شود
           localization={{
             variables: {
               sign_in: {
@@ -55,15 +55,6 @@ const Login = () => {
                 button_label: 'ورود',
                 social_provider_text: 'ورود با {{provider}}',
                 link_text: 'قبلاً حساب کاربری دارید؟ وارد شوید',
-              },
-              sign_up: {
-                email_label: 'ایمیل',
-                password_label: 'رمز عبور',
-                email_input_placeholder: 'ایمیل خود را وارد کنید',
-                password_input_placeholder: 'رمز عبور خود را وارد کنید',
-                button_label: 'ثبت نام',
-                social_provider_text: 'ثبت نام با {{provider}}',
-                link_text: 'حساب کاربری ندارید؟ ثبت نام کنید',
               },
               forgotten_password: {
                 email_label: 'ایمیل',
@@ -84,7 +75,6 @@ const Login = () => {
               verify_otp: {
                 email_input_placeholder: 'کد یکبار مصرف را وارد کنید',
                 button_label: 'تایید کد یکبار مصرف',
-                // link_text: 'کد یکبار مصرف را وارد کنید', // این خط حذف شد
               },
             },
           }}
