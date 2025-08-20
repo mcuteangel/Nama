@@ -1,11 +1,9 @@
-import React, { useState } from "react";
+import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { LogOut, PlusCircle, Users, Home, Menu } from "lucide-react";
+import { LogOut, PlusCircle, Users, Home } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { showError, showSuccess, showLoading, dismissToast } from "@/utils/toast";
-import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 
 const navItems = [
@@ -16,8 +14,6 @@ const navItems = [
 
 const Sidebar = () => {
   const navigate = useNavigate();
-  const isMobile = useIsMobile();
-  const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   const handleLogout = async () => {
     const toastId = showLoading("در حال خروج...");
@@ -34,66 +30,39 @@ const Sidebar = () => {
     }
   };
 
-  const NavLinks = () => (
-    <nav className="flex flex-col gap-2 p-4">
-      {navItems.map((item) => (
-        <Button
-          key={item.path}
-          variant="ghost"
-          className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-          asChild
-          onClick={() => isMobile && setIsSheetOpen(false)}
-        >
-          <Link to={item.path}>
-            <item.icon size={20} className="ms-2" />
-            {item.name}
-          </Link>
-        </Button>
-      ))}
-      <Button
-        variant="ghost"
-        onClick={handleLogout}
-        className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground mt-auto"
-      >
-        <LogOut size={20} className="ms-2" />
-        خروج
-      </Button>
-    </nav>
-  );
-
-  if (isMobile) {
-    return (
-      <div className="fixed top-0 right-0 w-full bg-gradient-to-r from-blue-600 to-purple-600 dark:from-gray-900 dark:to-gray-700 text-white p-4 shadow-lg flex items-center justify-between z-50 backdrop-blur-lg bg-opacity-80 dark:bg-opacity-80 border-b border-white/20 dark:border-gray-700/20">
-        <Link to="/" className="text-2xl font-bold">
-          Nama Contacts
-        </Link>
-        <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
-          <SheetTrigger asChild>
-            <Button variant="ghost" size="icon" className="text-white">
-              <Menu size={24} />
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="right" className="w-64 bg-sidebar dark:bg-sidebar-background flex flex-col p-0 backdrop-blur-lg bg-opacity-80 dark:bg-opacity-80 border-l border-white/20 dark:border-gray-700/20">
-            <div className="p-4 border-b border-sidebar-border dark:border-sidebar-border">
-              <h2 className="text-xl font-bold text-sidebar-primary dark:text-sidebar-primary-foreground">
-                Nama Contacts
-              </h2>
-            </div>
-            <NavLinks />
-          </SheetContent>
-        </Sheet>
-      </div>
-    );
-  }
-
   return (
-    <aside className="fixed right-0 top-0 h-full w-64 bg-sidebar dark:bg-sidebar-background text-sidebar-foreground shadow-lg flex flex-col z-40 backdrop-blur-lg bg-opacity-80 dark:bg-opacity-80 border-l border-white/20 dark:border-gray-700/20">
+    <aside className={cn(
+      "fixed right-0 top-0 h-full w-64 text-sidebar-foreground shadow-lg flex flex-col z-40",
+      "bg-sidebar dark:bg-sidebar-background backdrop-blur-lg bg-opacity-80 dark:bg-opacity-80 border-l border-white/20 dark:border-gray-700/20"
+    )}>
       <div className="p-4 border-b border-sidebar-border dark:border-sidebar-border">
         <h2 className="text-2xl font-bold text-sidebar-primary dark:text-sidebar-primary-foreground">
           Nama Contacts
         </h2>
       </div>
-      <NavLinks />
+      <nav className="flex flex-col gap-2 p-4">
+        {navItems.map((item) => (
+          <Button
+            key={item.path}
+            variant="ghost"
+            className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+            asChild
+          >
+            <Link to={item.path}>
+              <item.icon size={20} className="ms-2" />
+              {item.name}
+            </Link>
+          </Button>
+        ))}
+        <Button
+          variant="ghost"
+          onClick={handleLogout}
+          className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground mt-auto"
+        >
+          <LogOut size={20} className="ms-2" />
+          خروج
+        </Button>
+      </nav>
     </aside>
   );
 };
