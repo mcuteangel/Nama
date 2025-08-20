@@ -6,6 +6,7 @@ import { Edit, Trash2, Phone, Mail } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/integrations/supabase/auth";
 import { showSuccess, showError, showLoading, dismissToast } from "@/utils/toast";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 
 // Define types for contact data
 interface PhoneNumber {
@@ -31,11 +32,19 @@ interface Contact {
 }
 
 const ContactItem = ({ contact }: { contact: Contact }) => {
+  const navigate = useNavigate(); // Initialize useNavigate
   const displayPhoneNumber = contact.phone_numbers.length > 0 ? contact.phone_numbers[0].phone_number : "بدون شماره";
   const displayEmail = contact.email_addresses.length > 0 ? contact.email_addresses[0].email_address : undefined;
 
+  const handleContactClick = () => {
+    navigate(`/contacts/${contact.id}`); // Navigate to contact detail page
+  };
+
   return (
-    <Card className="flex items-center justify-between p-4 bg-white/20 dark:bg-gray-700/20 border border-white/30 dark:border-gray-600/30 rounded-lg shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.01]">
+    <Card
+      className="flex items-center justify-between p-4 bg-white/20 dark:bg-gray-700/20 border border-white/30 dark:border-gray-600/30 rounded-lg shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.01] cursor-pointer" // Add cursor-pointer
+      onClick={handleContactClick} // Add onClick handler
+    >
       <div className="flex items-center gap-4">
         <Avatar className="h-12 w-12 border border-white/50 dark:border-gray-600/50">
           <AvatarImage src={contact?.avatarUrl} alt={contact?.first_name} />
@@ -58,10 +67,10 @@ const ContactItem = ({ contact }: { contact: Contact }) => {
         </div>
       </div>
       <div className="flex gap-2">
-        <Button variant="ghost" size="icon" className="text-blue-600 hover:bg-blue-100 dark:text-blue-400 dark:hover:bg-gray-600/50 transition-all duration-200">
+        <Button variant="ghost" size="icon" className="text-blue-600 hover:bg-blue-100 dark:text-blue-400 dark:hover:bg-gray-600/50 transition-all duration-200" onClick={(e) => e.stopPropagation()}> {/* Stop propagation to prevent navigation */}
           <Edit size={20} />
         </Button>
-        <Button variant="ghost" size="icon" className="text-red-600 hover:bg-red-100 dark:text-red-400 dark:hover:bg-gray-600/50 transition-all duration-200">
+        <Button variant="ghost" size="icon" className="text-red-600 hover:bg-red-100 dark:text-red-400 dark:hover:bg-gray-600/50 transition-all duration-200" onClick={(e) => e.stopPropagation()}> {/* Stop propagation */}
           <Trash2 size={20} />
         </Button>
       </div>

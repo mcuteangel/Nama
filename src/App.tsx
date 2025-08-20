@@ -7,6 +7,7 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import AddContact from "./pages/AddContact";
 import Login from "./pages/Login";
+import ContactDetail from "./pages/ContactDetail"; // New import
 import { SessionContextProvider, useSession } from "./integrations/supabase/auth.tsx";
 import React from "react"; // Import React
 
@@ -32,6 +33,7 @@ const AuthRoutes = () => {
         <>
           <Route path="/" element={<Index />} />
           <Route path="/add-contact" element={<AddContact />} />
+          <Route path="/contacts/:id" element={<ContactDetail />} /> {/* New route for contact details */}
           {/* Catch-all for authenticated users for 404 */}
           <Route path="*" element={<NotFound />} />
         </>
