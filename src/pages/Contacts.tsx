@@ -2,7 +2,8 @@ import { MadeWithDyad } from "@/components/made-with-dyad";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, Search } from "lucide-react"; // Assuming lucide-react is installed for icons
+import { PlusCircle, Search } from "lucide-react";
+import ContactList from "@/components/ContactList"; // Import ContactList
 
 const Contacts = () => {
   return (
@@ -32,13 +33,8 @@ const Contacts = () => {
             </Button>
           </div>
 
-          <div className="text-center text-gray-700 dark:text-gray-200">
-            {/* Placeholder for ContactList component */}
-            <p className="text-lg">لیست مخاطبین شما در اینجا نمایش داده خواهد شد.</p>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-              (این بخش بعداً با کامپوننت‌های واقعی جایگزین می‌شود)
-            </p>
-          </div>
+          {/* Replace placeholder with actual ContactList component */}
+          <ContactList />
         </CardContent>
       </Card>
       <MadeWithDyad />
