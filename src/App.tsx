@@ -7,7 +7,8 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import AddContact from "./pages/AddContact";
 import Login from "./pages/Login";
-import { SessionContextProvider, useSession } from "./integrations/supabase/auth.tsx"; // Updated import path
+import { SessionContextProvider, useSession } from "./integrations/supabase/auth.tsx";
+import React from "react"; // Import React
 
 const queryClient = new QueryClient();
 
@@ -42,18 +43,25 @@ const AuthRoutes = () => {
   );
 };
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <SessionContextProvider>
-          <AuthRoutes /> {/* Use the new AuthRoutes component */}
-        </SessionContextProvider>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+const App = () => {
+  // Set document direction to RTL for Persian language
+  React.useEffect(() => {
+    document.documentElement.dir = 'rtl';
+  }, []);
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <SessionContextProvider>
+            <AuthRoutes />
+          </SessionContextProvider>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;
