@@ -63,7 +63,7 @@ const Sidebar = () => {
 
   if (isMobile) {
     return (
-      <div className="fixed top-0 right-0 w-full bg-gradient-to-r from-blue-600 to-purple-600 dark:from-gray-900 dark:to-gray-700 text-white p-4 shadow-lg flex items-center justify-between z-50">
+      <div className="fixed top-0 right-0 w-full bg-gradient-to-r from-blue-600 to-purple-600 dark:from-gray-900 dark:to-gray-700 text-white p-4 shadow-lg flex items-center justify-between z-50 backdrop-blur-lg bg-opacity-80 dark:bg-opacity-80 border-b border-white/20 dark:border-gray-700/20">
         <Link to="/" className="text-2xl font-bold">
           Nama Contacts
         </Link>
@@ -73,7 +73,7 @@ const Sidebar = () => {
               <Menu size={24} />
             </Button>
           </SheetTrigger>
-          <SheetContent side="right" className="w-64 bg-sidebar dark:bg-sidebar-background flex flex-col p-0">
+          <SheetContent side="right" className="w-64 bg-sidebar dark:bg-sidebar-background flex flex-col p-0 backdrop-blur-lg bg-opacity-80 dark:bg-opacity-80 border-l border-white/20 dark:border-gray-700/20">
             <div className="p-4 border-b border-sidebar-border dark:border-sidebar-border">
               <h2 className="text-xl font-bold text-sidebar-primary dark:text-sidebar-primary-foreground">
                 Nama Contacts
@@ -87,7 +87,7 @@ const Sidebar = () => {
   }
 
   return (
-    <aside className="fixed right-0 top-0 h-full w-64 bg-sidebar dark:bg-sidebar-background text-sidebar-foreground shadow-lg flex flex-col z-40">
+    <aside className="fixed right-0 top-0 h-full w-64 bg-sidebar dark:bg-sidebar-background text-sidebar-foreground shadow-lg flex flex-col z-40 backdrop-blur-lg bg-opacity-80 dark:bg-opacity-80 border-l border-white/20 dark:border-gray-700/20">
       <div className="p-4 border-b border-sidebar-border dark:border-sidebar-border">
         <h2 className="text-2xl font-bold text-sidebar-primary dark:text-sidebar-primary-foreground">
           Nama Contacts
