@@ -45,6 +45,7 @@ const Login = () => {
           }}
           theme="light" // استفاده از تم روشن
           view="sign_in" // فقط فرم ورود نمایش داده شود
+          showLinks={false} // غیرفعال کردن لینک‌های ثبت‌نام و بازیابی رمز عبور
           localization={{
             variables: {
               sign_in: {
@@ -55,26 +56,6 @@ const Login = () => {
                 button_label: 'ورود',
                 social_provider_text: 'ورود با {{provider}}',
                 link_text: 'قبلاً حساب کاربری دارید؟ وارد شوید',
-              },
-              forgotten_password: {
-                email_label: 'ایمیل',
-                email_input_placeholder: 'ایمیل خود را وارد کنید',
-                button_label: 'ارسال دستورالعمل بازیابی رمز عبور',
-                link_text: 'رمز عبور خود را فراموش کرده‌اید؟',
-              },
-              update_password: {
-                password_label: 'رمز عبور جدید',
-                password_input_placeholder: 'رمز عبور جدید خود را وارد کنید',
-                button_label: 'به‌روزرسانی رمز عبور',
-              },
-              magic_link: {
-                email_input_placeholder: 'ایمیل خود را وارد کنید',
-                button_label: 'ارسال لینک جادویی',
-                link_text: 'ارسال لینک جادویی',
-              },
-              verify_otp: {
-                email_input_placeholder: 'کد یکبار مصرف را وارد کنید',
-                button_label: 'تایید کد یکبار مصرف',
               },
             },
           }}
