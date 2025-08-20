@@ -1,0 +1,49 @@
+import { MadeWithDyad } from "@/components/made-with-dyad";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { PlusCircle, Search } from "lucide-react"; // Assuming lucide-react is installed for icons
+
+const Contacts = () => {
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-br from-blue-100 to-purple-100 dark:from-gray-900 dark:to-gray-800">
+      <Card className="w-full max-w-4xl backdrop-blur-lg bg-white/10 dark:bg-gray-800/10 border border-white/20 dark:border-gray-700/20 shadow-lg rounded-xl p-6">
+        <CardHeader className="text-center">
+          <CardTitle className="text-4xl font-bold text-gray-800 dark:text-gray-100 mb-2">
+            مدیریت مخاطبین
+          </CardTitle>
+          <CardDescription className="text-lg text-gray-600 dark:text-gray-300">
+            ثبت، جستجو و سازماندهی مخاطبین شما
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="relative flex-grow">
+              <Input
+                type="text"
+                placeholder="جستجوی مخاطبین..."
+                className="w-full pl-10 pr-4 py-2 rounded-lg bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all duration-300"
+              />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400" size={20} />
+            </div>
+            <Button className="flex items-center gap-2 px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-md transition-all duration-300 transform hover:scale-105">
+              <PlusCircle size={20} />
+              افزودن مخاطب جدید
+            </Button>
+          </div>
+
+          <div className="text-center text-gray-700 dark:text-gray-200">
+            {/* Placeholder for ContactList component */}
+            <p className="text-lg">لیست مخاطبین شما در اینجا نمایش داده خواهد شد.</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+              (این بخش بعداً با کامپوننت‌های واقعی جایگزین می‌شود)
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+      <MadeWithDyad />
+    </div>
+  );
+};
+
+export default Contacts;
