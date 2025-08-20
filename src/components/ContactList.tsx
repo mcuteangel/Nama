@@ -42,7 +42,7 @@ const ContactItem = ({ contact }: { contact: Contact }) => {
 
   return (
     <Card
-      className="flex items-center justify-between p-4 bg-white/20 dark:bg-gray-700/20 border border-white/30 dark:border-gray-600/30 rounded-lg shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.01] cursor-pointer"
+      className="flex items-center justify-between p-4 glass rounded-lg shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.01] cursor-pointer"
       onClick={handleContactClick}
     >
       <div className="flex items-center gap-4">

@@ -33,8 +33,8 @@ const BottomNavigationBar = () => {
 
   return (
     <div className={cn(
-      "fixed bottom-0 left-0 w-full bg-gradient-to-r from-blue-600 to-purple-600 dark:from-gray-900 dark:to-gray-700 text-white p-2 shadow-lg flex items-center justify-around z-50",
-      "backdrop-blur-lg bg-opacity-80 dark:bg-opacity-80 border-t border-white/20 dark:border-gray-700/20"
+      "fixed bottom-0 left-0 w-full text-white p-2 shadow-lg flex items-center justify-around z-50",
+      "glass border-t"
     )}>
       {navItems.map((item) => (
         <Button

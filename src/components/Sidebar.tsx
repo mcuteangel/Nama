@@ -33,7 +33,7 @@ const Sidebar = () => {
   return (
     <aside className={cn(
       "fixed right-0 top-0 h-full w-64 text-sidebar-foreground shadow-lg flex flex-col z-40",
-      "bg-sidebar dark:bg-sidebar-background backdrop-blur-lg bg-opacity-80 dark:bg-opacity-80 border-l border-white/20 dark:border-gray-700/20"
+      "glass border-l"
     )}>
       <div className="p-4 border-b border-sidebar-border dark:border-sidebar-border">
         <h2 className="text-2xl font-bold text-sidebar-primary dark:text-sidebar-primary-foreground">

@@ -104,7 +104,7 @@ const ContactDetail = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-br from-blue-100 to-purple-100 dark:from-gray-900 dark:to-gray-800">
-      <Card className="w-full max-w-2xl backdrop-blur-lg bg-white/10 dark:bg-gray-800/10 border border-white/20 dark:border-gray-700/20 shadow-lg rounded-xl p-6">
+      <Card className="w-full max-w-2xl glass rounded-xl p-6">
         <CardHeader className="text-center">
           <Avatar className="h-24 w-24 mx-auto mb-4 border-4 border-blue-400 dark:border-blue-600">
             <AvatarImage src={contact.avatarUrl} alt={`${contact.first_name} ${contact.last_name}`} />

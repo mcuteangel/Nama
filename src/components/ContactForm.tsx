@@ -115,7 +115,7 @@ const ContactForm = () => {
   }
 
   return (
-    <Card className="w-full max-w-md backdrop-blur-lg bg-white/10 dark:bg-gray-800/10 border border-white/20 dark:border-gray-700/20 shadow-lg rounded-xl p-6">
+    <Card className="w-full max-w-md glass rounded-xl p-6">
       <CardHeader className="text-center">
         <CardTitle className="text-2xl font-bold text-gray-800 dark:text-gray-100">
           افزودن/ویرایش مخاطب

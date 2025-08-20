@@ -45,7 +45,7 @@ const GroupItem = ({ group, onGroupUpdated, onGroupDeleted }: { group: Group; on
   };
 
   return (
-    <Card className="flex items-center justify-between p-4 bg-white/20 dark:bg-gray-700/20 border border-white/30 dark:border-gray-600/30 rounded-lg shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.01]">
+    <Card className="flex items-center justify-between p-4 glass rounded-lg shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.01]">
       <div className="flex items-center gap-4">
         <div className="w-10 h-10 rounded-full flex items-center justify-center border border-white/50 dark:border-gray-600/50" style={{ backgroundColor: group.color || "#cccccc" }}>
           <Users size={20} className="text-white" />
@@ -85,7 +85,7 @@ const GroupItem = ({ group, onGroupUpdated, onGroupDeleted }: { group: Group; on
               <Trash2 size={20} />
             </Button>
           </AlertDialogTrigger>
-          <AlertDialogContent className="backdrop-blur-lg bg-white/10 dark:bg-gray-800/10 border border-white/20 dark:border-gray-700/20 shadow-lg rounded-xl p-6">
+          <AlertDialogContent className="glass rounded-xl p-6">
             <AlertDialogHeader>
               <AlertDialogTitle className="text-gray-800 dark:text-gray-100">آیا از حذف این گروه مطمئن هستید؟</AlertDialogTitle>
               <AlertDialogDescription className="text-gray-600 dark:text-gray-300">
