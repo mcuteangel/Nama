@@ -32,7 +32,7 @@ export const SessionContextProvider = ({ children }: { children: React.ReactNode
   }, []);
 
   return (
-    <SessionContext.Provider value={{ session, isLoading }}>
+    <SessionContext.Provider value={{ session: session, isLoading: isLoading }}>
       {children}
     </SessionContext.Provider>
   );
