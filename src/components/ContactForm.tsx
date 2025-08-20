@@ -18,7 +18,7 @@ const formSchema = z.object({
   phoneNumber: z.string().regex(/^09\d{9}$/, { message: "شماره تلفن معتبر نیست (مثال: 09123456789)." }).optional().or(z.literal('')),
   emailAddress: z.string().email({ message: "آدرس ایمیل معتبر نیست." }).optional().or(z.literal('')),
   gender: z.enum(["male", "female", "not_specified"], { message: "جنسیت معتبر نیست." }).default("not_specified"),
-  role: z.string().optional(),
+  position: z.string().optional(), // Changed from 'role' to 'position'
   company: z.string().optional(),
   address: z.string().optional(),
   notes: z.string().optional(),
@@ -36,7 +36,7 @@ const ContactForm = () => {
       phoneNumber: "",
       emailAddress: "",
       gender: "not_specified",
-      role: "",
+      position: "", // Changed from 'role' to 'position'
       company: "",
       address: "",
       notes: "",
@@ -65,7 +65,7 @@ const ContactForm = () => {
           first_name: values.firstName,
           last_name: values.lastName,
           gender: values.gender,
-          role: values.role,
+          position: values.position, // Changed from 'role' to 'position'
           company: values.company,
           address: values.address,
           notes: values.notes,
@@ -216,7 +216,7 @@ const ContactForm = () => {
             />
             <FormField
               control={form.control}
-              name="role"
+              name="position" // Changed from 'role' to 'position'
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-gray-700 dark:text-gray-200">سمت/شغل</FormLabel>
