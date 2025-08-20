@@ -138,7 +138,7 @@ const GroupForm = ({ initialData, onSuccess }: GroupFormProps) => {
                           )}
                         </Button>
                       </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0">
+                      <PopoverContent className="w-auto p-0 backdrop-blur-md bg-white/80 dark:bg-gray-800/80 border border-white/30 dark:border-gray-600/30">
                         <HexColorPicker color={field.value || "#aabbcc"} onChange={handleColorChange} />
                       </PopoverContent>
                     </Popover>
