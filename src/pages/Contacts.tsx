@@ -3,9 +3,16 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { PlusCircle, Search } from "lucide-react";
-import ContactList from "@/components/ContactList"; // Import ContactList
+import ContactList from "@/components/ContactList";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 
 const Contacts = () => {
+  const navigate = useNavigate(); // Initialize useNavigate
+
+  const handleAddContactClick = () => {
+    navigate("/add-contact"); // Navigate to the new add-contact page
+  };
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-br from-blue-100 to-purple-100 dark:from-gray-900 dark:to-gray-800">
       <Card className="w-full max-w-4xl backdrop-blur-lg bg-white/10 dark:bg-gray-800/10 border border-white/20 dark:border-gray-700/20 shadow-lg rounded-xl p-6">
@@ -27,13 +34,15 @@ const Contacts = () => {
               />
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400" size={20} />
             </div>
-            <Button className="flex items-center gap-2 px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-md transition-all duration-300 transform hover:scale-105">
+            <Button
+              onClick={handleAddContactClick} // Add onClick handler
+              className="flex items-center gap-2 px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-md transition-all duration-300 transform hover:scale-105"
+            >
               <PlusCircle size={20} />
               افزودن مخاطب جدید
             </Button>
           </div>
 
-          {/* Replace placeholder with actual ContactList component */}
           <ContactList />
         </CardContent>
       </Card>
