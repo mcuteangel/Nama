@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 
 const AddContact = () => {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-br from-blue-100 to-purple-100 dark:from-gray-900 dark:to-gray-800">
+    <div className="flex flex-col items-center justify-center p-4 h-full w-full">
       <ContactForm />
       <MadeWithDyad />
     </div>

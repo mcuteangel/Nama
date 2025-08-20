@@ -9,7 +9,7 @@ const Groups = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-br from-blue-100 to-purple-100 dark:from-gray-900 dark:to-gray-800">
+    <div className="flex flex-col items-center justify-center p-4 h-full w-full">
       <Card className="w-full max-w-4xl glass rounded-xl p-6">
         <CardHeader className="text-center">
           <CardTitle className="text-4xl font-bold text-gray-800 dark:text-gray-100 mb-2">

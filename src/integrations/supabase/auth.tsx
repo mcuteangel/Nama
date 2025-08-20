@@ -1,6 +1,5 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { Session } from '@supabase/supabase-js';
-import { supabase } from '@/integrations/supabase/client';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { Session, SupabaseClient } from '@supabase/supabase-js';
 
 interface SessionContextType {
   session: Session | null;
@@ -9,30 +8,34 @@ interface SessionContextType {
 
 const SessionContext = createContext<SessionContextType | undefined>(undefined);
 
-export const SessionContextProvider = ({ children }: { children: React.ReactNode }): JSX.Element => {
+interface SessionContextProviderProps {
+  children: ReactNode;
+  supabaseClient: SupabaseClient; // Add supabaseClient prop
+}
+
+export const SessionContextProvider = ({ children, supabaseClient }: SessionContextProviderProps) => {
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const { data: { subscription } = { subscription: null } } = supabase.auth.onAuthStateChange((_event, currentSession) => {
-      setSession(currentSession);
+    const getSession = async () => {
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      setSession(session);
       setIsLoading(false);
-    });
-
-    supabase.auth.getSession().then(({ data: { session: initialSession } }) => {
-      setSession(initialSession);
-      setIsLoading(false);
-    });
-
-    return () => {
-      if (subscription) {
-        subscription.unsubscribe();
-      }
     };
-  }, []);
+
+    getSession();
+
+    const { data: { subscription } } = supabaseClient.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      setIsLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
+  }, [supabaseClient]); // Depend on supabaseClient
 
   return (
-    <SessionContext.Provider value={{ session: session, isLoading: isLoading }}>
+    <SessionContext.Provider value={{ session, isLoading }}>
       {children}
     </SessionContext.Provider>
   );

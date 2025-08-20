@@ -19,14 +19,14 @@ const Login = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 to-purple-100 dark:from-gray-900 dark:to-gray-800">
+      <div className="flex items-center justify-center h-full w-full">
         <p className="text-gray-700 dark:text-gray-300">در حال بارگذاری...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-br from-blue-100 to-purple-100 dark:from-gray-900 dark:to-gray-800">
+    <div className="flex flex-col items-center justify-center p-4 h-full w-full">
       <div className="w-full max-w-md p-8 glass rounded-xl">
         <h2 className="text-2xl font-bold text-center text-gray-800 dark:text-gray-100 mb-6">ورود به حساب کاربری</h2>
         <Auth
