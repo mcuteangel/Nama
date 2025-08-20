@@ -72,23 +72,71 @@ export default {
         "accordion-down": {
           from: {
             height: "0",
+            opacity: "0",
           },
           to: {
             height: "var(--radix-accordion-content-height)",
+            opacity: "1",
           },
         },
         "accordion-up": {
           from: {
             height: "var(--radix-accordion-content-height)",
+            opacity: "1",
           },
           to: {
             height: "0",
+            opacity: "0",
+          },
+        },
+        "tabShow": {
+          from: {
+            opacity: "0",
+            transform: "translateY(8px)",
+          },
+          to: {
+            opacity: "1",
+            transform: "translateY(0)",
+          },
+        },
+        "tabHide": {
+          to: {
+            opacity: "0",
+            transform: "translateY(-8px)",
+          },
+        },
+        "collapsible-down": {
+          from: {
+            height: "0",
+            opacity: "0",
+            overflow: "hidden",
+          },
+          to: {
+            height: "var(--radix-collapsible-content-height)",
+            opacity: "1",
+            overflow: "hidden",
+          },
+        },
+        "collapsible-up": {
+          from: {
+            height: "var(--radix-collapsible-content-height)",
+            opacity: "1",
+            overflow: "hidden",
+          },
+          to: {
+            height: "0",
+            opacity: "0",
+            overflow: "hidden",
           },
         },
       },
       animation: {
-        "accordion-down": "accordion-down 0.2s ease-out",
-        "accordion-up": "accordion-up 0.2s ease-out",
+        "accordion-down": "accordion-down 0.3s ease-out forwards",
+        "accordion-up": "accordion-up 0.2s ease-in forwards",
+        "tabShow": "tabShow 0.3s ease-out forwards",
+        "tabHide": "tabHide 0.2s ease-in forwards",
+        "collapsible-down": "collapsible-down 0.3s ease-out forwards",
+        "collapsible-up": "collapsible-up 0.2s ease-in forwards",
       },
     },
   },
