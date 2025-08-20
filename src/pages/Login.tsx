@@ -45,6 +45,7 @@ const Login = () => {
           }}
           theme="light" // استفاده از تم روشن
           view="sign_in" // فقط فرم ورود نمایش داده شود
+          showLinks={false} // غیرفعال کردن لینک‌های ثبت‌نام و بازیابی رمز عبور
           localization={{
             variables: {
               sign_in: {
@@ -54,13 +55,7 @@ const Login = () => {
                 password_input_placeholder: 'رمز عبور خود را وارد کنید',
                 button_label: 'ورود',
                 social_provider_text: 'ورود با {{provider}}',
-                link_text: '', // این لینک را خالی می‌کنیم تا گزینه ثبت‌نام نمایش داده نشود
-              },
-              forgotten_password: {
-                email_label: 'ایمیل',
-                email_input_placeholder: 'ایمیل خود را وارد کنید',
-                button_label: 'ارسال دستورالعمل بازیابی رمز عبور',
-                link_text: 'رمز عبور خود را فراموش کرده‌اید؟',
+                link_text: 'قبلاً حساب کاربری دارید؟ وارد شوید',
               },
             },
           }}
