@@ -33,15 +33,15 @@ const BottomNavigationBar = () => {
 
   return (
     <div className={cn(
-      "fixed bottom-0 left-0 w-full text-white p-2 shadow-lg flex items-center justify-around z-50",
-      "glass border-t"
+      "fixed bottom-0 left-0 w-full p-2 shadow-lg flex items-center justify-around z-50",
+      "glass border-t text-foreground" // Changed text-white to text-foreground
     )}>
       {navItems.map((item) => (
         <Button
           key={item.path}
           variant="ghost"
           className={cn(
-            "flex flex-col items-center justify-center text-white text-xs p-1 h-auto min-w-[60px]",
+            "flex flex-col items-center justify-center text-xs p-1 h-auto min-w-[60px]", // Removed text-white here
             "hover:bg-white/20",
             location.pathname === item.path ? "text-blue-200 dark:text-blue-300" : ""
           )}
@@ -56,7 +56,7 @@ const BottomNavigationBar = () => {
       <Button
         variant="ghost"
         onClick={handleLogout}
-        className="flex flex-col items-center justify-center text-white text-xs p-1 h-auto min-w-[60px] hover:bg-white/20"
+        className="flex flex-col items-center justify-center text-xs p-1 h-auto min-w-[60px] hover:bg-white/20" // Removed text-white here
       >
         <LogOut size={20} className="mb-1" />
         خروج
