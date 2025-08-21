@@ -209,18 +209,18 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-gray-700 dark:text-gray-200">جنسیت</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
+                  <FormControl>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <SelectTrigger className="w-full bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100">
                         <SelectValue placeholder="انتخاب جنسیت" />
                       </SelectTrigger>
-                    </FormControl>
-                    <SelectContent className="backdrop-blur-md bg-white/80 dark:bg-gray-800/80 border border-white/30 dark:border-gray-600/30">
-                      <SelectItem value="male">مرد</SelectItem>
-                      <SelectItem value="female">زن</SelectItem>
-                      <SelectItem value="not_specified">نامشخص</SelectItem>
-                    </SelectContent>
-                  </Select>
+                      <SelectContent className="backdrop-blur-md bg-white/80 dark:bg-gray-800/80 border border-white/30 dark:border-gray-600/30">
+                        <SelectItem value="male">مرد</SelectItem>
+                        <SelectItem value="female">زن</SelectItem>
+                        <SelectItem value="not_specified">نامشخص</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
@@ -359,8 +359,6 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {availableTemplates.map((template, index) => {
                   const fieldName = `customFields.${index}.value` as const;
-                  // The value for the field is now managed by the top-level useEffect
-                  // and accessed directly via form.watch or form.getValues
                   
                   return (
                     <FormField
@@ -374,15 +372,14 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
                             {template.required && <span className="text-red-500">*</span>}
                           </FormLabel>
                           <FormControl>
-                            {template.type === 'text' && (
+                            {template.type === 'text' ? (
                               <Input
                                 placeholder={template.description || `مقدار ${template.name}`}
                                 className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
                                 {...field}
                                 value={field.value || ''}
                               />
-                            )}
-                            {template.type === 'number' && (
+                            ) : template.type === 'number' ? (
                               <Input
                                 type="number"
                                 placeholder={template.description || `مقدار ${template.name}`}
@@ -391,8 +388,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
                                 value={field.value || ''}
                                 onChange={(e) => field.onChange(e.target.value === '' ? undefined : Number(e.target.value))}
                               />
-                            )}
-                            {template.type === 'date' && (
+                            ) : template.type === 'date' ? (
                               <Popover>
                                 <PopoverTrigger asChild>
                                   <Button
@@ -402,7 +398,6 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
                                       !field.value && "text-muted-foreground"
                                     )}
                                   >
-                                    {/* Wrap the children in a single span */}
                                     <span className="flex items-center">
                                       <CalendarIcon className="ml-2 h-4 w-4" />
                                       {field.value ? format(new Date(field.value), "yyyy/MM/dd") : <span>تاریخ را انتخاب کنید</span>}
@@ -417,25 +412,28 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
                                   />
                                 </PopoverContent>
                               </Popover>
-                            )}
-                            {template.type === 'list' && template.options && (
+                            ) : template.type === 'list' ? (
                               <Select
                                 onValueChange={field.onChange}
                                 value={field.value || ''}
+                                disabled={!template.options || template.options.length === 0}
                               >
                                 <FormControl>
                                   <SelectTrigger className="w-full bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100">
-                                    <SelectValue placeholder={`انتخاب ${template.name}`} />
+                                    <SelectValue placeholder={!template.options || template.options.length === 0 ? "گزینه‌ای یافت نشد" : `انتخاب ${template.name}`} />
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent className="backdrop-blur-md bg-white/80 dark:bg-gray-800/80 border border-white/30 dark:border-gray-600/30">
-                                  {template.options.map((option) => (
+                                  {template.options && template.options.map((option) => (
                                     <SelectItem key={option} value={option}>
                                       {option}
                                     </SelectItem>
                                   ))}
                                 </SelectContent>
                               </Select>
+                            ) : (
+                              // Fallback for unknown type
+                              <Input disabled placeholder="نوع فیلد نامشخص" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400" />
                             )}
                           </FormControl>
                           <FormMessage />
