@@ -4,6 +4,7 @@ import Index from './pages/Contacts';
 import Login from './pages/Login';
 import AddContact from './pages/AddContact';
 import ContactDetail from './pages/ContactDetail';
+import EditContact from './pages/EditContact'; // Import EditContact
 import Groups from './pages/Groups';
 import { SessionContextProvider } from './integrations/supabase/auth';
 import { supabase } from './integrations/supabase/client';
@@ -12,7 +13,7 @@ import BottomNavigationBar from './components/BottomNavigationBar';
 import Sidebar from './components/Sidebar';
 import { Toaster } from 'sonner';
 import { cn } from './lib/utils';
-import NotFound from './pages/NotFound'; // Import NotFound component
+import NotFound from './pages/NotFound';
 
 // New component to handle routing and layout based on location
 function AppLayout() {
@@ -26,7 +27,7 @@ function AppLayout() {
 
     handleResize(); // Set initial state
     window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize); // Corrected event listener cleanup
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   const isAuthPage = location.pathname === '/login';
@@ -49,8 +50,9 @@ function AppLayout() {
             <Route path="/login" element={<Login />} />
             <Route path="/add-contact" element={<AddContact />} />
             <Route path="/contacts/:id" element={<ContactDetail />} />
+            <Route path="/contacts/edit/:id" element={<EditContact />} /> {/* New route for editing */}
             <Route path="/groups" element={<Groups />} />
-            <Route path="*" element={<NotFound />} /> {/* Add catch-all route for 404 */}
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </main>
       </div>

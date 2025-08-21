@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/integrations/supabase/auth";
 import { showSuccess, showError, showLoading, dismissToast } from "@/utils/toast";
 import { useNavigate } from "react-router-dom";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 
 // Define types for contact data
 interface PhoneNumber {
@@ -31,13 +32,44 @@ interface Contact {
   avatarUrl?: string; // Assuming this might come from profiles or be generated
 }
 
-const ContactItem = ({ contact }: { contact: Contact }) => {
+const ContactItem = ({ contact, onContactDeleted, onContactEdited }: { contact: Contact; onContactDeleted: (id: string) => void; onContactEdited: (id: string) => void }) => {
   const navigate = useNavigate();
   const displayPhoneNumber = contact.phone_numbers.length > 0 ? contact.phone_numbers[0].phone_number : "بدون شماره";
   const displayEmail = contact.email_addresses.length > 0 ? contact.email_addresses[0].email_address : undefined;
 
   const handleContactClick = () => {
     navigate(`/contacts/${contact.id}`);
+  };
+
+  const handleDelete = async (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent navigating to detail page
+    const toastId = showLoading("در حال حذف مخاطب...");
+    try {
+      // Delete associated phone numbers and email addresses first (due to foreign key constraints if not CASCADE)
+      // Assuming CASCADE DELETE is set up in DB, otherwise explicit deletion is needed.
+      // For now, relying on CASCADE DELETE from 'contacts' table.
+
+      const { error } = await supabase
+        .from("contacts")
+        .delete()
+        .eq("id", contact.id);
+
+      if (error) throw error;
+
+      showSuccess("مخاطب با موفقیت حذف شد.");
+      onContactDeleted(contact.id); // Notify parent to refresh list
+    } catch (error: any) {
+      console.error("Error deleting contact:", error);
+      showError(`خطا در حذف مخاطب: ${error.message || "خطای ناشناخته"}`);
+    } finally {
+      dismissToast(toastId);
+    }
+  };
+
+  const handleEditClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent navigating to detail page
+    onContactEdited(contact.id); // Notify parent or navigate directly
+    navigate(`/contacts/edit/${contact.id}`);
   };
 
   return (
@@ -67,12 +99,28 @@ const ContactItem = ({ contact }: { contact: Contact }) => {
         </div>
       </div>
       <div className="flex gap-2">
-        <Button variant="ghost" size="icon" className="text-blue-600 hover:bg-blue-100 dark:text-blue-400 dark:hover:bg-gray-600/50 transition-all duration-200" onClick={(e) => e.stopPropagation()}>
+        <Button variant="ghost" size="icon" className="text-blue-600 hover:bg-blue-100 dark:text-blue-400 dark:hover:bg-gray-600/50 transition-all duration-200" onClick={handleEditClick}>
           <Edit size={20} />
         </Button>
-        <Button variant="ghost" size="icon" className="text-red-600 hover:bg-red-100 dark:text-red-400 dark:hover:bg-gray-600/50 transition-all duration-200" onClick={(e) => e.stopPropagation()}>
-          <Trash2 size={20} />
-        </Button>
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button variant="ghost" size="icon" className="text-red-600 hover:bg-red-100 dark:text-red-400 dark:hover:bg-gray-600/50 transition-all duration-200" onClick={(e) => e.stopPropagation()}>
+              <Trash2 size={20} />
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent className="glass rounded-xl p-6">
+            <AlertDialogHeader>
+              <AlertDialogTitle className="text-gray-800 dark:text-gray-100">آیا از حذف این مخاطب مطمئن هستید؟</AlertDialogTitle>
+              <AlertDialogDescription className="text-gray-600 dark:text-gray-300">
+                این عمل قابل بازگشت نیست. این مخاطب برای همیشه حذف خواهد شد.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-100">لغو</AlertDialogCancel>
+              <AlertDialogAction onClick={handleDelete} className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold">حذف</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </Card>
   );
@@ -84,66 +132,80 @@ const ContactList = () => {
   const [loadingContacts, setLoadingContacts] = useState(true);
   const [isFetchingRemote, setIsFetchingRemote] = useState(false);
 
-  useEffect(() => {
-    const fetchContacts = async () => {
-      if (isSessionLoading) return;
+  const fetchContacts = async () => {
+    if (isSessionLoading) return;
 
-      if (!session?.user) {
-        setContacts([]);
-        setLoadingContacts(false);
-        return;
-      }
+    if (!session?.user) {
+      setContacts([]);
+      setLoadingContacts(false);
+      return;
+    }
 
-      let toastId: string | number | undefined;
+    let toastId: string | number | undefined;
 
-      // 1. Try to load from local storage first
-      const cachedData = localStorage.getItem('cachedContacts');
-      if (cachedData) {
-        try {
-          const parsedData = JSON.parse(cachedData);
-          setContacts(parsedData as Contact[]);
-          setLoadingContacts(false); // Data is available immediately
-          showSuccess("مخاطبین از حافظه محلی بارگذاری شدند.");
-        } catch (e) {
-          console.error("Failed to parse cached contacts:", e);
-          localStorage.removeItem('cachedContacts'); // Clear corrupted cache
-        }
-      } else {
-        // If no cache, show loading toast immediately
-        toastId = showLoading("در حال بارگذاری مخاطبین...");
-      }
-
-      setIsFetchingRemote(true); // Indicate that remote fetch is starting
-
+    // 1. Try to load from local storage first
+    const cachedData = localStorage.getItem('cachedContacts');
+    if (cachedData) {
       try {
-        const { data, error } = await supabase
-          .from("contacts")
-          .select("*, phone_numbers(phone_number), email_addresses(email_address)")
-          .eq("user_id", session.user.id);
-
-        if (error) throw error;
-
-        // 2. Update state and cache with fresh data
-        setContacts(data as Contact[]);
-        localStorage.setItem('cachedContacts', JSON.stringify(data));
-        if (toastId) dismissToast(toastId); // Dismiss initial loading toast if it was shown
-        showSuccess("مخاطبین با موفقیت از سرور به‌روزرسانی شدند.");
-      } catch (error: any) {
-        console.error("Error fetching contacts from Supabase:", error);
-        if (toastId) dismissToast(toastId); // Dismiss initial loading toast
-        showError(`خطا در بارگذاری مخاطبین از سرور: ${error.message || "خطای ناشناخته"}`);
-        // If there was an error and no cached data was available, set contacts to empty
-        if (!cachedData) {
-          setContacts([]);
-        }
-      } finally {
-        setLoadingContacts(false); // Final loading state update
-        setIsFetchingRemote(false); // Remote fetch finished
+        const parsedData = JSON.parse(cachedData);
+        setContacts(parsedData as Contact[]);
+        setLoadingContacts(false); // Data is available immediately
+        // showSuccess("مخاطبین از حافظه محلی بارگذاری شدند."); // Commented out to avoid too many toasts
+      } catch (e) {
+        console.error("Failed to parse cached contacts:", e);
+        localStorage.removeItem('cachedContacts'); // Clear corrupted cache
       }
-    };
+    } else {
+      // If no cache, show loading toast immediately
+      toastId = showLoading("در حال بارگذاری مخاطبین...");
+    }
 
+    setIsFetchingRemote(true); // Indicate that remote fetch is starting
+
+    try {
+      const { data, error } = await supabase
+        .from("contacts")
+        .select("*, phone_numbers(phone_number), email_addresses(email_address)")
+        .eq("user_id", session.user.id)
+        .order("first_name", { ascending: true }); // Order by first name
+
+      if (error) throw error;
+
+      // 2. Update state and cache with fresh data
+      setContacts(data as Contact[]);
+      localStorage.setItem('cachedContacts', JSON.stringify(data));
+      if (toastId) dismissToast(toastId); // Dismiss initial loading toast if it was shown
+      // showSuccess("مخاطبین با موفقیت از سرور به‌روزرسانی شدند."); // Commented out to avoid too many toasts
+    } catch (error: any) {
+      console.error("Error fetching contacts from Supabase:", error);
+      if (toastId) dismissToast(toastId); // Dismiss initial loading toast
+      showError(`خطا در بارگذاری مخاطبین از سرور: ${error.message || "خطای ناشناخته"}`);
+      // If there was an error and no cached data was available, set contacts to empty
+      if (!cachedData) {
+        setContacts([]);
+      }
+    } finally {
+      setLoadingContacts(false); // Final loading state update
+      setIsFetchingRemote(false); // Remote fetch finished
+    }
+  };
+
+  useEffect(() => {
     fetchContacts();
-  }, [session, isSessionLoading]);
+  }, [session, isSessionLoading]); // Re-fetch when session changes
+
+  const handleContactDeleted = (deletedId: string) => {
+    setContacts(prevContacts => prevContacts.filter(contact => contact.id !== deletedId));
+    // Also update local storage
+    const updatedCache = contacts.filter(contact => contact.id !== deletedId);
+    localStorage.setItem('cachedContacts', JSON.stringify(updatedCache));
+  };
+
+  const handleContactEdited = (editedId: string) => {
+    // For now, we just trigger a re-fetch of all contacts to get the updated data
+    // In a larger app, you might update the specific contact in state.
+    fetchContacts();
+  };
 
   if (loadingContacts && !isFetchingRemote) {
     return <p className="text-center text-gray-500 dark:text-gray-400">در حال بارگذاری مخاطبین...</p>;
@@ -155,7 +217,12 @@ const ContactList = () => {
         <p className="text-center text-gray-500 dark:text-gray-400">هیچ مخاطبی یافت نشد.</p>
       ) : (
         contacts.map((contact) => (
-          <ContactItem key={contact.id} contact={contact} />
+          <ContactItem
+            key={contact.id}
+            contact={contact}
+            onContactDeleted={handleContactDeleted}
+            onContactEdited={handleContactEdited}
+          />
         ))
       )}
     </div>
