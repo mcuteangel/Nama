@@ -6,7 +6,8 @@ import { useEffect } from 'react';
 import { useSession } from '@/integrations/supabase/auth';
 import { MadeWithDyad } from '@/components/made-with-dyad';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@/components/ui/button'; // Ensure Button is imported
+import { Button } from '@/components/ui/button';
+import { Globe } from 'lucide-react'; // Import Globe icon
 
 const Login = () => {
   const navigate = useNavigate();
@@ -40,7 +41,7 @@ const Login = () => {
           {t('login.title')}
         </h2>
 
-        {/* Language Selector with Flag Buttons */}
+        {/* Language Selector with Buttons */}
         <div className="flex justify-center gap-4 mb-6">
           <Button
             variant="outline"
@@ -52,7 +53,7 @@ const Login = () => {
                 : 'bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-100 dark:hover:bg-gray-600'
             }`}
           >
-            <span className="text-2xl">🇮🇷</span>
+            <Globe size={20} />
             <span className="font-semibold">{t('settings.persian')}</span>
           </Button>
           <Button
@@ -65,7 +66,7 @@ const Login = () => {
                 : 'bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-100 dark:hover:bg-gray-600'
             }`}
           >
-            <span className="text-2xl">🇬🇧</span>
+            <Globe size={20} />
             <span className="font-semibold">{t('settings.english')}</span>
           </Button>
         </div>
