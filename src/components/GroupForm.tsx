@@ -1,157 +1,138 @@
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { supabase } from "@/integrations/supabase/client";
-import { showSuccess, showError, showLoading, dismissToast } from "@/utils/toast";
-import { HexColorPicker } from "react-colorful";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { useState } from "react";
+import React, { useState, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
+import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
+import { useNavigate } from 'react-router-dom';
+import ColorPicker from './ColorPicker'; // Corrected import statement
 
-// Define the schema for the form using Zod
 const formSchema = z.object({
-  name: z.string().min(1, { message: "نام گروه الزامی است." }),
+  name: z.string().min(1, { message: 'نام گروه نمی‌تواند خالی باشد.' }),
   color: z.string().optional(),
 });
 
+type GroupFormValues = z.infer<typeof formSchema>;
+
 interface GroupFormProps {
-  initialData?: { id: string; name: string; color?: string };
+  initialData?: {
+    id: string;
+    name: string;
+    color?: string;
+  };
   onSuccess?: () => void;
 }
 
-const GroupForm = ({ initialData, onSuccess }: GroupFormProps) => {
-  const [displayColorPicker, setDisplayColorPicker] = useState(false);
-
-  const form = useForm<z.infer<typeof formSchema>>({
+const GroupForm: React.FC<GroupFormProps> = ({ initialData, onSuccess }) => {
+  const navigate = useNavigate();
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors, isSubmitting },
+  } = useForm<GroupFormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: initialData?.name || "",
-      color: initialData?.color || "#aabbcc", // Default color
-    },
+    defaultValues: initialData || { name: '', color: '#60A5FA' }, // Default color blue-400
   });
 
-  const handleColorChange = (color: string) => {
-    form.setValue("color", color);
-  };
+  const selectedColor = watch('color');
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    const toastId = showLoading(initialData ? "در حال به‌روزرسانی گروه..." : "در حال ذخیره گروه...");
+  useEffect(() => {
+    if (initialData) {
+      setValue('name', initialData.name);
+      setValue('color', initialData.color || '#60A5FA');
+    }
+  }, [initialData, setValue]);
+
+  const onSubmit = async (values: GroupFormValues) => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-
-      if (!user) {
-        showError("برای مدیریت گروه‌ها باید وارد شوید.");
-        dismissToast(toastId);
+      const user = await supabase.auth.getUser();
+      if (!user.data.user) {
+        toast.error('برای افزودن/ویرایش گروه باید وارد شوید.');
+        navigate('/login');
         return;
       }
+      const userId = user.data.user.id;
 
+      let error = null;
       if (initialData) {
         // Update existing group
-        const { error } = await supabase
-          .from("groups")
-          .update({
-            name: values.name,
-            color: values.color,
-          })
-          .eq("id", initialData.id)
-          .eq("user_id", user.id); // Ensure user owns the group
-
-        if (error) throw error;
-        showSuccess("گروه با موفقیت به‌روزرسانی شد!");
+        const { error: updateError } = await supabase
+          .from('groups')
+          .update({ name: values.name, color: values.color, user_id: userId })
+          .eq('id', initialData.id);
+        error = updateError;
       } else {
-        // Insert new group
-        const { error } = await supabase
-          .from("groups")
-          .insert({
-            user_id: user.id,
-            name: values.name,
-            color: values.color,
-          });
-
-        if (error) throw error;
-        showSuccess("گروه با موفقیت ذخیره شد!");
-        form.reset({ name: "", color: "#aabbcc" }); // Reset form for new entry
+        // Add new group
+        const { error: insertError } = await supabase
+          .from('groups')
+          .insert({ name: values.name, color: values.color, user_id: userId });
+        error = insertError;
       }
 
-      onSuccess?.(); // Call success callback
+      if (error) {
+        throw error;
+      }
+
+      toast.success(initialData ? 'گروه با موفقیت ویرایش شد.' : 'گروه با موفقیت اضافه شد.');
+      onSuccess?.();
+      navigate('/groups');
     } catch (error: any) {
-      console.error("Error saving group:", error);
-      showError(`خطا در ذخیره گروه: ${error.message || "خطای ناشناخته"}`);
-    } finally {
-      dismissToast(toastId);
+      console.error('Error saving group:', error);
+      toast.error(`خطا در ذخیره گروه: ${error.message || 'خطای ناشناخته'}`);
     }
-  }
+  };
 
   return (
-    <Card className="w-full max-w-md glass rounded-xl p-6">
+    <Card className="w-full max-w-md glass rounded-xl p-6 bg-white/90 dark:bg-gray-900/90">
       <CardHeader className="text-center">
         <CardTitle className="text-2xl font-bold text-gray-800 dark:text-gray-100">
           {initialData ? "ویرایش گروه" : "افزودن گروه جدید"}
         </CardTitle>
-        <CardDescription className="text-gray-600 dark:text-gray-300">
-          اطلاعات گروه را وارد کنید.
-        </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-gray-700 dark:text-gray-200">نام گروه</FormLabel>
-                  <FormControl>
-                    <Input placeholder="نام گروه" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+      <CardContent>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          <div>
+            <Label htmlFor="name" className="text-gray-700 dark:text-gray-300">نام گروه</Label>
+            <Input
+              id="name"
+              {...register('name')}
+              className="mt-1 block w-full bg-white/50 dark:bg-gray-800/50 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-gray-100"
+              disabled={isSubmitting}
             />
-            <FormField
-              control={form.control}
-              name="color"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-gray-700 dark:text-gray-200">رنگ گروه (اختیاری)</FormLabel>
-                  <FormControl>
-                    <Popover open={displayColorPicker} onOpenChange={setDisplayColorPicker}>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          className="w-full justify-start text-left font-normal bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100"
-                          style={{ backgroundColor: field.value || "transparent" }}
-                        >
-                          {field.value ? (
-                            <div className="flex items-center gap-2">
-                              <div
-                                className="w-4 h-4 rounded-full border"
-                                style={{ backgroundColor: field.value }}
-                              />
-                              {field.value}
-                            </div>
-                          ) : (
-                            "انتخاب رنگ"
-                          )}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0 backdrop-blur-md bg-white/80 dark:bg-gray-800/80 border border-white/30 dark:border-gray-600/30">
-                        <HexColorPicker color={field.value || "#aabbcc"} onChange={handleColorChange} />
-                      </PopoverContent>
-                    </Popover>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button type="submit" className="w-full px-6 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white font-semibold shadow-md transition-all duration-300 transform hover:scale-105">
-              {initialData ? "به‌روزرسانی گروه" : "ذخیره گروه"}
+            {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>}
+          </div>
+
+          <div>
+            <Label htmlFor="color" className="text-gray-700 dark:text-gray-300">رنگ گروه</Label>
+            <ColorPicker selectedColor={selectedColor} onSelectColor={(color) => setValue('color', color)} />
+            {errors.color && <p className="text-red-500 text-sm mt-1">{errors.color.message}</p>}
+          </div>
+
+          <CardFooter className="flex justify-end gap-4 p-0 pt-4">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => navigate('/groups')}
+              className="px-6 py-2 rounded-md text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              disabled={isSubmitting}
+            >
+              لغو
             </Button>
-          </form>
-        </Form>
+            <Button
+              type="submit"
+              className="px-6 py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white transition-colors"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? (initialData ? "در حال ویرایش..." : "در حال افزودن...") : (initialData ? "ویرایش" : "افزودن")}
+            </Button>
+          </CardFooter>
+        </form>
       </CardContent>
     </Card>
   );
