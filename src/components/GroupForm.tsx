@@ -80,8 +80,8 @@ const GroupForm: React.FC<GroupFormProps> = ({ initialData, onSuccess }) => {
       }
 
       toast.success(initialData ? 'گروه با موفقیت ویرایش شد.' : 'گروه با موفقیت اضافه شد.');
-      onSuccess?.();
-      navigate('/groups');
+      onSuccess?.(); // Call onSuccess to handle closing dialog and refreshing list
+      // Removed navigate('/groups'); as navigation should be handled by parent component
     } catch (error: any) {
       console.error('Error saving group:', error);
       toast.error(`خطا در ذخیره گروه: ${error.message || 'خطای ناشناخته'}`);
