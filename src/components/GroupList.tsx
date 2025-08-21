@@ -158,8 +158,11 @@ const GroupList = () => {
           <Button
             className="w-full px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-md transition-all duration-300 transform hover:scale-105"
           >
-            <PlusCircle size={20} className="me-2" />
-            افزودن گروه جدید
+            {/* Wrap the children in a single span */}
+            <span className="flex items-center gap-2">
+              <PlusCircle size={20} className="me-2" />
+              افزودن گروه جدید
+            </span>
           </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px] p-0 border-none bg-transparent shadow-none">
