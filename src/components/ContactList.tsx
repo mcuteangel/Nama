@@ -186,8 +186,44 @@ const ContactList = ({ searchTerm, selectedGroup, companyFilter, sortOption }: C
       }
 
       // Apply sorting
-      const [sortBy, sortOrder] = sortOption.split('_');
-      query = query.order(sortBy, { ascending: sortOrder === 'asc' });
+      let sortByColumn: string;
+      let ascendingOrder: boolean;
+
+      switch (sortOption) {
+        case "first_name_asc":
+          sortByColumn = "first_name";
+          ascendingOrder = true;
+          break;
+        case "first_name_desc":
+          sortByColumn = "first_name";
+          ascendingOrder = false;
+          break;
+        case "last_name_asc":
+          sortByColumn = "last_name";
+          ascendingOrder = true;
+          break;
+        case "last_name_desc":
+          sortByColumn = "last_name";
+          ascendingOrder = false;
+          break;
+        case "created_at_desc":
+          sortByColumn = "created_at";
+          ascendingOrder = false;
+          break;
+        case "created_at_asc":
+          sortByColumn = "created_at";
+          ascendingOrder = true;
+          break;
+        default:
+          // Fallback to a safe default if sortOption is unexpected
+          sortByColumn = "first_name";
+          ascendingOrder = true;
+          console.warn("Unexpected sortOption value:", sortOption, "Falling back to first_name_asc.");
+          break;
+      }
+
+      console.log("DEBUG: Applying sort - Column:", sortByColumn, "Ascending:", ascendingOrder);
+      query = query.order(sortByColumn, { ascending: ascendingOrder });
 
       const { data, error } = await query;
 
