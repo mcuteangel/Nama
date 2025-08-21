@@ -12,33 +12,18 @@ interface CustomFieldFormData {
   value: string;
 }
 
-const formSchema = z.object({
-  firstName: z.string().min(1, { message: "نام الزامی است." }),
-  lastName: z.string().min(1, { message: "نام خانوادگی الزامی است." }),
-  phoneNumber: z.string().regex(/^09\d{9}$/, { message: "شماره تلفن معتبر نیست (مثال: 09123456789)." }).optional().or(z.literal('')),
-  emailAddress: z.string().email({ message: "آدرس ایمیل معتبر نیست." }).optional().or(z.literal('')),
-  gender: z.enum(["male", "female", "not_specified"], { message: "جنسیت معتبر نیست." }).default("not_specified"),
-  position: z.string().optional(),
-  company: z.string().optional(),
-  address: z.string().optional(),
-  notes: z.string().optional(),
-  groupId: z.string().optional(),
-  customFields: z.array(z.object({
-    template_id: z.string().min(1, { message: "شناسه قالب فیلد سفارشی الزامی است." }),
-    value: z.string().min(1, { message: "مقدار فیلد سفارشی نمی‌تواند خالی باشد." }),
-  })).optional(),
-});
-
-type ContactFormValues = z.infer<typeof formSchema>;
+// The formSchema is now defined in ContactForm.tsx to allow dynamic validation
+// based on availableTemplates. This file will no longer define it.
+// type ContactFormValues = z.infer<typeof formSchema>; // This type will now be passed from ContactForm
 
 export const useContactFormLogic = (
   contactId: string | undefined,
   navigate: NavigateFunction,
   session: Session | null,
-  form: UseFormReturn<ContactFormValues>,
+  form: UseFormReturn<any>, // Use 'any' here as the specific schema is defined externally
   availableTemplates: CustomFieldTemplate[] // Pass available templates to logic
 ) => {
-  const onSubmit = async (values: ContactFormValues) => {
+  const onSubmit = async (values: any) => { // Use 'any' for values as schema is external
     const toastId = showLoading(contactId ? "در حال به‌روزرسانی مخاطب..." : "در حال ذخیره مخاطب...");
     try {
       const user = session?.user;
@@ -292,7 +277,7 @@ export const useContactFormLogic = (
 
         // Insert custom fields for new contact
         if (values.customFields && values.customFields.length > 0) {
-          const customFieldsToInsert = values.customFields.map(field => ({
+          const customFieldsToInsert = values.customFields.map((field: CustomFieldFormData) => ({
             user_id: user.id,
             contact_id: currentContactId,
             template_id: field.template_id,

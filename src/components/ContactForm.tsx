@@ -22,24 +22,6 @@ import { JalaliCalendar } from "@/components/JalaliCalendar";
 import { cn } from "@/lib/utils";
 import AddCustomFieldTemplateDialog from "./AddCustomFieldTemplateDialog";
 
-// Define the schema for the form using Zod
-const formSchema = z.object({
-  firstName: z.string().min(1, { message: "نام الزامی است." }),
-  lastName: z.string().min(1, { message: "نام خانوادگی الزامی است." }),
-  phoneNumber: z.string().regex(/^09\d{9}$/, { message: "شماره تلفن معتبر نیست (مثال: 09123456789)." }).optional().or(z.literal('')),
-  emailAddress: z.string().email({ message: "آدرس ایمیل معتبر نیست." }).optional().or(z.literal('')),
-  gender: z.enum(["male", "female", "not_specified"], { message: "جنسیت معتبر نیست." }).default("not_specified"),
-  position: z.string().optional(),
-  company: z.string().optional(),
-  address: z.string().optional(),
-  notes: z.string().optional(),
-  groupId: z.string().optional(),
-  customFields: z.array(z.object({
-    template_id: z.string().min(1, { message: "شناسه قالب فیلد سفارشی الزامی است." }),
-    value: z.string().min(1, { message: "مقدار فیلد سفارشی نمی‌تواند خالی باشد." }),
-  })).optional(),
-});
-
 interface ContactFormProps {
   initialData?: {
     id: string;
@@ -65,7 +47,41 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
   const [availableTemplates, setAvailableTemplates] = useState<CustomFieldTemplate[]>([]);
   const [loadingTemplates, setLoadingTemplates] = useState(true);
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  // Define the schema for the form using Zod, now with dynamic validation for custom fields
+  const formSchema = z.object({
+    firstName: z.string().min(1, { message: "نام الزامی است." }),
+    lastName: z.string().min(1, { message: "نام خانوادگی الزامی است." }),
+    phoneNumber: z.string().regex(/^09\d{9}$/, { message: "شماره تلفن معتبر نیست (مثال: 09123456789)." }).optional().or(z.literal('')),
+    emailAddress: z.string().email({ message: "آدرس ایمیل معتبر نیست." }).optional().or(z.literal('')),
+    gender: z.enum(["male", "female", "not_specified"], { message: "جنسیت معتبر نیست." }).default("not_specified"),
+    position: z.string().optional(),
+    company: z.string().optional(),
+    address: z.string().optional(),
+    notes: z.string().optional(),
+    groupId: z.string().optional(),
+    customFields: z.array(z.object({
+      template_id: z.string(),
+      value: z.string(), // Allow empty string initially
+    })).optional(),
+  }).superRefine((data, ctx) => {
+    // Custom validation for required custom fields based on availableTemplates
+    if (data.customFields && availableTemplates) {
+      data.customFields.forEach((field, index) => {
+        const template = availableTemplates.find(t => t.id === field.template_id);
+        if (template && template.required && !field.value.trim()) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: `${template.name} الزامی است.`, // Specific error message
+            path: [`customFields`, index, `value`], // Point to the specific field
+          });
+        }
+      });
+    }
+  });
+
+  type ContactFormValues = z.infer<typeof formSchema>;
+
+  const form = useForm<ContactFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       firstName: initialData?.first_name || "",
