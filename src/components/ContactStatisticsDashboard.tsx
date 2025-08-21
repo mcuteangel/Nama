@@ -9,10 +9,14 @@ import TotalContactsCard from "@/components/statistics/TotalContactsCard";
 import ContactsByGenderChart from "@/components/statistics/ContactsByGenderChart";
 import ContactsByGroupChart from "@/components/statistics/ContactsByGroupChart";
 import ContactsByPreferredMethodChart from "@/components/statistics/ContactsByPreferredMethodChart";
-import UpcomingBirthdaysList from "@/components/statistics/UpcomingBirthdaysList"; // Import new component
+import UpcomingBirthdaysList from "@/components/statistics/UpcomingBirthdaysList";
+import ContactsByCreationTimeChart from "@/components/statistics/ContactsByCreationTimeChart"; // New import
+import TopCompaniesList from "@/components/statistics/TopCompaniesList"; // New import
+import TopPositionsList from "@/components/statistics/TopPositionsList"; // New import
+import { Skeleton } from "@/components/ui/skeleton"; // Import Skeleton
 import { ContactService } from "@/services/contact-service";
 import { useTranslation } from "react-i18next";
-import { showLoading, dismissToast, showError } from "@/utils/toast"; // Import toast utilities
+import { showLoading, dismissToast, showError } from "@/utils/toast";
 
 interface GenderData {
   gender: string;
@@ -38,13 +42,31 @@ interface BirthdayContact {
   days_until_birthday: number;
 }
 
+interface CreationTimeData {
+  month_year: string;
+  count: number;
+}
+
+interface CompanyData {
+  company: string;
+  count: number;
+}
+
+interface PositionData {
+  position: string;
+  count: number;
+}
+
 interface StatisticsCache {
   timestamp: number;
   totalContacts: number | null;
   genderData: GenderData[];
   groupData: GroupData[];
   preferredMethodData: PreferredMethodData[];
-  upcomingBirthdays: BirthdayContact[]; // Add to cache interface
+  upcomingBirthdays: BirthdayContact[];
+  creationTimeData: CreationTimeData[]; // Add to cache interface
+  topCompaniesData: CompanyData[]; // Add to cache interface
+  topPositionsData: PositionData[]; // Add to cache interface
 }
 
 const CACHE_EXPIRATION_TIME = 5 * 60 * 1000; // 5 minutes in milliseconds
@@ -57,14 +79,18 @@ const ContactStatisticsDashboard: React.FC = () => {
   const [genderData, setGenderData] = useState<GenderData[]>([]);
   const [groupData, setGroupData] = useState<GroupData[]>([]);
   const [preferredMethodData, setPreferredMethodData] = useState<PreferredMethodData[]>([]);
-  const [upcomingBirthdays, setUpcomingBirthdays] = useState<BirthdayContact[]>([]); // New state
-  const [isLoadingInitial, setIsLoadingInitial] = useState(true); // For initial load, before any data (cached or fresh)
-  const [isFetchingRemote, setIsFetchingRemote] = useState(false); // For background revalidation
+  const [upcomingBirthdays, setUpcomingBirthdays] = useState<BirthdayContact[]>([]);
+  const [creationTimeData, setCreationTimeData] = useState<CreationTimeData[]>([]); // New state
+  const [topCompaniesData, setTopCompaniesData] = useState<CompanyData[]>([]); // New state
+  const [topPositionsData, setTopPositionsData] = useState<PositionData[]>([]); // New state
+
+  const [isLoadingInitial, setIsLoadingInitial] = useState(true);
+  const [isFetchingRemote, setIsFetchingRemote] = useState(false);
 
   const {
     executeAsync,
   } = useErrorHandler(null, {
-    showToast: false, // Toasts handled manually for caching logic
+    showToast: false,
     customErrorMessage: t('statistics.error_loading_stats'),
     onError: (error) => {
       ErrorManager.logError(error, { component: 'ContactStatisticsDashboard', action: 'fetchStatistics' });
@@ -82,7 +108,10 @@ const ContactStatisticsDashboard: React.FC = () => {
       setGenderData([]);
       setGroupData([]);
       setPreferredMethodData([]);
-      setUpcomingBirthdays([]); // Clear birthdays
+      setUpcomingBirthdays([]);
+      setCreationTimeData([]);
+      setTopCompaniesData([]);
+      setTopPositionsData([]);
       setIsLoadingInitial(false);
       return;
     }
@@ -102,29 +131,32 @@ const ContactStatisticsDashboard: React.FC = () => {
           setGenderData(cachedData.genderData);
           setGroupData(cachedData.groupData);
           setPreferredMethodData(cachedData.preferredMethodData);
-          setUpcomingBirthdays(cachedData.upcomingBirthdays); // Set from cache
+          setUpcomingBirthdays(cachedData.upcomingBirthdays);
+          setCreationTimeData(cachedData.creationTimeData);
+          setTopCompaniesData(cachedData.topCompaniesData);
+          setTopPositionsData(cachedData.topPositionsData);
           setIsLoadingInitial(false);
-          setIsFetchingRemote(false); // No need to fetch remotely if cache is fresh
-          return; // Exit early if cache is fresh
+          setIsFetchingRemote(false);
+          return;
         } else {
-          // Cache is stale, use it but revalidate in background
           setTotalContacts(cachedData.totalContacts);
           setGenderData(cachedData.genderData);
           setGroupData(cachedData.groupData);
           setPreferredMethodData(cachedData.preferredMethodData);
-          setUpcomingBirthdays(cachedData.upcomingBirthdays); // Set from cache
+          setUpcomingBirthdays(cachedData.upcomingBirthdays);
+          setCreationTimeData(cachedData.creationTimeData);
+          setTopCompaniesData(cachedData.topCompaniesData);
+          setTopPositionsData(cachedData.topPositionsData);
           setIsLoadingInitial(false);
-          // Proceed to fetch remotely in background
         }
       } catch (e) {
         console.error("Failed to parse cached statistics:", e);
-        localStorage.removeItem(cacheKey); // Clear corrupted cache
+        localStorage.removeItem(cacheKey);
       }
     }
 
-    // If no fresh cache, or cache is stale and we need to revalidate
     let toastId: string | number | undefined;
-    if (showLoadingToast && (!cachedData || !cachedData.totalContacts)) { // Only show loading if no data at all
+    if (showLoadingToast && (!cachedData || !cachedData.totalContacts)) {
       toastId = showLoading(t('statistics.loading_stats'));
     }
     
@@ -138,26 +170,38 @@ const ContactStatisticsDashboard: React.FC = () => {
         { data: genderStats, error: genderError },
         { data: groupStats, error: groupError },
         { data: methodStats, error: methodError },
-        { data: birthdaysData, error: birthdaysError }, // Fetch birthdays
+        { data: birthdaysData, error: birthdaysError },
+        { data: creationTimeStats, error: creationTimeError }, // Fetch creation time stats
+        { data: companiesStats, error: companiesError }, // Fetch top companies
+        { data: positionsStats, error: positionsError }, // Fetch top positions
       ] = await Promise.all([
         ContactService.getTotalContacts(userId),
         ContactService.getContactsByGender(userId),
         ContactService.getContactsByGroup(userId),
         ContactService.getContactsByPreferredMethod(userId),
-        ContactService.getUpcomingBirthdays(userId), // Call new service function
+        ContactService.getUpcomingBirthdays(userId),
+        ContactService.getContactsByCreationMonth(userId), // Call new service function
+        ContactService.getTopCompanies(userId), // Call new service function
+        ContactService.getTopPositions(userId), // Call new service function
       ]);
 
       if (totalError) throw new Error(totalError);
       if (genderError) throw new Error(genderError);
       if (groupError) throw new Error(groupError);
       if (methodError) throw new Error(methodError);
-      if (birthdaysError) throw new Error(birthdaysError); // Handle birthdays error
+      if (birthdaysError) throw new Error(birthdaysError);
+      if (creationTimeError) throw new Error(creationTimeError); // Handle error
+      if (companiesError) throw new Error(companiesError); // Handle error
+      if (positionsError) throw new Error(positionsError); // Handle error
 
       setTotalContacts(totalData);
       setGenderData(genderStats || []);
       setGroupData(groupStats || []);
       setPreferredMethodData(methodStats || []);
-      setUpcomingBirthdays(birthdaysData || []); // Set birthdays data
+      setUpcomingBirthdays(birthdaysData || []);
+      setCreationTimeData(creationTimeStats || []); // Set new state
+      setTopCompaniesData(companiesStats || []); // Set new state
+      setTopPositionsData(positionsStats || []); // Set new state
 
       const newCache: StatisticsCache = {
         timestamp: Date.now(),
@@ -165,7 +209,10 @@ const ContactStatisticsDashboard: React.FC = () => {
         genderData: genderStats || [],
         groupData: groupStats || [],
         preferredMethodData: methodStats || [],
-        upcomingBirthdays: birthdaysData || [], // Add to new cache
+        upcomingBirthdays: birthdaysData || [],
+        creationTimeData: creationTimeStats || [], // Add to new cache
+        topCompaniesData: companiesStats || [], // Add to new cache
+        topPositionsData: positionsStats || [], // Add to new cache
       };
       localStorage.setItem(cacheKey, JSON.stringify(newCache));
 
@@ -175,13 +222,15 @@ const ContactStatisticsDashboard: React.FC = () => {
       console.error("Error fetching statistics from Supabase:", error);
       if (toastId) dismissToast(toastId);
       ErrorManager.notifyUser(`${t('statistics.error_loading_stats')}: ${error.message || t('common.unknown_error')}`, 'error');
-      // If fetching fails and no cached data was available, clear states
       if (!cachedData) {
         setTotalContacts(null);
         setGenderData([]);
         setGroupData([]);
         setPreferredMethodData([]);
-        setUpcomingBirthdays([]); // Clear birthdays on error
+        setUpcomingBirthdays([]);
+        setCreationTimeData([]);
+        setTopCompaniesData([]);
+        setTopPositionsData([]);
       }
     } finally {
       setIsLoadingInitial(false);
@@ -190,13 +239,88 @@ const ContactStatisticsDashboard: React.FC = () => {
   }, [session, isSessionLoading, executeAsync, t]);
 
   useEffect(() => {
-    fetchStatistics(true); // Show loading toast for initial fetch
+    fetchStatistics(true);
   }, [fetchStatistics]);
+
+  const renderSkeleton = () => (
+    <>
+      <Card className="glass rounded-xl p-4 flex flex-col items-center justify-center text-center">
+        <CardHeader className="pb-2">
+          <Skeleton className="h-6 w-3/4 mb-2" />
+        </CardHeader>
+        <CardContent>
+          <Skeleton className="h-12 w-24" />
+        </CardContent>
+      </Card>
+      <Card className="glass rounded-xl p-4">
+        <CardHeader className="pb-2">
+          <Skeleton className="h-6 w-3/4 mb-2" />
+        </CardHeader>
+        <CardContent className="h-64 flex items-center justify-center">
+          <Skeleton className="h-full w-full rounded-full" />
+        </CardContent>
+      </Card>
+      <Card className="glass rounded-xl p-4">
+        <CardHeader className="pb-2">
+          <Skeleton className="h-6 w-3/4 mb-2" />
+        </CardHeader>
+        <CardContent className="h-64 flex items-center justify-center">
+          <Skeleton className="h-full w-full rounded-full" />
+        </CardContent>
+      </Card>
+      <Card className="glass rounded-xl p-4">
+        <CardHeader className="pb-2">
+          <Skeleton className="h-6 w-3/4 mb-2" />
+        </CardHeader>
+        <CardContent className="h-64 flex items-center justify-center">
+          <Skeleton className="h-full w-full rounded-full" />
+        </CardContent>
+      </Card>
+      <Card className="glass rounded-xl p-4 col-span-1 md:col-span-2 lg:col-span-1">
+        <CardHeader className="pb-2">
+          <Skeleton className="h-6 w-3/4 mb-2" />
+        </CardHeader>
+        <CardContent className="h-64 overflow-y-auto custom-scrollbar space-y-3">
+          {[...Array(4)].map((_, i) => (
+            <Skeleton key={i} className="h-12 w-full rounded-md" />
+          ))}
+        </CardContent>
+      </Card>
+      <Card className="glass rounded-xl p-4 col-span-1 md:col-span-2">
+        <CardHeader className="pb-2">
+          <Skeleton className="h-6 w-3/4 mb-2" />
+        </CardHeader>
+        <CardContent className="h-64 flex items-center justify-center">
+          <Skeleton className="h-full w-full" />
+        </CardContent>
+      </Card>
+      <Card className="glass rounded-xl p-4 col-span-1">
+        <CardHeader className="pb-2">
+          <Skeleton className="h-6 w-3/4 mb-2" />
+        </CardHeader>
+        <CardContent className="h-64 overflow-y-auto custom-scrollbar space-y-3">
+          {[...Array(4)].map((_, i) => (
+            <Skeleton key={i} className="h-12 w-full rounded-md" />
+          ))}
+        </CardContent>
+      </Card>
+      <Card className="glass rounded-xl p-4 col-span-1">
+        <CardHeader className="pb-2">
+          <Skeleton className="h-6 w-3/4 mb-2" />
+        </CardHeader>
+        <CardContent className="h-64 overflow-y-auto custom-scrollbar space-y-3">
+          {[...Array(4)].map((_, i) => (
+            <Skeleton key={i} className="h-12 w-full rounded-md" />
+          ))}
+        </CardContent>
+      </Card>
+    </>
+  );
 
   if (isLoadingInitial) {
     return (
-      <div className="text-center text-gray-500 dark:text-gray-400">
-        {t('statistics.loading_stats')}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+        {renderSkeleton()}
       </div>
     );
   }
@@ -207,8 +331,10 @@ const ContactStatisticsDashboard: React.FC = () => {
       <ContactsByGenderChart data={genderData} />
       <ContactsByGroupChart data={groupData} />
       <ContactsByPreferredMethodChart data={preferredMethodData} />
-      <UpcomingBirthdaysList data={upcomingBirthdays} /> {/* New component */}
-      {/* Add more statistics components here */}
+      <UpcomingBirthdaysList data={upcomingBirthdays} />
+      <ContactsByCreationTimeChart data={creationTimeData} />
+      <TopCompaniesList data={topCompaniesData} />
+      <TopPositionsList data={topPositionsData} />
     </div>
   );
 };

@@ -218,4 +218,28 @@ export const ContactService = {
     }
     return { data: data as Array<{ id: string; first_name: string; last_name: string; birthday: string; days_until_birthday: number }>, error: null };
   },
+
+  async getContactsByCreationMonth(userId: string): Promise<{ data: Array<{ month_year: string; count: number }> | null; error: string | null }> {
+    const { data, error } = await supabase.rpc('get_contacts_by_creation_month', { user_id_param: userId });
+    if (error) {
+      return { data: null, error: error.message };
+    }
+    return { data: data as Array<{ month_year: string; count: number }>, error: null };
+  },
+
+  async getTopCompanies(userId: string, limit: number = 5): Promise<{ data: Array<{ company: string; count: number }> | null; error: string | null }> {
+    const { data, error } = await supabase.rpc('get_top_companies', { user_id_param: userId, limit_param: limit });
+    if (error) {
+      return { data: null, error: error.message };
+    }
+    return { data: data as Array<{ company: string; count: number }>, error: null };
+  },
+
+  async getTopPositions(userId: string, limit: number = 5): Promise<{ data: Array<{ position: string; count: number }> | null; error: string | null }> {
+    const { data, error } = await supabase.rpc('get_top_positions', { user_id_param: userId, limit_param: limit });
+    if (error) {
+      return { data: null, error: error.message };
+    }
+    return { data: data as Array<{ position: string; count: number }>, error: null };
+  },
 };
