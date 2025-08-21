@@ -9,7 +9,8 @@ import EditContact from './pages/EditContact';
 import Groups from './pages/Groups';
 import CustomFields from './pages/CustomFields';
 import UserProfile from './pages/UserProfile';
-import Settings from './pages/Settings'; // Import Settings page
+import Settings from './pages/Settings';
+import Statistics from './pages/Statistics'; // Import Statistics page
 import { SessionContextProvider } from './integrations/supabase/auth';
 import { supabase } from './integrations/supabase/client';
 import MobileHeader from './components/MobileHeader';
@@ -21,7 +22,7 @@ import NotFound from './pages/NotFound';
 import ProtectedRoute from './components/ProtectedRoute';
 import { TooltipProvider } from './components/ui/tooltip';
 import { ThemeProvider } from 'next-themes';
-import { useTranslation } from 'react-i18next'; // Import useTranslation
+import { useTranslation } from 'react-i18next';
 
 function AppLayout() {
   const location = useLocation();
@@ -76,7 +77,8 @@ function AppLayout() {
             <Route path="/groups" element={<ProtectedRoute><Groups /></ProtectedRoute>} />
             <Route path="/custom-fields" element={<ProtectedRoute><CustomFields /></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
-            <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} /> {/* New Settings route */}
+            <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+            <Route path="/statistics" element={<ProtectedRoute><Statistics /></ProtectedRoute>} /> {/* New Statistics route */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </main>

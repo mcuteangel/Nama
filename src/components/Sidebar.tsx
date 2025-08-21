@@ -1,13 +1,13 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { LogOut, PlusCircle, Users, Home, Menu, Settings, User } from "lucide-react";
+import { LogOut, PlusCircle, Users, Home, Menu, Settings, User, BarChart2 } from "lucide-react"; // Import BarChart2
 import { supabase } from "@/integrations/supabase/client";
 import { showError, showSuccess, showLoading, dismissToast } from "@/utils/toast";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { ThemeToggle } from "./ThemeToggle";
-import { useTranslation } from 'react-i18next'; // Import useTranslation
+import { useTranslation } from 'react-i18next';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -16,7 +16,7 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
   const navigate = useNavigate();
-  const { t } = useTranslation(); // Initialize useTranslation
+  const { t } = useTranslation();
 
   const navItems = [
     { name: t('common.home'), icon: Home, path: "/" },
@@ -24,7 +24,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
     { name: t('common.groups'), icon: Users, path: "/groups" },
     { name: t('common.custom_fields'), icon: Settings, path: "/custom-fields" },
     { name: t('common.profile'), icon: User, path: "/profile" },
-    { name: t('common.settings'), icon: Settings, path: "/settings" }, // New navigation item for Settings
+    { name: t('common.statistics'), icon: BarChart2, path: "/statistics" }, // New navigation item for Statistics
+    { name: t('common.settings'), icon: Settings, path: "/settings" },
   ];
 
   const handleLogout = async () => {

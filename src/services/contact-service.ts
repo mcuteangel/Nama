@@ -1,5 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import { CustomFieldTemplate, CreateCustomFieldTemplateInput, UpdateCustomFieldTemplateInput } from '@/domain/schemas/custom-field-template';
+import moment from 'moment-jalaali'; // Import moment-jalaali for date calculations
 
 export const ContactService = {
   async getAllCustomFieldTemplates(): Promise<{ data: CustomFieldTemplate[] | null; error: string | null }> {
@@ -137,5 +138,111 @@ export const ContactService = {
       return { data: null, error: error.message };
     }
     return { data, error: null };
+  },
+
+  // --- New Statistics Functions ---
+
+  async getTotalContacts(userId: string): Promise<{ data: number | null; error: string | null }> {
+    const { count, error } = await supabase
+      .from('contacts')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', userId);
+
+    if (error) {
+      return { data: null, error: error.message };
+    }
+    return { data: count, error: null };
+  },
+
+  async getContactsByGender(userId: string): Promise<{ data: Array<{ gender: string; count: number }> | null; error: string | null }> {
+    const { data, error } = await supabase
+      .from('contacts')
+      .select('gender, count')
+      .eq('user_id', userId);
+
+    if (error) {
+      return { data: null, error: error.message };
+    }
+    return { data: data as Array<{ gender: string; count: number }>, error: null };
+  },
+
+  async getContactsByGroup(userId: string): Promise<{ data: Array<{ name: string; color?: string; count: number }> | null; error: string | null }> {
+    // This query fetches contacts and their associated group names and colors, then counts them.
+    // Supabase's `group` on joined tables can be tricky. We'll fetch the raw data and process it in client.
+    const { data, error } = await supabase
+      .from('contact_groups')
+      .select('groups(name, color)')
+      .eq('user_id', userId);
+
+    if (error) {
+      return { data: null, error: error.message };
+    }
+
+    const groupCounts: { [key: string]: { name: string; color?: string; count: number } } = {};
+
+    data.forEach((item: any) => {
+      const group = item.groups;
+      if (group) {
+        const groupName = group.name || 'بدون گروه';
+        if (groupCounts[groupName]) {
+          groupCounts[groupName].count++;
+        } else {
+          groupCounts[groupName] = { name: groupName, color: group.color, count: 1 };
+        }
+      } else {
+        // Handle contacts without a group explicitly
+        const noGroupName = 'بدون گروه';
+        if (groupCounts[noGroupName]) {
+          groupCounts[noGroupName].count++;
+        } else {
+          groupCounts[noGroupName] = { name: noGroupName, count: 1 };
+        }
+      }
+    });
+
+    return { data: Object.values(groupCounts), error: null };
+  },
+
+  async getContactsByPreferredMethod(userId: string): Promise<{ data: Array<{ method: string; count: number }> | null; error: string | null }> {
+    const { data, error } = await supabase
+      .from('contacts')
+      .select('preferred_contact_method, count')
+      .eq('user_id', userId)
+      .not('preferred_contact_method', 'is', null);
+
+    if (error) {
+      return { data: null, error: error.message };
+    }
+    // Map the data to the expected type
+    const formattedData = data.map(item => ({
+      method: item.preferred_contact_method,
+      count: item.count,
+    }));
+    return { data: formattedData as Array<{ method: string; count: number }>, error: null };
+  },
+
+  async getUpcomingBirthdays(userId: string): Promise<{ data: Array<{ first_name: string; last_name: string; birthday: string }> | null; error: string | null }> {
+    const currentMonth = moment().month() + 1; // Gregorian month (1-12)
+    const currentDay = moment().date(); // Gregorian day of month
+
+    const { data, error } = await supabase
+      .from('contacts')
+      .select('first_name, last_name, birthday')
+      .eq('user_id', userId)
+      .not('birthday', 'is', null)
+      .filter('EXTRACT(MONTH FROM birthday)', 'eq', currentMonth)
+      .order('EXTRACT(DAY FROM birthday)', { ascending: true });
+
+    if (error) {
+      return { data: null, error: error.message };
+    }
+
+    // Filter for upcoming birthdays in the current month (today and future)
+    const upcoming = data.filter(contact => {
+      const birthdayDate = new Date(contact.birthday);
+      return birthdayDate.getDate() >= currentDay;
+    });
+
+    return { data: upcoming as Array<{ first_name: string; last_name: string; birthday: string }>, error: null };
   },
 };
