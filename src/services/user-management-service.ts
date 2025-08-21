@@ -26,30 +26,15 @@ interface UpdateUserRoleInput {
 export const UserManagementService = {
   async getAllUsers(): Promise<{ data: UserProfile[] | null; error: string | null }> {
     try {
-      // Fetch users from auth.users and join with profiles for role and names
-      const { data: usersData, error: usersError } = await supabase.from('profiles').select(`
-        id,
-        first_name,
-        last_name,
-        role,
-        created_at,
-        auth_users:id(email)
-      `);
+      // Call the new Edge Function to get all users with their profiles
+      const { data, error } = await supabase.functions.invoke('get-all-users');
 
-      if (usersError) {
-        throw new Error(usersError.message);
+      if (error) {
+        throw new Error(error.message);
       }
 
-      const formattedUsers: UserProfile[] = usersData.map((profile: any) => ({
-        id: profile.id,
-        email: profile.auth_users?.email || 'N/A', // Get email from auth_users join
-        first_name: profile.first_name,
-        last_name: profile.last_name,
-        role: profile.role,
-        created_at: profile.created_at,
-      }));
-
-      return { data: formattedUsers, error: null };
+      // The Edge Function returns { users: UserProfile[] }
+      return { data: data.users as UserProfile[], error: null };
     } catch (err: any) {
       ErrorManager.logError(err, { context: 'UserManagementService.getAllUsers' });
       return { data: null, error: ErrorManager.getErrorMessage(err) };
