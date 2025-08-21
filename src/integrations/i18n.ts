@@ -15,17 +15,13 @@ const resources = {
   },
 };
 
-// Get stored language or default to 'fa'
-const storedLng = typeof window !== 'undefined' ? localStorage.getItem('i18nextLng') : null;
-const initialLng = storedLng || 'fa'; // Prioritize stored, then 'fa'
-
 i18n
   .use(LanguageDetector) // Detect user language
   .use(initReactI18next) // Pass i18n instance to react-i18next
   .init({
     resources,
-    lng: initialLng, // Explicitly set the initial language
-    fallbackLng: 'fa', // Default language if detection fails, set to Persian
+    lng: 'fa', // Explicitly set the initial language to Persian
+    fallbackLng: 'fa', // Fallback to Persian if a detected language is not available
     debug: false, // Set to true for debugging
     interpolation: {
       escapeValue: false, // React already escapes by default
