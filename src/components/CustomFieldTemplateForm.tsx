@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
@@ -32,6 +32,20 @@ const CustomFieldTemplateForm: React.FC<CustomFieldTemplateFormProps> = ({ initi
   const { session } = useSession();
   const navigate = useNavigate();
 
+  const onSuccessCallback = useCallback(() => {
+    console.log("CustomFieldTemplateForm: useErrorHandler onSuccess triggered.");
+    ErrorManager.notifyUser(initialData ? 'قالب با موفقیت ویرایش شد.' : 'قالب با موفقیت اضافه شد.', 'success');
+    onSuccess?.();
+  }, [initialData, onSuccess]);
+
+  const onErrorCallback = useCallback((err) => {
+    console.error("CustomFieldTemplateForm: useErrorHandler onError triggered.", err);
+    ErrorManager.logError(err, {
+      component: "CustomFieldTemplateForm",
+      action: initialData ? "updateTemplate" : "addTemplate",
+    });
+  }, [initialData]);
+
   const {
     isLoading: isSubmitting,
     error,
@@ -44,18 +58,8 @@ const CustomFieldTemplateForm: React.FC<CustomFieldTemplateFormProps> = ({ initi
     retryDelay: 1000,
     showToast: true,
     customErrorMessage: initialData ? "خطایی در ویرایش قالب فیلد سفارشی رخ داد" : "خطایی در افزودن قالب فیلد سفارشی رخ داد",
-    onSuccess: () => {
-      console.log("CustomFieldTemplateForm: useErrorHandler onSuccess triggered.");
-      ErrorManager.notifyUser(initialData ? 'قالب با موفقیت ویرایش شد.' : 'قالب با موفقیت اضافه شد.', 'success');
-      onSuccess?.();
-    },
-    onError: (err) => {
-      console.error("CustomFieldTemplateForm: useErrorHandler onError triggered.", err);
-      ErrorManager.logError(err, {
-        component: "CustomFieldTemplateForm",
-        action: initialData ? "updateTemplate" : "addTemplate",
-      });
-    }
+    onSuccess: onSuccessCallback,
+    onError: onErrorCallback,
   });
 
   const form = useForm<CreateCustomFieldTemplateInput>({

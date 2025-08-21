@@ -27,7 +27,15 @@ type ProfileFormValues = z.infer<typeof profileSchema>;
 const UserProfileForm: React.FC = () => {
   const { session, isLoading: isSessionLoading } = useSession();
 
-  // This useErrorHandler instance is primarily for the SUBMIT operation
+  const onSuccessSubmit = useCallback(() => {
+    ErrorManager.notifyUser('پروفایل با موفقیت به‌روزرسانی شد.', 'success');
+    invalidateCache(`user_profile_${session?.user?.id}`);
+  }, [session]);
+
+  const onErrorSubmit = useCallback((err: Error) => {
+    ErrorManager.logError(err, { component: "UserProfileForm", action: "submitProfile" });
+  }, []);
+
   const {
     isLoading: isSubmitting,
     error: submitError, // Renamed to avoid conflict
@@ -40,13 +48,8 @@ const UserProfileForm: React.FC = () => {
     retryDelay: 1000,
     showToast: true, // We want toast for submit success/error
     customErrorMessage: "خطایی در به‌روزرسانی پروفایل رخ داد",
-    onSuccess: () => {
-      ErrorManager.notifyUser('پروفایل با موفقیت به‌روزرسانی شد.', 'success');
-      invalidateCache(`user_profile_${session?.user?.id}`);
-    },
-    onError: (err) => {
-      ErrorManager.logError(err, { component: "UserProfileForm", action: "submitProfile" });
-    },
+    onSuccess: onSuccessSubmit,
+    onError: onErrorSubmit,
   });
 
   const form = useForm<ProfileFormValues>({

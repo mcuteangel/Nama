@@ -59,6 +59,15 @@ const GroupForm: React.FC<GroupFormProps> = ({ initialData, onSuccess, onCancel 
     return '#60A5FA';
   }, []);
 
+  const onSuccessCallback = useCallback(() => {
+    ErrorManager.notifyUser(initialData ? 'گروه با موفقیت ویرایش شد.' : 'گروه با موفقیت اضافه شد.', 'success');
+    onSuccess?.();
+  }, [initialData, onSuccess]);
+
+  const onErrorCallback = useCallback((err) => {
+    ErrorManager.logError(err, { component: "GroupForm", action: initialData ? "updateGroup" : "addGroup" });
+  }, [initialData]);
+
   const {
     isLoading: isSaving,
     error,
@@ -71,13 +80,8 @@ const GroupForm: React.FC<GroupFormProps> = ({ initialData, onSuccess, onCancel 
     retryDelay: 1000,
     showToast: true,
     customErrorMessage: initialData ? "خطایی در ویرایش گروه رخ داد" : "خطایی در افزودن گروه رخ داد",
-    onSuccess: () => {
-      ErrorManager.notifyUser(initialData ? 'گروه با موفقیت ویرایش شد.' : 'گروه با موفقیت اضافه شد.', 'success');
-      onSuccess?.();
-    },
-    onError: (err) => {
-      ErrorManager.logError(err, { component: "GroupForm", action: initialData ? "updateGroup" : "addGroup" });
-    }
+    onSuccess: onSuccessCallback,
+    onError: onErrorCallback,
   });
 
   useEffect(() => {

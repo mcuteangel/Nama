@@ -83,6 +83,16 @@ const ContactStatisticsDashboard: React.FC = () => {
     topPositionsData: [],
   });
 
+  const onSuccessStats = useCallback((result: { data: StatisticsData | null; error: string | null; fromCache: boolean }) => {
+    if (result && !result.fromCache) {
+      ErrorManager.notifyUser(t('statistics.stats_loaded_success'), 'success');
+    }
+  }, [t]);
+
+  const onErrorStats = useCallback((err) => {
+    ErrorManager.logError(err, { component: 'ContactStatisticsDashboard', action: 'fetchStatistics' });
+  }, []);
+
   const {
     isLoading, // This isLoading is from useErrorHandler
     executeAsync,
@@ -91,15 +101,8 @@ const ContactStatisticsDashboard: React.FC = () => {
     retryDelay: 1000,
     showToast: true,
     customErrorMessage: t('statistics.error_loading_stats'),
-    onSuccess: (result) => {
-      // Only show success toast if data was NOT from cache
-      if (result && !result.fromCache) {
-        ErrorManager.notifyUser(t('statistics.stats_loaded_success'), 'success');
-      }
-    },
-    onError: (err) => {
-      ErrorManager.logError(err, { component: 'ContactStatisticsDashboard', action: 'fetchStatistics' });
-    },
+    onSuccess: onSuccessStats,
+    onError: onErrorStats,
   });
 
   const fetchStatistics = useCallback(async () => {

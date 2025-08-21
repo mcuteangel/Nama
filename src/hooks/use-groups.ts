@@ -15,6 +15,16 @@ export const useGroups = () => {
   const { session, isLoading: isSessionLoading } = useSession();
   const [groups, setGroups] = useState<Group[]>([]);
 
+  const onSuccessGroups = useCallback((result: { data: Group[] | null; error: string | null; fromCache: boolean }) => {
+    if (result && !result.fromCache) {
+      ErrorManager.notifyUser("گروه‌ها با موفقیت بارگذاری شدند.", 'success');
+    }
+  }, []);
+
+  const onErrorGroups = useCallback((err) => {
+    ErrorManager.logError(err, { component: 'useGroups', action: 'fetchGroups' });
+  }, []);
+
   const {
     isLoading: loadingGroups,
     executeAsync,
@@ -23,15 +33,8 @@ export const useGroups = () => {
     retryDelay: 1000,
     showToast: true,
     customErrorMessage: "خطا در بارگذاری گروه‌ها",
-    onSuccess: (result) => {
-      // Only show success toast if data was NOT from cache
-      if (result && !result.fromCache) {
-        ErrorManager.notifyUser("گروه‌ها با موفقیت بارگذاری شدند.", 'success');
-      }
-    },
-    onError: (err) => {
-      ErrorManager.logError(err, { component: 'useGroups', action: 'fetchGroups' });
-    },
+    onSuccess: onSuccessGroups,
+    onError: onErrorGroups,
   });
 
   const fetchGroups = useCallback(async () => {

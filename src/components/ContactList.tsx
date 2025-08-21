@@ -55,6 +55,15 @@ const ContactItem = ({ contact, onContactDeleted, onContactEdited }: { contact: 
   const displayPhoneNumber = contact.phone_numbers.length > 0 ? contact.phone_numbers[0].phone_number : "بدون شماره";
   const displayEmail = contact.email_addresses.length > 0 ? contact.email_addresses[0].email_address : undefined;
 
+  const onSuccessDelete = useCallback(() => {
+    ErrorManager.notifyUser("مخاطب با موفقیت حذف شد.", 'success');
+    onContactDeleted(contact.id);
+  }, [contact.id, onContactDeleted]);
+
+  const onErrorDelete = useCallback((err: Error) => {
+    ErrorManager.logError(err, { component: 'ContactItem', action: 'deleteContact', contactId: contact.id });
+  }, [contact.id]);
+
   const {
     isLoading: isDeleting,
     executeAsync: executeDelete,
@@ -63,13 +72,8 @@ const ContactItem = ({ contact, onContactDeleted, onContactEdited }: { contact: 
     retryDelay: 1000,
     showToast: true,
     customErrorMessage: "خطا در حذف مخاطب",
-    onSuccess: () => {
-      ErrorManager.notifyUser("مخاطب با موفقیت حذف شد.", 'success');
-      onContactDeleted(contact.id);
-    },
-    onError: (err) => {
-      ErrorManager.logError(err, { component: 'ContactItem', action: 'deleteContact', contactId: contact.id });
-    },
+    onSuccess: onSuccessDelete,
+    onError: onErrorDelete,
   });
 
   const handleContactClick = () => {
@@ -152,6 +156,16 @@ const ContactList = ({ searchTerm, selectedGroup, companyFilter, sortOption }: C
   const { session, isLoading: isSessionLoading } = useSession();
   const [contacts, setContacts] = useState<Contact[]>([]);
 
+  const onSuccessFetch = useCallback((result: { data: Contact[] | null; error: string | null; fromCache: boolean }) => {
+    if (result && !result.fromCache) {
+      ErrorManager.notifyUser("مخاطبین با موفقیت بارگذاری شدند.", 'success');
+    }
+  }, []);
+
+  const onErrorFetch = useCallback((err: Error) => {
+    ErrorManager.logError(err, { component: 'ContactList', action: 'fetchContacts' });
+  }, []);
+
   const {
     isLoading,
     executeAsync,
@@ -160,15 +174,8 @@ const ContactList = ({ searchTerm, selectedGroup, companyFilter, sortOption }: C
     retryDelay: 1000,
     showToast: true,
     customErrorMessage: "خطا در بارگذاری مخاطبین",
-    onSuccess: (result) => { // Added result parameter
-      // Only show success toast if data was NOT from cache
-      if (result && !result.fromCache) {
-        ErrorManager.notifyUser("مخاطبین با موفقیت بارگذاری شدند.", 'success');
-      }
-    },
-    onError: (err) => {
-      ErrorManager.logError(err, { component: 'ContactList', action: 'fetchContacts' });
-    },
+    onSuccess: onSuccessFetch,
+    onError: onErrorFetch,
   });
 
   const fetchContacts = useCallback(async () => {

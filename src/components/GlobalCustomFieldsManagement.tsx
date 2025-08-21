@@ -35,35 +35,7 @@ export function GlobalCustomFieldsManagement() {
   const [customFields, setCustomFields] = useState<TemplateViewModel[]>([]);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingField, setEditingField] = useState<CustomFieldTemplate | null>(null);
-
-  // This useErrorHandler is for DELETE and EDIT operations, not for initial load
-  const {
-    isLoading: isOperationLoading, // Renamed to avoid conflict with loadTemplates's loading
-    error: operationError,
-    errorMessage: operationErrorMessage,
-    retryCount: operationRetryCount,
-    retry: retryOperation,
-    executeAsync: executeOperation,
-  } = useErrorHandler(null, {
-    maxRetries: 3,
-    retryDelay: 1000,
-    showToast: true,
-    customErrorMessage: "خطایی در مدیریت فیلدهای سفارشی رخ داد",
-    onError: (error) => {
-      ErrorManager.logError(error, {
-        component: 'GlobalCustomFieldsManagement',
-        action: 'customFieldsOperation',
-        metadata: {
-          operation: error.message.includes('دریافت') ? 'fetch' :
-                   error.message.includes('افزودن') ? 'add' :
-                   error.message.includes('ویرایش') ? 'edit' :
-                   error.message.includes('حذف') ? 'delete' : 'unknown'
-        }
-      });
-    }
-  });
-
-  const [loadingTemplates, setLoadingTemplates] = useState(true); // New state for loading templates
+  const [loadingTemplates, setLoadingTemplates] = useState(true); // Declared here
 
   const loadTemplates = useCallback(async () => {
     if (isSessionLoading || !session?.user) {
@@ -113,6 +85,42 @@ export function GlobalCustomFieldsManagement() {
     }
   }, [session, isSessionLoading]);
 
+  const onSuccessOperation = useCallback(() => {
+    ErrorManager.notifyUser("قالب با موفقیت حذف شد", "success");
+    invalidateCache(`custom_field_templates_${session?.user?.id}`);
+    loadTemplates();
+  }, [session, loadTemplates]);
+
+  const onErrorOperation = useCallback((error) => {
+    ErrorManager.logError(error, {
+      component: 'GlobalCustomFieldsManagement',
+      action: 'customFieldsOperation',
+      metadata: {
+        operation: error.message.includes('دریافت') ? 'fetch' :
+                   error.message.includes('افزودن') ? 'add' :
+                   error.message.includes('ویرایش') ? 'edit' :
+                   error.message.includes('حذف') ? 'delete' : 'unknown'
+      }
+    });
+  }, []);
+
+  // This useErrorHandler is for DELETE and EDIT operations, not for initial load
+  const {
+    isLoading: isOperationLoading, // Renamed to avoid conflict with loadTemplates's loading
+    error: operationError,
+    errorMessage: operationErrorMessage,
+    retryCount: operationRetryCount,
+    retry: retryOperation,
+    executeAsync: executeOperation,
+  } = useErrorHandler(null, {
+    maxRetries: 3,
+    retryDelay: 1000,
+    showToast: true,
+    customErrorMessage: "خطایی در مدیریت فیلدهای سفارشی رخ داد",
+    onSuccess: onSuccessOperation,
+    onError: onErrorOperation,
+  });
+
   useEffect(() => {
     loadTemplates();
   }, [loadTemplates]);
@@ -123,10 +131,6 @@ export function GlobalCustomFieldsManagement() {
       if (res.error) {
         throw new Error(res.error || "خطا در حذف قالب فیلد سفارشی");
       }
-
-      ErrorManager.notifyUser("قالب با موفقیت حذف شد", "success");
-      invalidateCache(`custom_field_templates_${session?.user?.id}`);
-      await loadTemplates();
     });
   };
 

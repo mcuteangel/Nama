@@ -28,6 +28,15 @@ const UserItem = ({ user, onUserUpdated, onUserDeleted }: { user: UserProfile; o
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const { t } = useTranslation();
 
+  const onSuccessDelete = useCallback(() => {
+    ErrorManager.notifyUser(t('user_management.user_deleted_success'), 'success');
+    onUserDeleted();
+  }, [t, onUserDeleted]);
+
+  const onErrorDelete = useCallback((err) => {
+    ErrorManager.logError(err, { component: 'UserList', action: 'deleteUser', userId: user.id });
+  }, [user.id]);
+
   const {
     isLoading: isDeleting,
     executeAsync: executeDelete,
@@ -36,13 +45,8 @@ const UserItem = ({ user, onUserUpdated, onUserDeleted }: { user: UserProfile; o
     retryDelay: 1000,
     showToast: true,
     customErrorMessage: t('user_management.error_deleting_user'),
-    onSuccess: useCallback(() => {
-      ErrorManager.notifyUser(t('user_management.user_deleted_success'), 'success');
-      onUserDeleted();
-    }, [t, onUserDeleted]),
-    onError: useCallback((err) => {
-      ErrorManager.logError(err, { component: 'UserList', action: 'deleteUser', userId: user.id });
-    }, [user.id]),
+    onSuccess: onSuccessDelete,
+    onError: onErrorDelete,
   });
 
   const handleDelete = async () => {
@@ -122,6 +126,14 @@ const UserList: React.FC = () => {
   const [isAddUserDialogOpen, setIsAddUserDialogOpen] = useState(false);
   const { t } = useTranslation();
 
+  const onSuccessDeleteList = useCallback(() => {
+    ErrorManager.notifyUser(t('user_management.user_deleted_success'), 'success');
+  }, [t]);
+
+  const onErrorDeleteList = useCallback((err) => {
+    ErrorManager.logError(err, { component: 'UserList', action: 'deleteUser' });
+  }, []);
+
   // This useErrorHandler is for the DELETE operation
   const {
     isLoading: isDeleting,
@@ -131,16 +143,19 @@ const UserList: React.FC = () => {
     retryDelay: 1000,
     showToast: true,
     customErrorMessage: t('user_management.error_deleting_user'),
-    onSuccess: useCallback(() => {
-      ErrorManager.notifyUser(t('user_management.user_deleted_success'), 'success');
-      // No need to call onUserDeleted here, fetchUsers will be called after this.
-    }, [t]),
-    onError: useCallback((err) => {
-      // This onError is for the overall hook, specific user.id is not available here.
-      // The UserItem's onError will log the specific user.id.
-      ErrorManager.logError(err, { component: 'UserList', action: 'deleteUser' });
-    }, []),
+    onSuccess: onSuccessDeleteList,
+    onError: onErrorDeleteList,
   });
+
+  const onSuccessFetchUsers = useCallback((result: { data: UserProfile[] | null; error: string | null; fromCache: boolean }) => {
+    if (result && !result.fromCache) {
+      ErrorManager.notifyUser(t('user_management.users_loaded_success'), 'success');
+    }
+  }, [t]);
+
+  const onErrorFetchUsers = useCallback((err) => {
+    ErrorManager.logError(err, { component: 'UserList', action: 'fetchUsers' });
+  }, []);
 
   // New useErrorHandler for FETCHING users
   const {
@@ -151,14 +166,8 @@ const UserList: React.FC = () => {
     retryDelay: 1000,
     showToast: false, // IMPORTANT: Set to false to control toast manually
     customErrorMessage: t('user_management.error_loading_users'),
-    onSuccess: (result) => {
-      if (result && !result.fromCache) {
-        ErrorManager.notifyUser(t('user_management.users_loaded_success'), 'success');
-      }
-    },
-    onError: (err) => {
-      ErrorManager.logError(err, { component: 'UserList', action: 'fetchUsers' });
-    },
+    onSuccess: onSuccessFetchUsers,
+    onError: onErrorFetchUsers,
   });
 
   const fetchUsers = useCallback(async () => {

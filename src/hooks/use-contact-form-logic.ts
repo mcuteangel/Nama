@@ -7,6 +7,7 @@ import { ContactFormValues, CustomFieldFormData } from "../types/contact.ts";
 import { invalidateCache } from "@/utils/cache-helpers";
 import { useErrorHandler } from "./use-error-handler"; // Import useErrorHandler
 import { ErrorManager } from "@/lib/error-manager"; // Import ErrorManager
+import { useCallback } from "react"; // Import useCallback
 
 export const useContactFormLogic = (
   contactId: string | undefined,
@@ -15,6 +16,23 @@ export const useContactFormLogic = (
   form: UseFormReturn<ContactFormValues>,
   availableTemplates: CustomFieldTemplate[]
 ) => {
+  const onSuccessCallback = useCallback(() => {
+    ErrorManager.notifyUser(contactId ? "مخاطب با موفقیت به‌روزرسانی شد!" : "مخاطب با موفقیت ذخیره شد!", 'success');
+    if (!contactId) { // Only reset form for new contacts
+      form.reset();
+    }
+    invalidateCache(`contacts_list_${session?.user?.id}_`); // Invalidate all contact lists for this user
+    invalidateCache(`statistics_dashboard_${session?.user?.id}`); // Invalidate statistics cache
+    if (contactId) {
+      invalidateCache(`contact_detail_${contactId}`); // Invalidate single contact cache
+    }
+    navigate("/"); // Navigate back to contacts list after success
+  }, [contactId, form, session, navigate]);
+
+  const onErrorCallback = useCallback((err: Error) => {
+    ErrorManager.logError(err, { component: "useContactFormLogic", action: contactId ? "updateContact" : "createContact" });
+  }, [contactId]);
+
   const {
     isLoading: isSubmitting,
     error,
@@ -27,21 +45,8 @@ export const useContactFormLogic = (
     retryDelay: 1000,
     showToast: true,
     customErrorMessage: contactId ? "خطایی در به‌روزرسانی مخاطب رخ داد" : "خطایی در ذخیره مخاطب رخ داد",
-    onSuccess: () => {
-      ErrorManager.notifyUser(contactId ? "مخاطب با موفقیت به‌روزرسانی شد!" : "مخاطب با موفقیت ذخیره شد!", 'success');
-      if (!contactId) { // Only reset form for new contacts
-        form.reset();
-      }
-      invalidateCache(`contacts_list_${session?.user?.id}_`); // Invalidate all contact lists for this user
-      invalidateCache(`statistics_dashboard_${session?.user?.id}`); // Invalidate statistics cache
-      if (contactId) {
-        invalidateCache(`contact_detail_${contactId}`); // Invalidate single contact cache
-      }
-      navigate("/"); // Navigate back to contacts list after success
-    },
-    onError: (err) => {
-      ErrorManager.logError(err, { component: "useContactFormLogic", action: contactId ? "updateContact" : "createContact" });
-    }
+    onSuccess: onSuccessCallback,
+    onError: onErrorCallback,
   });
 
   const onSubmit = async (values: ContactFormValues) => {
