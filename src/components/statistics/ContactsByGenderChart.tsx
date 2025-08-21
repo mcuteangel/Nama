@@ -33,7 +33,7 @@ const ContactsByGenderChart: React.FC<ContactsByGenderChartProps> = ({ data }) =
       </CardHeader>
       <CardContent className="h-64 flex items-center justify-center">
         {formattedData.length > 0 ? (
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height={256}>
             <RechartsPieChart>
               <Pie
                 data={formattedData}

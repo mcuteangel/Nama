@@ -26,7 +26,7 @@ const ContactsByCreationTimeChart: React.FC<ContactsByCreationTimeChartProps> = 
       </CardHeader>
       <CardContent className="h-64 flex items-center justify-center">
         {data.length > 0 ? (
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height={256}>
             <BarChart data={data} margin={{ top: 5, right: 10, left: 10, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.3} />
               <XAxis dataKey="month_year" tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }} />
