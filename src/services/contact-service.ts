@@ -209,4 +209,13 @@ export const ContactService = {
     // The RPC function already returns 'method' and 'count' in the correct format
     return { data: data as Array<{ method: string; count: number }>, error: null };
   },
+
+  async getUpcomingBirthdays(userId: string): Promise<{ data: Array<{ id: string; first_name: string; last_name: string; birthday: string; days_until_birthday: number }> | null; error: string | null }> {
+    const { data, error } = await supabase.rpc('get_upcoming_birthdays', { user_id_param: userId });
+
+    if (error) {
+      return { data: null, error: error.message };
+    }
+    return { data: data as Array<{ id: string; first_name: string; last_name: string; birthday: string; days_until_birthday: number }>, error: null };
+  },
 };

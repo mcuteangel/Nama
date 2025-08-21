@@ -9,13 +9,13 @@
     "statistics": "Statistics",
     "logout": "Logout",
     "logout_loading": "Logging out...",
-    "logout_success": "Logged out successfully.",
+    "logout_success": "Successfully logged out.",
     "logout_error": "Error logging out",
     "unknown_error": "Unknown error"
   },
   "settings": {
-    "title": "Settings",
-    "description": "Manage application settings",
+    "title": "App Settings",
+    "description": "Display settings, data management, and user profile",
     "display_settings": "Display Settings",
     "theme": "Theme",
     "calendar_type": "Calendar Type",
@@ -25,20 +25,22 @@
     "persian": "Persian",
     "english": "English",
     "data_management": "Data Management",
-    "export_contacts": "Export Contacts",
-    "import_contacts": "Import Contacts",
+    "export_contacts": "Export Contacts (CSV)",
+    "import_contacts": "Import Contacts (CSV) (Coming Soon)",
     "user_profile": "Edit User Profile"
   },
   "statistics": {
     "title": "Statistics Dashboard",
-    "description": "View key statistics about your contacts",
-    "error_loading_stats": "An error occurred while loading statistics.",
+    "description": "View statistics and insights about your contacts",
     "loading_stats": "Loading statistics...",
+    "stats_loaded_success": "Statistics loaded successfully.",
+    "error_loading_stats": "Error loading statistics",
     "total_contacts": "Total Contacts",
     "contacts_by_gender": "Contacts by Gender",
     "contacts_by_group": "Contacts by Group",
     "contacts_by_preferred_method": "Contacts by Preferred Contact Method",
-    "upcoming_birthdays": "Upcoming Birthdays (This Month)",
+    "upcoming_birthdays": "Upcoming Birthdays",
+    "no_data_available": "No data available.",
     "male": "Male",
     "female": "Female",
     "not_specified": "Not Specified",
@@ -46,7 +48,8 @@
     "phone": "Phone",
     "sms": "SMS",
     "any": "Any",
-    "no_data_available": "No data available to display.",
-    "no_upcoming_birthdays": "No upcoming birthdays found this month."
+    "today": "Today",
+    "days_away": "{{count}} days away",
+    "no_upcoming_birthdays": "No upcoming birthdays found."
   }
 }

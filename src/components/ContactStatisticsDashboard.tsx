@@ -9,6 +9,7 @@ import TotalContactsCard from "@/components/statistics/TotalContactsCard";
 import ContactsByGenderChart from "@/components/statistics/ContactsByGenderChart";
 import ContactsByGroupChart from "@/components/statistics/ContactsByGroupChart";
 import ContactsByPreferredMethodChart from "@/components/statistics/ContactsByPreferredMethodChart";
+import UpcomingBirthdaysList from "@/components/statistics/UpcomingBirthdaysList"; // Import new component
 import { ContactService } from "@/services/contact-service";
 import { useTranslation } from "react-i18next";
 import { showLoading, dismissToast, showError } from "@/utils/toast"; // Import toast utilities
@@ -29,12 +30,21 @@ interface PreferredMethodData {
   count: number;
 }
 
+interface BirthdayContact {
+  id: string;
+  first_name: string;
+  last_name: string;
+  birthday: string;
+  days_until_birthday: number;
+}
+
 interface StatisticsCache {
   timestamp: number;
   totalContacts: number | null;
   genderData: GenderData[];
   groupData: GroupData[];
   preferredMethodData: PreferredMethodData[];
+  upcomingBirthdays: BirthdayContact[]; // Add to cache interface
 }
 
 const CACHE_EXPIRATION_TIME = 5 * 60 * 1000; // 5 minutes in milliseconds
@@ -47,6 +57,7 @@ const ContactStatisticsDashboard: React.FC = () => {
   const [genderData, setGenderData] = useState<GenderData[]>([]);
   const [groupData, setGroupData] = useState<GroupData[]>([]);
   const [preferredMethodData, setPreferredMethodData] = useState<PreferredMethodData[]>([]);
+  const [upcomingBirthdays, setUpcomingBirthdays] = useState<BirthdayContact[]>([]); // New state
   const [isLoadingInitial, setIsLoadingInitial] = useState(true); // For initial load, before any data (cached or fresh)
   const [isFetchingRemote, setIsFetchingRemote] = useState(false); // For background revalidation
 
@@ -71,6 +82,7 @@ const ContactStatisticsDashboard: React.FC = () => {
       setGenderData([]);
       setGroupData([]);
       setPreferredMethodData([]);
+      setUpcomingBirthdays([]); // Clear birthdays
       setIsLoadingInitial(false);
       return;
     }
@@ -90,6 +102,7 @@ const ContactStatisticsDashboard: React.FC = () => {
           setGenderData(cachedData.genderData);
           setGroupData(cachedData.groupData);
           setPreferredMethodData(cachedData.preferredMethodData);
+          setUpcomingBirthdays(cachedData.upcomingBirthdays); // Set from cache
           setIsLoadingInitial(false);
           setIsFetchingRemote(false); // No need to fetch remotely if cache is fresh
           return; // Exit early if cache is fresh
@@ -99,6 +112,7 @@ const ContactStatisticsDashboard: React.FC = () => {
           setGenderData(cachedData.genderData);
           setGroupData(cachedData.groupData);
           setPreferredMethodData(cachedData.preferredMethodData);
+          setUpcomingBirthdays(cachedData.upcomingBirthdays); // Set from cache
           setIsLoadingInitial(false);
           // Proceed to fetch remotely in background
         }
@@ -124,22 +138,26 @@ const ContactStatisticsDashboard: React.FC = () => {
         { data: genderStats, error: genderError },
         { data: groupStats, error: groupError },
         { data: methodStats, error: methodError },
+        { data: birthdaysData, error: birthdaysError }, // Fetch birthdays
       ] = await Promise.all([
         ContactService.getTotalContacts(userId),
         ContactService.getContactsByGender(userId),
         ContactService.getContactsByGroup(userId),
         ContactService.getContactsByPreferredMethod(userId),
+        ContactService.getUpcomingBirthdays(userId), // Call new service function
       ]);
 
       if (totalError) throw new Error(totalError);
       if (genderError) throw new Error(genderError);
       if (groupError) throw new Error(groupError);
       if (methodError) throw new Error(methodError);
+      if (birthdaysError) throw new Error(birthdaysError); // Handle birthdays error
 
       setTotalContacts(totalData);
       setGenderData(genderStats || []);
       setGroupData(groupStats || []);
       setPreferredMethodData(methodStats || []);
+      setUpcomingBirthdays(birthdaysData || []); // Set birthdays data
 
       const newCache: StatisticsCache = {
         timestamp: Date.now(),
@@ -147,6 +165,7 @@ const ContactStatisticsDashboard: React.FC = () => {
         genderData: genderStats || [],
         groupData: groupStats || [],
         preferredMethodData: methodStats || [],
+        upcomingBirthdays: birthdaysData || [], // Add to new cache
       };
       localStorage.setItem(cacheKey, JSON.stringify(newCache));
 
@@ -162,6 +181,7 @@ const ContactStatisticsDashboard: React.FC = () => {
         setGenderData([]);
         setGroupData([]);
         setPreferredMethodData([]);
+        setUpcomingBirthdays([]); // Clear birthdays on error
       }
     } finally {
       setIsLoadingInitial(false);
@@ -187,7 +207,7 @@ const ContactStatisticsDashboard: React.FC = () => {
       <ContactsByGenderChart data={genderData} />
       <ContactsByGroupChart data={groupData} />
       <ContactsByPreferredMethodChart data={preferredMethodData} />
-      {/* UpcomingBirthdaysList component removed */}
+      <UpcomingBirthdaysList data={upcomingBirthdays} /> {/* New component */}
       {/* Add more statistics components here */}
     </div>
   );

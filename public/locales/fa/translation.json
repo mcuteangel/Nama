@@ -14,8 +14,8 @@
     "unknown_error": "خطای ناشناخته"
   },
   "settings": {
-    "title": "تنظیمات",
-    "description": "مدیریت تنظیمات برنامه",
+    "title": "تنظیمات برنامه",
+    "description": "تنظیمات نمایش، مدیریت داده و پروفایل کاربری",
     "display_settings": "تنظیمات نمایش",
     "theme": "پوسته",
     "calendar_type": "نوع تقویم",
@@ -24,21 +24,23 @@
     "language": "زبان",
     "persian": "فارسی",
     "english": "انگلیسی",
-    "data_management": "مدیریت داده‌ها",
-    "export_contacts": "خروجی گرفتن از مخاطبین",
-    "import_contacts": "ورودی گرفتن مخاطبین",
+    "data_management": "مدیریت داده",
+    "export_contacts": "خروجی گرفتن از مخاطبین (CSV)",
+    "import_contacts": "ورودی گرفتن مخاطبین (CSV) (به زودی)",
     "user_profile": "ویرایش پروفایل کاربری"
   },
   "statistics": {
-    "title": "داشبورد آمار",
-    "description": "نمایش آمارهای کلیدی مخاطبین شما",
-    "error_loading_stats": "خطایی در بارگذاری آمار رخ داد.",
+    "title": "داشبورد آماری",
+    "description": "نمایش آمار و اطلاعات مربوط به مخاطبین شما",
     "loading_stats": "در حال بارگذاری آمار...",
-    "total_contacts": "تعداد کل مخاطبین",
+    "stats_loaded_success": "آمار با موفقیت بارگذاری شد.",
+    "error_loading_stats": "خطا در بارگذاری آمار",
+    "total_contacts": "کل مخاطبین",
     "contacts_by_gender": "مخاطبین بر اساس جنسیت",
     "contacts_by_group": "مخاطبین بر اساس گروه",
     "contacts_by_preferred_method": "مخاطبین بر اساس روش ارتباط ترجیحی",
-    "upcoming_birthdays": "تولدهای پیش رو (این ماه)",
+    "upcoming_birthdays": "تولدهای پیش رو",
+    "no_data_available": "داده‌ای برای نمایش وجود ندارد.",
     "male": "مرد",
     "female": "زن",
     "not_specified": "نامشخص",
@@ -46,7 +48,8 @@
     "phone": "تلفن",
     "sms": "پیامک",
     "any": "هر کدام",
-    "no_data_available": "داده‌ای برای نمایش یافت نشد.",
-    "no_upcoming_birthdays": "هیچ تولدی در این ماه یافت نشد."
+    "today": "امروز",
+    "days_away": "{{count}} روز دیگر",
+    "no_upcoming_birthdays": "هیچ تولدی در آینده نزدیک یافت نشد."
   }
 }
