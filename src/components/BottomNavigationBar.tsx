@@ -1,7 +1,7 @@
 import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { LogOut, PlusCircle, Users, Home, Settings, User, BarChart2 } from "lucide-react"; // Import BarChart2
+import { LogOut, PlusCircle, Users, Home, User, BarChart2, ClipboardList } from "lucide-react"; // Import ClipboardList
 import { supabase } from "@/integrations/supabase/client";
 import { showError, showSuccess, showLoading, dismissToast } from "@/utils/toast";
 import { cn } from "@/lib/utils";
@@ -16,10 +16,10 @@ const BottomNavigationBar = () => {
     { name: t('common.home'), icon: Home, path: "/" },
     { name: t('common.add_contact'), icon: PlusCircle, path: "/add-contact" },
     { name: t('common.groups'), icon: Users, path: "/groups" },
-    { name: t('common.custom_fields'), icon: Settings, path: "/custom-fields" },
+    { name: t('common.custom_fields'), icon: ClipboardList, path: "/custom-fields" }, // Changed icon to ClipboardList
     { name: t('common.profile'), icon: User, path: "/profile" },
-    { name: t('common.statistics'), icon: BarChart2, path: "/statistics" }, // New navigation item for Statistics
-    { name: t('common.settings'), icon: Settings, path: "/settings" },
+    { name: t('common.statistics'), icon: BarChart2, path: "/statistics" },
+    { name: t('common.settings'), icon: ClipboardList, path: "/settings" }, // Keep Settings icon for general settings
   ];
 
   const handleLogout = async () => {

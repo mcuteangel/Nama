@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Phone, Mail, Building, Briefcase, MapPin, Info, User, Users, Tag, CalendarClock, Gift, Link as LinkIcon, Linkedin, Twitter, Instagram, Send, HomeIcon, Globe, Map } from "lucide-react"; // Import new icons
+import { Phone, Mail, Building, Briefcase, MapPin, Info, User, Users, Tag, CalendarClock, Gift, Link as LinkIcon, Linkedin, Twitter, Instagram, Send, HomeIcon, Globe, Map, ClipboardList } from "lucide-react"; // Import ClipboardList
 import { MadeWithDyad } from "@/components/made-with-dyad";
 import { useJalaliCalendar } from "@/hooks/use-jalali-calendar";
 
@@ -294,7 +294,7 @@ const ContactDetail = () => {
 
           {contact.custom_fields.length > 0 && (
             <div className="space-y-2 pt-4 border-t border-gray-200 dark:border-gray-700">
-              <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><Tag size={16} /> فیلدهای سفارشی</Label>
+              <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><ClipboardList size={16} /> فیلدهای سفارشی</Label>
               {contact.custom_fields.map((field) => (
                 <div key={field.id} className="flex flex-col gap-1">
                   <Label className="text-gray-700 dark:text-gray-200 text-sm font-medium">
