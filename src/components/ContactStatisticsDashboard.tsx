@@ -71,27 +71,42 @@ const ContactStatisticsDashboard: React.FC = () => {
 
       // Fetch total contacts
       const { data: totalData, error: totalError } = await ContactService.getTotalContacts(userId);
-      if (totalError) throw new Error(totalError);
+      if (totalError) {
+        console.error("Error fetching total contacts:", totalError);
+        throw new Error(totalError);
+      }
       setTotalContacts(totalData);
 
       // Fetch contacts by gender
       const { data: genderStats, error: genderError } = await ContactService.getContactsByGender(userId);
-      if (genderError) throw new Error(genderError);
+      if (genderError) {
+        console.error("Error fetching gender statistics:", genderError);
+        throw new Error(genderError);
+      }
       setGenderData(genderStats || []);
 
       // Fetch contacts by group
       const { data: groupStats, error: groupError } = await ContactService.getContactsByGroup(userId);
-      if (groupError) throw new Error(groupError);
+      if (groupError) {
+        console.error("Error fetching group statistics:", groupError);
+        throw new Error(groupError);
+      }
       setGroupData(groupStats || []);
 
       // Fetch contacts by preferred method
       const { data: methodStats, error: methodError } = await ContactService.getContactsByPreferredMethod(userId);
-      if (methodError) throw new Error(methodError);
+      if (methodError) {
+        console.error("Error fetching preferred method statistics:", methodError);
+        throw new Error(methodError);
+      }
       setPreferredMethodData(methodStats || []);
 
       // Fetch upcoming birthdays
       const { data: birthdays, error: birthdayError } = await ContactService.getUpcomingBirthdays(userId);
-      if (birthdayError) throw new Error(birthdayError);
+      if (birthdayError) {
+        console.error("Error fetching upcoming birthdays:", birthdayError);
+        throw new Error(birthdayError);
+      }
       setUpcomingBirthdays(birthdays || []);
 
     }, {

@@ -155,10 +155,7 @@ export const ContactService = {
   },
 
   async getContactsByGender(userId: string): Promise<{ data: Array<{ gender: string; count: number }> | null; error: string | null }> {
-    const { data, error } = await supabase
-      .from('contacts')
-      .select('gender, count')
-      .eq('user_id', userId);
+    const { data, error } = await supabase.rpc('get_gender_counts', { user_id_param: userId });
 
     if (error) {
       return { data: null, error: error.message };
@@ -204,21 +201,13 @@ export const ContactService = {
   },
 
   async getContactsByPreferredMethod(userId: string): Promise<{ data: Array<{ method: string; count: number }> | null; error: string | null }> {
-    const { data, error } = await supabase
-      .from('contacts')
-      .select('preferred_contact_method, count')
-      .eq('user_id', userId)
-      .not('preferred_contact_method', 'is', null);
+    const { data, error } = await supabase.rpc('get_preferred_method_counts', { user_id_param: userId });
 
     if (error) {
       return { data: null, error: error.message };
     }
-    // Map the data to the expected type
-    const formattedData = data.map(item => ({
-      method: item.preferred_contact_method,
-      count: item.count,
-    }));
-    return { data: formattedData as Array<{ method: string; count: number }>, error: null };
+    // The RPC function already returns 'method' and 'count' in the correct format
+    return { data: data as Array<{ method: string; count: number }>, error: null };
   },
 
   async getUpcomingBirthdays(userId: string): Promise<{ data: Array<{ first_name: string; last_name: string; birthday: string }> | null; error: string | null }> {
