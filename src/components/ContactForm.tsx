@@ -484,14 +484,17 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
               render={({ field }) => (
                 <FormItem className="flex-grow">
                   <FormLabel className="text-gray-700 dark:text-gray-200">گروه</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value || ""}>
+                  <Select
+                    onValueChange={(value) => field.onChange(value === "no-group-selected" ? "" : value)}
+                    value={field.value === "" ? "no-group-selected" : field.value}
+                  >
                     <FormControl>
                       <SelectTrigger className="w-full bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100">
                         <SelectValue placeholder="انتخاب گروه" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent className="backdrop-blur-md bg-white/80 dark:bg-gray-800/80 border border-white/30 dark:border-gray-600/30">
-                      <SelectItem value="">بدون گروه</SelectItem>
+                      <SelectItem value="no-group-selected">بدون گروه</SelectItem>
                       {groups.map((group) => (
                         <SelectItem key={group.id} value={group.id}>
                           {group.name}
