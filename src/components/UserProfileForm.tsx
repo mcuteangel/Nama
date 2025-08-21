@@ -37,21 +37,18 @@ const UserProfileForm: React.FC = () => {
     retryDelay: 1000,
     showToast: true,
     customErrorMessage: "خطایی در به‌روزرسانی پروفایل رخ داد",
-    onSuccess: () => {
-      ErrorManager.notifyUser('پروفایل با موفقیت به‌روزرسانی شد.', 'success');
-    },
+    // Removed onSuccess here, it will be handled directly in onSubmit
     onError: (err) => {
-      console.error("Supabase profile update error:", err);
+      console.error("Supabase profile operation error:", err);
       ErrorManager.logError(err, {
         component: "UserProfileForm",
-        action: "updateProfile",
+        action: "profileOperation",
       });
     }
   });
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
-    // Initialize with undefined to match optional() in schema
     defaultValues: {
       first_name: undefined,
       last_name: undefined,
@@ -75,9 +72,6 @@ const UserProfileForm: React.FC = () => {
           throw new Error(error.message || "خطا در دریافت اطلاعات پروفایل");
         }
 
-        // Reset form with fetched data. If data.first_name/last_name is null,
-        // use nullish coalescing (??) to convert it to undefined for optional() in schema.
-        // If it's an empty string, it will be set as an empty string.
         form.reset({
           first_name: data?.first_name ?? undefined,
           last_name: data?.last_name ?? undefined,
@@ -97,13 +91,12 @@ const UserProfileForm: React.FC = () => {
       return;
     }
 
-    await executeAsync(async () => {
+    const result = await executeAsync(async () => {
       const { error } = await supabase
         .from('profiles')
         .upsert(
           {
             id: session.user.id,
-            // Convert empty strings from form fields to null for database consistency
             first_name: values.first_name === '' ? null : values.first_name,
             last_name: values.last_name === '' ? null : values.last_name,
           },
@@ -117,6 +110,11 @@ const UserProfileForm: React.FC = () => {
       component: "UserProfileForm",
       action: "submitProfile"
     });
+
+    // Only show success toast if the submission was successful
+    if (result !== undefined) { // executeAsync returns undefined on error
+      ErrorManager.notifyUser('پروفایل با موفقیت به‌روزرسانی شد.', 'success');
+    }
   };
 
   if (isSessionLoading) {
