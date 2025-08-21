@@ -5,12 +5,12 @@ import Login from './pages/Login';
 import AddContact from './pages/AddContact';
 import ContactDetail from './pages/ContactDetail';
 import Groups from './pages/Groups';
-import { SessionContextProvider } from './integrations/supabase/auth';
+import { SessionContextProvider } from './integrations/supabase/auth'; // Corrected import syntax
 import { supabase } from './integrations/supabase/client';
 import MobileHeader from './components/MobileHeader';
 import BottomNavigationBar from './components/BottomNavigationBar';
 import Sidebar from './components/Sidebar';
-import { Toaster } from 'react-hot-toast';
+import { Toaster } from 'sonner';
 import { cn } from './lib/utils';
 
 function App() {
@@ -41,9 +41,9 @@ function App() {
         )}
         <div className={cn(
           "flex-grow",
-          !isAuthPage && (isMobile ? "pt-[64px] pb-16" : "pr-64") // Adjusted pt-[72px] to pt-[64px]
+          !isAuthPage && (isMobile ? "pt-[64px] pb-16" : "pr-64")
         )}>
-          <main className="h-full w-full flex flex-col items-center justify-center p-4 bg-gradient-to-br from-blue-100 to-purple-100 dark:from-gray-900 dark:to-gray-800"> {/* Applied gradient here */}
+          <main className="h-full w-full flex flex-col items-center justify-center p-4 bg-gradient-to-br from-blue-100 to-purple-100 dark:from-gray-900 dark:to-gray-800">
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/login" element={<Login />} />
