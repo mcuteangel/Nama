@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react';
 import {
@@ -10,7 +8,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import moment from 'moment-jalaali';
-import { useJalaliCalendar } from '@/hooks/use-jalali-calendar';
 
 interface JalaliCalendarProps {
   selected?: Date | undefined;

@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { MadeWithDyad } from "@/components/made-with-dyad";
-import JalaliCalendar from "@/components/JalaliCalendar"; // Import JalaliCalendar
+import { JalaliCalendar } from "@/components/JalaliCalendar"; // Changed to named import
 import { format } from "date-fns-jalali"; // Import format from date-fns-jalali
 
 const Home = () => {
