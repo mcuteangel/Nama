@@ -66,8 +66,8 @@ const Contacts = () => {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="relative flex-grow">
+          <div className="flex flex-col sm:flex-row gap-4 justify-between items-center">
+            <div className="relative flex-grow w-full sm:w-auto">
               <Input
                 type="text"
                 placeholder="جستجوی مخاطبین..."
@@ -77,13 +77,23 @@ const Contacts = () => {
               />
               <Search className="absolute inset-inline-start-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400" size={20} />
             </div>
-            <Button
-              onClick={handleAddContactClick}
-              className="flex items-center gap-2 px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-md transition-all duration-300 transform hover:scale-105"
-            >
-              <PlusCircle size={20} />
-              افزودن مخاطب جدید
-            </Button>
+            <div className="flex gap-2 w-full sm:w-auto">
+              <Button
+                onClick={handleAddContactClick}
+                className="flex items-center gap-2 px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-md transition-all duration-300 transform hover:scale-105 flex-grow sm:flex-grow-0"
+              >
+                <PlusCircle size={20} />
+                افزودن مخاطب جدید
+              </Button>
+              <Button
+                onClick={handleExportClick}
+                variant="outline"
+                className="flex items-center gap-2 px-6 py-2 rounded-lg text-gray-700 font-semibold shadow-md transition-all duration-300 transform hover:scale-105 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-100 dark:border-gray-600 flex-grow sm:flex-grow-0"
+              >
+                <Download size={20} />
+                خروجی
+              </Button>
+            </div>
           </div>
 
           {/* Filter and Sort Controls */}
@@ -134,14 +144,6 @@ const Contacts = () => {
               </Select>
             </div>
           </div>
-
-          <Button
-            onClick={handleExportClick}
-            className="w-full flex items-center gap-2 px-6 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white font-semibold shadow-md transition-all duration-300 transform hover:scale-105"
-          >
-            <Download size={20} />
-            خروجی گرفتن از مخاطبین (CSV)
-          </Button>
 
           <ContactList
             searchTerm={searchTerm}
