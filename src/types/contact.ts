@@ -23,13 +23,13 @@ export const contactFormSchema = z.object({
   gender: z.enum(["male", "female", "not_specified"], { message: "جنسیت معتبر نیست." }).default("not_specified"),
   position: z.string().optional(),
   company: z.string().optional(),
-  street: z.string().optional(), // New: Detailed address field
-  city: z.string().optional(),    // New: Detailed address field
-  state: z.string().optional(),   // New: Detailed address field
-  zipCode: z.string().optional(), // New: Detailed address field
-  country: z.string().optional(), // New: Detailed address field
-  notes: z.string().optional(),
-  groupId: z.string().optional(),
+  street: z.string().optional().nullable(), // New: Detailed address field
+  city: z.string().optional().nullable(),    // New: Detailed address field
+  state: z.string().optional().nullable(),   // New: Detailed address field
+  zipCode: z.string().optional().nullable(), // New: Detailed address field
+  country: z.string().optional().nullable(), // New: Detailed address field
+  notes: z.string().optional().nullable(),
+  groupId: z.string().optional().nullable(),
   birthday: z.string().optional().nullable(),
   avatarUrl: z.string().url({ message: "آدرس URL تصویر معتبر نیست." }).optional().nullable(), // New: Avatar URL
   preferredContactMethod: z.enum(['email', 'phone', 'sms', 'any'], { message: "روش ارتباط ترجیحی معتبر نیست." }).optional().nullable(), // New: Preferred contact method

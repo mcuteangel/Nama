@@ -55,14 +55,14 @@ interface ContactDetailType {
   first_name: string;
   last_name: string;
   gender: string;
-  position?: string;
-  company?: string;
-  street?: string; // New: Detailed address field
-  city?: string;    // New: Detailed address field
-  state?: string;   // New: Detailed address field
-  zip_code?: string; // New: Detailed address field
-  country?: string; // New: Detailed address field
-  notes?: string;
+  position?: string | null;
+  company?: string | null;
+  street?: string | null; // New: Detailed address field
+  city?: string | null;    // New: Detailed address field
+  state?: string | null;   // New: Detailed address field
+  zip_code?: string | null; // New: Detailed address field
+  country?: string | null; // New: Detailed address field
+  notes?: string | null;
   phone_numbers: PhoneNumber[];
   email_addresses: EmailAddress[];
   social_links: SocialLink[];

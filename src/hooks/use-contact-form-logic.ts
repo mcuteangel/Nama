@@ -35,14 +35,14 @@ export const useContactFormLogic = (
             first_name: values.firstName,
             last_name: values.lastName,
             gender: values.gender,
-            position: values.position,
-            company: values.company,
-            street: values.street === '' ? null : values.street, // New: Detailed address field
-            city: values.city === '' ? null : values.city,      // New: Detailed address field
-            state: values.state === '' ? null : values.state,   // New: Detailed address field
-            zip_code: values.zipCode === '' ? null : values.zipCode, // New: Detailed address field
-            country: values.country === '' ? null : values.country, // New: Detailed address field
-            notes: values.notes,
+            position: values.position || null,
+            company: values.company || null,
+            street: values.street || null, // New: Detailed address field
+            city: values.city || null,      // New: Detailed address field
+            state: values.state || null,   // New: Detailed address field
+            zip_code: values.zipCode || null, // New: Detailed address field
+            country: values.country || null, // New: Detailed address field
+            notes: values.notes || null,
             birthday: values.birthday || null,
             avatar_url: values.avatarUrl || null, // New: Avatar URL
             preferred_contact_method: values.preferredContactMethod || null, // New: Preferred contact method
@@ -82,7 +82,7 @@ export const useContactFormLogic = (
               .update({
                 phone_type: phone.phone_type,
                 phone_number: phone.phone_number,
-                extension: phone.extension === '' ? null : phone.extension,
+                extension: phone.extension || null,
               })
               .eq("id", phone.id)
               .eq("user_id", user.id);
@@ -96,7 +96,7 @@ export const useContactFormLogic = (
                 contact_id: contactId,
                 phone_type: phone.phone_type,
                 phone_number: phone.phone_number,
-                extension: phone.extension === '' ? null : phone.extension,
+                extension: phone.extension || null,
               });
             if (insertError) throw insertError;
           }
@@ -205,9 +205,9 @@ export const useContactFormLogic = (
             .select("contact_id, group_id")
             .eq("contact_id", contactId)
             .eq("user_id", user.id)
-            .single();
+            .maybeSingle(); // Use maybeSingle for cases where no record is found
 
-          if (fetchGroupError && fetchGroupError.code !== 'PGRST116') {
+          if (fetchGroupError && fetchGroupError.code !== 'PGRST116') { // PGRST116 means no rows found
             throw fetchGroupError;
           }
 
@@ -229,11 +229,13 @@ export const useContactFormLogic = (
             if (insertGroupError) throw insertGroupError;
           }
         } else {
-          await supabase
+          // If groupId is null/empty, delete any existing group assignment
+          const { error: deleteGroupError } = await supabase
             .from("contact_groups")
             .delete()
             .eq("contact_id", contactId)
             .eq("user_id", user.id);
+          if (deleteGroupError) throw deleteGroupError;
         }
 
         // Handle custom fields update/insert/delete
@@ -245,6 +247,7 @@ export const useContactFormLogic = (
 
         const newCustomFields = values.customFields || [];
 
+        // Delete removed custom fields (if a template was removed from the global list, or value cleared)
         const fieldsToDelete = existingCustomFields.filter(
           (existingField) => !newCustomFields.some((newField) => newField.template_id === existingField.template_id)
         );
@@ -259,6 +262,7 @@ export const useContactFormLogic = (
         for (const field of newCustomFields) {
           const existingField = existingCustomFields.find(f => f.template_id === field.template_id);
           if (existingField) {
+            // Update if value changed
             if (existingField.field_value !== field.value) {
               const { error: updateError } = await supabase
                 .from("custom_fields")
@@ -268,15 +272,18 @@ export const useContactFormLogic = (
               if (updateError) throw updateError;
             }
           } else {
-            const { error: insertError } = await supabase
-              .from("custom_fields")
-              .insert({
-                user_id: user.id,
-                contact_id: contactId,
-                template_id: field.template_id,
-                field_value: field.value,
-              });
-            if (insertError) throw insertError;
+            // Insert new custom field if it has a value
+            if (field.value && field.value.trim() !== '') {
+              const { error: insertError } = await supabase
+                .from("custom_fields")
+                .insert({
+                  user_id: user.id,
+                  contact_id: currentContactId,
+                  template_id: field.template_id,
+                  field_value: field.value,
+                });
+              if (insertError) throw insertError;
+            }
           }
         }
 
@@ -291,14 +298,14 @@ export const useContactFormLogic = (
             first_name: values.firstName,
             last_name: values.lastName,
             gender: values.gender,
-            position: values.position,
-            company: values.company,
-            street: values.street === '' ? null : values.street, // New: Detailed address field
-            city: values.city === '' ? null : values.city,      // New: Detailed address field
-            state: values.state === '' ? null : values.state,   // New: Detailed address field
-            zip_code: values.zipCode === '' ? null : values.zipCode, // New: Detailed address field
-            country: values.country === '' ? null : values.country, // New: Detailed address field
-            notes: values.notes,
+            position: values.position || null,
+            company: values.company || null,
+            street: values.street || null, // New: Detailed address field
+            city: values.city || null,      // New: Detailed address field
+            state: values.state || null,   // New: Detailed address field
+            zip_code: values.zipCode || null, // New: Detailed address field
+            country: values.country || null, // New: Detailed address field
+            notes: values.notes || null,
             birthday: values.birthday || null,
             avatar_url: values.avatarUrl || null, // New: Avatar URL
             preferred_contact_method: values.preferredContactMethod || null, // New: Preferred contact method
@@ -317,7 +324,7 @@ export const useContactFormLogic = (
             contact_id: currentContactId,
             phone_type: phone.phone_type,
             phone_number: phone.phone_number,
-            extension: phone.extension === '' ? null : phone.extension,
+            extension: phone.extension || null,
           }));
           const { error: phoneError } = await supabase
             .from("phone_numbers")
@@ -365,16 +372,20 @@ export const useContactFormLogic = (
         }
 
         if (values.customFields && values.customFields.length > 0) {
-          const customFieldsToInsert = values.customFields.map((field: CustomFieldFormData) => ({
-            user_id: user.id,
-            contact_id: currentContactId,
-            template_id: field.template_id,
-            field_value: field.value,
-          }));
-          const { error: customFieldsError } = await supabase
-            .from("custom_fields")
-            .insert(customFieldsToInsert);
-          if (customFieldsError) throw customFieldsError;
+          const customFieldsToInsert = values.customFields
+            .filter(field => field.value && field.value.trim() !== '') // Only insert if value is not empty
+            .map((field: CustomFieldFormData) => ({
+              user_id: user.id,
+              contact_id: currentContactId,
+              template_id: field.template_id,
+              field_value: field.value,
+            }));
+          if (customFieldsToInsert.length > 0) {
+            const { error: customFieldsError } = await supabase
+              .from("custom_fields")
+              .insert(customFieldsToInsert);
+            if (customFieldsError) throw customFieldsError;
+          }
         }
 
         showSuccess("مخاطب با موفقیت ذخیره شد!");

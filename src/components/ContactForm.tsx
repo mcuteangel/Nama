@@ -30,16 +30,16 @@ interface ContactFormProps {
     gender: "male" | "female" | "not_specified";
     position?: string;
     company?: string;
-    street?: string; // New: Detailed address field
-    city?: string;    // New: Detailed address field
-    state?: string;   // New: Detailed address field
-    zip_code?: string; // New: Detailed address field
-    country?: string; // New: Detailed address field
-    notes?: string;
+    street?: string | null; // New: Detailed address field
+    city?: string | null;    // New: Detailed address field
+    state?: string | null;   // New: Detailed address field
+    zip_code?: string | null; // New: Detailed address field
+    country?: string | null; // New: Detailed address field
+    notes?: string | null;
     phone_numbers?: { id?: string; phone_type: string; phone_number: string; extension?: string | null }[];
     email_addresses?: { id?: string; email_type: string; email_address: string }[];
     social_links?: { id?: string; type: string; url: string }[];
-    groupId?: string;
+    groupId?: string | null;
     birthday?: string | null;
     avatar_url?: string | null; // New: Avatar URL
     preferred_contact_method?: 'email' | 'phone' | 'sms' | 'any' | null; // New: Preferred contact method
@@ -69,7 +69,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
       if (data.customFields) {
         data.customFields.forEach((field, index) => {
           const template = availableTemplates.find((t: CustomFieldTemplate) => t.id === field.template_id);
-          if (template && template.required && !field.value.trim()) {
+          if (template && template.required && (!field.value || field.value.trim() === '')) {
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
               message: `${template.name} الزامی است.`,
@@ -89,16 +89,16 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
       gender: initialData?.gender || "not_specified",
       position: initialData?.position || "",
       company: initialData?.company || "",
-      street: initialData?.street || "", // New: Detailed address field
-      city: initialData?.city || "",      // New: Detailed address field
-      state: initialData?.state || "",    // New: Detailed address field
-      zipCode: initialData?.zip_code || "", // New: Detailed address field
-      country: initialData?.country || "", // New: Detailed address field
-      notes: initialData?.notes || "",
-      groupId: initialData?.groupId || "",
-      birthday: initialData?.birthday || null,
-      avatarUrl: initialData?.avatar_url || null, // New: Avatar URL
-      preferredContactMethod: initialData?.preferred_contact_method || null, // New: Preferred contact method
+      street: initialData?.street ?? null, // New: Detailed address field
+      city: initialData?.city ?? null,      // New: Detailed address field
+      state: initialData?.state ?? null,   // New: Detailed address field
+      zipCode: initialData?.zip_code ?? null, // New: Detailed address field
+      country: initialData?.country ?? null, // New: Detailed address field
+      notes: initialData?.notes ?? null,
+      groupId: initialData?.groupId ?? null,
+      birthday: initialData?.birthday ?? null,
+      avatarUrl: initialData?.avatar_url ?? null, // New: Avatar URL
+      preferredContactMethod: initialData?.preferred_contact_method ?? null, // New: Preferred contact method
       phoneNumbers: initialData?.phone_numbers || [],
       emailAddresses: initialData?.email_addresses || [],
       socialLinks: initialData?.social_links || [],
@@ -136,16 +136,16 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
         gender: initialData.gender,
         position: initialData.position,
         company: initialData.company,
-        street: initialData.street || "", // New: Detailed address field
-        city: initialData.city || "",      // New: Detailed address field
-        state: initialData.state || "",    // New: Detailed address field
-        zipCode: initialData.zip_code || "", // New: Detailed address field
-        country: initialData.country || "", // New: Detailed address field
-        notes: initialData.notes,
-        groupId: initialData.groupId || "",
-        birthday: initialData.birthday || null,
-        avatarUrl: initialData.avatar_url || null, // New: Avatar URL
-        preferredContactMethod: initialData.preferred_contact_method || null, // New: Preferred contact method
+        street: initialData.street ?? null, // New: Detailed address field
+        city: initialData.city ?? null,      // New: Detailed address field
+        state: initialData.state ?? null,    // New: Detailed address field
+        zipCode: initialData.zip_code ?? null, // New: Detailed address field
+        country: initialData.country ?? null, // New: Detailed address field
+        notes: initialData.notes ?? null,
+        groupId: initialData.groupId ?? null,
+        birthday: initialData.birthday ?? null,
+        avatarUrl: initialData.avatar_url ?? null, // New: Avatar URL
+        preferredContactMethod: initialData.preferred_contact_method ?? null, // New: Preferred contact method
         phoneNumbers: initialData.phone_numbers || [],
         emailAddresses: initialData.email_addresses || [],
         socialLinks: initialData.social_links || [],

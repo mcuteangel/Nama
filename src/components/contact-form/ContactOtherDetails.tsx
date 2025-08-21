@@ -30,10 +30,10 @@ const ContactOtherDetails: React.FC = () => {
                     if (value === "__ADD_NEW_GROUP__") {
                       setIsAddGroupDialogOpen(true);
                     } else {
-                      field.onChange(value === "no-group-selected" ? "" : value);
+                      field.onChange(value === "no-group-selected" ? null : value);
                     }
                   }}
-                  value={field.value === "" ? "no-group-selected" : field.value}
+                  value={field.value === null ? "no-group-selected" : field.value}
                 >
                   <FormControl>
                     <SelectTrigger className="w-full bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100">
@@ -73,7 +73,7 @@ const ContactOtherDetails: React.FC = () => {
             <FormItem>
               <FormLabel className="text-gray-700 dark:text-gray-200">شرکت</FormLabel>
               <FormControl>
-                <Input placeholder="مثال: شرکت X" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400" {...field} />
+                <Input placeholder="مثال: شرکت X" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400" {...field} value={field.value || ''} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -86,7 +86,7 @@ const ContactOtherDetails: React.FC = () => {
             <FormItem>
               <FormLabel className="text-gray-700 dark:text-gray-200">سمت/شغل</FormLabel>
               <FormControl>
-                <Input placeholder="مثال: مهندس نرم‌افزار" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400" {...field} />
+                <Input placeholder="مثال: مهندس نرم‌افزار" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400" {...field} value={field.value || ''} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -104,7 +104,7 @@ const ContactOtherDetails: React.FC = () => {
             <FormItem>
               <FormLabel className="text-gray-700 dark:text-gray-200">خیابان/کوچه</FormLabel>
               <FormControl>
-                <Input placeholder="مثال: خیابان آزادی" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400" {...field} />
+                <Input placeholder="مثال: خیابان آزادی" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400" {...field} value={field.value || ''} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -117,7 +117,7 @@ const ContactOtherDetails: React.FC = () => {
             <FormItem>
               <FormLabel className="text-gray-700 dark:text-gray-200">شهر</FormLabel>
               <FormControl>
-                <Input placeholder="مثال: تهران" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400" {...field} />
+                <Input placeholder="مثال: تهران" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400" {...field} value={field.value || ''} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -130,7 +130,7 @@ const ContactOtherDetails: React.FC = () => {
             <FormItem>
               <FormLabel className="text-gray-700 dark:text-gray-200">استان</FormLabel>
               <FormControl>
-                <Input placeholder="مثال: تهران" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400" {...field} />
+                <Input placeholder="مثال: تهران" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400" {...field} value={field.value || ''} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -143,7 +143,7 @@ const ContactOtherDetails: React.FC = () => {
             <FormItem>
               <FormLabel className="text-gray-700 dark:text-gray-200">کد پستی</FormLabel>
               <FormControl>
-                <Input placeholder="مثال: 12345-67890" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400" {...field} />
+                <Input placeholder="مثال: 12345-67890" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400" {...field} value={field.value || ''} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -156,7 +156,7 @@ const ContactOtherDetails: React.FC = () => {
             <FormItem>
               <FormLabel className="text-gray-700 dark:text-gray-200">کشور</FormLabel>
               <FormControl>
-                <Input placeholder="مثال: ایران" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400" {...field} />
+                <Input placeholder="مثال: ایران" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400" {...field} value={field.value || ''} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -172,7 +172,7 @@ const ContactOtherDetails: React.FC = () => {
           render={({ field }) => (
             <FormItem>
               <FormLabel className="text-gray-700 dark:text-gray-200">روش ارتباط ترجیحی</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value || ""}>
+              <Select onValueChange={(value) => field.onChange(value === "" ? null : value)} value={field.value || ""}>
                 <FormControl>
                   <SelectTrigger className="w-full bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100">
                     <SelectValue placeholder="انتخاب روش ارتباطی" />
@@ -199,7 +199,7 @@ const ContactOtherDetails: React.FC = () => {
             <FormItem className="col-span-full">
               <FormLabel className="text-gray-700 dark:text-gray-200">یادداشت‌ها</FormLabel>
               <FormControl>
-                <Textarea placeholder="یادداشت‌های اضافی" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400" {...field} />
+                <Textarea placeholder="یادداشت‌های اضافی" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400" {...field} value={field.value || ''} />
               </FormControl>
               <FormMessage />
             </FormItem>

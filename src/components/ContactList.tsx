@@ -27,14 +27,14 @@ interface Contact {
   first_name: string;
   last_name: string;
   gender: string;
-  position?: string;
-  company?: string;
-  street?: string; // New: Detailed address field
-  city?: string;    // New: Detailed address field
-  state?: string;   // New: Detailed address field
-  zip_code?: string; // New: Detailed address field
-  country?: string; // New: Detailed address field
-  notes?: string;
+  position?: string | null;
+  company?: string | null;
+  street?: string | null; // New: Detailed address field
+  city?: string | null;    // New: Detailed address field
+  state?: string | null;   // New: Detailed address field
+  zip_code?: string | null; // New: Detailed address field
+  country?: string | null; // New: Detailed address field
+  notes?: string | null;
   phone_numbers: PhoneNumber[];
   email_addresses: EmailAddress[];
   avatar_url?: string | null; // New: Avatar URL
@@ -171,11 +171,13 @@ const ContactList = ({ searchTerm, selectedGroup, companyFilter, sortOption }: C
     setIsFetchingRemote(true);
 
     try {
-      const { data, error } = await supabase
-        .from("contacts")
-        .select("id, first_name, last_name, gender, position, company, street, city, state, zip_code, country, notes, created_at, updated_at, birthday, avatar_url, preferred_contact_method, phone_numbers(phone_number, phone_type, extension), email_addresses(email_address, email_type), social_links(type, url), contact_groups(group_id), custom_fields(id, template_id, field_value, custom_field_templates(name, type, options))")
-        .eq("user_id", session.user.id)
-        .order("first_name", { ascending: true }); // Default sort
+      const { data, error } = await ContactService.getFilteredContacts(
+        session.user.id,
+        searchTerm,
+        selectedGroup,
+        companyFilter,
+        sortOption
+      );
 
       if (error) throw error;
 

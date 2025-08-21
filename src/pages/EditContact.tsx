@@ -46,18 +46,18 @@ interface ContactDetailType {
   first_name: string;
   last_name: string;
   gender: "male" | "female" | "not_specified";
-  position?: string;
-  company?: string;
-  street?: string; // New: Detailed address field
-  city?: string;    // New: Detailed address field
-  state?: string;   // New: Detailed address field
-  zip_code?: string; // New: Detailed address field
-  country?: string; // New: Detailed address field
-  notes?: string;
+  position?: string | null;
+  company?: string | null;
+  street?: string | null; // New: Detailed address field
+  city?: string | null;    // New: Detailed address field
+  state?: string | null;   // New: Detailed address field
+  zip_code?: string | null; // New: Detailed address field
+  country?: string | null; // New: Detailed address field
+  notes?: string | null;
   phone_numbers: PhoneNumber[]; // Now an array
   email_addresses: EmailAddress[]; // Now an array
   social_links: SocialLink[]; // New: Social Links
-  groupId?: string;
+  groupId?: string | null;
   birthday?: string | null;
   avatar_url?: string | null; // New: Avatar URL
   preferred_contact_method?: 'email' | 'phone' | 'sms' | 'any' | null; // New: Preferred contact method
@@ -98,7 +98,7 @@ const EditContact = () => {
             phone_numbers: data.phone_numbers || [],
             email_addresses: data.email_addresses || [],
             social_links: data.social_links || [], // New: Social Links
-            groupId: data.contact_groups[0]?.group_id || "",
+            groupId: data.contact_groups[0]?.group_id || null, // Ensure null for no group
             custom_fields: data.custom_fields || [],
           } as ContactDetailType;
 
