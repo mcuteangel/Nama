@@ -85,6 +85,8 @@
   }
   body {
     @apply bg-background text-foreground;
+    direction: rtl; /* Added for RTL support */
+    text-align: right; /* Added for RTL text alignment */
   }
 }
 
