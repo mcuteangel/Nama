@@ -203,13 +203,12 @@ export function GlobalCustomFieldsManagement() {
       {/* Single Edit Dialog for CustomFieldTemplateForm */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="sm:max-w-[500px] p-0 border-none bg-transparent shadow-none">
-          {editingField && (
-            <CustomFieldTemplateForm
-              initialData={editingField}
-              onSuccess={handleEditSuccess}
-              onCancel={handleEditCancel}
-            />
-          )}
+          {/* Always render CustomFieldTemplateForm, pass editingField as initialData */}
+          <CustomFieldTemplateForm
+            initialData={editingField || undefined}
+            onSuccess={handleEditSuccess}
+            onCancel={handleEditCancel}
+          />
         </DialogContent>
       </Dialog>
     </Card>
