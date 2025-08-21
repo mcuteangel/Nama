@@ -16,6 +16,7 @@ interface PhoneNumber {
   id: string;
   phone_type: string;
   phone_number: string;
+  extension?: string | null;
 }
 
 interface EmailAddress {
@@ -36,7 +37,7 @@ interface CustomField {
   id: string;
   template_id: string;
   field_value: string;
-  custom_field_templates: Array<{ // Changed to Array<...>
+  custom_field_templates: Array<{
     name: string;
     type: string;
     options?: string[];
@@ -82,7 +83,7 @@ const ContactDetail = () => {
       try {
         const { data, error } = await supabase
           .from("contacts")
-          .select("id, first_name, last_name, gender, position, company, address, notes, created_at, updated_at, phone_numbers(id, phone_type, phone_number), email_addresses(id, email_type, email_address), contact_groups(group_id, groups(name, color)), custom_fields(id, template_id, field_value, custom_field_templates(name, type, options))")
+          .select("id, first_name, last_name, gender, position, company, address, notes, created_at, updated_at, phone_numbers(id, phone_type, phone_number, extension), email_addresses(id, email_type, email_address), contact_groups(group_id, groups(name, color)), custom_fields(id, template_id, field_value, custom_field_templates(name, type, options))")
           .eq("id", id)
           .single();
 
@@ -182,7 +183,7 @@ const ContactDetail = () => {
             <div className="space-y-2">
               <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><Phone size={16} /> شماره تلفن‌ها</Label>
               {contact.phone_numbers.map((phone) => (
-                <Input key={phone.id} value={`${phone.phone_number} (${phone.phone_type})`} readOnly className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
+                <Input key={phone.id} value={`${phone.phone_number} (${phone.phone_type})${phone.extension ? ` - داخلی: ${phone.extension}` : ''}`} readOnly className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
               ))}
             </div>
           )}
@@ -223,7 +224,6 @@ const ContactDetail = () => {
             </div>
           )}
 
-          {/* Display Created At and Updated At */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
             <div>
               <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><CalendarClock size={16} /> تاریخ ایجاد</Label>

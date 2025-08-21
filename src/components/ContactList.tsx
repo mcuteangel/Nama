@@ -12,10 +12,13 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 // Define types for contact data
 interface PhoneNumber {
   phone_number: string;
+  phone_type: string; // Added phone_type
+  extension?: string | null; // Added extension
 }
 
 interface EmailAddress {
   email_address: string;
+  email_type: string; // Added email_type
 }
 
 interface Contact {
@@ -29,14 +32,14 @@ interface Contact {
   notes?: string;
   phone_numbers: PhoneNumber[];
   email_addresses: EmailAddress[];
-  avatarUrl?: string; // Assuming this might come from profiles or be generated
+  avatarUrl?: string;
 }
 
 interface ContactListProps {
   searchTerm: string;
-  selectedGroup: string; // New prop for group filter
-  companyFilter: string; // New prop for company filter
-  sortOption: string;    // New prop for sort option
+  selectedGroup: string;
+  companyFilter: string;
+  sortOption: string;
 }
 
 const ContactItem = ({ contact, onContactDeleted, onContactEdited }: { contact: Contact; onContactDeleted: (id: string) => void; onContactEdited: (id: string) => void }) => {
@@ -49,13 +52,9 @@ const ContactItem = ({ contact, onContactDeleted, onContactEdited }: { contact: 
   };
 
   const handleDelete = async (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent navigating to detail page
+    e.stopPropagation();
     const toastId = showLoading("در حال حذف مخاطب...");
     try {
-      // Delete associated phone numbers and email addresses first (due to foreign key constraints if not CASCADE)
-      // Assuming CASCADE DELETE is set up in DB, otherwise explicit deletion is needed.
-      // For now, relying on CASCADE DELETE from 'contacts' table.
-
       const { error } = await supabase
         .from("contacts")
         .delete()
@@ -64,7 +63,7 @@ const ContactItem = ({ contact, onContactDeleted, onContactEdited }: { contact: 
       if (error) throw error;
 
       showSuccess("مخاطب با موفقیت حذف شد.");
-      onContactDeleted(contact.id); // Notify parent to refresh list
+      onContactDeleted(contact.id);
     } catch (error: any) {
       console.error("Error deleting contact:", error);
       showError(`خطا در حذف مخاطب: ${error.message || "خطای ناشناخته"}`);
@@ -74,8 +73,8 @@ const ContactItem = ({ contact, onContactDeleted, onContactEdited }: { contact: 
   };
 
   const handleEditClick = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent navigating to detail page
-    onContactEdited(contact.id); // Notify parent or navigate directly
+    e.stopPropagation();
+    onContactEdited(contact.id);
     navigate(`/contacts/edit/${contact.id}`);
   };
 
@@ -150,42 +149,36 @@ const ContactList = ({ searchTerm, selectedGroup, companyFilter, sortOption }: C
 
     let toastId: string | number | undefined;
 
-    // 1. Try to load from local storage first
     const cachedData = localStorage.getItem('cachedContacts');
     if (cachedData) {
       try {
         const parsedData = JSON.parse(cachedData);
         setContacts(parsedData as Contact[]);
-        setLoadingContacts(false); // Data is available immediately
-        // showSuccess("مخاطبین از حافظه محلی بارگذاری شدند."); // Commented out to avoid too many toasts
+        setLoadingContacts(false);
       } catch (e) {
         console.error("Failed to parse cached contacts:", e);
-        localStorage.removeItem('cachedContacts'); // Clear corrupted cache
+        localStorage.removeItem('cachedContacts');
       }
     } else {
-      // If no cache, show loading toast immediately
       toastId = showLoading("در حال بارگذاری مخاطبین...");
     }
 
-    setIsFetchingRemote(true); // Indicate that remote fetch is starting
+    setIsFetchingRemote(true);
 
     try {
       let query = supabase
         .from("contacts")
-        .select("id, first_name, last_name, gender, position, company, address, notes, created_at, updated_at, phone_numbers(phone_number), email_addresses(email_address), contact_groups(group_id), custom_fields(id, template_id, field_value, custom_field_templates(name, type, options))")
+        .select("id, first_name, last_name, gender, position, company, address, notes, created_at, updated_at, phone_numbers(phone_number, phone_type, extension), email_addresses(email_address, email_type), contact_groups(group_id), custom_fields(id, template_id, field_value, custom_field_templates(name, type, options))")
         .eq("user_id", session.user.id);
 
-      // Apply group filter
       if (selectedGroup) {
         query = query.filter('contact_groups.group_id', 'eq', selectedGroup);
       }
 
-      // Apply company filter
       if (companyFilter) {
         query = query.ilike('company', `%${companyFilter}%`);
       }
 
-      // Apply sorting
       let sortByColumn: string;
       let ascendingOrder: boolean;
 
@@ -215,7 +208,6 @@ const ContactList = ({ searchTerm, selectedGroup, companyFilter, sortOption }: C
           ascendingOrder = true;
           break;
         default:
-          // Fallback to a safe default if sortOption is unexpected
           sortByColumn = "first_name";
           ascendingOrder = true;
           console.warn("Unexpected sortOption value:", sortOption, "Falling back to first_name_asc.");
@@ -229,43 +221,36 @@ const ContactList = ({ searchTerm, selectedGroup, companyFilter, sortOption }: C
 
       if (error) throw error;
 
-      // 2. Update state and cache with fresh data
       setContacts(data as Contact[]);
       localStorage.setItem('cachedContacts', JSON.stringify(data));
-      if (toastId) dismissToast(toastId); // Dismiss initial loading toast if it was shown
-      // showSuccess("مخاطبین با موفقیت از سرور به‌روزرسانی شدند."); // Commented out to avoid too many toasts
+      if (toastId) dismissToast(toastId);
     } catch (error: any) {
       console.error("Error fetching contacts from Supabase:", error);
-      if (toastId) dismissToast(toastId); // Dismiss initial loading toast
+      if (toastId) dismissToast(toastId);
       showError(`خطا در بارگذاری مخاطبین از سرور: ${error.message || "خطای ناشناخته"}`);
-      // If there was an error and no cached data was available, set contacts to empty
       if (!cachedData) {
         setContacts([]);
       }
     } finally {
-      setLoadingContacts(false); // Final loading state update
-      setIsFetchingRemote(false); // Remote fetch finished
+      setLoadingContacts(false);
+      setIsFetchingRemote(false);
     }
   };
 
   useEffect(() => {
     fetchContacts();
-  }, [session, isSessionLoading, selectedGroup, companyFilter, sortOption]); // Re-fetch when session or filters/sort options change
+  }, [session, isSessionLoading, selectedGroup, companyFilter, sortOption]);
 
   const handleContactDeleted = (deletedId: string) => {
     setContacts(prevContacts => prevContacts.filter(contact => contact.id !== deletedId));
-    // Also update local storage
     const updatedCache = contacts.filter(contact => contact.id !== deletedId);
     localStorage.setItem('cachedContacts', JSON.stringify(updatedCache));
   };
 
   const handleContactEdited = (editedId: string) => {
-    // For now, we just trigger a re-fetch of all contacts to get the updated data
-    // In a larger app, you might update the specific contact in state.
     fetchContacts();
   };
 
-  // Filter contacts based on searchTerm (client-side filtering for search term)
   const filteredContacts = contacts.filter(contact => {
     const lowerCaseSearchTerm = searchTerm.toLowerCase();
     const matchesName = contact.first_name.toLowerCase().includes(lowerCaseSearchTerm) ||

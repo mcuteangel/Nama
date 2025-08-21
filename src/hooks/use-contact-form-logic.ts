@@ -5,6 +5,7 @@ import { Session } from "@supabase/supabase-js";
 import { NavigateFunction } from "react-router-dom";
 import * as z from "zod";
 import { CustomFieldTemplate } from "@/domain/schemas/custom-field-template";
+import { formSchema } from "@/components/ContactForm"; // Import formSchema
 
 // Define CustomField interface for form data
 interface CustomFieldFormData {
@@ -12,18 +13,30 @@ interface CustomFieldFormData {
   value: string;
 }
 
-// The formSchema is now defined in ContactForm.tsx to allow dynamic validation
-// based on availableTemplates. This file will no longer define it.
-// type ContactFormValues = z.infer<typeof formSchema>; // This type will now be passed from ContactForm
+interface PhoneNumberFormData {
+  id?: string;
+  phone_type: string;
+  phone_number: string;
+  extension?: string | null;
+}
+
+interface EmailAddressFormData {
+  id?: string;
+  email_type: string;
+  email_address: string;
+}
+
+// Derive ContactFormValues directly from the imported formSchema
+type ContactFormValues = z.infer<typeof formSchema>;
 
 export const useContactFormLogic = (
   contactId: string | undefined,
   navigate: NavigateFunction,
   session: Session | null,
-  form: UseFormReturn<any>, // Use 'any' here as the specific schema is defined externally
-  availableTemplates: CustomFieldTemplate[] // Pass available templates to logic
+  form: UseFormReturn<ContactFormValues>,
+  availableTemplates: CustomFieldTemplate[]
 ) => {
-  const onSubmit = async (values: any) => { // Use 'any' for values as schema is external
+  const onSubmit = async (values: ContactFormValues) => {
     const toastId = showLoading(contactId ? "در حال به‌روزرسانی مخاطب..." : "در حال ذخیره مخاطب...");
     try {
       const user = session?.user;
@@ -55,80 +68,102 @@ export const useContactFormLogic = (
 
         if (contactError) throw contactError;
 
-        // Handle phone number update/insert/delete
-        if (values.phoneNumber) {
-          const { data: existingPhone, error: fetchPhoneError } = await supabase
-            .from("phone_numbers")
-            .select("id")
-            .eq("contact_id", contactId)
-            .eq("user_id", user.id)
-            .single();
+        // --- Handle Phone Numbers ---
+        const existingPhoneNumbers = (await supabase
+          .from("phone_numbers")
+          .select("id, phone_type, phone_number, extension")
+          .eq("contact_id", contactId)
+          .eq("user_id", user.id)).data || [];
 
-          if (fetchPhoneError && fetchPhoneError.code !== 'PGRST116') { // PGRST116 means no rows found
-            throw fetchPhoneError;
-          }
+        const newPhoneNumbers = values.phoneNumbers || [];
 
-          if (existingPhone) {
-            const { error: updatePhoneError } = await supabase
-              .from("phone_numbers")
-              .update({ phone_number: values.phoneNumber })
-              .eq("id", existingPhone.id);
-            if (updatePhoneError) throw updatePhoneError;
-          } else {
-            const { error: insertPhoneError } = await supabase
-              .from("phone_numbers")
-              .insert({
-                user_id: user.id,
-                contact_id: contactId,
-                phone_type: "mobile",
-                phone_number: values.phoneNumber,
-              });
-            if (insertPhoneError) throw insertPhoneError;
-          }
-        } else {
-          await supabase
+        // Delete removed phone numbers
+        const phonesToDelete = existingPhoneNumbers.filter(
+          (existingPhone) => !newPhoneNumbers.some((newPhone) => newPhone.id === existingPhone.id)
+        );
+        if (phonesToDelete.length > 0) {
+          const { error: deleteError } = await supabase
             .from("phone_numbers")
             .delete()
-            .eq("contact_id", contactId)
-            .eq("user_id", user.id);
+            .in("id", phonesToDelete.map((p) => p.id));
+          if (deleteError) throw deleteError;
         }
 
-        // Handle email address update/insert/delete
-        if (values.emailAddress) {
-          const { data: existingEmail, error: fetchEmailError } = await supabase
-            .from("email_addresses")
-            .select("id")
-            .eq("contact_id", contactId)
-            .eq("user_id", user.id)
-            .single();
-
-          if (fetchEmailError && fetchEmailError.code !== 'PGRST116') {
-            throw fetchEmailError;
-          }
-
-          if (existingEmail) {
-            const { error: updateEmailError } = await supabase
-              .from("email_addresses")
-              .update({ email_address: values.emailAddress })
-              .eq("id", existingEmail.id);
-            if (updateEmailError) throw updateEmailError;
+        // Update or insert phone numbers
+        for (const phone of newPhoneNumbers) {
+          if (phone.id) {
+            // Update existing phone number
+            const { error: updateError } = await supabase
+              .from("phone_numbers")
+              .update({
+                phone_type: phone.phone_type,
+                phone_number: phone.phone_number,
+                extension: phone.extension === '' ? null : phone.extension,
+              })
+              .eq("id", phone.id)
+              .eq("user_id", user.id);
+            if (updateError) throw updateError;
           } else {
-            const { error: insertEmailError } = await supabase
+            // Insert new phone number
+            const { error: insertError } = await supabase
+              .from("phone_numbers")
+              .insert({
+                user_id: user.id,
+                contact_id: contactId,
+                phone_type: phone.phone_type,
+                phone_number: phone.phone_number,
+                extension: phone.extension === '' ? null : phone.extension,
+              });
+            if (insertError) throw insertError;
+          }
+        }
+
+        // --- Handle Email Addresses ---
+        const existingEmailAddresses = (await supabase
+          .from("email_addresses")
+          .select("id, email_type, email_address")
+          .eq("contact_id", contactId)
+          .eq("user_id", user.id)).data || [];
+
+        const newEmailAddresses = values.emailAddresses || [];
+
+        // Delete removed email addresses
+        const emailsToDelete = existingEmailAddresses.filter(
+          (existingEmail) => !newEmailAddresses.some((newEmail) => newEmail.id === existingEmail.id)
+        );
+        if (emailsToDelete.length > 0) {
+          const { error: deleteError } = await supabase
+            .from("email_addresses")
+            .delete()
+            .in("id", emailsToDelete.map((e) => e.id));
+          if (deleteError) throw deleteError;
+        }
+
+        // Update or insert email addresses
+        for (const email of newEmailAddresses) {
+          if (email.id) {
+            // Update existing email address
+            const { error: updateError } = await supabase
+              .from("email_addresses")
+              .update({
+                email_type: email.email_type,
+                email_address: email.email_address,
+              })
+              .eq("id", email.id)
+              .eq("user_id", user.id);
+            if (updateError) throw updateError;
+          } else {
+            // Insert new email address
+            const { error: insertError } = await supabase
               .from("email_addresses")
               .insert({
                 user_id: user.id,
                 contact_id: contactId,
-                email_type: "personal",
-                email_address: values.emailAddress,
+                email_type: email.email_type,
+                email_address: email.email_address,
               });
-            if (insertEmailError) throw insertEmailError;
+            if (insertError) throw insertError;
           }
-        } else {
-          await supabase
-            .from("email_addresses")
-            .delete()
-            .eq("contact_id", contactId)
-            .eq("user_id", user.id);
         }
 
         // Handle group assignment
@@ -172,13 +207,12 @@ export const useContactFormLogic = (
         // Handle custom fields update/insert/delete
         const existingCustomFields = (await supabase
           .from("custom_fields")
-          .select("id, template_id, field_value") // Select template_id
+          .select("id, template_id, field_value")
           .eq("contact_id", contactId)
           .eq("user_id", user.id)).data || [];
 
         const newCustomFields = values.customFields || [];
 
-        // Fields to delete (those in DB but not in form)
         const fieldsToDelete = existingCustomFields.filter(
           (existingField) => !newCustomFields.some((newField) => newField.template_id === existingField.template_id)
         );
@@ -190,11 +224,9 @@ export const useContactFormLogic = (
           if (deleteError) throw deleteError;
         }
 
-        // Fields to update or insert
         for (const field of newCustomFields) {
           const existingField = existingCustomFields.find(f => f.template_id === field.template_id);
           if (existingField) {
-            // Update existing field if value changed
             if (existingField.field_value !== field.value) {
               const { error: updateError } = await supabase
                 .from("custom_fields")
@@ -204,7 +236,6 @@ export const useContactFormLogic = (
               if (updateError) throw updateError;
             }
           } else {
-            // Insert new field
             const { error: insertError } = await supabase
               .from("custom_fields")
               .insert({
@@ -218,7 +249,7 @@ export const useContactFormLogic = (
         }
 
         showSuccess("مخاطب با موفقیت به‌روزرسانی شد!");
-        navigate("/"); // Redirect to contacts list after successful update
+        navigate("/");
       } else {
         // Insert new contact
         const { data: contactData, error: contactError } = await supabase
@@ -233,34 +264,39 @@ export const useContactFormLogic = (
             address: values.address,
             notes: values.notes,
           })
-          .select('id') // Changed from .select() to .select('id')
+          .select('id')
           .single();
 
         if (contactError) throw contactError;
 
         currentContactId = contactData.id;
 
-        if (values.phoneNumber) {
+        // Insert phone numbers
+        if (values.phoneNumbers && values.phoneNumbers.length > 0) {
+          const phonesToInsert = values.phoneNumbers.map(phone => ({
+            user_id: user.id,
+            contact_id: currentContactId,
+            phone_type: phone.phone_type,
+            phone_number: phone.phone_number,
+            extension: phone.extension === '' ? null : phone.extension,
+          }));
           const { error: phoneError } = await supabase
             .from("phone_numbers")
-            .insert({
-              user_id: user.id,
-              contact_id: currentContactId,
-              phone_type: "mobile",
-              phone_number: values.phoneNumber,
-            });
+            .insert(phonesToInsert);
           if (phoneError) throw phoneError;
         }
 
-        if (values.emailAddress) {
+        // Insert email addresses
+        if (values.emailAddresses && values.emailAddresses.length > 0) {
+          const emailsToInsert = values.emailAddresses.map(email => ({
+            user_id: user.id,
+            contact_id: currentContactId,
+            email_type: email.email_type,
+            email_address: email.email_address,
+          }));
           const { error: emailError } = await supabase
             .from("email_addresses")
-            .insert({
-              user_id: user.id,
-              contact_id: currentContactId,
-              email_type: "personal",
-              email_address: values.emailAddress,
-            });
+            .insert(emailsToInsert);
           if (emailError) throw emailError;
         }
 
@@ -275,7 +311,6 @@ export const useContactFormLogic = (
           if (groupAssignmentError) throw groupAssignmentError;
         }
 
-        // Insert custom fields for new contact
         if (values.customFields && values.customFields.length > 0) {
           const customFieldsToInsert = values.customFields.map((field: CustomFieldFormData) => ({
             user_id: user.id,
@@ -290,8 +325,7 @@ export const useContactFormLogic = (
         }
 
         showSuccess("مخاطب با موفقیت ذخیره شد!");
-        form.reset(); // Reset form after successful submission for new contact
-        // Stay on the form for adding more contacts
+        form.reset();
       }
     } catch (error: any) {
       console.error("Error saving contact:", error);

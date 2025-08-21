@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CardContent } from "@/components/ui/card";
-import { useForm } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -15,7 +15,7 @@ import { useGroups } from "@/hooks/use-groups";
 import { useContactFormLogic } from "@/hooks/use-contact-form-logic";
 import { ContactService } from "@/services/contact-service";
 import { CustomFieldTemplate } from "@/domain/schemas/custom-field-template";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, Plus, X } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns-jalali";
 import { JalaliCalendar } from "@/components/JalaliCalendar";
@@ -32,14 +32,14 @@ interface ContactFormProps {
     company?: string;
     address?: string;
     notes?: string;
-    phoneNumber?: string;
-    emailAddress?: string;
+    phone_numbers?: { id?: string; phone_type: string; phone_number: string; extension?: string | null }[];
+    email_addresses?: { id?: string; email_type: string; email_address: string }[];
     groupId?: string;
     custom_fields?: {
       id: string;
       template_id: string;
       field_value: string;
-      custom_field_templates: Array<{ // Changed to Array<...>
+      custom_field_templates: Array<{
         name: string;
         type: string;
         options?: string[];
@@ -49,6 +49,61 @@ interface ContactFormProps {
   contactId?: string;
 }
 
+const phoneTypeOptions = [
+  { value: "mobile", label: "موبایل" },
+  { value: "home", label: "منزل" },
+  { value: "work", label: "کار" },
+  { value: "fax", label: "فکس" },
+  { value: "other", label: "سایر" },
+];
+
+const emailTypeOptions = [
+  { value: "personal", label: "شخصی" },
+  { value: "work", label: "کار" },
+  { value: "other", label: "سایر" },
+];
+
+export const formSchema = z.object({
+  firstName: z.string().min(1, { message: "نام الزامی است." }),
+  lastName: z.string().min(1, { message: "نام خانوادگی الزامی است." }),
+  phoneNumbers: z.array(z.object({
+    id: z.string().optional(),
+    phone_type: z.string().min(1, { message: "نوع شماره الزامی است." }),
+    phone_number: z.string().regex(/^09\d{9}$/, { message: "شماره تلفن معتبر نیست (مثال: 09123456789)." }),
+    extension: z.string().optional().nullable(),
+  })).optional(),
+  emailAddresses: z.array(z.object({
+    id: z.string().optional(),
+    email_type: z.string().min(1, { message: "نوع ایمیل الزامی است." }),
+    email_address: z.string().email({ message: "آدرس ایمیل معتبر نیست." }),
+  })).optional(),
+  gender: z.enum(["male", "female", "not_specified"], { message: "جنسیت معتبر نیست." }).default("not_specified"),
+  position: z.string().optional(),
+  company: z.string().optional(),
+  address: z.string().optional(),
+  notes: z.string().optional(),
+  groupId: z.string().optional(),
+  customFields: z.array(z.object({
+    template_id: z.string(),
+    value: z.string(),
+  })).optional(),
+}).superRefine((data, ctx) => {
+  if (data.customFields) {
+    data.customFields.forEach((field, index) => {
+      const template = (ctx as any).parent.availableTemplates?.find((t: CustomFieldTemplate) => t.id === field.template_id);
+      if (template && template.required && !field.value.trim()) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `${template.name} الزامی است.`,
+          path: [`customFields`, index, `value`],
+        });
+      }
+    });
+  }
+});
+
+type ContactFormValues = z.infer<typeof formSchema>;
+
 const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => {
   const navigate = useNavigate();
   const { session } = useSession();
@@ -56,61 +111,38 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
   const [availableTemplates, setAvailableTemplates] = useState<CustomFieldTemplate[]>([]);
   const [loadingTemplates, setLoadingTemplates] = useState(true);
 
-  // Define the schema for the form using Zod, now with dynamic validation for custom fields
-  const formSchema = z.object({
-    firstName: z.string().min(1, { message: "نام الزامی است." }),
-    lastName: z.string().min(1, { message: "نام خانوادگی الزامی است." }),
-    phoneNumber: z.string().regex(/^09\d{9}$/, { message: "شماره تلفن معتبر نیست (مثال: 09123456789)." }).optional().or(z.literal('')),
-    emailAddress: z.string().email({ message: "آدرس ایمیل معتبر نیست." }).optional().or(z.literal('')),
-    gender: z.enum(["male", "female", "not_specified"], { message: "جنسیت معتبر نیست." }).default("not_specified"),
-    position: z.string().optional(),
-    company: z.string().optional(),
-    address: z.string().optional(),
-    notes: z.string().optional(),
-    groupId: z.string().optional(),
-    customFields: z.array(z.object({
-      template_id: z.string(),
-      value: z.string(), // Allow empty string initially
-    })).optional(),
-  }).superRefine((data, ctx) => {
-    // Custom validation for required custom fields based on availableTemplates
-    if (data.customFields && availableTemplates) {
-      data.customFields.forEach((field, index) => {
-        const template = availableTemplates.find(t => t.id === field.template_id);
-        if (template && template.required && !field.value.trim()) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: `${template.name} الزامی است.`, // Specific error message
-            path: [`customFields`, index, `value`], // Point to the specific field
-          });
-        }
-      });
-    }
-  });
-
-  type ContactFormValues = z.infer<typeof formSchema>;
-
   const form = useForm<ContactFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       firstName: initialData?.first_name || "",
       lastName: initialData?.last_name || "",
-      phoneNumber: initialData?.phoneNumber || "",
-      emailAddress: initialData?.emailAddress || "",
       gender: initialData?.gender || "not_specified",
       position: initialData?.position || "",
       company: initialData?.company || "",
       address: initialData?.address || "",
       notes: initialData?.notes || "",
       groupId: initialData?.groupId || "",
+      phoneNumbers: initialData?.phone_numbers || [],
+      emailAddresses: initialData?.email_addresses || [],
       customFields: initialData?.custom_fields?.map(cf => ({
         template_id: cf.template_id,
         value: cf.field_value,
       })) || [],
     },
+    context: { availableTemplates }, // Pass availableTemplates to Zod context for superRefine
   });
 
   const { onSubmit } = useContactFormLogic(contactId, navigate, session, form, availableTemplates);
+
+  const { fields: phoneFields, append: appendPhone, remove: removePhone } = useFieldArray({
+    control: form.control,
+    name: "phoneNumbers",
+  });
+
+  const { fields: emailFields, append: appendEmail, remove: removeEmail } = useFieldArray({
+    control: form.control,
+    name: "emailAddresses",
+  });
 
   const fetchTemplates = useCallback(async () => {
     setLoadingTemplates(true);
@@ -133,14 +165,14 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
       form.reset({
         firstName: initialData.first_name,
         lastName: initialData.last_name,
-        phoneNumber: initialData.phoneNumber,
-        emailAddress: initialData.emailAddress,
         gender: initialData.gender,
         position: initialData.position,
         company: initialData.company,
         address: initialData.address,
         notes: initialData.notes,
         groupId: initialData.groupId || "",
+        phoneNumbers: initialData.phone_numbers || [],
+        emailAddresses: initialData.email_addresses || [],
         customFields: initialData.custom_fields?.map(cf => ({
           template_id: cf.template_id,
           value: cf.field_value,
@@ -149,35 +181,30 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
     }
   }, [initialData, form]);
 
-  // New useEffect to manage customFields array based on availableTemplates and initialData
   useEffect(() => {
-    if (loadingTemplates) return; // Wait for templates to load
+    if (loadingTemplates) return;
 
     const newCustomFieldsFormState: { template_id: string; value: string }[] = [];
     const initialCustomFieldValuesMap = new Map<string, string>();
 
-    // Populate map with initial data's custom field values
     initialData?.custom_fields?.forEach(cf => {
       initialCustomFieldValuesMap.set(cf.template_id, cf.field_value);
     });
 
-    // For each available template, create a form field entry
     availableTemplates.forEach(template => {
       const existingValue = initialCustomFieldValuesMap.get(template.id!);
       newCustomFieldsFormState.push({
         template_id: template.id!,
-        value: existingValue !== undefined ? existingValue : "", // Use existing value or empty string
+        value: existingValue !== undefined ? existingValue : "",
       });
     });
 
-    // Sort to ensure consistent order, which helps React Hook Form's internal diffing
     newCustomFieldsFormState.sort((a, b) => {
       const templateA = availableTemplates.find(t => t.id === a.template_id)?.name || '';
       const templateB = availableTemplates.find(t => t.id === b.template_id)?.name || '';
       return templateA.localeCompare(templateB);
     });
 
-    // Only update if the new state is different from the current form state
     const currentFormValues = form.getValues("customFields");
     const isDifferent = currentFormValues.length !== newCustomFieldsFormState.length ||
                         currentFormValues.some((field, index) =>
@@ -194,8 +221,6 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
   const handleCancel = () => {
     navigate(-1);
   };
-
-  const customFieldsWatch = form.watch("customFields");
 
   return (
     <CardContent className="space-y-4">
@@ -252,33 +277,134 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
             />
           </div>
 
+          {/* Phone Numbers Section */}
+          <div className="space-y-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">شماره تلفن‌ها</h3>
+            {phoneFields.map((item, index) => (
+              <div key={item.id} className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                <FormField
+                  control={form.control}
+                  name={`phoneNumbers.${index}.phone_type`}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-700 dark:text-gray-200">نوع شماره</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger className="w-full bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100">
+                            <SelectValue placeholder="انتخاب نوع" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent className="backdrop-blur-md bg-white/80 dark:bg-gray-800/80 border border-white/30 dark:border-gray-600/30">
+                          {phoneTypeOptions.map(option => (
+                            <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name={`phoneNumbers.${index}.phone_number`}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-700 dark:text-gray-200">شماره تلفن</FormLabel>
+                      <FormControl>
+                        <Input placeholder="مثال: 09123456789" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <div className="flex items-end gap-2">
+                  <FormField
+                    control={form.control}
+                    name={`phoneNumbers.${index}.extension`}
+                    render={({ field }) => (
+                      <FormItem className="flex-grow">
+                        <FormLabel className="text-gray-700 dark:text-gray-200">داخلی (اختیاری)</FormLabel>
+                        <FormControl>
+                          <Input placeholder="مثال: 123" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400" {...field} value={field.value || ''} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <Button type="button" variant="ghost" size="icon" onClick={() => removePhone(index)} className="text-red-500 hover:bg-red-100 dark:hover:bg-gray-700/50">
+                    <X size={16} />
+                  </Button>
+                </div>
+              </div>
+            ))}
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => appendPhone({ phone_type: "mobile", phone_number: "", extension: null })}
+              className="w-full flex items-center gap-2 px-6 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold shadow-sm transition-all duration-300 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-200 dark:border-gray-600"
+            >
+              <Plus size={16} className="me-2" /> افزودن شماره تلفن
+            </Button>
+          </div>
+
+          {/* Email Addresses Section */}
+          <div className="space-y-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">آدرس‌های ایمیل</h3>
+            {emailFields.map((item, index) => (
+              <div key={item.id} className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
+                <FormField
+                  control={form.control}
+                  name={`emailAddresses.${index}.email_type`}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-700 dark:text-gray-200">نوع ایمیل</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger className="w-full bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100">
+                            <SelectValue placeholder="انتخاب نوع" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent className="backdrop-blur-md bg-white/80 dark:bg-gray-800/80 border border-white/30 dark:border-gray-600/30">
+                          {emailTypeOptions.map(option => (
+                            <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <div className="flex items-end gap-2">
+                  <FormField
+                    control={form.control}
+                    name={`emailAddresses.${index}.email_address`}
+                    render={({ field }) => (
+                      <FormItem className="flex-grow">
+                        <FormLabel className="text-gray-700 dark:text-gray-200">آدرس ایمیل</FormLabel>
+                        <FormControl>
+                          <Input type="email" placeholder="مثال: example@domain.com" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <Button type="button" variant="ghost" size="icon" onClick={() => removeEmail(index)} className="text-red-500 hover:bg-red-100 dark:hover:bg-gray-700/50">
+                    <X size={16} />
+                  </Button>
+                </div>
+              </div>
+            ))}
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => appendEmail({ email_type: "personal", email_address: "" })}
+              className="w-full flex items-center gap-2 px-6 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold shadow-sm transition-all duration-300 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-200 dark:border-gray-600"
+            >
+              <Plus size={16} className="me-2" /> افزودن آدرس ایمیل
+            </Button>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <FormField
-              control={form.control}
-              name="phoneNumber"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-gray-700 dark:text-gray-200">شماره تلفن اصلی</FormLabel>
-                  <FormControl>
-                    <Input placeholder="مثال: 09123456789" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="emailAddress"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-gray-700 dark:text-gray-200">آدرس ایمیل</FormLabel>
-                  <FormControl>
-                    <Input type="email" placeholder="مثال: example@domain.com" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
             <div className="flex items-end gap-2">
               <FormField
                 control={form.control}
@@ -310,9 +436,6 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
               />
               <AddGroupDialog onGroupAdded={fetchGroups} />
             </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <FormField
               control={form.control}
               name="company"
@@ -341,35 +464,6 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
             />
           </div>
 
-          <div className="grid grid-cols-1 gap-4">
-            <FormField
-              control={form.control}
-              name="address"
-              render={({ field }) => (
-                <FormItem className="col-span-full">
-                  <FormLabel className="text-gray-700 dark:text-gray-200">آدرس</FormLabel>
-                  <FormControl>
-                    <Textarea placeholder="آدرس کامل" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="notes"
-              render={({ field }) => (
-                <FormItem className="col-span-full">
-                  <FormLabel className="text-gray-700 dark:text-gray-200">یادداشت‌ها</FormLabel>
-                  <FormControl>
-                    <Textarea placeholder="یادداشت‌های اضافی" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
           {/* Dynamic Custom Fields Section */}
           <div className="space-y-4 pt-4 border-t border-gray-200 dark:border-gray-700">
             <div className="flex justify-between items-center mb-2">
@@ -382,7 +476,10 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
               <p className="text-center text-gray-500 dark:text-gray-400">هیچ قالب فیلد سفارشی تعریف نشده است.</p>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {availableTemplates.map((template, index) => {
+                {form.watch("customFields")?.map((fieldItem, index) => {
+                  const template = availableTemplates.find(t => t.id === fieldItem.template_id);
+                  if (!template) return null; // Should not happen if logic is correct
+
                   const fieldName = `customFields.${index}.value` as const;
                   
                   return (
@@ -457,7 +554,6 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
                                 </SelectContent>
                               </Select>
                             ) : (
-                              // Fallback for unknown type
                               <Input disabled placeholder="نوع فیلد نامشخص" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400" />
                             )}
                           </FormControl>

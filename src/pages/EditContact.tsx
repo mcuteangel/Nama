@@ -11,6 +11,7 @@ interface PhoneNumber {
   id: string;
   phone_type: string;
   phone_number: string;
+  extension?: string | null;
 }
 
 interface EmailAddress {
@@ -43,13 +44,10 @@ interface ContactDetailType {
   company?: string;
   address?: string;
   notes?: string;
-  phoneNumber?: string; // Flattened for form
-  emailAddress?: string; // Flattened for form
-  groupId?: string; // Flattened for form
-  phone_numbers: PhoneNumber[];
-  email_addresses: EmailAddress[];
-  contact_groups: ContactGroup[];
-  custom_fields: CustomField[]; // Updated type for custom_fields
+  phone_numbers: PhoneNumber[]; // Now an array
+  email_addresses: EmailAddress[]; // Now an array
+  groupId?: string;
+  custom_fields: CustomField[];
   created_at: string;
   updated_at: string;
 }
@@ -74,20 +72,19 @@ const EditContact = () => {
       try {
         const { data, error } = await supabase
           .from("contacts")
-          .select("id, first_name, last_name, gender, position, company, address, notes, created_at, updated_at, phone_numbers(id, phone_type, phone_number), email_addresses(id, email_type, email_address), contact_groups(group_id), custom_fields(id, template_id, field_value, custom_field_templates(name, type, options))") // Explicitly select all required columns
+          .select("id, first_name, last_name, gender, position, company, address, notes, created_at, updated_at, phone_numbers(id, phone_type, phone_number, extension), email_addresses(id, email_type, email_address), contact_groups(group_id), custom_fields(id, template_id, field_value, custom_field_templates(name, type, options))")
           .eq("id", id)
           .single();
 
         if (error) throw error;
 
         if (data) {
-          // Flatten the data for ContactForm
           const formattedData: ContactDetailType = {
             ...data,
-            phoneNumber: data.phone_numbers[0]?.phone_number || "",
-            emailAddress: data.email_addresses[0]?.email_address || "",
+            phone_numbers: data.phone_numbers || [],
+            email_addresses: data.email_addresses || [],
             groupId: data.contact_groups[0]?.group_id || "",
-            custom_fields: data.custom_fields || [], // Pass full custom_fields array
+            custom_fields: data.custom_fields || [],
           } as ContactDetailType;
 
           setInitialContactData(formattedData);
