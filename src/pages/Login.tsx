@@ -5,14 +5,13 @@ import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import { useSession } from '@/integrations/supabase/auth';
 import { MadeWithDyad } from '@/components/made-with-dyad';
-import { useTranslation } from 'react-i18next'; // Import useTranslation
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'; // Import Select components
-import { Label } from '@/components/ui/label'; // Import Label
+import { useTranslation } from 'react-i18next';
+import { Button } from '@/components/ui/button'; // Ensure Button is imported
 
 const Login = () => {
   const navigate = useNavigate();
   const { session, isLoading } = useSession();
-  const { i18n, t } = useTranslation(); // Initialize useTranslation
+  const { i18n, t } = useTranslation();
 
   useEffect(() => {
     // کاربر احراز هویت شده است و شیء کاربر معتبر است، به صفحه اصلی هدایت شود
@@ -41,28 +40,39 @@ const Login = () => {
           {t('login.title')}
         </h2>
 
-        {/* Language Selector */}
-        <div className="mb-6">
-          <Label htmlFor="language-select" className="text-gray-700 dark:text-gray-200 mb-2 block">
-            {t('settings.language')}
-          </Label>
-          <Select
-            value={i18n.language}
-            onValueChange={handleLanguageChange}
+        {/* Language Selector with Flag Buttons */}
+        <div className="flex justify-center gap-4 mb-6">
+          <Button
+            variant="outline"
+            size="lg"
+            onClick={() => handleLanguageChange('fa')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+              i18n.language === 'fa'
+                ? 'bg-blue-600 text-white hover:bg-blue-700'
+                : 'bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-100 dark:hover:bg-gray-600'
+            }`}
           >
-            <SelectTrigger id="language-select" className="w-full bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100">
-              <SelectValue placeholder={t('settings.language')} />
-            </SelectTrigger>
-            <SelectContent className="backdrop-blur-md bg-white/80 dark:bg-gray-800/80 border border-white/30 dark:border-gray-600/30">
-                <SelectItem value="fa">{t('settings.persian')}</SelectItem>
-                <SelectItem value="en">{t('settings.english')}</SelectItem>
-            </SelectContent>
-          </Select>
+            <span className="text-2xl">🇮🇷</span>
+            <span className="font-semibold">{t('settings.persian')}</span>
+          </Button>
+          <Button
+            variant="outline"
+            size="lg"
+            onClick={() => handleLanguageChange('en')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+              i18n.language === 'en'
+                ? 'bg-blue-600 text-white hover:bg-blue-700'
+                : 'bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-100 dark:hover:bg-gray-600'
+            }`}
+          >
+            <span className="text-2xl">🇬🇧</span>
+            <span className="font-semibold">{t('settings.english')}</span>
+          </Button>
         </div>
 
         <Auth
           supabaseClient={supabase}
-          providers={[]} // ارائه‌دهندگان شخص ثالث غیرفعال هستند مگر اینکه مشخص شوند
+          providers={[]}
           appearance={{
             theme: ThemeSupa,
             variables: {
@@ -74,9 +84,9 @@ const Login = () => {
               },
             },
           }}
-          theme="light" // استفاده از تم روشن
-          view="sign_in" // فقط فرم ورود نمایش داده شود
-          showLinks={false} // غیرفعال کردن لینک‌های ثبت‌نام و بازیابی رمز عبور
+          theme="light"
+          view="sign_in"
+          showLinks={false}
           localization={{
             variables: {
               sign_in: {
