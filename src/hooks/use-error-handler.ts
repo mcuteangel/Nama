@@ -15,7 +15,8 @@ export function useErrorHandler(initialError: Error | null = null, options?: Use
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
-  const [lastOperation, setLastOperation] = useState<(() => Promise<void>) | null>(null);
+  // Change the type of lastOperation to accept Promise<unknown>
+  const [lastOperation, setLastOperation] = useState<(() => Promise<unknown>) | null>(null);
 
   const {
     maxRetries = 0,
@@ -33,7 +34,8 @@ export function useErrorHandler(initialError: Error | null = null, options?: Use
     setIsLoading(true);
     setError(null);
     setErrorMessage('');
-    setLastOperation(() => asyncFunction); // Store the function for retry
+    // Store the function, wrapping it to ensure it returns Promise<unknown>
+    setLastOperation(() => async () => { await asyncFunction(); });
 
     try {
       const result = await asyncFunction();
@@ -67,7 +69,7 @@ export function useErrorHandler(initialError: Error | null = null, options?: Use
       }
 
       try {
-        await lastOperation();
+        await lastOperation(); // This now correctly awaits a Promise<unknown>
         onSuccessHandler?.();
         setRetryCount(0); // Reset retry count on success
       } catch (err: any) {

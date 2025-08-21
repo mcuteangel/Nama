@@ -1,12 +1,16 @@
 import * as z from 'zod';
 
-export const customFieldTemplateSchema = z.object({
+// Define the base object schema first
+const baseCustomFieldTemplateSchema = z.object({
   name: z.string().min(1, { message: 'نام فیلد نمی‌تواند خالی باشد.' }),
   type: z.enum(['text', 'number', 'date', 'list'], { message: 'نوع فیلد معتبر نیست.' }),
   options: z.array(z.string().min(1, { message: 'گزینه‌های لیست نمی‌توانند خالی باشند.' })).optional(),
   description: z.string().optional(),
   required: z.boolean().default(false),
-}).superRefine((data, ctx) => {
+});
+
+// Apply superRefine to the base schema for the full schema
+export const customFieldTemplateSchema = baseCustomFieldTemplateSchema.superRefine((data, ctx) => {
   if (data.type === 'list' && (!data.options || data.options.length === 0)) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
@@ -16,7 +20,8 @@ export const customFieldTemplateSchema = z.object({
   }
 });
 
-export const updateCustomFieldTemplateSchema = customFieldTemplateSchema.partial();
+// Create the partial schema from the base object schema
+export const updateCustomFieldTemplateSchema = baseCustomFieldTemplateSchema.partial();
 
 export type CreateCustomFieldTemplateInput = z.infer<typeof customFieldTemplateSchema>;
 export type UpdateCustomFieldTemplateInput = z.infer<typeof updateCustomFieldTemplateSchema>;

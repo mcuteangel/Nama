@@ -46,7 +46,7 @@ function AppLayout() {
     <div className="flex flex-col min-h-screen bg-background">
       {!isAuthPage && (
         <>
-          {isMobile ? <MobileHeader /> : <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsOpen} />}
+          {isMobile ? <MobileHeader /> : <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />}
           {isMobile && <BottomNavigationBar />}
         </>
       )}
