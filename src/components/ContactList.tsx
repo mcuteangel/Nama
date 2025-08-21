@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -46,6 +46,9 @@ interface ContactListProps {
   companyFilter: string;
   sortOption: string;
 }
+
+// Cache invalidation period (e.g., 5 minutes)
+const CACHE_EXPIRATION_TIME = 5 * 60 * 1000; // 5 minutes in milliseconds
 
 const ContactItem = ({ contact, onContactDeleted, onContactEdited }: { contact: Contact; onContactDeleted: (id: string) => void; onContactEdited: (id: string) => void }) => {
   const navigate = useNavigate();
@@ -143,7 +146,7 @@ const ContactList = ({ searchTerm, selectedGroup, companyFilter, sortOption }: C
   const [loadingContacts, setLoadingContacts] = useState(true);
   const [isFetchingRemote, setIsFetchingRemote] = useState(false);
 
-  const fetchContacts = async () => {
+  const fetchContacts = useCallback(async (showLoadingToast: boolean = true) => {
     if (isSessionLoading) return;
 
     if (!session?.user) {
@@ -152,22 +155,39 @@ const ContactList = ({ searchTerm, selectedGroup, companyFilter, sortOption }: C
       return;
     }
 
-    let toastId: string | number | undefined;
+    const cacheKey = `contacts_cache_${session.user.id}_${searchTerm}_${selectedGroup}_${companyFilter}_${sortOption}`;
+    const cachedDataString = localStorage.getItem(cacheKey);
+    let cachedData: { timestamp: number; contacts: Contact[] } | null = null;
 
-    const cachedData = localStorage.getItem('cachedContacts');
-    if (cachedData) {
+    if (cachedDataString) {
       try {
-        const parsedData = JSON.parse(cachedData);
-        setContacts(parsedData as Contact[]);
-        setLoadingContacts(false);
+        cachedData = JSON.parse(cachedDataString);
+        const now = Date.now();
+        const isCacheFresh = (now - cachedData.timestamp) < CACHE_EXPIRATION_TIME;
+
+        if (isCacheFresh) {
+          setContacts(cachedData.contacts);
+          setLoadingContacts(false);
+          setIsFetchingRemote(false); // No need to fetch remotely if cache is fresh
+          return; // Exit early if cache is fresh
+        } else {
+          // Cache is stale, use it but revalidate in background
+          setContacts(cachedData.contacts);
+          setLoadingContacts(false);
+          // Proceed to fetch remotely in background
+        }
       } catch (e) {
         console.error("Failed to parse cached contacts:", e);
-        localStorage.removeItem('cachedContacts');
+        localStorage.removeItem(cacheKey); // Clear corrupted cache
       }
-    } else {
-      toastId = showLoading("در حال بارگذاری مخاطبین...");
     }
 
+    // If no fresh cache, or cache is stale and we need to revalidate
+    let toastId: string | number | undefined;
+    if (showLoadingToast && (!cachedData || !cachedData.contacts || cachedData.contacts.length === 0)) {
+      toastId = showLoading("در حال بارگذاری مخاطبین...");
+    }
+    
     setIsFetchingRemote(true);
 
     try {
@@ -182,33 +202,37 @@ const ContactList = ({ searchTerm, selectedGroup, companyFilter, sortOption }: C
       if (error) throw error;
 
       setContacts(data as Contact[]);
-      localStorage.setItem('cachedContacts', JSON.stringify(data));
+      localStorage.setItem(cacheKey, JSON.stringify({ timestamp: Date.now(), contacts: data }));
       if (toastId) dismissToast(toastId);
+      if (showLoadingToast) showSuccess("مخاطبین با موفقیت بارگذاری شدند.");
     } catch (error: any) {
       console.error("Error fetching contacts from Supabase:", error);
       if (toastId) dismissToast(toastId);
       showError(`خطا در بارگذاری مخاطبین از سرور: ${error.message || "خطای ناشناخته"}`);
-      if (!cachedData) {
+      if (!cachedData) { // Only clear contacts if no cached data was available at all
         setContacts([]);
       }
     } finally {
       setLoadingContacts(false);
       setIsFetchingRemote(false);
     }
-  };
-
-  useEffect(() => {
-    fetchContacts();
   }, [session, isSessionLoading, searchTerm, selectedGroup, companyFilter, sortOption]);
 
+  useEffect(() => {
+    // Initial fetch on component mount or when dependencies change
+    fetchContacts(true); // Show loading toast for initial fetch
+  }, [fetchContacts]);
+
   const handleContactDeleted = (deletedId: string) => {
-    setContacts(prevContacts => prevContacts.filter(contact => contact.id !== deletedId));
-    const updatedCache = contacts.filter(contact => contact.id !== deletedId);
-    localStorage.setItem('cachedContacts', JSON.stringify(updatedCache));
+    // Invalidate cache and refetch after deletion
+    localStorage.removeItem(`contacts_cache_${session?.user?.id}_${searchTerm}_${selectedGroup}_${companyFilter}_${sortOption}`);
+    fetchContacts(false); // Don't show loading toast for background refetch
   };
 
   const handleContactEdited = (editedId: string) => {
-    fetchContacts();
+    // Invalidate cache and refetch after edit
+    localStorage.removeItem(`contacts_cache_${session?.user?.id}_${searchTerm}_${selectedGroup}_${companyFilter}_${sortOption}`);
+    fetchContacts(false); // Don't show loading toast for background refetch
   };
 
   if (loadingContacts && !isFetchingRemote) {
