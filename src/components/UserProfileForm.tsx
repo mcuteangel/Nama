@@ -30,7 +30,7 @@ const UserProfileForm: React.FC = () => {
     errorMessage,
     retry: retryLastOperation,
     executeAsync,
-    retryCount, // Added retryCount here
+    retryCount,
   } = useErrorHandler(null, {
     maxRetries: 3,
     retryDelay: 1000,
@@ -40,6 +40,8 @@ const UserProfileForm: React.FC = () => {
       ErrorManager.notifyUser('پروفایل با موفقیت به‌روزرسانی شد.', 'success');
     },
     onError: (err) => {
+      // Log the detailed error from Supabase to the console
+      console.error("Supabase profile update error:", err);
       ErrorManager.logError(err, {
         component: "UserProfileForm",
         action: "updateProfile",
@@ -108,7 +110,7 @@ const UserProfileForm: React.FC = () => {
             first_name: values.first_name || null,
             last_name: values.last_name || null,
           },
-          { onConflict: 'id' } // Use upsert to insert if not exists, update if exists
+          { onConflict: 'id' }
         );
 
       if (error) {
