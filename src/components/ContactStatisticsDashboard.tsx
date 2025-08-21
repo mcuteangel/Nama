@@ -12,6 +12,7 @@ import ContactsByPreferredMethodChart from "@/components/statistics/ContactsByPr
 import UpcomingBirthdaysList from "@/components/statistics/UpcomingBirthdaysList";
 import { ContactService } from "@/services/contact-service";
 import { useTranslation } from "react-i18next";
+import { showLoading, dismissToast, showError } from "@/utils/toast"; // Import toast utilities
 
 interface GenderData {
   gender: string;
@@ -35,6 +36,17 @@ interface BirthdayContact {
   birthday: string;
 }
 
+interface StatisticsCache {
+  timestamp: number;
+  totalContacts: number | null;
+  genderData: GenderData[];
+  groupData: GroupData[];
+  preferredMethodData: PreferredMethodData[];
+  upcomingBirthdays: BirthdayContact[];
+}
+
+const CACHE_EXPIRATION_TIME = 5 * 60 * 1000; // 5 minutes in milliseconds
+
 const ContactStatisticsDashboard: React.FC = () => {
   const { session, isLoading: isSessionLoading } = useSession();
   const { t } = useTranslation();
@@ -44,82 +56,142 @@ const ContactStatisticsDashboard: React.FC = () => {
   const [groupData, setGroupData] = useState<GroupData[]>([]);
   const [preferredMethodData, setPreferredMethodData] = useState<PreferredMethodData[]>([]);
   const [upcomingBirthdays, setUpcomingBirthdays] = useState<BirthdayContact[]>([]);
+  const [isLoadingInitial, setIsLoadingInitial] = useState(true); // For initial load, before any data (cached or fresh)
+  const [isFetchingRemote, setIsFetchingRemote] = useState(false); // For background revalidation
 
   const {
-    isLoading: loading,
     executeAsync,
   } = useErrorHandler(null, {
-    showToast: true,
+    showToast: false, // Toasts handled manually for caching logic
     customErrorMessage: t('statistics.error_loading_stats'),
     onError: (error) => {
       ErrorManager.logError(error, { component: 'ContactStatisticsDashboard', action: 'fetchStatistics' });
     }
   });
 
-  const fetchStatistics = useCallback(async () => {
-    if (isSessionLoading || !session?.user) {
+  const fetchStatistics = useCallback(async (showLoadingToast: boolean = true) => {
+    if (isSessionLoading) {
+      setIsLoadingInitial(true);
+      return;
+    }
+
+    if (!session?.user) {
       setTotalContacts(null);
       setGenderData([]);
       setGroupData([]);
       setPreferredMethodData([]);
       setUpcomingBirthdays([]);
+      setIsLoadingInitial(false);
       return;
     }
 
-    await executeAsync(async () => {
+    const cacheKey = `statistics_cache_${session.user.id}`;
+    const cachedDataString = localStorage.getItem(cacheKey);
+    let cachedData: StatisticsCache | null = null;
+
+    if (cachedDataString) {
+      try {
+        cachedData = JSON.parse(cachedDataString);
+        const now = Date.now();
+        const isCacheFresh = (now - cachedData.timestamp) < CACHE_EXPIRATION_TIME;
+
+        if (isCacheFresh) {
+          setTotalContacts(cachedData.totalContacts);
+          setGenderData(cachedData.genderData);
+          setGroupData(cachedData.groupData);
+          setPreferredMethodData(cachedData.preferredMethodData);
+          setUpcomingBirthdays(cachedData.upcomingBirthdays);
+          setIsLoadingInitial(false);
+          setIsFetchingRemote(false); // No need to fetch remotely if cache is fresh
+          return; // Exit early if cache is fresh
+        } else {
+          // Cache is stale, use it but revalidate in background
+          setTotalContacts(cachedData.totalContacts);
+          setGenderData(cachedData.genderData);
+          setGroupData(cachedData.groupData);
+          setPreferredMethodData(cachedData.preferredMethodData);
+          setUpcomingBirthdays(cachedData.upcomingBirthdays);
+          setIsLoadingInitial(false);
+          // Proceed to fetch remotely in background
+        }
+      } catch (e) {
+        console.error("Failed to parse cached statistics:", e);
+        localStorage.removeItem(cacheKey); // Clear corrupted cache
+      }
+    }
+
+    // If no fresh cache, or cache is stale and we need to revalidate
+    let toastId: string | number | undefined;
+    if (showLoadingToast && (!cachedData || !cachedData.totalContacts)) { // Only show loading if no data at all
+      toastId = showLoading(t('statistics.loading_stats'));
+    }
+    
+    setIsFetchingRemote(true);
+
+    try {
       const userId = session.user.id;
 
-      // Fetch total contacts
-      const { data: totalData, error: totalError } = await ContactService.getTotalContacts(userId);
-      if (totalError) {
-        console.error("Error fetching total contacts:", totalError);
-        throw new Error(totalError);
-      }
+      const [
+        { data: totalData, error: totalError },
+        { data: genderStats, error: genderError },
+        { data: groupStats, error: groupError },
+        { data: methodStats, error: methodError },
+        { data: birthdays, error: birthdayError },
+      ] = await Promise.all([
+        ContactService.getTotalContacts(userId),
+        ContactService.getContactsByGender(userId),
+        ContactService.getContactsByGroup(userId),
+        ContactService.getContactsByPreferredMethod(userId),
+        ContactService.getUpcomingBirthdays(userId),
+      ]);
+
+      if (totalError) throw new Error(totalError);
+      if (genderError) throw new Error(genderError);
+      if (groupError) throw new Error(groupError);
+      if (methodError) throw new Error(methodError);
+      if (birthdayError) throw new Error(birthdayError);
+
       setTotalContacts(totalData);
-
-      // Fetch contacts by gender
-      const { data: genderStats, error: genderError } = await ContactService.getContactsByGender(userId);
-      if (genderError) {
-        console.error("Error fetching gender statistics:", genderError);
-        throw new Error(genderError);
-      }
       setGenderData(genderStats || []);
-
-      // Fetch contacts by group
-      const { data: groupStats, error: groupError } = await ContactService.getContactsByGroup(userId);
-      if (groupError) {
-        console.error("Error fetching group statistics:", groupError);
-        throw new Error(groupError);
-      }
       setGroupData(groupStats || []);
-
-      // Fetch contacts by preferred method
-      const { data: methodStats, error: methodError } = await ContactService.getContactsByPreferredMethod(userId);
-      if (methodError) {
-        console.error("Error fetching preferred method statistics:", methodError);
-        throw new Error(methodError);
-      }
       setPreferredMethodData(methodStats || []);
-
-      // Fetch upcoming birthdays
-      const { data: birthdays, error: birthdayError } = await ContactService.getUpcomingBirthdays(userId);
-      if (birthdayError) {
-        console.error("Error fetching upcoming birthdays:", birthdayError);
-        throw new Error(birthdayError);
-      }
       setUpcomingBirthdays(birthdays || []);
 
-    }, {
-      component: "ContactStatisticsDashboard",
-      action: "fetchStatistics"
-    });
+      const newCache: StatisticsCache = {
+        timestamp: Date.now(),
+        totalContacts: totalData,
+        genderData: genderStats || [],
+        groupData: groupStats || [],
+        preferredMethodData: methodStats || [],
+        upcomingBirthdays: birthdays || [],
+      };
+      localStorage.setItem(cacheKey, JSON.stringify(newCache));
+
+      if (toastId) dismissToast(toastId);
+      if (showLoadingToast) ErrorManager.notifyUser(t('statistics.stats_loaded_success'), 'success');
+    } catch (error: any) {
+      console.error("Error fetching statistics from Supabase:", error);
+      if (toastId) dismissToast(toastId);
+      ErrorManager.notifyUser(`${t('statistics.error_loading_stats')}: ${error.message || t('common.unknown_error')}`, 'error');
+      // If fetching fails and no cached data was available, clear states
+      if (!cachedData) {
+        setTotalContacts(null);
+        setGenderData([]);
+        setGroupData([]);
+        setPreferredMethodData([]);
+        setUpcomingBirthdays([]);
+      }
+    } finally {
+      setIsLoadingInitial(false);
+      setIsFetchingRemote(false);
+    }
   }, [session, isSessionLoading, executeAsync, t]);
 
   useEffect(() => {
-    fetchStatistics();
+    fetchStatistics(true); // Show loading toast for initial fetch
   }, [fetchStatistics]);
 
-  if (loading) {
+  if (isLoadingInitial) {
     return (
       <div className="text-center text-gray-500 dark:text-gray-400">
         {t('statistics.loading_stats')}
