@@ -275,6 +275,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
         }
 
         showSuccess("مخاطب با موفقیت به‌روزرسانی شد!");
+        navigate("/"); // Redirect to contacts list after successful update
       } else {
         // Insert new contact
         const { data: contactData, error: contactError } = await supabase
@@ -336,9 +337,8 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
 
         showSuccess("مخاطب با موفقیت ذخیره شد!");
         form.reset(); // Reset form after successful submission for new contact
+        // Do NOT navigate for new contact, stay on the form
       }
-
-      navigate("/"); // Redirect to contacts list after successful submission/update
     } catch (error: any) {
       console.error("Error saving contact:", error);
       showError(`خطا در ذخیره مخاطب: ${error.message || "خطای ناشناخته"}`);
@@ -403,6 +403,57 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
               </FormItem>
             )}
           />
+          <div className="flex items-end gap-2">
+            <FormField
+              control={form.control}
+              name="groupId"
+              render={({ field }) => (
+                <FormItem className="flex-grow">
+                  <FormLabel className="text-gray-700 dark:text-gray-200">گروه</FormLabel>
+                  <Select
+                    onValueChange={(value) => field.onChange(value === "no-group-selected" ? "" : value)}
+                    value={field.value === "" ? "no-group-selected" : field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger className="w-full bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100">
+                        <SelectValue placeholder="انتخاب گروه" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent className="backdrop-blur-md bg-white/80 dark:bg-gray-800/80 border border-white/30 dark:border-gray-600/30">
+                      <SelectItem value="no-group-selected">بدون گروه</SelectItem>
+                      {groups.map((group) => (
+                        <SelectItem key={group.id} value={group.id}>
+                          {group.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Dialog open={isAddGroupDialogOpen} onOpenChange={setIsAddGroupDialogOpen}>
+              <DialogTrigger asChild>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  className="h-10 w-10 mt-auto bg-blue-500 hover:bg-blue-600 text-white border-blue-500 dark:bg-blue-700 dark:hover:bg-blue-800 dark:border-blue-700"
+                >
+                  <PlusCircle size={20} />
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px] p-0 border-none bg-transparent shadow-none">
+                <GroupForm
+                  onSuccess={() => {
+                    setIsAddGroupDialogOpen(false);
+                    fetchGroups(); // Re-fetch groups after a new one is added
+                  }}
+                  onCancel={() => setIsAddGroupDialogOpen(false)}
+                />
+              </DialogContent>
+            </Dialog>
+          </div>
           <FormField
             control={form.control}
             name="gender"
@@ -477,57 +528,6 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
               </FormItem>
             )}
           />
-          <div className="flex items-end gap-2">
-            <FormField
-              control={form.control}
-              name="groupId"
-              render={({ field }) => (
-                <FormItem className="flex-grow">
-                  <FormLabel className="text-gray-700 dark:text-gray-200">گروه</FormLabel>
-                  <Select
-                    onValueChange={(value) => field.onChange(value === "no-group-selected" ? "" : value)}
-                    value={field.value === "" ? "no-group-selected" : field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger className="w-full bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100">
-                        <SelectValue placeholder="انتخاب گروه" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent className="backdrop-blur-md bg-white/80 dark:bg-gray-800/80 border border-white/30 dark:border-gray-600/30">
-                      <SelectItem value="no-group-selected">بدون گروه</SelectItem>
-                      {groups.map((group) => (
-                        <SelectItem key={group.id} value={group.id}>
-                          {group.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Dialog open={isAddGroupDialogOpen} onOpenChange={setIsAddGroupDialogOpen}>
-              <DialogTrigger asChild>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  className="h-10 w-10 mt-auto bg-blue-500 hover:bg-blue-600 text-white border-blue-500 dark:bg-blue-700 dark:hover:bg-blue-800 dark:border-blue-700"
-                >
-                  <PlusCircle size={20} />
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[425px] p-0 border-none bg-transparent shadow-none">
-                <GroupForm
-                  onSuccess={() => {
-                    setIsAddGroupDialogOpen(false);
-                    fetchGroups(); // Re-fetch groups after a new one is added
-                  }}
-                  onCancel={() => setIsAddGroupDialogOpen(false)}
-                />
-              </DialogContent>
-            </Dialog>
-          </div>
           <Button type="submit" className="w-full px-6 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white font-semibold shadow-md transition-all duration-300 transform hover:scale-105">
             {contactId ? "به‌روزرسانی مخاطب" : "ذخیره مخاطب"}
           </Button>
