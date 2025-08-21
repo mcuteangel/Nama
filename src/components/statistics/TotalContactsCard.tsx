@@ -10,7 +10,7 @@ interface TotalContactsCardProps {
 const TotalContactsCard: React.FC<TotalContactsCardProps> = ({ count }) => {
   const { t } = useTranslation();
   return (
-    <Card className="rounded-xl p-4 flex flex-col items-center justify-center text-center bg-white dark:bg-gray-800">
+    <Card className="rounded-xl p-4 flex flex-col items-center justify-center text-center bg-white dark:bg-gray-800 min-h-[256px]">
       <CardHeader className="pb-2">
         <CardTitle className="text-lg font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
           <Users size={20} className="text-blue-500" />
