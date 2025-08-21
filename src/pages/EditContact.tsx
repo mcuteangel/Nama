@@ -27,7 +27,7 @@ interface CustomField {
   id: string;
   template_id: string;
   field_value: string;
-  custom_field_templates: Array<{ // Changed to Array<...>
+  custom_field_templates: Array<{
     name: string;
     type: string;
     options?: string[];
@@ -74,7 +74,7 @@ const EditContact = () => {
       try {
         const { data, error } = await supabase
           .from("contacts")
-          .select("*, phone_numbers(id, phone_type, phone_number), email_addresses(id, email_type, email_address), contact_groups(group_id), custom_fields(id, template_id, field_value, custom_field_templates(name, type, options))") // Select custom_field_templates
+          .select("id, first_name, last_name, gender, position, company, address, notes, created_at, updated_at, phone_numbers(id, phone_type, phone_number), email_addresses(id, email_type, email_address), contact_groups(group_id), custom_fields(id, template_id, field_value, custom_field_templates(name, type, options))") // Explicitly select all required columns
           .eq("id", id)
           .single();
 
