@@ -1,10 +1,21 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { MadeWithDyad } from "@/components/made-with-dyad";
 
 const Home = () => {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const hasSeenWelcome = localStorage.getItem('hasSeenWelcome');
+    if (hasSeenWelcome) {
+      navigate('/contacts');
+    } else {
+      localStorage.setItem('hasSeenWelcome', 'true');
+    }
+  }, [navigate]);
+
   return (
     <div className="flex flex-col items-center justify-center p-4 h-full w-full bg-gradient-to-br from-blue-100 to-purple-100 dark:from-gray-900 dark:to-gray-800">
       <Card className="w-full max-w-md glass rounded-xl p-6 text-center">
