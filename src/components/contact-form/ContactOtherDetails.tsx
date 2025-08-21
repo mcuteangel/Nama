@@ -94,20 +94,104 @@ const ContactOtherDetails: React.FC = () => {
         />
       </div>
 
-      <div className="grid grid-cols-1 gap-4">
+      {/* Detailed Address Fields */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+        <h3 className="col-span-full text-lg font-semibold text-gray-800 dark:text-gray-100 mb-2">آدرس</h3>
         <FormField
           control={form.control}
-          name="address"
+          name="street"
           render={({ field }) => (
-            <FormItem className="col-span-full">
-              <FormLabel className="text-gray-700 dark:text-gray-200">آدرس</FormLabel>
+            <FormItem>
+              <FormLabel className="text-gray-700 dark:text-gray-200">خیابان/کوچه</FormLabel>
               <FormControl>
-                <Textarea placeholder="آدرس کامل" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400" {...field} />
+                <Input placeholder="مثال: خیابان آزادی" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
+        <FormField
+          control={form.control}
+          name="city"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-gray-700 dark:text-gray-200">شهر</FormLabel>
+              <FormControl>
+                <Input placeholder="مثال: تهران" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="state"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-gray-700 dark:text-gray-200">استان</FormLabel>
+              <FormControl>
+                <Input placeholder="مثال: تهران" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="zipCode"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-gray-700 dark:text-gray-200">کد پستی</FormLabel>
+              <FormControl>
+                <Input placeholder="مثال: 12345-67890" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="country"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-gray-700 dark:text-gray-200">کشور</FormLabel>
+              <FormControl>
+                <Input placeholder="مثال: ایران" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </div>
+
+      {/* Preferred Communication Method */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+        <FormField
+          control={form.control}
+          name="preferredContactMethod"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-gray-700 dark:text-gray-200">روش ارتباط ترجیحی</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value || ""}>
+                <FormControl>
+                  <SelectTrigger className="w-full bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100">
+                    <SelectValue placeholder="انتخاب روش ارتباطی" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent className="backdrop-blur-md bg-white/80 dark:bg-gray-800/80 border border-white/30 dark:border-gray-600/30">
+                  <SelectItem value="any">هر کدام</SelectItem>
+                  <SelectItem value="email">ایمیل</SelectItem>
+                  <SelectItem value="phone">تلفن</SelectItem>
+                  <SelectItem value="sms">پیامک</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
         <FormField
           control={form.control}
           name="notes"

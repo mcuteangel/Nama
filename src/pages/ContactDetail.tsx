@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Phone, Mail, Building, Briefcase, MapPin, Info, User, Users, Tag, CalendarClock, Gift, Link as LinkIcon, Linkedin, Twitter, Instagram, Send } from "lucide-react"; // Import LinkIcon, social icons
+import { Phone, Mail, Building, Briefcase, MapPin, Info, User, Users, Tag, CalendarClock, Gift, Link as LinkIcon, Linkedin, Twitter, Instagram, Send, HomeIcon, Globe, Map } from "lucide-react"; // Import new icons
 import { MadeWithDyad } from "@/components/made-with-dyad";
 import { useJalaliCalendar } from "@/hooks/use-jalali-calendar";
 
@@ -25,7 +25,7 @@ interface EmailAddress {
   email_address: string;
 }
 
-interface SocialLink { // New: Social Link interface
+interface SocialLink {
   id: string;
   type: string;
   url: string;
@@ -57,17 +57,22 @@ interface ContactDetailType {
   gender: string;
   position?: string;
   company?: string;
-  address?: string;
+  street?: string; // New: Detailed address field
+  city?: string;    // New: Detailed address field
+  state?: string;   // New: Detailed address field
+  zip_code?: string; // New: Detailed address field
+  country?: string; // New: Detailed address field
   notes?: string;
   phone_numbers: PhoneNumber[];
   email_addresses: EmailAddress[];
-  social_links: SocialLink[]; // New: Social Links
+  social_links: SocialLink[];
   contact_groups: ContactGroup[];
   custom_fields: CustomField[];
   birthday?: string | null;
+  avatar_url?: string | null; // New: Avatar URL
+  preferred_contact_method?: 'email' | 'phone' | 'sms' | 'any' | null; // New: Preferred contact method
   created_at: string;
   updated_at: string;
-  avatarUrl?: string;
 }
 
 const getSocialIcon = (type: string) => {
@@ -75,7 +80,7 @@ const getSocialIcon = (type: string) => {
     case 'linkedin': return <Linkedin size={16} />;
     case 'twitter': return <Twitter size={16} />;
     case 'instagram': return <Instagram size={16} />;
-    case 'telegram': return <Send size={16} />; // Telegram icon
+    case 'telegram': return <Send size={16} />;
     case 'website': return <LinkIcon size={16} />;
     default: return <LinkIcon size={16} />;
   }
@@ -89,6 +94,16 @@ const getSocialLabel = (type: string) => {
     case 'telegram': return 'تلگرام';
     case 'website': return 'وب‌سایت';
     default: return 'سایر';
+  }
+};
+
+const getPreferredContactMethodLabel = (method: string | null | undefined) => {
+  switch (method) {
+    case 'email': return 'ایمیل';
+    case 'phone': return 'تلفن';
+    case 'sms': return 'پیامک';
+    case 'any': return 'هر کدام';
+    default: return 'نامشخص';
   }
 };
 
@@ -113,7 +128,7 @@ const ContactDetail = () => {
       try {
         const { data, error } = await supabase
           .from("contacts")
-          .select("id, first_name, last_name, gender, position, company, address, notes, created_at, updated_at, birthday, phone_numbers(id, phone_type, phone_number, extension), email_addresses(id, email_type, email_address), social_links(id, type, url), contact_groups(group_id, groups(name, color)), custom_fields(id, template_id, field_value, custom_field_templates(name, type, options))")
+          .select("id, first_name, last_name, gender, position, company, street, city, state, zip_code, country, notes, created_at, updated_at, birthday, avatar_url, preferred_contact_method, phone_numbers(id, phone_type, phone_number, extension), email_addresses(id, email_type, email_address), social_links(id, type, url), contact_groups(group_id, groups(name, color)), custom_fields(id, template_id, field_value, custom_field_templates(name, type, options))")
           .eq("id", id)
           .single();
 
@@ -165,7 +180,7 @@ const ContactDetail = () => {
       <Card className="w-full max-w-2xl glass rounded-xl p-6">
         <CardHeader className="text-center">
           <Avatar className="h-24 w-24 mx-auto mb-4 border-4 border-blue-400 dark:border-blue-600">
-            <AvatarImage src={contact.avatarUrl} alt={`${contact.first_name} ${contact.last_name}`} />
+            <AvatarImage src={contact.avatar_url || undefined} alt={`${contact.first_name} ${contact.last_name}`} />
             <AvatarFallback className="bg-blue-500 text-white dark:bg-blue-700 text-4xl font-bold">
               {contact.first_name ? contact.first_name[0] : "?"}
             </AvatarFallback>
@@ -195,10 +210,34 @@ const ContactDetail = () => {
                 <Input value={contact.company} readOnly className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
               </div>
             )}
-            {contact.address && (
-              <div className="md:col-span-2">
-                <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><MapPin size={16} /> آدرس</Label>
-                <Textarea value={contact.address} readOnly className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
+            {contact.street && (
+              <div>
+                <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><HomeIcon size={16} /> خیابان/کوچه</Label>
+                <Input value={contact.street} readOnly className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
+              </div>
+            )}
+            {contact.city && (
+              <div>
+                <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><Map size={16} /> شهر</Label>
+                <Input value={contact.city} readOnly className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
+              </div>
+            )}
+            {contact.state && (
+              <div>
+                <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><MapPin size={16} /> استان</Label>
+                <Input value={contact.state} readOnly className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
+              </div>
+            )}
+            {contact.zip_code && (
+              <div>
+                <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><Tag size={16} /> کد پستی</Label>
+                <Input value={contact.zip_code} readOnly className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
+              </div>
+            )}
+            {contact.country && (
+              <div>
+                <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><Globe size={16} /> کشور</Label>
+                <Input value={contact.country} readOnly className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
               </div>
             )}
             {assignedGroup && (
@@ -213,10 +252,16 @@ const ContactDetail = () => {
                 <Input value={formatDate(new Date(contact.birthday), 'jYYYY/jMM/jDD')} readOnly className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
               </div>
             )}
+            {contact.preferred_contact_method && (
+              <div>
+                <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><Mail size={16} /> روش ارتباط ترجیحی</Label>
+                <Input value={getPreferredContactMethodLabel(contact.preferred_contact_method)} readOnly className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
+              </div>
+            )}
           </div>
 
           {contact.phone_numbers.length > 0 && (
-            <div className="space-y-2">
+            <div className="space-y-2 pt-4 border-t border-gray-200 dark:border-gray-700">
               <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><Phone size={16} /> شماره تلفن‌ها</Label>
               {contact.phone_numbers.map((phone) => (
                 <Input key={phone.id} value={`${phone.phone_number} (${phone.phone_type})${phone.extension ? ` - داخلی: ${phone.extension}` : ''}`} readOnly className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
@@ -225,7 +270,7 @@ const ContactDetail = () => {
           )}
 
           {contact.email_addresses.length > 0 && (
-            <div className="space-y-2">
+            <div className="space-y-2 pt-4 border-t border-gray-200 dark:border-gray-700">
               <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><Mail size={16} /> آدرس‌های ایمیل</Label>
               {contact.email_addresses.map((email) => (
                 <Input key={email.id} value={`${email.email_address} (${email.email_type})`} readOnly className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
@@ -233,8 +278,8 @@ const ContactDetail = () => {
             </div>
           )}
 
-          {contact.social_links.length > 0 && ( // New: Display Social Links
-            <div className="space-y-2">
+          {contact.social_links.length > 0 && (
+            <div className="space-y-2 pt-4 border-t border-gray-200 dark:border-gray-700">
               <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><LinkIcon size={16} /> لینک‌های شبکه‌های اجتماعی</Label>
               {contact.social_links.map((link) => (
                 <div key={link.id} className="flex items-center gap-2 bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 rounded-md p-2">
@@ -248,7 +293,7 @@ const ContactDetail = () => {
           )}
 
           {contact.custom_fields.length > 0 && (
-            <div className="space-y-2">
+            <div className="space-y-2 pt-4 border-t border-gray-200 dark:border-gray-700">
               <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><Tag size={16} /> فیلدهای سفارشی</Label>
               {contact.custom_fields.map((field) => (
                 <div key={field.id} className="flex flex-col gap-1">
@@ -268,7 +313,7 @@ const ContactDetail = () => {
           )}
 
           {contact.notes && (
-            <div className="space-y-2">
+            <div className="space-y-2 pt-4 border-t border-gray-200 dark:border-gray-700">
               <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><Info size={16} /> یادداشت‌ها</Label>
               <Textarea value={contact.notes} readOnly className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
             </div>

@@ -38,8 +38,8 @@ export const exportContactsToCsv = async (session: Session | null, options: Expo
 
     // Define CSV headers and map data
     const headers = [
-      "نام", "نام خانوادگی", "جنسیت", "سمت", "شرکت", "آدرس", "یادداشت‌ها", "تاریخ تولد",
-      "شماره تلفن‌ها", "ایمیل‌ها", "لینک‌های اجتماعی", "گروه"
+      "نام", "نام خانوادگی", "جنسیت", "سمت", "شرکت", "خیابان", "شهر", "استان", "کد پستی", "کشور", "یادداشت‌ها", "تاریخ تولد",
+      "شماره تلفن‌ها", "ایمیل‌ها", "لینک‌های اجتماعی", "گروه", "URL آواتار", "روش ارتباط ترجیحی"
     ];
 
     const csvRows = contacts.map(contact => {
@@ -59,19 +59,35 @@ export const exportContactsToCsv = async (session: Session | null, options: Expo
         ? contact.contact_groups[0].groups[0].name
         : '';
 
+      const preferredContactMethodLabel = (() => {
+        switch (contact.preferred_contact_method) {
+          case 'email': return 'ایمیل';
+          case 'phone': return 'تلفن';
+          case 'sms': return 'پیامک';
+          case 'any': return 'هر کدام';
+          default: return '';
+        }
+      })();
+
       return [
         contact.first_name || '',
         contact.last_name || '',
         contact.gender === "male" ? "مرد" : contact.gender === "female" ? "زن" : "نامشخص",
         contact.position || '',
         contact.company || '',
-        contact.address || '',
+        contact.street || '', // New: Detailed address field
+        contact.city || '',    // New: Detailed address field
+        contact.state || '',   // New: Detailed address field
+        contact.zip_code || '', // New: Detailed address field
+        contact.country || '', // New: Detailed address field
         contact.notes || '',
         contact.birthday ? new Date(contact.birthday).toLocaleDateString('fa-IR') : '', // Format date for Persian calendar
         phoneNumbers,
         emailAddresses,
         socialLinks,
         groupName,
+        contact.avatar_url || '', // New: Avatar URL
+        preferredContactMethodLabel, // New: Preferred contact method
       ].map(field => `"${String(field).replace(/"/g, '""')}"`).join(','); // Escape double quotes and join
     });
 

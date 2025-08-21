@@ -20,6 +20,12 @@ interface EmailAddress {
   email_address: string;
 }
 
+interface SocialLink {
+  id: string;
+  type: string;
+  url: string;
+}
+
 interface ContactGroup {
   group_id: string;
 }
@@ -42,11 +48,19 @@ interface ContactDetailType {
   gender: "male" | "female" | "not_specified";
   position?: string;
   company?: string;
-  address?: string;
+  street?: string; // New: Detailed address field
+  city?: string;    // New: Detailed address field
+  state?: string;   // New: Detailed address field
+  zip_code?: string; // New: Detailed address field
+  country?: string; // New: Detailed address field
   notes?: string;
   phone_numbers: PhoneNumber[]; // Now an array
   email_addresses: EmailAddress[]; // Now an array
+  social_links: SocialLink[]; // New: Social Links
   groupId?: string;
+  birthday?: string | null;
+  avatar_url?: string | null; // New: Avatar URL
+  preferred_contact_method?: 'email' | 'phone' | 'sms' | 'any' | null; // New: Preferred contact method
   custom_fields: CustomField[];
   created_at: string;
   updated_at: string;
@@ -72,7 +86,7 @@ const EditContact = () => {
       try {
         const { data, error } = await supabase
           .from("contacts")
-          .select("id, first_name, last_name, gender, position, company, address, notes, created_at, updated_at, phone_numbers(id, phone_type, phone_number, extension), email_addresses(id, email_type, email_address), contact_groups(group_id), custom_fields(id, template_id, field_value, custom_field_templates(name, type, options))")
+          .select("id, first_name, last_name, gender, position, company, street, city, state, zip_code, country, notes, created_at, updated_at, birthday, avatar_url, preferred_contact_method, phone_numbers(id, phone_type, phone_number, extension), email_addresses(id, email_type, email_address), social_links(id, type, url), contact_groups(group_id), custom_fields(id, template_id, field_value, custom_field_templates(name, type, options))")
           .eq("id", id)
           .single();
 
@@ -83,6 +97,7 @@ const EditContact = () => {
             ...data,
             phone_numbers: data.phone_numbers || [],
             email_addresses: data.email_addresses || [],
+            social_links: data.social_links || [], // New: Social Links
             groupId: data.contact_groups[0]?.group_id || "",
             custom_fields: data.custom_fields || [],
           } as ContactDetailType;

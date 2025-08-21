@@ -13,13 +13,13 @@ import { ContactService } from "@/services/contact-service"; // Import ContactSe
 // Define types for contact data
 interface PhoneNumber {
   phone_number: string;
-  phone_type: string; // Added phone_type
-  extension?: string | null; // Added extension
+  phone_type: string;
+  extension?: string | null;
 }
 
 interface EmailAddress {
   email_address: string;
-  email_type: string; // Added email_type
+  email_type: string;
 }
 
 interface Contact {
@@ -29,11 +29,15 @@ interface Contact {
   gender: string;
   position?: string;
   company?: string;
-  address?: string;
+  street?: string; // New: Detailed address field
+  city?: string;    // New: Detailed address field
+  state?: string;   // New: Detailed address field
+  zip_code?: string; // New: Detailed address field
+  country?: string; // New: Detailed address field
   notes?: string;
   phone_numbers: PhoneNumber[];
   email_addresses: EmailAddress[];
-  avatarUrl?: string;
+  avatar_url?: string | null; // New: Avatar URL
 }
 
 interface ContactListProps {
@@ -86,7 +90,7 @@ const ContactItem = ({ contact, onContactDeleted, onContactEdited }: { contact: 
     >
       <div className="flex items-center gap-4">
         <Avatar className="h-12 w-12 border border-white/50 dark:border-gray-600/50">
-          <AvatarImage src={contact?.avatarUrl} alt={contact?.first_name} />
+          <AvatarImage src={contact?.avatar_url || undefined} alt={contact?.first_name} />
           <AvatarFallback className="bg-blue-500 text-white dark:bg-blue-700">
             {contact?.first_name ? contact.first_name[0] : "?"}
           </AvatarFallback>
@@ -167,13 +171,11 @@ const ContactList = ({ searchTerm, selectedGroup, companyFilter, sortOption }: C
     setIsFetchingRemote(true);
 
     try {
-      const { data, error } = await ContactService.getFilteredContacts(
-        session.user.id,
-        searchTerm,
-        selectedGroup,
-        companyFilter,
-        sortOption
-      );
+      const { data, error } = await supabase
+        .from("contacts")
+        .select("id, first_name, last_name, gender, position, company, street, city, state, zip_code, country, notes, created_at, updated_at, birthday, avatar_url, preferred_contact_method, phone_numbers(phone_number, phone_type, extension), email_addresses(email_address, email_type), social_links(type, url), contact_groups(group_id), custom_fields(id, template_id, field_value, custom_field_templates(name, type, options))")
+        .eq("user_id", session.user.id)
+        .order("first_name", { ascending: true }); // Default sort
 
       if (error) throw error;
 
@@ -195,7 +197,7 @@ const ContactList = ({ searchTerm, selectedGroup, companyFilter, sortOption }: C
 
   useEffect(() => {
     fetchContacts();
-  }, [session, isSessionLoading, searchTerm, selectedGroup, companyFilter, sortOption]); // Added searchTerm to dependencies
+  }, [session, isSessionLoading, searchTerm, selectedGroup, companyFilter, sortOption]);
 
   const handleContactDeleted = (deletedId: string) => {
     setContacts(prevContacts => prevContacts.filter(contact => contact.id !== deletedId));
@@ -213,7 +215,7 @@ const ContactList = ({ searchTerm, selectedGroup, companyFilter, sortOption }: C
 
   return (
     <div className="space-y-4">
-      {contacts.length === 0 ? ( // Use 'contacts' directly as filtering is now done by the service
+      {contacts.length === 0 ? (
         <p className="text-center text-gray-500 dark:text-gray-400">هیچ مخاطبی یافت نشد.</p>
       ) : (
         contacts.map((contact) => (

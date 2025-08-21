@@ -37,9 +37,15 @@ export const useContactFormLogic = (
             gender: values.gender,
             position: values.position,
             company: values.company,
-            address: values.address,
+            street: values.street === '' ? null : values.street, // New: Detailed address field
+            city: values.city === '' ? null : values.city,      // New: Detailed address field
+            state: values.state === '' ? null : values.state,   // New: Detailed address field
+            zip_code: values.zipCode === '' ? null : values.zipCode, // New: Detailed address field
+            country: values.country === '' ? null : values.country, // New: Detailed address field
             notes: values.notes,
             birthday: values.birthday || null,
+            avatar_url: values.avatarUrl || null, // New: Avatar URL
+            preferred_contact_method: values.preferredContactMethod || null, // New: Preferred contact method
           })
           .eq("id", contactId)
           .eq("user_id", user.id);
@@ -287,9 +293,15 @@ export const useContactFormLogic = (
             gender: values.gender,
             position: values.position,
             company: values.company,
-            address: values.address,
+            street: values.street === '' ? null : values.street, // New: Detailed address field
+            city: values.city === '' ? null : values.city,      // New: Detailed address field
+            state: values.state === '' ? null : values.state,   // New: Detailed address field
+            zip_code: values.zipCode === '' ? null : values.zipCode, // New: Detailed address field
+            country: values.country === '' ? null : values.country, // New: Detailed address field
             notes: values.notes,
             birthday: values.birthday || null,
+            avatar_url: values.avatarUrl || null, // New: Avatar URL
+            preferred_contact_method: values.preferredContactMethod || null, // New: Preferred contact method
           })
           .select('id')
           .single();

@@ -15,11 +15,12 @@ import { ContactFormValues, contactFormSchema } from "../types/contact.ts";
 import ContactBasicInfo from "./contact-form/ContactBasicInfo.tsx";
 import ContactPhoneNumbers from "./contact-form/ContactPhoneNumbers.tsx";
 import ContactEmailAddresses from "./contact-form/ContactEmailAddresses.tsx";
-import ContactSocialLinks from "./contact-form/ContactSocialLinks.tsx"; // New import
+import ContactSocialLinks from "./contact-form/ContactSocialLinks.tsx";
 import ContactOtherDetails from "./contact-form/ContactOtherDetails.tsx";
 import ContactImportantDates from "./contact-form/ContactImportantDates.tsx";
 import ContactCustomFields from "./contact-form/ContactCustomFields.tsx";
 import ContactFormActions from "./contact-form/ContactFormActions.tsx";
+import ContactAvatarUpload from "./ContactAvatarUpload.tsx"; // New import
 
 interface ContactFormProps {
   initialData?: {
@@ -29,13 +30,19 @@ interface ContactFormProps {
     gender: "male" | "female" | "not_specified";
     position?: string;
     company?: string;
-    address?: string;
+    street?: string; // New: Detailed address field
+    city?: string;    // New: Detailed address field
+    state?: string;   // New: Detailed address field
+    zip_code?: string; // New: Detailed address field
+    country?: string; // New: Detailed address field
     notes?: string;
     phone_numbers?: { id?: string; phone_type: string; phone_number: string; extension?: string | null }[];
     email_addresses?: { id?: string; email_type: string; email_address: string }[];
-    social_links?: { id?: string; type: string; url: string }[]; // New: Social Links
+    social_links?: { id?: string; type: string; url: string }[];
     groupId?: string;
     birthday?: string | null;
+    avatar_url?: string | null; // New: Avatar URL
+    preferred_contact_method?: 'email' | 'phone' | 'sms' | 'any' | null; // New: Preferred contact method
     custom_fields?: {
       id: string;
       template_id: string;
@@ -82,13 +89,19 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
       gender: initialData?.gender || "not_specified",
       position: initialData?.position || "",
       company: initialData?.company || "",
-      address: initialData?.address || "",
+      street: initialData?.street || "", // New: Detailed address field
+      city: initialData?.city || "",      // New: Detailed address field
+      state: initialData?.state || "",    // New: Detailed address field
+      zipCode: initialData?.zip_code || "", // New: Detailed address field
+      country: initialData?.country || "", // New: Detailed address field
       notes: initialData?.notes || "",
       groupId: initialData?.groupId || "",
       birthday: initialData?.birthday || null,
+      avatarUrl: initialData?.avatar_url || null, // New: Avatar URL
+      preferredContactMethod: initialData?.preferred_contact_method || null, // New: Preferred contact method
       phoneNumbers: initialData?.phone_numbers || [],
       emailAddresses: initialData?.email_addresses || [],
-      socialLinks: initialData?.social_links || [], // New: Social Links default value
+      socialLinks: initialData?.social_links || [],
       customFields: initialData?.custom_fields?.map(cf => ({
         template_id: cf.template_id,
         value: cf.field_value,
@@ -123,13 +136,19 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
         gender: initialData.gender,
         position: initialData.position,
         company: initialData.company,
-        address: initialData.address,
+        street: initialData.street || "", // New: Detailed address field
+        city: initialData.city || "",      // New: Detailed address field
+        state: initialData.state || "",    // New: Detailed address field
+        zipCode: initialData.zip_code || "", // New: Detailed address field
+        country: initialData.country || "", // New: Detailed address field
         notes: initialData.notes,
         groupId: initialData.groupId || "",
         birthday: initialData.birthday || null,
+        avatarUrl: initialData.avatar_url || null, // New: Avatar URL
+        preferredContactMethod: initialData.preferred_contact_method || null, // New: Preferred contact method
         phoneNumbers: initialData.phone_numbers || [],
         emailAddresses: initialData.email_addresses || [],
-        socialLinks: initialData.social_links || [], // New: Social Links reset
+        socialLinks: initialData.social_links || [],
         customFields: initialData.custom_fields?.map(cf => ({
           template_id: cf.template_id,
           value: cf.field_value,
@@ -183,10 +202,15 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
     <CardContent className="space-y-4">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <ContactAvatarUpload
+            initialAvatarUrl={form.watch('avatarUrl')}
+            onAvatarChange={(url) => form.setValue('avatarUrl', url)}
+            disabled={form.formState.isSubmitting}
+          />
           <ContactBasicInfo />
           <ContactPhoneNumbers />
           <ContactEmailAddresses />
-          <ContactSocialLinks /> {/* New: Social Links section */}
+          <ContactSocialLinks />
           <ContactImportantDates />
           <ContactOtherDetails />
           <ContactCustomFields
