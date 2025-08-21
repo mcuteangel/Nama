@@ -19,23 +19,21 @@ import ProtectedRoute from './components/ProtectedRoute';
 
 function AppLayout() {
   const location = useLocation();
-  const [isMobile, setIsMobile] = useState(false);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true); // State for sidebar open/close
+  const mobileBreakpoint = 768; // Tailwind's 'md' breakpoint
+
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < mobileBreakpoint);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(() => window.innerWidth >= mobileBreakpoint); // Open by default on desktop
 
   useEffect(() => {
     const handleResize = () => {
-      const mobileBreakpoint = 768; // Tailwind's 'md' breakpoint
       setIsMobile(window.innerWidth < mobileBreakpoint);
-      // If resizing from mobile to desktop, ensure sidebar is open by default
-      if (window.innerWidth >= mobileBreakpoint && !isSidebarOpen) {
-        setIsSidebarOpen(true);
-      }
+      // Do NOT force isSidebarOpen here. It should be controlled by user interaction.
+      // If it transitions from mobile to desktop, the initial state will handle it.
     };
 
-    handleResize(); // Set initial state
     window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('change', handleResize); // Corrected event listener cleanup
-  }, [isSidebarOpen]);
+    return () => window.removeEventListener('resize', handleResize); // Corrected event listener cleanup
+  }, []); // Empty dependency array to run once on mount
 
   const isAuthPage = location.pathname === '/login';
 
