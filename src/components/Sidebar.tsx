@@ -1,39 +1,42 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { LogOut, PlusCircle, Users, Home, Menu, Settings, User } from "lucide-react"; // Import User icon
+import { LogOut, PlusCircle, Users, Home, Menu, Settings, User } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { showError, showSuccess, showLoading, dismissToast } from "@/utils/toast";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { ThemeToggle } from "./ThemeToggle";
+import { useTranslation } from 'react-i18next'; // Import useTranslation
 
 interface SidebarProps {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
 }
 
-const navItems = [
-  { name: "خانه", icon: Home, path: "/" },
-  { name: "افزودن مخاطب", icon: PlusCircle, path: "/add-contact" },
-  { name: "گروه‌ها", icon: Users, path: "/groups" },
-  { name: "فیلدهای سفارشی", icon: Settings, path: "/custom-fields" },
-  { name: "پروفایل", icon: User, path: "/profile" }, // New navigation item for User Profile
-];
-
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
   const navigate = useNavigate();
+  const { t } = useTranslation(); // Initialize useTranslation
+
+  const navItems = [
+    { name: t('common.home'), icon: Home, path: "/" },
+    { name: t('common.add_contact'), icon: PlusCircle, path: "/add-contact" },
+    { name: t('common.groups'), icon: Users, path: "/groups" },
+    { name: t('common.custom_fields'), icon: Settings, path: "/custom-fields" },
+    { name: t('common.profile'), icon: User, path: "/profile" },
+    { name: t('common.settings'), icon: Settings, path: "/settings" }, // New navigation item for Settings
+  ];
 
   const handleLogout = async () => {
-    const toastId = showLoading("در حال خروج...");
+    const toastId = showLoading(t('common.logout_loading'));
     try {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
-      showSuccess("با موفقیت از حساب کاربری خود خارج شدید.");
+      showSuccess(t('common.logout_success'));
       navigate("/login");
     } catch (error: any) {
       console.error("Error logging out:", error);
-      showError(`خطا در خروج: ${error.message || "خطای ناشناخته"}`);
+      showError(`${t('common.logout_error')}: ${error.message || t('common.unknown_error')}`);
     } finally {
       dismissToast(toastId);
     }
@@ -101,11 +104,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
               >
                 <div className="flex items-center">
                   <LogOut size={20} className={cn(isOpen ? "me-2" : "mx-auto")} />
-                  {isOpen && <span className="whitespace-nowrap overflow-hidden">خروج</span>}
+                  {isOpen && <span className="whitespace-nowrap overflow-hidden">{t('common.logout')}</span>}
                 </div>
               </Button>
             </TooltipTrigger>
-            {!isOpen && <TooltipContent side="left">خروج</TooltipContent>}
+            {!isOpen && <TooltipContent side="left">{t('common.logout')}</TooltipContent>}
           </Tooltip>
         )}
         {!isOpen && (
@@ -120,7 +123,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
                 <LogOut size={20} />
               </Button>
             </TooltipTrigger>
-            <TooltipContent side="left">خروج</TooltipContent>
+            <TooltipContent side="left">{t('common.logout')}</TooltipContent>
           </Tooltip>
         )}
         <ThemeToggle />

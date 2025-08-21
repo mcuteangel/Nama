@@ -1,0 +1,39 @@
+{
+  "settings": {
+    "title": "تنظیمات",
+    "description": "تنظیمات برنامه خود را مدیریت کنید.",
+    "general_settings": "تنظیمات عمومی",
+    "display_settings": "تنظیمات نمایش",
+    "data_management": "مدیریت داده‌ها",
+    "theme": "تم",
+    "light": "روشن",
+    "dark": "تاریک",
+    "system": "سیستم",
+    "calendar_type": "نوع تقویم",
+    "jalali": "شمسی",
+    "gregorian": "میلادی",
+    "language": "زبان",
+    "persian": "فارسی",
+    "english": "انگلیسی",
+    "export_contacts": "خروجی گرفتن از مخاطبین",
+    "import_contacts": "وارد کردن مخاطبین (به زودی)",
+    "user_profile": "پروفایل کاربری",
+    "loading_settings": "در حال بارگذاری تنظیمات...",
+    "preparing_form": "در حال آماده‌سازی فرم گروه..."
+  },
+  "common": {
+    "home": "خانه",
+    "add_contact": "افزودن مخاطب",
+    "groups": "گروه‌ها",
+    "custom_fields": "فیلدها",
+    "profile": "پروفایل",
+    "settings": "تنظیمات",
+    "logout": "خروج",
+    "cancel": "لغو",
+    "save": "ذخیره",
+    "loading": "در حال بارگذاری...",
+    "error": "خطا",
+    "success": "موفقیت",
+    "unknown_error": "خطای ناشناخته رخ داد."
+  }
+}

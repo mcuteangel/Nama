@@ -8,7 +8,8 @@ import ContactDetail from './pages/ContactDetail';
 import EditContact from './pages/EditContact';
 import Groups from './pages/Groups';
 import CustomFields from './pages/CustomFields';
-import UserProfile from './pages/UserProfile'; // Import UserProfile
+import UserProfile from './pages/UserProfile';
+import Settings from './pages/Settings'; // Import Settings page
 import { SessionContextProvider } from './integrations/supabase/auth';
 import { supabase } from './integrations/supabase/client';
 import MobileHeader from './components/MobileHeader';
@@ -20,10 +21,12 @@ import NotFound from './pages/NotFound';
 import ProtectedRoute from './components/ProtectedRoute';
 import { TooltipProvider } from './components/ui/tooltip';
 import { ThemeProvider } from 'next-themes';
+import { useTranslation } from 'react-i18next'; // Import useTranslation
 
 function AppLayout() {
   const location = useLocation();
   const mobileBreakpoint = 768; // Tailwind's 'md' breakpoint
+  const { i18n } = useTranslation(); // Get i18n instance
 
   const [isMobile, setIsMobile] = useState(() => window.innerWidth < mobileBreakpoint);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -36,6 +39,11 @@ function AppLayout() {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  // Set document direction based on language
+  useEffect(() => {
+    document.documentElement.dir = i18n.dir();
+  }, [i18n.dir()]);
 
   const isAuthPage = location.pathname === '/login';
 
@@ -67,7 +75,8 @@ function AppLayout() {
             <Route path="/contacts/edit/:id" element={<ProtectedRoute><EditContact /></ProtectedRoute>} />
             <Route path="/groups" element={<ProtectedRoute><Groups /></ProtectedRoute>} />
             <Route path="/custom-fields" element={<ProtectedRoute><CustomFields /></ProtectedRoute>} />
-            <Route path="/profile" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} /> {/* New UserProfile route */}
+            <Route path="/profile" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
+            <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} /> {/* New Settings route */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </main>

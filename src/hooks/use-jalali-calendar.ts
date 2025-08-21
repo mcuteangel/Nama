@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import moment from 'moment-jalaali';
 import { enUS } from 'date-fns/locale';
 
@@ -15,13 +15,15 @@ export interface CalendarOptions {
 export interface CalendarHookReturn {
   calendarType: CalendarType;
   currentLocale: any;
-  toggleCalendarType: () => void;
+  setCalendarType: (type: CalendarType) => void; // Changed to setCalendarType
   formatDate: (date: Date | undefined, formatString?: string) => string;
   formatDateWithDay: (date: Date | undefined) => string;
   getCalendarLabel: () => string;
   convertToJalali: (date: Date) => moment.Moment;
   convertToGregorian: (date: moment.Moment) => Date;
 }
+
+const CALENDAR_TYPE_STORAGE_KEY = 'calendarType';
 
 export function useJalaliCalendar(options: CalendarOptions = {}): CalendarHookReturn {
   const { 
@@ -30,10 +32,23 @@ export function useJalaliCalendar(options: CalendarOptions = {}): CalendarHookRe
     format: formatString = 'jYYYY/jMM/jDD' 
   } = options;
 
-  const [calendarType, setCalendarType] = useState<CalendarType>(type);
+  const [calendarType, setCalendarTypeState] = useState<CalendarType>(() => {
+    if (typeof window !== 'undefined') {
+      const storedType = localStorage.getItem(CALENDAR_TYPE_STORAGE_KEY);
+      return (storedType === 'jalali' || storedType === 'gregorian') ? storedType : type;
+    }
+    return type;
+  });
 
-  const toggleCalendarType = useCallback(() => {
-    setCalendarType(prev => prev === 'jalali' ? 'gregorian' : 'jalali');
+  // Update localStorage when calendarType changes
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(CALENDAR_TYPE_STORAGE_KEY, calendarType);
+    }
+  }, [calendarType]);
+
+  const setCalendarType = useCallback((newType: CalendarType) => {
+    setCalendarTypeState(newType);
   }, []);
 
   const formatDate = useCallback((date: Date | undefined, customFormat?: string) => {
@@ -59,7 +74,7 @@ export function useJalaliCalendar(options: CalendarOptions = {}): CalendarHookRe
       // For Gregorian, use date-fns with English locale
       const { format } = require('date-fns');
       const dateObj = new Date(date);
-      const dayName = dateObj.toLocaleDateString('fa-IR', { weekday: 'long' });
+      const dayName = dateObj.toLocaleDateString('fa-IR', { weekday: 'long' }); // Still use fa-IR for day name for consistency
       return `${format(date, 'yyyy/MM/dd', { locale: enUS })} (${dayName})`;
     }
   }, [calendarType]);
@@ -79,7 +94,7 @@ export function useJalaliCalendar(options: CalendarOptions = {}): CalendarHookRe
   return {
     calendarType,
     currentLocale: calendarType === 'jalali' ? 'fa' : 'en',
-    toggleCalendarType,
+    setCalendarType,
     formatDate,
     formatDateWithDay,
     getCalendarLabel,

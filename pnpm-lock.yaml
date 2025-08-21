@@ -116,6 +116,9 @@ importers:
       '@tanstack/react-query':
         specifier: ^5.56.2
         version: 5.74.4(react@18.3.1)
+      '@types/i18next-browser-languagedetector':
+        specifier: ^3.0.0
+        version: 3.0.0
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -137,6 +140,9 @@ importers:
       i18next:
         specifier: ^25.4.0
         version: 25.4.0(typescript@5.8.3)
+      i18next-browser-languagedetector:
+        specifier: ^8.2.0
+        version: 8.2.0
       input-otp:
         specifier: ^1.2.4
         version: 1.4.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -1475,6 +1481,10 @@ packages:
   '@types/fs-extra@8.1.5':
     resolution: {integrity: sha512-0dzKcwO+S8s2kuF5Z9oUWatQJj5Uq/iqphEtE3GQJVRRYm/tD1LglU2UnXi2A8jLq5umkGouOXOR9y0n613ZwQ==}
 
+  '@types/i18next-browser-languagedetector@3.0.0':
+    resolution: {integrity: sha512-jCIazV+0MyFB/re4i+HdqkNLNIWahcVztIPyDoBM2KjrFIhzGyvpclel7ma6xhbm+PvidTDY0eXcFRCO+2QOhQ==}
+    deprecated: This is a stub types definition. i18next-browser-languagedetector provides its own type definitions, so you do not need this installed.
+
   '@types/json-schema@7.0.15':
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
 
@@ -2028,6 +2038,9 @@ packages:
 
   html-parse-stringify@3.0.1:
     resolution: {integrity: sha512-KknJ50kTInJ7qIScF3jeaFRpMpE8/lfiTdzf/twXyPBLAGrLRTmkz3AdTnKeh40X8k9L2fdYwEp/42WGXIRGcg==}
+
+  i18next-browser-languagedetector@8.2.0:
+    resolution: {integrity: sha512-P+3zEKLnOF0qmiesW383vsLdtQVyKtCNA9cjSoKCppTKPQVfKd2W8hbVo5ZhNJKDqeM7BOcvNoKJOjpHh4Js9g==}
 
   i18next@25.4.0:
     resolution: {integrity: sha512-UH5aiamXsO3cfrZFurCHiB6YSs3C+s+XY9UaJllMMSbmaoXILxFgqDEZu4NbfzJFjmUo3BNMa++Rjkr3ofjfLw==}
@@ -4116,6 +4129,10 @@ snapshots:
     dependencies:
       '@types/node': 22.14.1
 
+  '@types/i18next-browser-languagedetector@3.0.0':
+    dependencies:
+      i18next-browser-languagedetector: 8.2.0
+
   '@types/json-schema@7.0.15': {}
 
   '@types/node@22.14.1':
@@ -4702,6 +4719,10 @@ snapshots:
   html-parse-stringify@3.0.1:
     dependencies:
       void-elements: 3.1.0
+
+  i18next-browser-languagedetector@8.2.0:
+    dependencies:
+      '@babel/runtime': 7.28.3
 
   i18next@25.4.0(typescript@5.8.3):
     dependencies:

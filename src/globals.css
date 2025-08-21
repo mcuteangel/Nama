@@ -85,8 +85,8 @@
   }
   body {
     @apply bg-background text-foreground;
-    direction: rtl; /* Added for RTL support */
-    text-align: right; /* Added for RTL text alignment */
+    /* direction: rtl; Removed fixed direction, now controlled by JS */
+    /* text-align: right; Removed fixed text-align, now controlled by JS */
   }
 }
 

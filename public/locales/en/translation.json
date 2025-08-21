@@ -1,0 +1,39 @@
+{
+  "settings": {
+    "title": "Settings",
+    "description": "Manage your application preferences.",
+    "general_settings": "General Settings",
+    "display_settings": "Display Settings",
+    "data_management": "Data Management",
+    "theme": "Theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System",
+    "calendar_type": "Calendar Type",
+    "jalali": "Jalali",
+    "gregorian": "Gregorian",
+    "language": "Language",
+    "persian": "Persian",
+    "english": "English",
+    "export_contacts": "Export Contacts",
+    "import_contacts": "Import Contacts (Coming Soon)",
+    "user_profile": "User Profile",
+    "loading_settings": "Loading settings...",
+    "preparing_form": "Preparing group form..."
+  },
+  "common": {
+    "home": "Home",
+    "add_contact": "Add Contact",
+    "groups": "Groups",
+    "custom_fields": "Custom Fields",
+    "profile": "Profile",
+    "settings": "Settings",
+    "logout": "Logout",
+    "cancel": "Cancel",
+    "save": "Save",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "unknown_error": "Unknown error occurred."
+  }
+}
