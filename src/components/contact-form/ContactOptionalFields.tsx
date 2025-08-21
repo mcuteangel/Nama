@@ -1,16 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react'; // Import useState
 import { useFormContext } from 'react-hook-form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
-import AddGroupDialog from '@/components/AddGroupDialog';
+import AddGroupDialog from '@/components/AddGroupDialog'; // Updated import
 import { useGroups } from '@/hooks/use-groups';
 import { ContactFormValues } from '@/types/contact';
+import { Separator } from '@/components/ui/separator'; // Import Separator
+import { PlusCircle } from 'lucide-react'; // Import PlusCircle icon
 
 const ContactOptionalFields: React.FC = () => {
   const form = useFormContext<ContactFormValues>();
   const { groups, fetchGroups } = useGroups();
+  const [isAddGroupDialogOpen, setIsAddGroupDialogOpen] = useState(false); // State to control AddGroupDialog
 
   return (
     <>
@@ -23,7 +26,15 @@ const ContactOptionalFields: React.FC = () => {
               <FormItem className="flex-grow">
                 <FormLabel className="text-gray-700 dark:text-gray-200">گروه</FormLabel>
                 <Select
-                  onValueChange={(value) => field.onChange(value === "no-group-selected" ? "" : value)}
+                  onValueChange={(value) => {
+                    if (value === "__ADD_NEW_GROUP__") {
+                      setIsAddGroupDialogOpen(true);
+                      // Do not update the form field value for this special option
+                      // The actual group selection will be handled when a group is chosen
+                    } else {
+                      field.onChange(value === "no-group-selected" ? "" : value);
+                    }
+                  }}
                   value={field.value === "" ? "no-group-selected" : field.value}
                 >
                   <FormControl>
@@ -38,13 +49,25 @@ const ContactOptionalFields: React.FC = () => {
                         {group.name}
                       </SelectItem>
                     ))}
+                    <Separator className="my-1" /> {/* Add a separator for better UX */}
+                    <SelectItem value="__ADD_NEW_GROUP__" className="text-blue-600 dark:text-blue-400">
+                      <div className="flex items-center gap-2">
+                        <PlusCircle size={16} />
+                        افزودن گروه جدید
+                      </div>
+                    </SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />
               </FormItem>
             )}
           />
-          <AddGroupDialog onGroupAdded={fetchGroups} />
+          {/* AddGroupDialog is now controlled by state and rendered directly */}
+          <AddGroupDialog
+            open={isAddGroupDialogOpen}
+            onOpenChange={setIsAddGroupDialogOpen}
+            onGroupAdded={fetchGroups}
+          />
         </div>
         <FormField
           control={form.control}
