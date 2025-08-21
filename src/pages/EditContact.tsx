@@ -23,6 +23,12 @@ interface ContactGroup {
   group_id: string;
 }
 
+interface CustomField {
+  id: string;
+  field_name: string;
+  field_value: string;
+}
+
 interface ContactDetailType {
   id: string;
   first_name: string;
@@ -35,6 +41,7 @@ interface ContactDetailType {
   phone_numbers: PhoneNumber[];
   email_addresses: EmailAddress[];
   contact_groups: ContactGroup[]; // Added for group information
+  custom_fields: CustomField[]; // Added for custom fields
   created_at: string;
   updated_at: string;
 }
@@ -59,7 +66,7 @@ const EditContact = () => {
       try {
         const { data, error } = await supabase
           .from("contacts")
-          .select("*, phone_numbers(id, phone_type, phone_number), email_addresses(id, email_type, email_address), contact_groups(group_id)") // Include contact_groups
+          .select("*, phone_numbers(id, phone_type, phone_number), email_addresses(id, email_type, email_address), contact_groups(group_id), custom_fields(id, field_name, field_value)") // Include custom_fields
           .eq("id", id)
           .single();
 
@@ -72,6 +79,7 @@ const EditContact = () => {
             phoneNumber: data.phone_numbers[0]?.phone_number || "",
             emailAddress: data.email_addresses[0]?.email_address || "",
             groupId: data.contact_groups[0]?.group_id || "", // Extract group_id
+            custom_fields: data.custom_fields || [], // Extract custom_fields
           } as ContactDetailType;
 
           setInitialContactData(formattedData);

@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CardContent } from "@/components/ui/card";
-import { useForm } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form"; // Import useFieldArray
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -13,6 +13,7 @@ import { useSession } from "@/integrations/supabase/auth";
 import AddGroupDialog from "./AddGroupDialog";
 import { useGroups } from "@/hooks/use-groups";
 import { useContactFormLogic } from "@/hooks/use-contact-form-logic";
+import { PlusCircle, XCircle } from "lucide-react"; // Import icons
 
 // Define the schema for the form using Zod
 const formSchema = z.object({
@@ -26,6 +27,11 @@ const formSchema = z.object({
   address: z.string().optional(),
   notes: z.string().optional(),
   groupId: z.string().optional(), // New field for group ID
+  customFields: z.array(z.object({
+    id: z.string().optional(), // For existing custom fields
+    field_name: z.string().min(1, { message: "نام فیلد سفارشی نمی‌تواند خالی باشد." }),
+    field_value: z.string().min(1, { message: "مقدار فیلد سفارشی نمی‌تواند خالی باشد." }),
+  })).optional(),
 });
 
 interface ContactFormProps {
@@ -41,6 +47,7 @@ interface ContactFormProps {
     phoneNumber?: string;
     emailAddress?: string;
     groupId?: string; // Added for initial data
+    custom_fields?: { id: string; field_name: string; field_value: string }[]; // Added for initial custom fields
   };
   contactId?: string;
 }
@@ -64,7 +71,14 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
       address: initialData?.address || "",
       notes: initialData?.notes || "",
       groupId: initialData?.groupId || "", // Set initial group ID
+      customFields: initialData?.custom_fields || [], // Set initial custom fields
     },
+  });
+
+  // Use useFieldArray for dynamic custom fields
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "customFields",
   });
 
   // Use the new useContactFormLogic hook for submission
@@ -83,6 +97,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
         address: initialData.address,
         notes: initialData.notes,
         groupId: initialData.groupId || "", // Ensure groupId is reset
+        customFields: initialData.custom_fields || [], // Ensure customFields are reset
       });
     }
   }, [initialData, form]);
@@ -264,6 +279,60 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
               </FormItem>
             )}
           />
+
+          {/* Custom Fields Section */}
+          <div className="space-y-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">فیلدهای سفارشی</h3>
+            {fields.map((item, index) => (
+              <div key={item.id} className="flex flex-col md:flex-row gap-2 items-end">
+                <FormField
+                  control={form.control}
+                  name={`customFields.${index}.field_name`}
+                  render={({ field }) => (
+                    <FormItem className="flex-grow">
+                      <FormLabel className="text-gray-700 dark:text-gray-200 sr-only">نام فیلد</FormLabel>
+                      <FormControl>
+                        <Input placeholder="نام فیلد (مثال: وب‌سایت)" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name={`customFields.${index}.field_value`}
+                  render={({ field }) => (
+                    <FormItem className="flex-grow">
+                      <FormLabel className="text-gray-700 dark:text-gray-200 sr-only">مقدار فیلد</FormLabel>
+                      <FormControl>
+                        <Input placeholder="مقدار فیلد (مثال: www.example.com)" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => remove(index)}
+                  className="text-red-500 hover:bg-red-100 dark:hover:bg-gray-700/50"
+                >
+                  <XCircle size={20} />
+                </Button>
+              </div>
+            ))}
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => append({ field_name: "", field_value: "" })}
+              className="w-full flex items-center gap-2 px-6 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold shadow-sm transition-all duration-300 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-200 dark:border-gray-600"
+            >
+              <PlusCircle size={20} />
+              افزودن فیلد سفارشی
+            </Button>
+          </div>
+
           <div className="flex justify-end gap-2">
             <Button
               type="button"

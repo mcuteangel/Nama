@@ -7,7 +7,7 @@ import {
 } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import moment from 'moment-jalaali';
+import * as moment from 'moment-jalaali'; // Changed import statement
 
 interface JalaliCalendarProps {
   selected?: Date | undefined;

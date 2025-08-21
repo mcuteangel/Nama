@@ -5,6 +5,13 @@ import { Session } from "@supabase/supabase-js";
 import { NavigateFunction } from "react-router-dom";
 import * as z from "zod";
 
+// Define CustomField interface
+interface CustomField {
+  id?: string; // Optional for new fields
+  field_name: string;
+  field_value: string;
+}
+
 const formSchema = z.object({
   firstName: z.string().min(1, { message: "نام الزامی است." }),
   lastName: z.string().min(1, { message: "نام خانوادگی الزامی است." }),
@@ -16,6 +23,11 @@ const formSchema = z.object({
   address: z.string().optional(),
   notes: z.string().optional(),
   groupId: z.string().optional(),
+  customFields: z.array(z.object({
+    id: z.string().optional(), // For existing custom fields
+    field_name: z.string().min(1, { message: "نام فیلد سفارشی نمی‌تواند خالی باشد." }),
+    field_value: z.string().min(1, { message: "مقدار فیلد سفارشی نمی‌تواند خالی باشد." }),
+  })).optional(),
 });
 
 type ContactFormValues = z.infer<typeof formSchema>;
@@ -67,7 +79,7 @@ export const useContactFormLogic = (
             .eq("user_id", user.id)
             .single();
 
-          if (fetchPhoneError && fetchPhoneError.code !== 'PGRST116') {
+          if (fetchPhoneError && fetchPhoneError.code !== 'PGRST116') { // PGRST116 means no rows found
             throw fetchPhoneError;
           }
 
@@ -172,6 +184,51 @@ export const useContactFormLogic = (
             .eq("user_id", user.id);
         }
 
+        // Handle custom fields update/insert/delete
+        const existingCustomFields = (await supabase
+          .from("custom_fields")
+          .select("id, field_name, field_value")
+          .eq("contact_id", contactId)
+          .eq("user_id", user.id)).data || [];
+
+        const newCustomFields = values.customFields || [];
+
+        // Fields to delete
+        const fieldsToDelete = existingCustomFields.filter(
+          (existingField) => !newCustomFields.some((newField) => newField.id === existingField.id)
+        );
+        if (fieldsToDelete.length > 0) {
+          const { error: deleteError } = await supabase
+            .from("custom_fields")
+            .delete()
+            .in("id", fieldsToDelete.map((f) => f.id));
+          if (deleteError) throw deleteError;
+        }
+
+        // Fields to update and insert
+        for (const field of newCustomFields) {
+          if (field.id) {
+            // Update existing field
+            const { error: updateError } = await supabase
+              .from("custom_fields")
+              .update({ field_name: field.field_name, field_value: field.field_value })
+              .eq("id", field.id)
+              .eq("user_id", user.id);
+            if (updateError) throw updateError;
+          } else {
+            // Insert new field
+            const { error: insertError } = await supabase
+              .from("custom_fields")
+              .insert({
+                user_id: user.id,
+                contact_id: contactId,
+                field_name: field.field_name,
+                field_value: field.field_value,
+              });
+            if (insertError) throw insertError;
+          }
+        }
+
         showSuccess("مخاطب با موفقیت به‌روزرسانی شد!");
         navigate("/"); // Redirect to contacts list after successful update
       } else {
@@ -228,6 +285,20 @@ export const useContactFormLogic = (
               group_id: values.groupId,
             });
           if (groupAssignmentError) throw groupAssignmentError;
+        }
+
+        // Insert custom fields for new contact
+        if (values.customFields && values.customFields.length > 0) {
+          const customFieldsToInsert = values.customFields.map(field => ({
+            user_id: user.id,
+            contact_id: currentContactId,
+            field_name: field.field_name,
+            field_value: field.field_value,
+          }));
+          const { error: customFieldsError } = await supabase
+            .from("custom_fields")
+            .insert(customFieldsToInsert);
+          if (customFieldsError) throw customFieldsError;
         }
 
         showSuccess("مخاطب با موفقیت ذخیره شد!");
