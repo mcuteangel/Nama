@@ -8,6 +8,7 @@ import { useSession } from "@/integrations/supabase/auth";
 import { showSuccess, showError, showLoading, dismissToast } from "@/utils/toast";
 import { useNavigate } from "react-router-dom";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { ContactService } from "@/services/contact-service"; // Import ContactService
 
 // Define types for contact data
 interface PhoneNumber {
@@ -166,58 +167,13 @@ const ContactList = ({ searchTerm, selectedGroup, companyFilter, sortOption }: C
     setIsFetchingRemote(true);
 
     try {
-      let query = supabase
-        .from("contacts")
-        .select("id, first_name, last_name, gender, position, company, address, notes, created_at, updated_at, phone_numbers(phone_number, phone_type, extension), email_addresses(email_address, email_type), contact_groups(group_id), custom_fields(id, template_id, field_value, custom_field_templates(name, type, options))")
-        .eq("user_id", session.user.id);
-
-      if (selectedGroup) {
-        query = query.filter('contact_groups.group_id', 'eq', selectedGroup);
-      }
-
-      if (companyFilter) {
-        query = query.ilike('company', `%${companyFilter}%`);
-      }
-
-      let sortByColumn: string;
-      let ascendingOrder: boolean;
-
-      switch (sortOption) {
-        case "first_name_asc":
-          sortByColumn = "first_name";
-          ascendingOrder = true;
-          break;
-        case "first_name_desc":
-          sortByColumn = "first_name";
-          ascendingOrder = false;
-          break;
-        case "last_name_asc":
-          sortByColumn = "last_name";
-          ascendingOrder = true;
-          break;
-        case "last_name_desc":
-          sortByColumn = "last_name";
-          ascendingOrder = false;
-          break;
-        case "created_at_desc":
-          sortByColumn = "created_at";
-          ascendingOrder = false;
-          break;
-        case "created_at_asc":
-          sortByColumn = "created_at";
-          ascendingOrder = true;
-          break;
-        default:
-          sortByColumn = "first_name";
-          ascendingOrder = true;
-          console.warn("Unexpected sortOption value:", sortOption, "Falling back to first_name_asc.");
-          break;
-      }
-
-      console.log("DEBUG: Applying sort - Column:", sortByColumn, "Ascending:", ascendingOrder);
-      query = query.order(sortByColumn, { ascending: ascendingOrder });
-
-      const { data, error } = await query;
+      const { data, error } = await ContactService.getFilteredContacts(
+        session.user.id,
+        searchTerm,
+        selectedGroup,
+        companyFilter,
+        sortOption
+      );
 
       if (error) throw error;
 
@@ -239,7 +195,7 @@ const ContactList = ({ searchTerm, selectedGroup, companyFilter, sortOption }: C
 
   useEffect(() => {
     fetchContacts();
-  }, [session, isSessionLoading, selectedGroup, companyFilter, sortOption]);
+  }, [session, isSessionLoading, searchTerm, selectedGroup, companyFilter, sortOption]); // Added searchTerm to dependencies
 
   const handleContactDeleted = (deletedId: string) => {
     setContacts(prevContacts => prevContacts.filter(contact => contact.id !== deletedId));
@@ -251,26 +207,16 @@ const ContactList = ({ searchTerm, selectedGroup, companyFilter, sortOption }: C
     fetchContacts();
   };
 
-  const filteredContacts = contacts.filter(contact => {
-    const lowerCaseSearchTerm = searchTerm.toLowerCase();
-    const matchesName = contact.first_name.toLowerCase().includes(lowerCaseSearchTerm) ||
-                        contact.last_name.toLowerCase().includes(lowerCaseSearchTerm);
-    const matchesPhoneNumber = contact.phone_numbers.some(pn => pn.phone_number.includes(lowerCaseSearchTerm));
-    const matchesEmail = contact.email_addresses.some(ea => ea.email_address.toLowerCase().includes(lowerCaseSearchTerm));
-    
-    return matchesName || matchesPhoneNumber || matchesEmail;
-  });
-
   if (loadingContacts && !isFetchingRemote) {
     return <p className="text-center text-gray-500 dark:text-gray-400">در حال بارگذاری مخاطبین...</p>;
   }
 
   return (
     <div className="space-y-4">
-      {filteredContacts.length === 0 ? (
+      {contacts.length === 0 ? ( // Use 'contacts' directly as filtering is now done by the service
         <p className="text-center text-gray-500 dark:text-gray-400">هیچ مخاطبی یافت نشد.</p>
       ) : (
-        filteredContacts.map((contact) => (
+        contacts.map((contact) => (
           <ContactItem
             key={contact.id}
             contact={contact}

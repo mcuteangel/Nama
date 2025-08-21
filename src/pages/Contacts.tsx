@@ -2,24 +2,27 @@ import { MadeWithDyad } from "@/components/made-with-dyad";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, Search } from "lucide-react";
+import { PlusCircle, Search, Download } from "lucide-react"; // Import Download icon
 import ContactList from "@/components/ContactList";
 import { useNavigate } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useGroups } from "@/hooks/use-groups"; // Import useGroups
+import { useGroups } from "@/hooks/use-groups";
+import { exportContactsToCsv } from "@/utils/export-contacts"; // Import export utility
+import { useSession } from "@/integrations/supabase/auth"; // Import useSession
 
 const Contacts = () => {
   const navigate = useNavigate();
-  const { groups, loadingGroups, fetchGroups } = useGroups(); // Fetch groups for filter dropdown
+  const { groups, loadingGroups, fetchGroups } = useGroups();
+  const { session } = useSession(); // Get session for export function
 
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedGroup, setSelectedGroup] = useState<string>(""); // State for group filter
-  const [companyFilter, setCompanyFilter] = useState<string>(""); // State for company filter
-  const [sortOption, setSortOption] = useState<string>("first_name_asc"); // State for sort option
+  const [selectedGroup, setSelectedGroup] = useState<string>("");
+  const [companyFilter, setCompanyFilter] = useState<string>("");
+  const [sortOption, setSortOption] = useState<string>("first_name_asc");
 
   useEffect(() => {
-    fetchGroups(); // Ensure groups are fetched when component mounts
+    fetchGroups();
   }, [fetchGroups]);
 
   const handleAddContactClick = () => {
@@ -40,6 +43,15 @@ const Contacts = () => {
 
   const handleSortChange = (value: string) => {
     setSortOption(value);
+  };
+
+  const handleExportClick = () => {
+    exportContactsToCsv(session, {
+      searchTerm,
+      selectedGroup,
+      companyFilter,
+      sortOption,
+    });
   };
 
   return (
@@ -74,7 +86,7 @@ const Contacts = () => {
             </Button>
           </div>
 
-          {/* New Filter and Sort Controls */}
+          {/* Filter and Sort Controls */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label htmlFor="group-filter" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">فیلتر بر اساس گروه:</label>
@@ -122,6 +134,14 @@ const Contacts = () => {
               </Select>
             </div>
           </div>
+
+          <Button
+            onClick={handleExportClick}
+            className="w-full flex items-center gap-2 px-6 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white font-semibold shadow-md transition-all duration-300 transform hover:scale-105"
+          >
+            <Download size={20} />
+            خروجی گرفتن از مخاطبین (CSV)
+          </Button>
 
           <ContactList
             searchTerm={searchTerm}
