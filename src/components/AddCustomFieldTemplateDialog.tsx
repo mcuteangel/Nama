@@ -29,8 +29,11 @@ const AddCustomFieldTemplateDialog: React.FC<AddCustomFieldTemplateDialogProps> 
           size="sm"
           className="flex items-center gap-1 px-3 py-1 rounded-lg bg-blue-500 hover:bg-blue-600 text-white font-semibold shadow-md transition-all duration-300 transform hover:scale-105 dark:bg-blue-700 dark:hover:bg-blue-800"
         >
-          <Plus size={16} />
-          افزودن فیلد جدید
+          {/* Wrap the children in a single span */}
+          <span className="flex items-center gap-1">
+            <Plus size={16} />
+            افزودن فیلد جدید
+          </span>
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px] p-0 border-none bg-transparent shadow-none">
