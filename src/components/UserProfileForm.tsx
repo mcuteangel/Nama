@@ -68,9 +68,9 @@ const UserProfileForm: React.FC = () => {
           .from('profiles')
           .select('first_name, last_name')
           .eq('id', session.user.id)
-          .single();
+          .maybeSingle(); // Changed from .single() to .maybeSingle()
 
-        if (error && error.code !== 'PGRST116') { // PGRST116 means no rows found
+        if (error) { // maybeSingle() only returns error for network/server issues, not for no rows
           throw new Error(error.message || "خطا در دریافت اطلاعات پروفایل");
         }
 
@@ -80,7 +80,7 @@ const UserProfileForm: React.FC = () => {
             last_name: data.last_name || '',
           });
         } else {
-          // If no profile exists, initialize with empty strings
+          // If no profile exists (data is null), initialize with empty strings
           form.reset({
             first_name: '',
             last_name: '',
