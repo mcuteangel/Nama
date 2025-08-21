@@ -7,7 +7,8 @@ import { useSession } from '@/integrations/supabase/auth';
 import { MadeWithDyad } from '@/components/made-with-dyad';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
-import { Globe } from 'lucide-react'; // Import Globe icon
+import IranFlag from '@/assets/icons/flags/IranFlag'; // Import IranFlag SVG component
+import UKFlag from '@/assets/icons/flags/UKFlag';     // Import UKFlag SVG component
 
 const Login = () => {
   const navigate = useNavigate();
@@ -41,7 +42,7 @@ const Login = () => {
           {t('login.title')}
         </h2>
 
-        {/* Language Selector with Buttons */}
+        {/* Language Selector with Flag Buttons */}
         <div className="flex justify-center gap-4 mb-6">
           <Button
             variant="outline"
@@ -53,7 +54,7 @@ const Login = () => {
                 : 'bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-100 dark:hover:bg-gray-600'
             }`}
           >
-            <Globe size={20} />
+            <IranFlag className="w-6 h-6" /> {/* Use IranFlag SVG component */}
             <span className="font-semibold">{t('settings.persian')}</span>
           </Button>
           <Button
@@ -66,7 +67,7 @@ const Login = () => {
                 : 'bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-100 dark:hover:bg-gray-600'
             }`}
           >
-            <Globe size={20} />
+            <UKFlag className="w-6 h-6" /> {/* Use UKFlag SVG component */}
             <span className="font-semibold">{t('settings.english')}</span>
           </Button>
         </div>
