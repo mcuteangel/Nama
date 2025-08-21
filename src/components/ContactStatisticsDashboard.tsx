@@ -84,7 +84,7 @@ const ContactStatisticsDashboard: React.FC = () => {
   });
 
   const {
-    isLoading,
+    isLoading, // This isLoading is from useErrorHandler
     executeAsync,
   } = useErrorHandler(null, {
     maxRetries: 3,
@@ -111,6 +111,11 @@ const ContactStatisticsDashboard: React.FC = () => {
         topCompaniesData: [],
         topPositionsData: [],
       });
+      return;
+    }
+
+    // Prevent re-fetching if a fetch is already in progress
+    if (isLoading) {
       return;
     }
 
@@ -171,7 +176,7 @@ const ContactStatisticsDashboard: React.FC = () => {
       }
       return data;
     });
-  }, [session, isSessionLoading, executeAsync, t]);
+  }, [session, isSessionLoading, executeAsync, isLoading, t]); // Add isLoading to dependencies
 
   useEffect(() => {
     fetchStatistics();
