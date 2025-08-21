@@ -87,14 +87,16 @@ const ContactStatisticsDashboard: React.FC = () => {
   const [isLoadingInitial, setIsLoadingInitial] = useState(true);
   const [isFetchingRemote, setIsFetchingRemote] = useState(false);
 
+  const onErrorStatistics = useCallback((error: Error) => { // Wrapped in useCallback
+    ErrorManager.logError(error, { component: 'ContactStatisticsDashboard', action: 'fetchStatistics' });
+  }, []);
+
   const {
     executeAsync,
   } = useErrorHandler(null, {
     showToast: false,
     customErrorMessage: t('statistics.error_loading_stats'),
-    onError: (error) => {
-      ErrorManager.logError(error, { component: 'ContactStatisticsDashboard', action: 'fetchStatistics' });
-    }
+    onError: onErrorStatistics, // Use the memoized callback
   });
 
   const fetchStatistics = useCallback(async (showLoadingToast: boolean = true) => {
@@ -236,7 +238,7 @@ const ContactStatisticsDashboard: React.FC = () => {
       setIsLoadingInitial(false);
       setIsFetchingRemote(false);
     }
-  }, [session, isSessionLoading, executeAsync, t]);
+  }, [session, isSessionLoading, executeAsync, t, onErrorStatistics]); // Added onErrorStatistics to dependencies
 
   useEffect(() => {
     fetchStatistics(true);

@@ -32,13 +32,13 @@ const UserItem = ({ user, onUserUpdated, onUserDeleted }: { user: UserProfile; o
     retryDelay: 1000,
     showToast: true,
     customErrorMessage: t('user_management.error_deleting_user'),
-    onSuccess: () => {
+    onSuccess: useCallback(() => { // Wrapped in useCallback
       ErrorManager.notifyUser(t('user_management.user_deleted_success'), 'success');
       onUserDeleted();
-    },
-    onError: (err) => {
+    }, [t, onUserDeleted]), // Dependencies for useCallback
+    onError: useCallback((err) => { // Wrapped in useCallback
       ErrorManager.logError(err, { component: 'UserList', action: 'deleteUser', userId: user.id });
-    }
+    }, [user.id]), // Dependencies for useCallback
   });
 
   const handleDelete = async () => {
@@ -118,6 +118,14 @@ const UserList: React.FC = () => {
   const [isAddUserDialogOpen, setIsAddUserDialogOpen] = useState(false);
   const { t } = useTranslation();
 
+  const onSuccessFetchUsers = useCallback(() => {
+    ErrorManager.notifyUser(t('user_management.users_loaded_success'), 'success');
+  }, [t]);
+
+  const onErrorFetchUsers = useCallback((err: Error) => {
+    ErrorManager.logError(err, { component: 'UserList', action: 'fetchUsers' });
+  }, []);
+
   const {
     isLoading: loadingUsers,
     executeAsync: executeFetchUsers,
@@ -126,10 +134,8 @@ const UserList: React.FC = () => {
     retryDelay: 1000,
     showToast: true,
     customErrorMessage: t('user_management.error_loading_users'),
-    onSuccess: () => ErrorManager.notifyUser(t('user_management.users_loaded_success'), 'success'),
-    onError: (err) => {
-      ErrorManager.logError(err, { component: 'UserList', action: 'fetchUsers' });
-    }
+    onSuccess: onSuccessFetchUsers, // Use the memoized callback
+    onError: onErrorFetchUsers,     // Use the memoized callback
   });
 
   const fetchUsers = useCallback(async () => {
