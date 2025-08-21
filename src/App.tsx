@@ -49,6 +49,11 @@ function AppLayout() {
     document.documentElement.dir = i18n.dir();
   }, [i18n.dir()]);
 
+  // Debugging: Log the user's role
+  useEffect(() => {
+    console.log("Current user role from session:", session?.user?.user_metadata?.role);
+  }, [session]);
+
   const isAuthPage = location.pathname === '/login';
 
   // Calculate padding for main content based on sidebar state
