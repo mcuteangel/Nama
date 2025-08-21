@@ -33,7 +33,10 @@ interface Contact {
 }
 
 interface ContactListProps {
-  searchTerm: string; // Add searchTerm prop
+  searchTerm: string;
+  selectedGroup: string; // New prop for group filter
+  companyFilter: string; // New prop for company filter
+  sortOption: string;    // New prop for sort option
 }
 
 const ContactItem = ({ contact, onContactDeleted, onContactEdited }: { contact: Contact; onContactDeleted: (id: string) => void; onContactEdited: (id: string) => void }) => {
@@ -130,7 +133,7 @@ const ContactItem = ({ contact, onContactDeleted, onContactEdited }: { contact: 
   );
 };
 
-const ContactList = ({ searchTerm }: ContactListProps) => {
+const ContactList = ({ searchTerm, selectedGroup, companyFilter, sortOption }: ContactListProps) => {
   const { session, isLoading: isSessionLoading } = useSession();
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [loadingContacts, setLoadingContacts] = useState(true);
@@ -167,11 +170,26 @@ const ContactList = ({ searchTerm }: ContactListProps) => {
     setIsFetchingRemote(true); // Indicate that remote fetch is starting
 
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from("contacts")
-        .select("*, phone_numbers(phone_number), email_addresses(email_address)")
-        .eq("user_id", session.user.id)
-        .order("first_name", { ascending: true }); // Order by first name
+        .select("*, phone_numbers(phone_number), email_addresses(email_address), contact_groups(group_id), custom_fields(id, template_id, field_value, custom_field_templates(name, type, options))")
+        .eq("user_id", session.user.id);
+
+      // Apply group filter
+      if (selectedGroup) {
+        query = query.filter('contact_groups.group_id', 'eq', selectedGroup);
+      }
+
+      // Apply company filter
+      if (companyFilter) {
+        query = query.ilike('company', `%${companyFilter}%`);
+      }
+
+      // Apply sorting
+      const [sortBy, sortOrder] = sortOption.split('_');
+      query = query.order(sortBy, { ascending: sortOrder === 'asc' });
+
+      const { data, error } = await query;
 
       if (error) throw error;
 
@@ -196,7 +214,7 @@ const ContactList = ({ searchTerm }: ContactListProps) => {
 
   useEffect(() => {
     fetchContacts();
-  }, [session, isSessionLoading]); // Re-fetch when session changes
+  }, [session, isSessionLoading, selectedGroup, companyFilter, sortOption]); // Re-fetch when session or filters/sort options change
 
   const handleContactDeleted = (deletedId: string) => {
     setContacts(prevContacts => prevContacts.filter(contact => contact.id !== deletedId));
@@ -211,7 +229,7 @@ const ContactList = ({ searchTerm }: ContactListProps) => {
     fetchContacts();
   };
 
-  // Filter contacts based on searchTerm
+  // Filter contacts based on searchTerm (client-side filtering for search term)
   const filteredContacts = contacts.filter(contact => {
     const lowerCaseSearchTerm = searchTerm.toLowerCase();
     const matchesName = contact.first_name.toLowerCase().includes(lowerCaseSearchTerm) ||

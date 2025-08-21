@@ -5,11 +5,22 @@ import { Button } from "@/components/ui/button";
 import { PlusCircle, Search } from "lucide-react";
 import ContactList from "@/components/ContactList";
 import { useNavigate } from "react-router-dom";
-import React, { useState } from "react"; // Import useState
+import React, { useState, useEffect } from "react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useGroups } from "@/hooks/use-groups"; // Import useGroups
 
 const Contacts = () => {
   const navigate = useNavigate();
-  const [searchTerm, setSearchTerm] = useState(""); // State for search term
+  const { groups, loadingGroups, fetchGroups } = useGroups(); // Fetch groups for filter dropdown
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedGroup, setSelectedGroup] = useState<string>(""); // State for group filter
+  const [companyFilter, setCompanyFilter] = useState<string>(""); // State for company filter
+  const [sortOption, setSortOption] = useState<string>("first_name_asc"); // State for sort option
+
+  useEffect(() => {
+    fetchGroups(); // Ensure groups are fetched when component mounts
+  }, [fetchGroups]);
 
   const handleAddContactClick = () => {
     navigate("/add-contact");
@@ -17,6 +28,18 @@ const Contacts = () => {
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
+  };
+
+  const handleGroupChange = (value: string) => {
+    setSelectedGroup(value === "all" ? "" : value);
+  };
+
+  const handleCompanyChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setCompanyFilter(event.target.value);
+  };
+
+  const handleSortChange = (value: string) => {
+    setSortOption(value);
   };
 
   return (
@@ -37,8 +60,8 @@ const Contacts = () => {
                 type="text"
                 placeholder="جستجوی مخاطبین..."
                 className="w-full ps-10 pe-4 py-2 rounded-lg bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all duration-300"
-                value={searchTerm} // Bind input value to state
-                onChange={handleSearchChange} // Handle input changes
+                value={searchTerm}
+                onChange={handleSearchChange}
               />
               <Search className="absolute inset-inline-start-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400" size={20} />
             </div>
@@ -51,7 +74,61 @@ const Contacts = () => {
             </Button>
           </div>
 
-          <ContactList searchTerm={searchTerm} /> {/* Pass search term to ContactList */}
+          {/* New Filter and Sort Controls */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label htmlFor="group-filter" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">فیلتر بر اساس گروه:</label>
+              <Select onValueChange={handleGroupChange} value={selectedGroup || "all"}>
+                <SelectTrigger id="group-filter" className="w-full bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100">
+                  <SelectValue placeholder="همه گروه‌ها" />
+                </SelectTrigger>
+                <SelectContent className="backdrop-blur-md bg-white/80 dark:bg-gray-800/80 border border-white/30 dark:border-gray-600/30">
+                  <SelectItem value="all">همه گروه‌ها</SelectItem>
+                  {groups.map((group) => (
+                    <SelectItem key={group.id} value={group.id}>
+                      {group.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <label htmlFor="company-filter" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">فیلتر بر اساس شرکت:</label>
+              <Input
+                id="company-filter"
+                type="text"
+                placeholder="نام شرکت..."
+                className="w-full bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
+                value={companyFilter}
+                onChange={handleCompanyChange}
+              />
+            </div>
+
+            <div>
+              <label htmlFor="sort-option" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">مرتب‌سازی بر اساس:</label>
+              <Select onValueChange={handleSortChange} value={sortOption}>
+                <SelectTrigger id="sort-option" className="w-full bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100">
+                  <SelectValue placeholder="مرتب‌سازی" />
+                </SelectTrigger>
+                <SelectContent className="backdrop-blur-md bg-white/80 dark:bg-gray-800/80 border border-white/30 dark:border-gray-600/30">
+                  <SelectItem value="first_name_asc">نام (صعودی)</SelectItem>
+                  <SelectItem value="first_name_desc">نام (نزولی)</SelectItem>
+                  <SelectItem value="last_name_asc">نام خانوادگی (صعودی)</SelectItem>
+                  <SelectItem value="last_name_desc">نام خانوادگی (نزولی)</SelectItem>
+                  <SelectItem value="created_at_desc">تاریخ ایجاد (جدیدترین)</SelectItem>
+                  <SelectItem value="created_at_asc">تاریخ ایجاد (قدیمی‌ترین)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <ContactList
+            searchTerm={searchTerm}
+            selectedGroup={selectedGroup}
+            companyFilter={companyFilter}
+            sortOption={sortOption}
+          />
         </CardContent>
       </Card>
       <MadeWithDyad />
