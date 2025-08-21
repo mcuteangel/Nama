@@ -1,12 +1,12 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { LogOut, PlusCircle, Users, Home, Menu, Settings } from "lucide-react";
+import { LogOut, PlusCircle, Users, Home, Menu, Settings, User } from "lucide-react"; // Import User icon
 import { supabase } from "@/integrations/supabase/client";
 import { showError, showSuccess, showLoading, dismissToast } from "@/utils/toast";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { ThemeToggle } from "./ThemeToggle"; // Import ThemeToggle
+import { ThemeToggle } from "./ThemeToggle";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -18,6 +18,7 @@ const navItems = [
   { name: "افزودن مخاطب", icon: PlusCircle, path: "/add-contact" },
   { name: "گروه‌ها", icon: Users, path: "/groups" },
   { name: "فیلدهای سفارشی", icon: Settings, path: "/custom-fields" },
+  { name: "پروفایل", icon: User, path: "/profile" }, // New navigation item for User Profile
 ];
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
@@ -86,7 +87,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
           </Tooltip>
         ))}
       </nav>
-      <div className="p-4 border-t border-sidebar-border dark:border-sidebar-border flex items-center justify-between"> {/* Added justify-between */}
+      <div className="p-4 border-t border-sidebar-border dark:border-sidebar-border flex items-center justify-between">
         {isOpen && (
           <Tooltip>
             <TooltipTrigger asChild>
@@ -107,7 +108,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
             {!isOpen && <TooltipContent side="left">خروج</TooltipContent>}
           </Tooltip>
         )}
-        {!isOpen && ( // Show logout button when sidebar is collapsed
+        {!isOpen && (
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
@@ -122,7 +123,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
             <TooltipContent side="left">خروج</TooltipContent>
           </Tooltip>
         )}
-        <ThemeToggle /> {/* Add ThemeToggle here */}
+        <ThemeToggle />
       </div>
     </aside>
   );

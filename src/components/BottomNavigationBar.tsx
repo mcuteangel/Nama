@@ -1,7 +1,7 @@
 import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { LogOut, PlusCircle, Users, Home, Settings } from "lucide-react"; // Import Settings icon
+import { LogOut, PlusCircle, Users, Home, Settings, User } from "lucide-react"; // Import User icon
 import { supabase } from "@/integrations/supabase/client";
 import { showError, showSuccess, showLoading, dismissToast } from "@/utils/toast";
 import { cn } from "@/lib/utils";
@@ -10,7 +10,8 @@ const navItems = [
   { name: "خانه", icon: Home, path: "/" },
   { name: "افزودن مخاطب", icon: PlusCircle, path: "/add-contact" },
   { name: "گروه‌ها", icon: Users, path: "/groups" },
-  { name: "فیلدها", icon: Settings, path: "/custom-fields" }, // New navigation item
+  { name: "فیلدها", icon: Settings, path: "/custom-fields" },
+  { name: "پروفایل", icon: User, path: "/profile" }, // New navigation item for User Profile
 ];
 
 const BottomNavigationBar = () => {

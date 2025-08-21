@@ -1,0 +1,213 @@
+"use client";
+
+import React, { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
+import { supabase } from '@/integrations/supabase/client';
+import { useSession } from '@/integrations/supabase/auth';
+import { useErrorHandler } from '@/hooks/use-error-handler';
+import { ErrorManager } from '@/lib/error-manager';
+import { User } from 'lucide-react';
+
+const profileSchema = z.object({
+  first_name: z.string().min(1, { message: 'نام نمی‌تواند خالی باشد.' }).optional().or(z.literal('')),
+  last_name: z.string().min(1, { message: 'نام خانوادگی نمی‌تواند خالی باشد.' }).optional().or(z.literal('')),
+});
+
+type ProfileFormValues = z.infer<typeof profileSchema>;
+
+const UserProfileForm: React.FC = () => {
+  const { session, isLoading: isSessionLoading } = useSession();
+
+  const {
+    isLoading: isSubmitting,
+    error,
+    errorMessage,
+    retry: retryLastOperation,
+    executeAsync,
+    retryCount, // Added retryCount here
+  } = useErrorHandler(null, {
+    maxRetries: 3,
+    retryDelay: 1000,
+    showToast: true,
+    customErrorMessage: "خطایی در به‌روزرسانی پروفایل رخ داد",
+    onSuccess: () => {
+      ErrorManager.notifyUser('پروفایل با موفقیت به‌روزرسانی شد.', 'success');
+    },
+    onError: (err) => {
+      ErrorManager.logError(err, {
+        component: "UserProfileForm",
+        action: "updateProfile",
+      });
+    }
+  });
+
+  const form = useForm<ProfileFormValues>({
+    resolver: zodResolver(profileSchema),
+    defaultValues: {
+      first_name: '',
+      last_name: '',
+    },
+  });
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (isSessionLoading || !session?.user) {
+        return;
+      }
+
+      await executeAsync(async () => {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('first_name, last_name')
+          .eq('id', session.user.id)
+          .single();
+
+        if (error && error.code !== 'PGRST116') { // PGRST116 means no rows found
+          throw new Error(error.message || "خطا در دریافت اطلاعات پروفایل");
+        }
+
+        if (data) {
+          form.reset({
+            first_name: data.first_name || '',
+            last_name: data.last_name || '',
+          });
+        } else {
+          // If no profile exists, initialize with empty strings
+          form.reset({
+            first_name: '',
+            last_name: '',
+          });
+        }
+      }, {
+        component: "UserProfileForm",
+        action: "fetchProfile"
+      });
+    };
+
+    fetchProfile();
+  }, [session, isSessionLoading, form, executeAsync]);
+
+  const onSubmit = async (values: ProfileFormValues) => {
+    if (!session?.user) {
+      ErrorManager.notifyUser('برای به‌روزرسانی پروفایل باید وارد شوید.', 'error');
+      return;
+    }
+
+    await executeAsync(async () => {
+      const { error } = await supabase
+        .from('profiles')
+        .upsert(
+          {
+            id: session.user.id,
+            first_name: values.first_name || null,
+            last_name: values.last_name || null,
+          },
+          { onConflict: 'id' } // Use upsert to insert if not exists, update if exists
+        );
+
+      if (error) {
+        throw new Error(error.message || "خطا در ذخیره پروفایل");
+      }
+    }, {
+      component: "UserProfileForm",
+      action: "submitProfile"
+    });
+  };
+
+  if (isSessionLoading) {
+    return (
+      <Card className="w-full max-w-md glass rounded-xl p-6 bg-white/90 dark:bg-gray-900/90">
+        <CardHeader className="text-center">
+          <CardTitle className="text-2xl font-bold text-gray-800 dark:text-gray-100">
+            در حال بارگذاری پروفایل...
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-center text-gray-500 dark:text-gray-400">لطفاً صبر کنید.</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <Card className="w-full max-w-md glass rounded-xl p-6 bg-white/90 dark:bg-gray-900/90">
+      <CardHeader className="text-center">
+        <CardTitle className="text-2xl font-bold text-gray-800 dark:text-gray-100">
+          پروفایل کاربری
+        </CardTitle>
+        {error && (
+          <div className="text-sm text-destructive flex items-center justify-center gap-2 mt-2">
+            <span>{errorMessage}</span>
+            {retryLastOperation && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={retryLastOperation}
+                disabled={isSubmitting}
+                className="text-destructive hover:bg-destructive/10"
+              >
+                تلاش مجدد ({retryCount} از ۳)
+              </Button>
+            )}
+          </div>
+        )}
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <div>
+            <Label htmlFor="first_name" className="text-gray-700 dark:text-gray-200">نام</Label>
+            <Input
+              id="first_name"
+              {...form.register('first_name')}
+              placeholder="نام خود را وارد کنید"
+              className="mt-1 block w-full bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
+              disabled={isSubmitting}
+            />
+            {form.formState.errors.first_name && <p className="text-red-500 text-sm mt-1">{form.formState.errors.first_name.message}</p>}
+          </div>
+
+          <div>
+            <Label htmlFor="last_name" className="text-gray-700 dark:text-gray-200">نام خانوادگی</Label>
+            <Input
+              id="last_name"
+              {...form.register('last_name')}
+              placeholder="نام خانوادگی خود را وارد کنید"
+              className="mt-1 block w-full bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
+              disabled={isSubmitting}
+            />
+            {form.formState.errors.last_name && <p className="text-red-500 text-sm mt-1">{form.formState.errors.last_name.message}</p>}
+          </div>
+
+          {/* Display user's email (read-only) */}
+          <div>
+            <Label className="text-gray-700 dark:text-gray-200">ایمیل</Label>
+            <Input
+              value={session?.user?.email || ''}
+              readOnly
+              className="mt-1 block w-full bg-gray-100/50 dark:bg-gray-800/50 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm text-gray-700 dark:text-gray-300 cursor-not-allowed"
+            />
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">ایمیل از طریق تنظیمات حساب کاربری قابل تغییر است.</p>
+          </div>
+
+          <CardFooter className="flex justify-end gap-4 p-0 pt-4">
+            <Button
+              type="submit"
+              className="px-6 py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white transition-colors"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "در حال ذخیره..." : "ذخیره تغییرات"}
+            </Button>
+          </CardFooter>
+        </form>
+      </CardContent>
+    </Card>
+  );
+};
+
+export default UserProfileForm;

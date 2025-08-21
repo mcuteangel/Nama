@@ -8,6 +8,7 @@ import ContactDetail from './pages/ContactDetail';
 import EditContact from './pages/EditContact';
 import Groups from './pages/Groups';
 import CustomFields from './pages/CustomFields';
+import UserProfile from './pages/UserProfile'; // Import UserProfile
 import { SessionContextProvider } from './integrations/supabase/auth';
 import { supabase } from './integrations/supabase/client';
 import MobileHeader from './components/MobileHeader';
@@ -18,7 +19,7 @@ import { cn } from './lib/utils';
 import NotFound from './pages/NotFound';
 import ProtectedRoute from './components/ProtectedRoute';
 import { TooltipProvider } from './components/ui/tooltip';
-import { ThemeProvider } from 'next-themes'; // Import ThemeProvider
+import { ThemeProvider } from 'next-themes';
 
 function AppLayout() {
   const location = useLocation();
@@ -66,6 +67,7 @@ function AppLayout() {
             <Route path="/contacts/edit/:id" element={<ProtectedRoute><EditContact /></ProtectedRoute>} />
             <Route path="/groups" element={<ProtectedRoute><Groups /></ProtectedRoute>} />
             <Route path="/custom-fields" element={<ProtectedRoute><CustomFields /></ProtectedRoute>} />
+            <Route path="/profile" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} /> {/* New UserProfile route */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </main>
@@ -77,7 +79,7 @@ function AppLayout() {
 export default function App() {
   return (
     <SessionContextProvider supabaseClient={supabase}>
-      <ThemeProvider attribute="class" defaultTheme="system" enableSystem> {/* Add ThemeProvider */}
+      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
         <Toaster />
         <BrowserRouter>
           <TooltipProvider>
