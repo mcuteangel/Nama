@@ -16,7 +16,7 @@ import TopPositionsList from "@/components/statistics/TopPositionsList"; // New 
 import { Skeleton } from "@/components/ui/skeleton"; // Import Skeleton
 import { ContactService } from "@/services/contact-service";
 import { useTranslation } from "react-i18next";
-import { showLoading, dismissToast, showError } from "@/utils/toast";
+import { showLoading, dismissToast, showError, showSuccess } from "@/utils/toast"; // Import toast functions
 import { fetchWithCache, invalidateCache } from "@/utils/cache-helpers"; // Import caching helpers
 
 interface GenderData {
@@ -116,82 +116,79 @@ const ContactStatisticsDashboard: React.FC = () => {
     setIsLoadingInitial(true);
     setIsFetchingRemote(true);
 
-    const { data, error } = await fetchWithCache<StatisticsData>(
-      cacheKey,
-      async () => {
-        const userId = session.user.id;
-        const [
-          { data: totalData, error: totalError },
-          { data: genderStats, error: genderError },
-          { data: groupStats, error: groupError },
-          { data: methodStats, error: methodError },
-          { data: birthdaysData, error: birthdaysError },
-          { data: creationTimeStats, error: creationTimeError },
-          { data: companiesStats, error: companiesError },
-          { data: positionsStats, error: errorPositions },
-        ] = await Promise.all([
-          ContactService.getTotalContacts(userId),
-          ContactService.getContactsByGender(userId),
-          ContactService.getContactsByGroup(userId),
-          ContactService.getContactsByPreferredMethod(userId),
-          ContactService.getUpcomingBirthdays(userId),
-          ContactService.getContactsByCreationMonth(userId),
-          ContactService.getTopCompanies(userId),
-          ContactService.getTopPositions(userId),
-        ]);
+    let toastId: string | number | undefined;
 
-        if (totalError) throw new Error(totalError);
-        if (genderError) throw new Error(genderError);
-        if (groupError) throw new Error(groupError);
-        if (methodError) throw new Error(methodError);
-        if (birthdaysError) throw new Error(birthdaysError);
-        if (creationTimeError) throw new Error(creationTimeError);
-        if (companiesError) throw new Error(companiesError);
-        if (errorPositions) throw new Error(errorPositions);
+    try {
+      const { data, error, fromCache } = await fetchWithCache<StatisticsData>(
+        cacheKey,
+        async () => {
+          const userId = session.user.id;
+          const [
+            { data: totalData, error: totalError },
+            { data: genderStats, error: genderError },
+            { data: groupStats, error: groupError },
+            { data: methodStats, error: methodError },
+            { data: birthdaysData, error: birthdaysError },
+            { data: creationTimeStats, error: creationTimeError },
+            { data: companiesStats, error: companiesError },
+            { data: positionsStats, error: errorPositions },
+          ] = await Promise.all([
+            ContactService.getTotalContacts(userId),
+            ContactService.getContactsByGender(userId),
+            ContactService.getContactsByGroup(userId),
+            ContactService.getContactsByPreferredMethod(userId),
+            ContactService.getUpcomingBirthdays(userId),
+            ContactService.getContactsByCreationMonth(userId),
+            ContactService.getTopCompanies(userId),
+            ContactService.getTopPositions(userId),
+          ]);
 
-        return {
-          data: {
-            totalContacts: totalData,
-            genderData: genderStats || [],
-            groupData: groupStats || [],
-            preferredMethodData: methodStats || [],
-            upcomingBirthdays: birthdaysData || [],
-            creationTimeData: creationTimeStats || [],
-            topCompaniesData: companiesStats || [],
-            topPositionsData: positionsStats || [],
-          },
-          error: null,
-        };
-      },
-      {
-        loadingMessage: t('statistics.loading_stats'),
-        successMessage: t('statistics.stats_loaded_success'),
-        errorMessage: t('statistics.error_loading_stats'),
+          if (totalError) throw new Error(totalError);
+          if (genderError) throw new Error(genderError);
+          if (groupError) throw new Error(groupError);
+          if (methodError) throw new Error(methodError);
+          if (birthdaysError) throw new Error(birthdaysError);
+          if (creationTimeError) throw new Error(creationTimeError);
+          if (companiesError) throw new Error(companiesError);
+          if (errorPositions) throw new Error(errorPositions);
+
+          return {
+            data: {
+              totalContacts: totalData,
+              genderData: genderStats || [],
+              groupData: groupStats || [],
+              preferredMethodData: methodStats || [],
+              upcomingBirthdays: birthdaysData || [],
+              creationTimeData: creationTimeStats || [],
+              topCompaniesData: companiesStats || [],
+              topPositionsData: positionsStats || [],
+            },
+            error: null,
+          };
+        }
+      );
+
+      if (data) {
+        setStatistics(data);
       }
-    );
 
-    if (error) {
-      console.error("Error fetching statistics:", error);
-      // If there's an error and no cached data was returned, set to empty/null
-      if (!data) {
-        setStatistics({
-          totalContacts: null,
-          genderData: [],
-          groupData: [],
-          preferredMethodData: [],
-          upcomingBirthdays: [],
-          creationTimeData: [],
-          topCompaniesData: [],
-          topPositionsData: [],
-        });
-      } else {
-        setStatistics(data); // Use stale data if available on error
+      if (error) {
+        throw new Error(error);
       }
-    } else {
-      setStatistics(data || statistics); // Use fetched data or current state if data is null
+
+      if (!fromCache) {
+        showSuccess(t('statistics.stats_loaded_success'));
+      }
+
+    } catch (err: any) {
+      console.error("Error fetching statistics:", err);
+      showError(t('statistics.error_loading_stats'));
+      onErrorStatistics(err);
+    } finally {
+      if (toastId) dismissToast(toastId);
+      setIsLoadingInitial(false);
+      setIsFetchingRemote(false);
     }
-    setIsLoadingInitial(false);
-    setIsFetchingRemote(false);
   }, [session, isSessionLoading, t, onErrorStatistics, statistics]);
 
   useEffect(() => {

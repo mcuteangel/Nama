@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { showError } from "@/utils/toast";
+import { showError, showLoading, showSuccess, dismissToast } from "@/utils/toast"; // Import toast functions
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -127,6 +127,7 @@ const ContactDetail = () => {
 
       const cacheKey = `contact_detail_${id}`;
       setLoading(true);
+      const toastId = showLoading("در حال بارگذاری جزئیات مخاطب..."); // Add toast
 
       const { data, error } = await fetchWithCache<ContactDetailType>(
         cacheKey,
@@ -143,24 +144,23 @@ const ContactDetail = () => {
             return { data: data as ContactDetailType, error: null };
           }
           return { data: null, error: "مخاطب یافت نشد." };
-        },
-        {
-          loadingMessage: "در حال بارگذاری جزئیات مخاطب...",
-          successMessage: "جزئیات مخاطب با موفقیت بارگذاری شد.",
-          errorMessage: "خطا در بارگذاری جزئیات مخاطب",
         }
       );
 
       if (error) {
         console.error("Error fetching contact details:", error);
+        showError(`خطا در بارگذاری جزئیات مخاطب: ${error || "خطای ناشناخته"}`); // Fixed: Use error directly
         navigate("/");
       } else {
         setContact(data || null);
         if (!data) {
           showError("مخاطب یافت نشد.");
           navigate("/");
+        } else {
+          showSuccess("جزئیات مخاطب با موفقیت بارگذاری شد."); // Add success toast
         }
       }
+      dismissToast(toastId); // Dismiss toast
       setLoading(false);
     };
 
@@ -168,7 +168,9 @@ const ContactDetail = () => {
   }, [id, navigate]);
 
   if (loading) {
-    return <LoadingMessage message="در حال بارگذاری جزئیات مخاطب..." />;
+    return (
+      <LoadingMessage message="در حال بارگذاری جزئیات مخاطب..." />
+    );
   }
 
   if (!contact) {

@@ -84,12 +84,6 @@ const UserProfileForm: React.FC = () => {
               throw new Error(error.message || "خطا در دریافت اطلاعات پروفایل");
             }
             return { data: data, error: null };
-          },
-          {
-            loadingMessage: "در حال بارگذاری پروفایل...",
-            successMessage: "پروفایل با موفقیت بارگذاری شد.",
-            errorMessage: "خطا در دریافت اطلاعات پروفایل",
-            showLoadingToast: false
           }
         );
 
@@ -99,7 +93,10 @@ const UserProfileForm: React.FC = () => {
         });
       }, {
         component: "UserProfileForm",
-        action: "fetchProfile"
+        action: "fetchProfile",
+        loadingMessage: "در حال بارگذاری پروفایل...", // Added to executeAsync
+        successMessage: "پروفایل با موفقیت بارگذاری شد.", // Added to executeAsync
+        errorMessage: "خطا در دریافت اطلاعات پروفایل", // Added to executeAsync
       });
     };
 

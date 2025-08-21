@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/integrations/supabase/auth";
-import { showError } from "@/utils/toast";
+import { showError, showLoading, dismissToast, showSuccess } from "@/utils/toast"; // Import toast functions
 import { fetchWithCache, invalidateCache } from "@/utils/cache-helpers"; // Import caching helpers
 
 interface Group {
@@ -30,6 +30,7 @@ export const useGroups = () => {
     const cacheKey = `user_groups_${session.user.id}`;
     
     setLoadingGroups(true);
+    const toastId = showLoading("در حال بارگذاری گروه‌ها..."); // Add toast
 
     const { data, error } = await fetchWithCache<Group[]>(
       cacheKey,
@@ -41,20 +42,18 @@ export const useGroups = () => {
           .order("name", { ascending: true });
 
         return { data: data as Group[], error: error?.message || null };
-      },
-      {
-        loadingMessage: "در حال بارگذاری گروه‌ها...",
-        successMessage: "گروه‌ها با موفقیت بارگذاری شدند.",
-        errorMessage: "خطا در بارگذاری گروه‌ها",
       }
     );
 
     if (error) {
       console.error("Error fetching groups:", error);
+      showError(`خطا در بارگذاری گروه‌ها: ${error || "خطای ناشناخته"}`); // Fixed: Use error directly
       setGroups([]);
     } else {
       setGroups(data || []);
+      showSuccess("گروه‌ها با موفقیت بارگذاری شدند."); // Add success toast
     }
+    dismissToast(toastId); // Dismiss toast
     setLoadingGroups(false);
   }, [session, isSessionLoading]);
 

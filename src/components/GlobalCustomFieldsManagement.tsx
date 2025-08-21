@@ -17,6 +17,7 @@ import { fetchWithCache, invalidateCache } from "@/utils/cache-helpers";
 import FormDialogWrapper from "./FormDialogWrapper"; // Import the new wrapper
 import LoadingMessage from "./LoadingMessage"; // Import LoadingMessage
 import CancelButton from "./CancelButton"; // Import CancelButton
+import { showLoading, dismissToast, showError, showSuccess } from "@/utils/toast"; // Import toast functions
 
 type TemplateType = 'text' | 'number' | 'date' | 'list';
 
@@ -67,6 +68,8 @@ export function GlobalCustomFieldsManagement() {
       return;
     }
     const cacheKey = `custom_field_templates_${session.user.id}`;
+    const toastId = showLoading("در حال بارگذاری قالب‌های فیلد سفارشی..."); // Add toast
+
     const { data, error } = await fetchWithCache<CustomFieldTemplate[]>(
       cacheKey,
       async () => {
@@ -75,16 +78,12 @@ export function GlobalCustomFieldsManagement() {
           throw new Error(res.error || "خطا در دریافت لیست قالب‌های فیلدهای سفارشی");
         }
         return { data: res.data, error: null };
-      },
-      {
-        loadingMessage: "در حال بارگذاری قالب‌های فیلد سفارشی...",
-        successMessage: "قالب‌های فیلد سفارشی با موفقیت بارگذاری شدند.",
-        errorMessage: "خطا در دریافت لیست قالب‌های فیلدهای سفارشی",
       }
     );
 
     if (error) {
       console.error("Error loading custom field templates:", error);
+      showError(`خطا در دریافت لیست قالب‌های فیلدهای سفارشی: ${error || "خطای ناشناخته"}`); // Fixed: Use error directly
       setCustomFields([]);
     } else {
       setCustomFields(data!.map((t: CustomFieldTemplate) => ({
@@ -95,7 +94,9 @@ export function GlobalCustomFieldsManagement() {
         description: t.description || "",
         required: t.required
       })));
+      showSuccess("قالب‌های فیلد سفارشی با موفقیت بارگذاری شدند."); // Add success toast
     }
+    dismissToast(toastId); // Dismiss toast
   };
 
   useEffect(() => {

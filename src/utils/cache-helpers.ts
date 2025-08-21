@@ -53,34 +53,25 @@ export function invalidateCache(cacheKey: string) {
 /**
  * Fetches data, attempting to retrieve it from cache first.
  * If fresh cache is available, it returns immediately.
- * Otherwise, it fetches from the provided function, caches the result, and shows toasts.
+ * Otherwise, it fetches from the provided function, caches the result.
+ * This function no longer handles toasts directly.
  * @param cacheKey The key for caching this specific data.
  * @param fetchFunction The asynchronous function to call to fetch the data from the source.
- * @param options Configuration options for toasts and messages.
- * @returns A promise that resolves with the fetched data or null on error.
+ * @returns A promise that resolves with the fetched data, an error, and a flag indicating if it was from cache.
  */
 export async function fetchWithCache<T>(
   cacheKey: string,
   fetchFunction: () => Promise<{ data: T | null; error: string | null }>,
-  options?: {
-    loadingMessage?: string;
-    successMessage?: string;
-    errorMessage?: string;
-    showLoadingToast?: boolean;
-  }
-): Promise<{ data: T | null; error: string | null }> {
-  const { loadingMessage, successMessage, errorMessage, showLoadingToast = true } = options || {};
-
+): Promise<{ data: T | null; error: string | null; fromCache: boolean }> {
   // 1. Try to get fresh cached data first
   const freshCachedData = getCachedData<T>(cacheKey);
   if (freshCachedData) {
-    return { data: freshCachedData, error: null };
+    return { data: freshCachedData, error: null, fromCache: true };
   }
 
-  let toastId: string | number | undefined;
   let initialData: T | null = null;
 
-  // 2. If no fresh cache, check for stale cache to potentially display while fetching
+  // 2. If no fresh cache, check for stale cache to potentially return as initial data
   const staleCachedDataString = localStorage.getItem(cacheKey);
   if (staleCachedDataString) {
     try {
@@ -91,34 +82,23 @@ export async function fetchWithCache<T>(
     }
   }
 
-  // 3. Show loading toast if no fresh data was immediately available
-  if (showLoadingToast) {
-    toastId = showLoading(loadingMessage || "در حال بارگذاری...");
-  }
-
   try {
-    // 4. Perform the actual fetch
+    // 3. Perform the actual fetch
     const { data, error } = await fetchFunction();
 
     if (error) {
       throw new Error(error);
     }
 
-    // 5. Cache the new data
+    // 4. Cache the new data
     if (data !== null) {
       setCachedData(cacheKey, data);
     }
 
-    // 6. Dismiss loading toast and show success toast
-    if (toastId) dismissToast(toastId);
-    if (successMessage) showSuccess(successMessage);
-
-    return { data, error: null };
+    return { data, error: null, fromCache: false };
   } catch (err: any) {
-    // 7. Handle errors: dismiss toast, show error toast, and return stale data if available
+    // 5. Handle errors: return stale data if available, otherwise null
     console.error(`Error fetching data for ${cacheKey}:`, err);
-    if (toastId) dismissToast(toastId);
-    showError(errorMessage || `خطا در بارگذاری: ${err.message || "خطای ناشناخته"}`);
-    return { data: initialData, error: err.message || "Unknown error" }; // Return stale data on error if available
+    return { data: initialData, error: err.message || "Unknown error", fromCache: false };
   }
 }

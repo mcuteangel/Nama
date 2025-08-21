@@ -160,34 +160,37 @@ const ContactList = ({ searchTerm, selectedGroup, companyFilter, sortOption }: C
     
     setLoadingContacts(true);
     setIsFetchingRemote(true);
+    const toastId = showLoading("در حال بارگذاری مخاطبین..."); // Add toast
 
-    const { data, error } = await fetchWithCache<Contact[]>(
-      cacheKey,
-      async () => {
-        const result = await ContactService.getFilteredContacts(
-          session.user.id,
-          searchTerm,
-          selectedGroup,
-          companyFilter,
-          sortOption
-        );
-        return { data: result.data as Contact[], error: result.error };
-      },
-      {
-        loadingMessage: "در حال بارگذاری مخاطبین...",
-        successMessage: "مخاطبین با موفقیت بارگذاری شدند.",
-        errorMessage: "خطا در بارگذاری مخاطبین از سرور",
+    try {
+      const { data, error } = await fetchWithCache<Contact[]>(
+        cacheKey,
+        async () => {
+          const result = await ContactService.getFilteredContacts(
+            session.user.id,
+            searchTerm,
+            selectedGroup,
+            companyFilter,
+            sortOption
+          );
+          return { data: result.data as Contact[], error: result.error };
+        }
+      );
+
+      if (error) {
+        throw new Error(error);
       }
-    );
-
-    if (error) {
-      console.error("Error fetching contacts:", error);
-      setContacts([]);
-    } else {
+      showSuccess("مخاطبین با موفقیت بارگذاری شدند."); // Add success toast
       setContacts(data || []);
+    } catch (err: any) {
+      console.error("Error fetching contacts:", err);
+      showError(`خطا در بارگذاری مخاطبین از سرور: ${err.message || "خطای ناشناخته"}`); // Add error toast
+      setContacts([]);
+    } finally {
+      dismissToast(toastId); // Dismiss toast
+      setLoadingContacts(false);
+      setIsFetchingRemote(false);
     }
-    setLoadingContacts(false);
-    setIsFetchingRemote(false);
   }, [session, isSessionLoading, searchTerm, selectedGroup, companyFilter, sortOption]);
 
   useEffect(() => {

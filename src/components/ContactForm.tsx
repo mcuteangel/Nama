@@ -122,11 +122,6 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
       async () => {
         const result = await ContactService.getAllCustomFieldTemplates();
         return { data: result.data, error: result.error };
-      },
-      {
-        loadingMessage: "در حال بارگذاری قالب‌های فیلد سفارشی...",
-        errorMessage: "خطا در بارگذاری قالب‌های فیلد سفارشی",
-        showLoadingToast: false
       }
     );
     if (error) {
@@ -141,35 +136,6 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
   useEffect(() => {
     fetchTemplates();
   }, [fetchTemplates]);
-
-  useEffect(() => {
-    if (initialData) {
-      form.reset({
-        firstName: initialData.first_name,
-        lastName: initialData.last_name,
-        gender: initialData.gender,
-        position: initialData.position,
-        company: initialData.company,
-        street: initialData.street ?? null,
-        city: initialData.city ?? null,
-        state: initialData.state ?? null,
-        zipCode: initialData.zip_code ?? null,
-        country: initialData.country ?? null,
-        notes: initialData.notes ?? null,
-        groupId: initialData.groupId ?? null,
-        birthday: initialData.birthday ?? null,
-        avatarUrl: initialData.avatar_url ?? null,
-        preferredContactMethod: initialData.preferred_contact_method ?? null,
-        phoneNumbers: initialData.phone_numbers || [],
-        emailAddresses: initialData.email_addresses || [],
-        socialLinks: initialData.social_links || [],
-        customFields: initialData.custom_fields?.map(cf => ({
-          template_id: cf.template_id,
-          value: cf.field_value,
-        })) || [],
-      });
-    }
-  }, [initialData, form]);
 
   useEffect(() => {
     if (loadingTemplates) return;
