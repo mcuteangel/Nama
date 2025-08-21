@@ -3,6 +3,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import moment from 'moment-jalaali';
 import { enUS } from 'date-fns/locale';
+import { format as formatFns } from 'date-fns'; // Renamed to avoid conflict with local format function
 
 export type CalendarType = 'gregorian' | 'jalali';
 
@@ -15,7 +16,7 @@ export interface CalendarOptions {
 export interface CalendarHookReturn {
   calendarType: CalendarType;
   currentLocale: any;
-  setCalendarType: (type: CalendarType) => void; // Changed to setCalendarType
+  setCalendarType: (type: CalendarType) => void;
   formatDate: (date: Date | undefined, formatString?: string) => string;
   formatDateWithDay: (date: Date | undefined) => string;
   getCalendarLabel: () => string;
@@ -58,9 +59,7 @@ export function useJalaliCalendar(options: CalendarOptions = {}): CalendarHookRe
       const momentDate = moment(date);
       return momentDate.format(customFormat || formatString);
     } else {
-      // For Gregorian, use date-fns with English locale
-      const { format } = require('date-fns');
-      return format(date, customFormat || 'yyyy/MM/dd', { locale: enUS });
+      return formatFns(date, customFormat || 'yyyy/MM/dd', { locale: enUS });
     }
   }, [calendarType, formatString]);
 
@@ -71,11 +70,9 @@ export function useJalaliCalendar(options: CalendarOptions = {}): CalendarHookRe
       const momentDate = moment(date);
       return `${momentDate.format('jYYYY/jMM/jDD')} (${momentDate.format('dddd')})`;
     } else {
-      // For Gregorian, use date-fns with English locale
-      const { format } = require('date-fns');
       const dateObj = new Date(date);
-      const dayName = dateObj.toLocaleDateString('fa-IR', { weekday: 'long' }); // Still use fa-IR for day name for consistency
-      return `${format(date, 'yyyy/MM/dd', { locale: enUS })} (${dayName})`;
+      const dayName = dateObj.toLocaleDateString('fa-IR', { weekday: 'long' });
+      return `${formatFns(date, 'yyyy/MM/dd', { locale: enUS })} (${dayName})`;
     }
   }, [calendarType]);
 
