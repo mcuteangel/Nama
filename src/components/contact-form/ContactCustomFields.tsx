@@ -1,0 +1,134 @@
+import React from 'react';
+import { useFormContext } from 'react-hook-form';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Button } from '@/components/ui/button';
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
+import { CalendarIcon } from 'lucide-react';
+import { format } from 'date-fns-jalali';
+import { JalaliCalendar } from '@/components/JalaliCalendar';
+import { cn } from '@/lib/utils';
+import AddCustomFieldTemplateDialog from '@/components/AddCustomFieldTemplateDialog';
+import { CustomFieldTemplate } from '@/domain/schemas/custom-field-template';
+import { ContactFormValues } from '@/types/contact';
+
+interface ContactCustomFieldsProps {
+  availableTemplates: CustomFieldTemplate[];
+  loadingTemplates: boolean;
+  fetchTemplates: () => void;
+}
+
+const ContactCustomFields: React.FC<ContactCustomFieldsProps> = ({
+  availableTemplates,
+  loadingTemplates,
+  fetchTemplates,
+}) => {
+  const form = useFormContext<ContactFormValues>();
+
+  return (
+    <div className="space-y-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+      <div className="flex justify-between items-center mb-2">
+        <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">فیلدهای سفارشی</h3>
+        <AddCustomFieldTemplateDialog onTemplateAdded={fetchTemplates} />
+      </div>
+      {loadingTemplates ? (
+        <p className="text-center text-gray-500 dark:text-gray-400">در حال بارگذاری قالب‌های فیلد سفارشی...</p>
+      ) : availableTemplates.length === 0 ? (
+        <p className="text-center text-gray-500 dark:text-gray-400">هیچ قالب فیلد سفارشی تعریف نشده است.</p>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {form.watch("customFields")?.map((fieldItem, index) => {
+            const template = availableTemplates.find(t => t.id === fieldItem.template_id);
+            if (!template) return null; // Should not happen if logic is correct
+
+            const fieldName = `customFields.${index}.value` as const;
+            
+            return (
+              <FormField
+                key={template.id}
+                control={form.control}
+                name={fieldName}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-gray-700 dark:text-gray-200">
+                      {template.name}
+                      {template.required && <span className="text-red-500">*</span>}
+                    </FormLabel>
+                    <FormControl>
+                      {template.type === 'text' ? (
+                        <Input
+                          placeholder={template.description || `مقدار ${template.name}`}
+                          className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
+                          {...field}
+                          value={field.value || ''}
+                        />
+                      ) : template.type === 'number' ? (
+                        <Input
+                          type="number"
+                          placeholder={template.description || `مقدار ${template.name}`}
+                          className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
+                          {...field}
+                          value={field.value || ''}
+                          onChange={(e) => field.onChange(e.target.value === '' ? undefined : Number(e.target.value))}
+                        />
+                      ) : template.type === 'date' ? (
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant={"outline"}
+                              className={cn(
+                                "w-full justify-start text-left font-normal bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100",
+                                !field.value && "text-muted-foreground"
+                              )}
+                            >
+                              <span className="flex items-center">
+                                <CalendarIcon className="ml-2 h-4 w-4" />
+                                {field.value ? format(new Date(field.value), "yyyy/MM/dd") : <span>تاریخ را انتخاب کنید</span>}
+                              </span>
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0">
+                            <JalaliCalendar
+                              selected={field.value ? new Date(field.value) : undefined}
+                              onSelect={(date) => field.onChange(date ? date.toISOString() : "")}
+                              showToggle={false}
+                            />
+                          </PopoverContent>
+                        </Popover>
+                      ) : template.type === 'list' ? (
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value || ''}
+                          disabled={!template.options || template.options.length === 0}
+                        >
+                          <FormControl>
+                            <SelectTrigger className="w-full bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100">
+                              <SelectValue placeholder={!template.options || template.options.length === 0 ? "گزینه‌ای یافت نشد" : `انتخاب ${template.name}`} />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent className="backdrop-blur-md bg-white/80 dark:bg-gray-800/80 border border-white/30 dark:border-gray-600/30">
+                            {template.options && template.options.map((option) => (
+                              <SelectItem key={option} value={option}>
+                                {option}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      ) : (
+                        <Input disabled placeholder="نوع فیلد نامشخص" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400" />
+                      )}
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default ContactCustomFields;
