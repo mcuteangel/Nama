@@ -209,32 +209,4 @@ export const ContactService = {
     // The RPC function already returns 'method' and 'count' in the correct format
     return { data: data as Array<{ method: string; count: number }>, error: null };
   },
-
-  async getUpcomingBirthdays(): Promise<{ data: Array<{ first_name: string; last_name: string; birthday: string }> | null; error: string | null }> {
-    const { data, error } = await supabase.rpc('get_upcoming_birthdays');
-
-    if (error) {
-      console.error("Supabase RPC Error (get_upcoming_birthdays):", error);
-      return { data: null, error: error.message };
-    }
-
-    // Explicitly check if data is an array and its elements conform to the expected structure
-    if (!Array.isArray(data)) {
-      console.error("Unexpected data format from get_upcoming_birthdays RPC: Expected array, got", data);
-      return { data: null, error: "فرمت داده‌های دریافتی برای تولدهای آینده نامعتبر است." };
-    }
-
-    // Further validate each item in the array to ensure required fields are strings
-    const validatedData = data.filter((item: any) =>
-      typeof item.first_name === 'string' &&
-      typeof item.last_name === 'string' &&
-      typeof item.birthday === 'string' // Assuming ISO string format for date
-    );
-
-    if (validatedData.length !== data.length) {
-      console.warn("Some items in get_upcoming_birthdays RPC response did not match expected type. Filtering out invalid entries.");
-    }
-
-    return { data: validatedData as Array<{ first_name: string; last_name: string; birthday: string }>, error: null };
-  },
 };
