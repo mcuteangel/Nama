@@ -68,9 +68,9 @@ const UserProfileForm: React.FC = () => {
           .from('profiles')
           .select('first_name, last_name')
           .eq('id', session.user.id)
-          .maybeSingle(); // Changed from .single() to .maybeSingle()
+          .maybeSingle();
 
-        if (error) { // maybeSingle() only returns error for network/server issues, not for no rows
+        if (error) {
           throw new Error(error.message || "خطا در دریافت اطلاعات پروفایل");
         }
 
