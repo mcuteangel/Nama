@@ -211,27 +211,12 @@ export const ContactService = {
   },
 
   async getUpcomingBirthdays(userId: string): Promise<{ data: Array<{ first_name: string; last_name: string; birthday: string }> | null; error: string | null }> {
-    const currentMonth = moment().month() + 1; // Gregorian month (1-12)
-    const currentDay = moment().date(); // Gregorian day of month
-
-    const { data, error } = await supabase
-      .from('contacts')
-      .select('first_name, last_name, birthday')
-      .eq('user_id', userId)
-      .not('birthday', 'is', null)
-      .filter('EXTRACT(MONTH FROM birthday)', 'eq', currentMonth)
-      .order('EXTRACT(DAY FROM birthday)', { ascending: true });
+    const { data, error } = await supabase.rpc('get_upcoming_birthdays', { user_id_param: userId });
 
     if (error) {
       return { data: null, error: error.message };
     }
-
-    // Filter for upcoming birthdays in the current month (today and future)
-    const upcoming = data.filter(contact => {
-      const birthdayDate = new Date(contact.birthday);
-      return birthdayDate.getDate() >= currentDay;
-    });
-
-    return { data: upcoming as Array<{ first_name: string; last_name: string; birthday: string }>, error: null };
+    // The RPC function already returns 'first_name', 'last_name', 'birthday' in the correct format
+    return { data: data as Array<{ first_name: string; last_name: string; birthday: string }>, error: null };
   },
 };
