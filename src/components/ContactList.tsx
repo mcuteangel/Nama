@@ -10,7 +10,9 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { ContactService } from "@/services/contact-service";
 import { fetchWithCache, invalidateCache } from "@/utils/cache-helpers";
 import { useSession } from "@/integrations/supabase/auth";
-import LoadingMessage from "./LoadingMessage"; // Import LoadingMessage
+import LoadingMessage from "./LoadingMessage";
+import { useErrorHandler } from "@/hooks/use-error-handler"; // Import useErrorHandler
+import { ErrorManager } from "@/lib/error-manager"; // Import ErrorManager
 
 interface PhoneNumber {
   phone_number: string;
@@ -53,29 +55,37 @@ const ContactItem = ({ contact, onContactDeleted, onContactEdited }: { contact: 
   const displayPhoneNumber = contact.phone_numbers.length > 0 ? contact.phone_numbers[0].phone_number : "بدون شماره";
   const displayEmail = contact.email_addresses.length > 0 ? contact.email_addresses[0].email_address : undefined;
 
+  const {
+    isLoading: isDeleting,
+    executeAsync: executeDelete,
+  } = useErrorHandler(null, {
+    maxRetries: 3,
+    retryDelay: 1000,
+    showToast: true,
+    customErrorMessage: "خطا در حذف مخاطب",
+    onSuccess: () => {
+      ErrorManager.notifyUser("مخاطب با موفقیت حذف شد.", 'success');
+      onContactDeleted(contact.id);
+    },
+    onError: (err) => {
+      ErrorManager.logError(err, { component: 'ContactItem', action: 'deleteContact', contactId: contact.id });
+    },
+  });
+
   const handleContactClick = () => {
     navigate(`/contacts/${contact.id}`);
   };
 
   const handleDelete = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    const toastId = showLoading("در حال حذف مخاطب...");
-    try {
+    await executeDelete(async () => {
       const { error } = await supabase
         .from("contacts")
         .delete()
         .eq("id", contact.id);
 
       if (error) throw error;
-
-      showSuccess("مخاطب با موفقیت حذف شد.");
-      onContactDeleted(contact.id);
-    } catch (error: any) {
-      console.error("Error deleting contact:", error);
-      showError(`خطا در حذف مخاطب: ${error.message || "خطای ناشناخته"}`);
-    } finally {
-      dismissToast(toastId);
-    }
+    });
   };
 
   const handleEditClick = (e: React.MouseEvent) => {
@@ -116,7 +126,7 @@ const ContactItem = ({ contact, onContactDeleted, onContactEdited }: { contact: 
         </Button>
         <AlertDialog>
           <AlertDialogTrigger asChild>
-            <Button variant="ghost" size="icon" className="text-red-600 hover:bg-red-100 dark:text-red-400 dark:hover:bg-gray-600/50 transition-all duration-200" onClick={(e) => e.stopPropagation()}>
+            <Button variant="ghost" size="icon" className="text-red-600 hover:bg-red-100 dark:text-red-400 dark:hover:bg-gray-600/50 transition-all duration-200" onClick={(e) => e.stopPropagation()} disabled={isDeleting}>
               <Trash2 size={20} />
             </Button>
           </AlertDialogTrigger>
@@ -129,7 +139,7 @@ const ContactItem = ({ contact, onContactDeleted, onContactEdited }: { contact: 
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-100">لغو</AlertDialogCancel>
-              <AlertDialogAction onClick={handleDelete} className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold">حذف</AlertDialogAction>
+              <AlertDialogAction onClick={handleDelete} className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold" disabled={isDeleting}>حذف</AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
@@ -141,28 +151,32 @@ const ContactItem = ({ contact, onContactDeleted, onContactEdited }: { contact: 
 const ContactList = ({ searchTerm, selectedGroup, companyFilter, sortOption }: ContactListProps) => {
   const { session, isLoading: isSessionLoading } = useSession();
   const [contacts, setContacts] = useState<Contact[]>([]);
-  const [loadingContacts, setLoadingContacts] = useState(true);
-  const [isFetchingRemote, setIsFetchingRemote] = useState(false);
+
+  const {
+    isLoading,
+    executeAsync,
+  } = useErrorHandler(null, {
+    maxRetries: 3,
+    retryDelay: 1000,
+    showToast: true,
+    customErrorMessage: "خطا در بارگذاری مخاطبین",
+    onSuccess: () => {
+      ErrorManager.notifyUser("مخاطبین با موفقیت بارگذاری شدند.", 'success');
+    },
+    onError: (err) => {
+      ErrorManager.logError(err, { component: 'ContactList', action: 'fetchContacts' });
+    },
+  });
 
   const fetchContacts = useCallback(async () => {
-    if (isSessionLoading) {
-      setLoadingContacts(true);
-      return;
-    }
-
-    if (!session?.user) {
+    if (isSessionLoading || !session?.user) {
       setContacts([]);
-      setLoadingContacts(false);
       return;
     }
 
     const cacheKey = `contacts_list_${session.user.id}_${searchTerm}_${selectedGroup}_${companyFilter}_${sortOption}`;
     
-    setLoadingContacts(true);
-    setIsFetchingRemote(true);
-    const toastId = showLoading("در حال بارگذاری مخاطبین..."); // Add toast
-
-    try {
+    await executeAsync(async () => {
       const { data, error } = await fetchWithCache<Contact[]>(
         cacheKey,
         async () => {
@@ -180,18 +194,10 @@ const ContactList = ({ searchTerm, selectedGroup, companyFilter, sortOption }: C
       if (error) {
         throw new Error(error);
       }
-      showSuccess("مخاطبین با موفقیت بارگذاری شدند."); // Add success toast
       setContacts(data || []);
-    } catch (err: any) {
-      console.error("Error fetching contacts:", err);
-      showError(`خطا در بارگذاری مخاطبین از سرور: ${err.message || "خطای ناشناخته"}`); // Add error toast
-      setContacts([]);
-    } finally {
-      dismissToast(toastId); // Dismiss toast
-      setLoadingContacts(false);
-      setIsFetchingRemote(false);
-    }
-  }, [session, isSessionLoading, searchTerm, selectedGroup, companyFilter, sortOption]);
+      return data;
+    });
+  }, [session, isSessionLoading, searchTerm, selectedGroup, companyFilter, sortOption, executeAsync]);
 
   useEffect(() => {
     fetchContacts();
@@ -209,7 +215,7 @@ const ContactList = ({ searchTerm, selectedGroup, companyFilter, sortOption }: C
     fetchContacts();
   };
 
-  if (loadingContacts && !isFetchingRemote) {
+  if (isLoading || isSessionLoading) {
     return <LoadingMessage message="در حال بارگذاری مخاطبین..." />;
   }
 

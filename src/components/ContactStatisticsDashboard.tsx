@@ -10,14 +10,13 @@ import ContactsByGenderChart from "@/components/statistics/ContactsByGenderChart
 import ContactsByGroupChart from "@/components/statistics/ContactsByGroupChart";
 import ContactsByPreferredMethodChart from "@/components/statistics/ContactsByPreferredMethodChart";
 import UpcomingBirthdaysList from "@/components/statistics/UpcomingBirthdaysList";
-import ContactsByCreationTimeChart from "@/components/statistics/ContactsByCreationTimeChart"; // New import
-import TopCompaniesList from "@/components/statistics/TopCompaniesList"; // New import
-import TopPositionsList from "@/components/statistics/TopPositionsList"; // New import
-import { Skeleton } from "@/components/ui/skeleton"; // Import Skeleton
+import ContactsByCreationTimeChart from "@/components/statistics/ContactsByCreationTimeChart";
+import TopCompaniesList from "@/components/statistics/TopCompaniesList";
+import TopPositionsList from "@/components/statistics/TopPositionsList";
+import { Skeleton } from "@/components/ui/skeleton";
 import { ContactService } from "@/services/contact-service";
 import { useTranslation } from "react-i18next";
-import { showLoading, dismissToast, showError, showSuccess } from "@/utils/toast"; // Import toast functions
-import { fetchWithCache, invalidateCache } from "@/utils/cache-helpers"; // Import caching helpers
+import { fetchWithCache } from "@/utils/cache-helpers";
 
 interface GenderData {
   gender: string;
@@ -83,20 +82,25 @@ const ContactStatisticsDashboard: React.FC = () => {
     topCompaniesData: [],
     topPositionsData: [],
   });
-  const [isLoadingInitial, setIsLoadingInitial] = useState(true);
-  const [isFetchingRemote, setIsFetchingRemote] = useState(false);
 
-  const onErrorStatistics = useCallback((error: Error) => {
-    ErrorManager.logError(error, { component: 'ContactStatisticsDashboard', action: 'fetchStatistics' });
-  }, []);
+  const {
+    isLoading,
+    executeAsync,
+  } = useErrorHandler(null, {
+    maxRetries: 3,
+    retryDelay: 1000,
+    showToast: true,
+    customErrorMessage: t('statistics.error_loading_stats'),
+    onSuccess: () => {
+      ErrorManager.notifyUser(t('statistics.stats_loaded_success'), 'success');
+    },
+    onError: (err) => {
+      ErrorManager.logError(err, { component: 'ContactStatisticsDashboard', action: 'fetchStatistics' });
+    },
+  });
 
   const fetchStatistics = useCallback(async () => {
-    if (isSessionLoading) {
-      setIsLoadingInitial(true);
-      return;
-    }
-
-    if (!session?.user) {
+    if (isSessionLoading || !session?.user) {
       setStatistics({
         totalContacts: null,
         genderData: [],
@@ -107,22 +111,16 @@ const ContactStatisticsDashboard: React.FC = () => {
         topCompaniesData: [],
         topPositionsData: [],
       });
-      setIsLoadingInitial(false);
       return;
     }
 
-    const cacheKey = `statistics_dashboard_${session.user.id}`;
-    
-    setIsLoadingInitial(true);
-    setIsFetchingRemote(true);
+    const userId = session.user.id;
+    const cacheKey = `statistics_dashboard_${userId}`;
 
-    let toastId: string | number | undefined;
-
-    try {
-      const { data, error, fromCache } = await fetchWithCache<StatisticsData>(
+    await executeAsync(async () => {
+      const { data, error } = await fetchWithCache<StatisticsData>(
         cacheKey,
         async () => {
-          const userId = session.user.id;
           const [
             { data: totalData, error: totalError },
             { data: genderStats, error: genderError },
@@ -171,25 +169,9 @@ const ContactStatisticsDashboard: React.FC = () => {
       if (data) {
         setStatistics(data);
       }
-
-      if (error) {
-        throw new Error(error);
-      }
-
-      if (!fromCache) {
-        showSuccess(t('statistics.stats_loaded_success'));
-      }
-
-    } catch (err: any) {
-      console.error("Error fetching statistics:", err);
-      showError(t('statistics.error_loading_stats'));
-      onErrorStatistics(err);
-    } finally {
-      if (toastId) dismissToast(toastId);
-      setIsLoadingInitial(false);
-      setIsFetchingRemote(false);
-    }
-  }, [session, isSessionLoading, t, onErrorStatistics, statistics]);
+      return data;
+    });
+  }, [session, isSessionLoading, executeAsync, t]);
 
   useEffect(() => {
     fetchStatistics();
@@ -270,7 +252,7 @@ const ContactStatisticsDashboard: React.FC = () => {
     </>
   );
 
-  if (isLoadingInitial) {
+  if (isLoading || isSessionLoading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
         {renderSkeleton()}
