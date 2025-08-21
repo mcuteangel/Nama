@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -9,7 +9,8 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/componen
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
-import ColorPicker from './ColorPicker'; // Corrected import statement
+import ColorPicker, { colors } from './ColorPicker'; // Corrected import statement and imported colors
+import { useSession } from '@/integrations/supabase/auth'; // Import useSession
 
 const formSchema = z.object({
   name: z.string().min(1, { message: 'نام گروه نمی‌تواند خالی باشد.' }),
@@ -30,6 +31,10 @@ interface GroupFormProps {
 
 const GroupForm: React.FC<GroupFormProps> = ({ initialData, onSuccess, onCancel }) => {
   const navigate = useNavigate();
+  const { session, isLoading: isSessionLoading } = useSession();
+  const [existingGroupColors, setExistingGroupColors] = useState<string[]>([]);
+  const [isFetchingColors, setIsFetchingColors] = useState(true);
+
   const {
     register,
     handleSubmit,
@@ -38,27 +43,78 @@ const GroupForm: React.FC<GroupFormProps> = ({ initialData, onSuccess, onCancel 
     formState: { errors, isSubmitting },
   } = useForm<GroupFormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: initialData || { name: '', color: '#60A5FA' }, // Default color blue-400
+    defaultValues: initialData || { name: '', color: '#60A5FA' }, // Default color blue-400, will be overridden
   });
 
   const selectedColor = watch('color');
 
-  useEffect(() => {
-    if (initialData) {
-      setValue('name', initialData.name);
-      setValue('color', initialData.color || '#60A5FA');
+  const findUniqueColor = useCallback((usedColors: string[]): string => {
+    for (const color of colors) {
+      if (!usedColors.includes(color)) {
+        return color;
+      }
     }
-  }, [initialData, setValue]);
+    return '#60A5FA'; // Fallback if all predefined colors are used
+  }, []);
+
+  useEffect(() => {
+    const fetchExistingColorsAndSetDefault = async () => {
+      if (isSessionLoading) {
+        setIsFetchingColors(true); // Keep loading state true while session is loading
+        return;
+      }
+
+      if (!session?.user) {
+        setExistingGroupColors([]);
+        setIsFetchingColors(false);
+        // If no user, default color will be the fallback in findUniqueColor
+        if (!initialData) {
+          setValue('color', '#60A5FA');
+        }
+        return;
+      }
+
+      setIsFetchingColors(true);
+      try {
+        const { data, error } = await supabase
+          .from('groups')
+          .select('color')
+          .eq('user_id', session.user.id);
+
+        if (error) throw error;
+
+        const currentColors = data.map(g => g.color).filter(Boolean) as string[];
+        setExistingGroupColors(currentColors);
+
+        if (!initialData) { // Only set default color for new groups
+          const uniqueColor = findUniqueColor(currentColors);
+          setValue('color', uniqueColor);
+        } else {
+          // For existing groups, ensure the initial color is set
+          setValue('color', initialData.color || findUniqueColor(currentColors));
+        }
+      } catch (error) {
+        console.error("Error fetching existing group colors:", error);
+        // Fallback to a default if fetching fails
+        if (!initialData) {
+          setValue('color', '#60A5FA');
+        }
+      } finally {
+        setIsFetchingColors(false);
+      }
+    };
+
+    fetchExistingColorsAndSetDefault();
+  }, [session, isSessionLoading, initialData, setValue, findUniqueColor]);
 
   const onSubmit = async (values: GroupFormValues) => {
     try {
-      const user = await supabase.auth.getUser();
-      if (!user.data.user) {
+      if (!session?.user) {
         toast.error('برای افزودن/ویرایش گروه باید وارد شوید.');
         navigate('/login');
         return;
       }
-      const userId = user.data.user.id;
+      const userId = session.user.id;
 
       let error = null;
       if (initialData) {
@@ -97,6 +153,21 @@ const GroupForm: React.FC<GroupFormProps> = ({ initialData, onSuccess, onCancel 
     }
   };
 
+  if (isFetchingColors && !initialData) { // Show loading only for new group creation while fetching colors
+    return (
+      <Card className="w-full max-w-md glass rounded-xl p-6 bg-white/90 dark:bg-gray-900/90">
+        <CardHeader className="text-center">
+          <CardTitle className="text-2xl font-bold text-gray-800 dark:text-gray-100">
+            در حال بارگذاری...
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-center text-gray-500 dark:text-gray-400">در حال آماده‌سازی فرم گروه...</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card className="w-full max-w-md glass rounded-xl p-6 bg-white/90 dark:bg-gray-900/90">
       <CardHeader className="text-center">
@@ -119,7 +190,7 @@ const GroupForm: React.FC<GroupFormProps> = ({ initialData, onSuccess, onCancel 
 
           <div>
             <Label htmlFor="color" className="text-gray-700 dark:text-gray-300">رنگ گروه</Label>
-            <ColorPicker selectedColor={selectedColor} onSelectColor={(color) => setValue('color', color)} />
+            <ColorPicker selectedColor={selectedColor || '#60A5FA'} onSelectColor={(color) => setValue('color', color)} />
             {errors.color && <p className="text-red-500 text-sm mt-1">{errors.color.message}</p>}
           </div>
 

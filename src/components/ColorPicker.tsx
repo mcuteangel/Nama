@@ -3,12 +3,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
-interface ColorPickerProps {
-  selectedColor: string;
-  onSelectColor: (color: string) => void;
-}
-
-const colors = [
+export const colors = [
   '#EF4444', // red-500
   '#F97316', // orange-500
   '#F59E0B', // amber-500
@@ -28,6 +23,11 @@ const colors = [
   '#6B7280', // gray-500
   '#374151', // gray-700
 ];
+
+interface ColorPickerProps {
+  selectedColor: string;
+  onSelectColor: (color: string) => void;
+}
 
 const ColorPicker: React.FC<ColorPickerProps> = ({ selectedColor, onSelectColor }) => {
   return (
