@@ -8,7 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useNavigate } from "react-router-dom";
-import React, { useEffect, useState, useCallback } from "react"; // Import useCallback
+import React, { useEffect, useState, useCallback } from "react";
 import { useSession } from "@/integrations/supabase/auth";
 import AddGroupDialog from "./AddGroupDialog";
 import { useGroups } from "@/hooks/use-groups";
@@ -20,7 +20,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { format } from "date-fns-jalali";
 import { JalaliCalendar } from "@/components/JalaliCalendar";
 import { cn } from "@/lib/utils";
-import AddCustomFieldTemplateDialog from "./AddCustomFieldTemplateDialog"; // Import the new dialog
+import AddCustomFieldTemplateDialog from "./AddCustomFieldTemplateDialog";
 
 // Define the schema for the form using Zod
 const formSchema = z.object({
@@ -124,6 +124,48 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
     }
   }, [initialData, form]);
 
+  // New useEffect to manage customFields array based on availableTemplates and initialData
+  useEffect(() => {
+    if (loadingTemplates) return; // Wait for templates to load
+
+    const newCustomFieldsFormState: { template_id: string; value: string }[] = [];
+    const initialCustomFieldValuesMap = new Map<string, string>();
+
+    // Populate map with initial data's custom field values
+    initialData?.custom_fields?.forEach(cf => {
+      initialCustomFieldValuesMap.set(cf.template_id, cf.field_value);
+    });
+
+    // For each available template, create a form field entry
+    availableTemplates.forEach(template => {
+      const existingValue = initialCustomFieldValuesMap.get(template.id!);
+      newCustomFieldsFormState.push({
+        template_id: template.id!,
+        value: existingValue !== undefined ? existingValue : "", // Use existing value or empty string
+      });
+    });
+
+    // Sort to ensure consistent order, which helps React Hook Form's internal diffing
+    newCustomFieldsFormState.sort((a, b) => {
+      const templateA = availableTemplates.find(t => t.id === a.template_id)?.name || '';
+      const templateB = availableTemplates.find(t => t.id === b.template_id)?.name || '';
+      return templateA.localeCompare(templateB);
+    });
+
+    // Only update if the new state is different from the current form state
+    const currentFormValues = form.getValues("customFields");
+    const isDifferent = currentFormValues.length !== newCustomFieldsFormState.length ||
+                        currentFormValues.some((field, index) =>
+                          field.template_id !== newCustomFieldsFormState[index].template_id ||
+                          field.value !== newCustomFieldsFormState[index].value
+                        );
+
+    if (isDifferent) {
+      form.setValue("customFields", newCustomFieldsFormState, { shouldValidate: true, shouldDirty: true });
+    }
+
+  }, [availableTemplates, initialData, loadingTemplates, form]);
+
   const handleCancel = () => {
     navigate(-1);
   };
@@ -134,7 +176,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
     <CardContent className="space-y-4">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"> {/* Changed to lg:grid-cols-3 */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <FormField
               control={form.control}
               name="firstName"
@@ -185,7 +227,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"> {/* Changed to lg:grid-cols-3 */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <FormField
               control={form.control}
               name="phoneNumber"
@@ -245,7 +287,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"> {/* Changed to lg:grid-cols-3 */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <FormField
               control={form.control}
               name="company"
@@ -274,12 +316,12 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
             />
           </div>
 
-          <div className="grid grid-cols-1 gap-4"> {/* New wrapper for address and notes */}
+          <div className="grid grid-cols-1 gap-4">
             <FormField
               control={form.control}
               name="address"
               render={({ field }) => (
-                <FormItem className="col-span-full"> {/* Made it span full width */}
+                <FormItem className="col-span-full">
                   <FormLabel className="text-gray-700 dark:text-gray-200">آدرس</FormLabel>
                   <FormControl>
                     <Textarea placeholder="آدرس کامل" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400" {...field} />
@@ -292,7 +334,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
               control={form.control}
               name="notes"
               render={({ field }) => (
-                <FormItem className="col-span-full"> {/* Made it span full width */}
+                <FormItem className="col-span-full">
                   <FormLabel className="text-gray-700 dark:text-gray-200">یادداشت‌ها</FormLabel>
                   <FormControl>
                     <Textarea placeholder="یادداشت‌های اضافی" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400" {...field} />
@@ -314,20 +356,12 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
             ) : availableTemplates.length === 0 ? (
               <p className="text-center text-gray-500 dark:text-gray-400">هیچ قالب فیلد سفارشی تعریف نشده است.</p>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"> {/* Added grid for custom fields */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {availableTemplates.map((template, index) => {
                   const fieldName = `customFields.${index}.value` as const;
-                  const currentCustomFieldValue = customFieldsWatch?.[index]?.value;
-                  const initialValueForTemplate = initialData?.custom_fields?.find(cf => cf.template_id === template.id)?.field_value || "";
-
-                  // Set default value for new fields if not already set
-                  useEffect(() => {
-                    if (!contactId && !form.getValues(`customFields.${index}.value`)) {
-                      form.setValue(`customFields.${index}.template_id`, template.id!);
-                      form.setValue(`customFields.${index}.value`, initialValueForTemplate);
-                    }
-                  }, [template.id, initialValueForTemplate, form, index, contactId]);
-
+                  // The value for the field is now managed by the top-level useEffect
+                  // and accessed directly via form.watch or form.getValues
+                  
                   return (
                     <FormField
                       key={template.id}
@@ -345,7 +379,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
                                 placeholder={template.description || `مقدار ${template.name}`}
                                 className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
                                 {...field}
-                                value={field.value || ''} // Ensure controlled component
+                                value={field.value || ''}
                               />
                             )}
                             {template.type === 'number' && (
@@ -376,7 +410,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
                                   <JalaliCalendar
                                     selected={field.value ? new Date(field.value) : undefined}
                                     onSelect={(date) => field.onChange(date ? date.toISOString() : "")}
-                                    showToggle={false} // Hide calendar type toggle
+                                    showToggle={false}
                                   />
                                 </PopoverContent>
                               </Popover>
