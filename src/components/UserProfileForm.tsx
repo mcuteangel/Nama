@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react'; // Import useCallback
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -25,6 +25,19 @@ type ProfileFormValues = z.infer<typeof profileSchema>;
 const UserProfileForm: React.FC = () => {
   const { session, isLoading: isSessionLoading } = useSession();
 
+  // Define callbacks using useCallback to ensure stability
+  const handleSuccess = useCallback(() => {
+    ErrorManager.notifyUser('پروفایل با موفقیت به‌روزرسانی شد.', 'success');
+  }, []);
+
+  const handleError = useCallback((err: Error) => {
+    console.error("Supabase profile operation error:", err);
+    ErrorManager.logError(err, {
+      component: "UserProfileForm",
+      action: "profileOperation",
+    });
+  }, []);
+
   const {
     isLoading: isSubmitting,
     error,
@@ -37,14 +50,8 @@ const UserProfileForm: React.FC = () => {
     retryDelay: 1000,
     showToast: true,
     customErrorMessage: "خطایی در به‌روزرسانی پروفایل رخ داد",
-    // Removed onSuccess here, it will be handled directly in onSubmit
-    onError: (err) => {
-      console.error("Supabase profile operation error:", err);
-      ErrorManager.logError(err, {
-        component: "UserProfileForm",
-        action: "profileOperation",
-      });
-    }
+    onSuccess: handleSuccess, // Use the stable callback
+    onError: handleError,     // Use the stable callback
   });
 
   const form = useForm<ProfileFormValues>({
@@ -91,7 +98,7 @@ const UserProfileForm: React.FC = () => {
       return;
     }
 
-    const result = await executeAsync(async () => {
+    await executeAsync(async () => {
       const { error } = await supabase
         .from('profiles')
         .upsert(
@@ -110,11 +117,6 @@ const UserProfileForm: React.FC = () => {
       component: "UserProfileForm",
       action: "submitProfile"
     });
-
-    // Only show success toast if the submission was successful
-    if (result !== undefined) { // executeAsync returns undefined on error
-      ErrorManager.notifyUser('پروفایل با موفقیت به‌روزرسانی شد.', 'success');
-    }
   };
 
   if (isSessionLoading) {
