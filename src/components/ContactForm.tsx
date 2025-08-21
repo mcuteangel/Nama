@@ -134,7 +134,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
     <CardContent className="space-y-4">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"> {/* Changed to lg:grid-cols-3 */}
             <FormField
               control={form.control}
               name="firstName"
@@ -161,9 +161,31 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
                 </FormItem>
               )}
             />
+            <FormField
+              control={form.control}
+              name="gender"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-gray-700 dark:text-gray-200">جنسیت</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger className="w-full bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100">
+                        <SelectValue placeholder="انتخاب جنسیت" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent className="backdrop-blur-md bg-white/80 dark:bg-gray-800/80 border border-white/30 dark:border-gray-600/30">
+                      <SelectItem value="male">مرد</SelectItem>
+                      <SelectItem value="female">زن</SelectItem>
+                      <SelectItem value="not_specified">نامشخص</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"> {/* Changed to lg:grid-cols-3 */}
             <FormField
               control={form.control}
               name="phoneNumber"
@@ -186,31 +208,6 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
                   <FormControl>
                     <Input type="email" placeholder="مثال: example@domain.com" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400" {...field} />
                   </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
-            <FormField
-              control={form.control}
-              name="gender"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-gray-700 dark:text-gray-200">جنسیت</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger className="w-full bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100">
-                        <SelectValue placeholder="انتخاب جنسیت" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent className="backdrop-blur-md bg-white/80 dark:bg-gray-800/80 border border-white/30 dark:border-gray-600/30">
-                      <SelectItem value="male">مرد</SelectItem>
-                      <SelectItem value="female">زن</SelectItem>
-                      <SelectItem value="not_specified">نامشخص</SelectItem>
-                    </SelectContent>
-                  </Select>
                   <FormMessage />
                 </FormItem>
               )}
@@ -248,7 +245,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"> {/* Changed to lg:grid-cols-3 */}
             <FormField
               control={form.control}
               name="company"
@@ -277,32 +274,34 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
             />
           </div>
 
-          <FormField
-            control={form.control}
-            name="address"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-gray-700 dark:text-gray-200">آدرس</FormLabel>
-                <FormControl>
-                  <Textarea placeholder="آدرس کامل" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="notes"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-gray-700 dark:text-gray-200">یادداشت‌ها</FormLabel>
-                <FormControl>
-                  <Textarea placeholder="یادداشت‌های اضافی" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className="grid grid-cols-1 gap-4"> {/* New wrapper for address and notes */}
+            <FormField
+              control={form.control}
+              name="address"
+              render={({ field }) => (
+                <FormItem className="col-span-full"> {/* Made it span full width */}
+                  <FormLabel className="text-gray-700 dark:text-gray-200">آدرس</FormLabel>
+                  <FormControl>
+                    <Textarea placeholder="آدرس کامل" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="notes"
+              render={({ field }) => (
+                <FormItem className="col-span-full"> {/* Made it span full width */}
+                  <FormLabel className="text-gray-700 dark:text-gray-200">یادداشت‌ها</FormLabel>
+                  <FormControl>
+                    <Textarea placeholder="یادداشت‌های اضافی" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
 
           {/* Dynamic Custom Fields Section */}
           <div className="space-y-4 pt-4 border-t border-gray-200 dark:border-gray-700">
@@ -315,98 +314,100 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
             ) : availableTemplates.length === 0 ? (
               <p className="text-center text-gray-500 dark:text-gray-400">هیچ قالب فیلد سفارشی تعریف نشده است.</p>
             ) : (
-              availableTemplates.map((template, index) => {
-                const fieldName = `customFields.${index}.value` as const;
-                const currentCustomFieldValue = customFieldsWatch?.[index]?.value;
-                const initialValueForTemplate = initialData?.custom_fields?.find(cf => cf.template_id === template.id)?.field_value || "";
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"> {/* Added grid for custom fields */}
+                {availableTemplates.map((template, index) => {
+                  const fieldName = `customFields.${index}.value` as const;
+                  const currentCustomFieldValue = customFieldsWatch?.[index]?.value;
+                  const initialValueForTemplate = initialData?.custom_fields?.find(cf => cf.template_id === template.id)?.field_value || "";
 
-                // Set default value for new fields if not already set
-                useEffect(() => {
-                  if (!contactId && !form.getValues(`customFields.${index}.value`)) {
-                    form.setValue(`customFields.${index}.template_id`, template.id!);
-                    form.setValue(`customFields.${index}.value`, initialValueForTemplate);
-                  }
-                }, [template.id, initialValueForTemplate, form, index, contactId]);
+                  // Set default value for new fields if not already set
+                  useEffect(() => {
+                    if (!contactId && !form.getValues(`customFields.${index}.value`)) {
+                      form.setValue(`customFields.${index}.template_id`, template.id!);
+                      form.setValue(`customFields.${index}.value`, initialValueForTemplate);
+                    }
+                  }, [template.id, initialValueForTemplate, form, index, contactId]);
 
-                return (
-                  <FormField
-                    key={template.id}
-                    control={form.control}
-                    name={fieldName}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-gray-700 dark:text-gray-200">
-                          {template.name}
-                          {template.required && <span className="text-red-500">*</span>}
-                        </FormLabel>
-                        <FormControl>
-                          {template.type === 'text' && (
-                            <Input
-                              placeholder={template.description || `مقدار ${template.name}`}
-                              className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
-                              {...field}
-                              value={field.value || ''} // Ensure controlled component
-                            />
-                          )}
-                          {template.type === 'number' && (
-                            <Input
-                              type="number"
-                              placeholder={template.description || `مقدار ${template.name}`}
-                              className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
-                              {...field}
-                              value={field.value || ''}
-                              onChange={(e) => field.onChange(e.target.value === '' ? undefined : Number(e.target.value))}
-                            />
-                          )}
-                          {template.type === 'date' && (
-                            <Popover>
-                              <PopoverTrigger asChild>
-                                <Button
-                                  variant={"outline"}
-                                  className={cn(
-                                    "w-full justify-start text-left font-normal bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100",
-                                    !field.value && "text-muted-foreground"
-                                  )}
-                                >
-                                  <CalendarIcon className="ml-2 h-4 w-4" />
-                                  {field.value ? format(new Date(field.value), "yyyy/MM/dd") : <span>تاریخ را انتخاب کنید</span>}
-                                </Button>
-                              </PopoverTrigger>
-                              <PopoverContent className="w-auto p-0">
-                                <JalaliCalendar
-                                  selected={field.value ? new Date(field.value) : undefined}
-                                  onSelect={(date) => field.onChange(date ? date.toISOString() : "")}
-                                  showToggle={false} // Hide calendar type toggle
-                                />
-                              </PopoverContent>
-                            </Popover>
-                          )}
-                          {template.type === 'list' && template.options && (
-                            <Select
-                              onValueChange={field.onChange}
-                              value={field.value || ''}
-                            >
-                              <FormControl>
-                                <SelectTrigger className="w-full bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100">
-                                  <SelectValue placeholder={`انتخاب ${template.name}`} />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent className="backdrop-blur-md bg-white/80 dark:bg-gray-800/80 border border-white/30 dark:border-gray-600/30">
-                                {template.options.map((option) => (
-                                  <SelectItem key={option} value={option}>
-                                    {option}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          )}
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                );
-              })
+                  return (
+                    <FormField
+                      key={template.id}
+                      control={form.control}
+                      name={fieldName}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-gray-700 dark:text-gray-200">
+                            {template.name}
+                            {template.required && <span className="text-red-500">*</span>}
+                          </FormLabel>
+                          <FormControl>
+                            {template.type === 'text' && (
+                              <Input
+                                placeholder={template.description || `مقدار ${template.name}`}
+                                className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
+                                {...field}
+                                value={field.value || ''} // Ensure controlled component
+                              />
+                            )}
+                            {template.type === 'number' && (
+                              <Input
+                                type="number"
+                                placeholder={template.description || `مقدار ${template.name}`}
+                                className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
+                                {...field}
+                                value={field.value || ''}
+                                onChange={(e) => field.onChange(e.target.value === '' ? undefined : Number(e.target.value))}
+                              />
+                            )}
+                            {template.type === 'date' && (
+                              <Popover>
+                                <PopoverTrigger asChild>
+                                  <Button
+                                    variant={"outline"}
+                                    className={cn(
+                                      "w-full justify-start text-left font-normal bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100",
+                                      !field.value && "text-muted-foreground"
+                                    )}
+                                  >
+                                    <CalendarIcon className="ml-2 h-4 w-4" />
+                                    {field.value ? format(new Date(field.value), "yyyy/MM/dd") : <span>تاریخ را انتخاب کنید</span>}
+                                  </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-auto p-0">
+                                  <JalaliCalendar
+                                    selected={field.value ? new Date(field.value) : undefined}
+                                    onSelect={(date) => field.onChange(date ? date.toISOString() : "")}
+                                    showToggle={false} // Hide calendar type toggle
+                                  />
+                                </PopoverContent>
+                              </Popover>
+                            )}
+                            {template.type === 'list' && template.options && (
+                              <Select
+                                onValueChange={field.onChange}
+                                value={field.value || ''}
+                              >
+                                <FormControl>
+                                  <SelectTrigger className="w-full bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100">
+                                    <SelectValue placeholder={`انتخاب ${template.name}`} />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent className="backdrop-blur-md bg-white/80 dark:bg-gray-800/80 border border-white/30 dark:border-gray-600/30">
+                                  {template.options.map((option) => (
+                                    <SelectItem key={option} value={option}>
+                                      {option}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            )}
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  );
+                })}
+              </div>
             )}
           </div>
 
