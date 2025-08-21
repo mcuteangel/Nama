@@ -8,7 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useNavigate } from "react-router-dom";
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react"; // Added useMemo
 import { useSession } from "@/integrations/supabase/auth";
 import AddGroupDialog from "./AddGroupDialog";
 import { useGroups } from "@/hooks/use-groups";
@@ -21,6 +21,7 @@ import { format } from "date-fns-jalali";
 import { JalaliCalendar } from "@/components/JalaliCalendar";
 import { cn } from "@/lib/utils";
 import AddCustomFieldTemplateDialog from "./AddCustomFieldTemplateDialog";
+import { ContactFormValues, contactFormSchema } from "../types/contact.ts"; // Changed import path
 
 interface ContactFormProps {
   initialData?: {
@@ -63,53 +64,30 @@ const emailTypeOptions = [
   { value: "other", label: "سایر" },
 ];
 
-export const formSchema = z.object({
-  firstName: z.string().min(1, { message: "نام الزامی است." }),
-  lastName: z.string().min(1, { message: "نام خانوادگی الزامی است." }),
-  phoneNumbers: z.array(z.object({
-    id: z.string().optional(),
-    phone_type: z.string().min(1, { message: "نوع شماره الزامی است." }),
-    phone_number: z.string().regex(/^09\d{9}$/, { message: "شماره تلفن معتبر نیست (مثال: 09123456789)." }),
-    extension: z.string().optional().nullable(),
-  })).optional(),
-  emailAddresses: z.array(z.object({
-    id: z.string().optional(),
-    email_type: z.string().min(1, { message: "نوع ایمیل الزامی است." }),
-    email_address: z.string().email({ message: "آدرس ایمیل معتبر نیست." }),
-  })).optional(),
-  gender: z.enum(["male", "female", "not_specified"], { message: "جنسیت معتبر نیست." }).default("not_specified"),
-  position: z.string().optional(),
-  company: z.string().optional(),
-  address: z.string().optional(),
-  notes: z.string().optional(),
-  groupId: z.string().optional(),
-  customFields: z.array(z.object({
-    template_id: z.string(),
-    value: z.string(),
-  })).optional(),
-}).superRefine((data, ctx) => {
-  if (data.customFields) {
-    data.customFields.forEach((field, index) => {
-      const template = (ctx as any).parent.availableTemplates?.find((t: CustomFieldTemplate) => t.id === field.template_id);
-      if (template && template.required && !field.value.trim()) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: `${template.name} الزامی است.`,
-          path: [`customFields`, index, `value`],
-        });
-      }
-    });
-  }
-});
-
-type ContactFormValues = z.infer<typeof formSchema>;
-
 const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => {
   const navigate = useNavigate();
   const { session } = useSession();
   const { groups, fetchGroups } = useGroups();
   const [availableTemplates, setAvailableTemplates] = useState<CustomFieldTemplate[]>([]);
   const [loadingTemplates, setLoadingTemplates] = useState(true);
+
+  // Define formSchema inside the component using useMemo
+  const formSchema = useMemo(() => {
+    return contactFormSchema.superRefine((data, ctx) => {
+      if (data.customFields) {
+        data.customFields.forEach((field, index) => {
+          const template = availableTemplates.find((t: CustomFieldTemplate) => t.id === field.template_id);
+          if (template && template.required && !field.value.trim()) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: `${template.name} الزامی است.`,
+              path: [`customFields`, index, `value`],
+            });
+          }
+        });
+      }
+    });
+  }, [availableTemplates]); // Re-create schema only if availableTemplates changes
 
   const form = useForm<ContactFormValues>({
     resolver: zodResolver(formSchema),
@@ -457,6 +435,35 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
                   <FormLabel className="text-gray-700 dark:text-gray-200">سمت/شغل</FormLabel>
                   <FormControl>
                     <Input placeholder="مثال: مهندس نرم‌افزار" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <div className="grid grid-cols-1 gap-4">
+            <FormField
+              control={form.control}
+              name="address"
+              render={({ field }) => (
+                <FormItem className="col-span-full">
+                  <FormLabel className="text-gray-700 dark:text-gray-200">آدرس</FormLabel>
+                  <FormControl>
+                    <Textarea placeholder="آدرس کامل" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="notes"
+              render={({ field }) => (
+                <FormItem className="col-span-full">
+                  <FormLabel className="text-gray-700 dark:text-gray-200">یادداشت‌ها</FormLabel>
+                  <FormControl>
+                    <Textarea placeholder="یادداشت‌های اضافی" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

@@ -3,31 +3,8 @@ import { showSuccess, showError, showLoading, dismissToast } from "@/utils/toast
 import { UseFormReturn } from "react-hook-form";
 import { Session } from "@supabase/supabase-js";
 import { NavigateFunction } from "react-router-dom";
-import * as z from "zod";
 import { CustomFieldTemplate } from "@/domain/schemas/custom-field-template";
-import { formSchema } from "@/components/ContactForm"; // Import formSchema
-
-// Define CustomField interface for form data
-interface CustomFieldFormData {
-  template_id: string;
-  value: string;
-}
-
-interface PhoneNumberFormData {
-  id?: string;
-  phone_type: string;
-  phone_number: string;
-  extension?: string | null;
-}
-
-interface EmailAddressFormData {
-  id?: string;
-  email_type: string;
-  email_address: string;
-}
-
-// Derive ContactFormValues directly from the imported formSchema
-type ContactFormValues = z.infer<typeof formSchema>;
+import { ContactFormValues, CustomFieldFormData, PhoneNumberFormData, EmailAddressFormData } from "../types/contact.ts"; // Changed import path
 
 export const useContactFormLogic = (
   contactId: string | undefined,
