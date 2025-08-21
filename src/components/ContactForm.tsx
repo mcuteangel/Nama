@@ -10,9 +10,9 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { useSession } from "@/integrations/supabase/auth";
-import AddGroupDialog from "./AddGroupDialog"; // New import
-import { useGroups } from "@/hooks/use-groups"; // New import
-import { useContactFormLogic } from "@/hooks/use-contact-form-logic"; // New import
+import AddGroupDialog from "./AddGroupDialog";
+import { useGroups } from "@/hooks/use-groups";
+import { useContactFormLogic } from "@/hooks/use-contact-form-logic";
 
 // Define the schema for the form using Zod
 const formSchema = z.object({
@@ -86,6 +86,10 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
       });
     }
   }, [initialData, form]);
+
+  const handleCancel = () => {
+    navigate(-1); // Go back to the previous page
+  };
 
   return (
     <CardContent className="space-y-4">
@@ -172,7 +176,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
                 </FormItem>
               )}
             />
-            <AddGroupDialog onGroupAdded={fetchGroups} /> {/* Use the new AddGroupDialog component */}
+            <AddGroupDialog onGroupAdded={fetchGroups} />
           </div>
           <FormField
             control={form.control}
@@ -248,9 +252,19 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
               </FormItem>
             )}
           />
-          <Button type="submit" className="w-full px-6 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white font-semibold shadow-md transition-all duration-300 transform hover:scale-105">
-            {contactId ? "به‌روزرسانی مخاطب" : "ذخیره مخاطب"}
-          </Button>
+          <div className="flex justify-end gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleCancel}
+              className="px-6 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold shadow-md transition-all duration-300 transform hover:scale-105 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-100 dark:border-gray-600"
+            >
+              انصراف
+            </Button>
+            <Button type="submit" className="px-6 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white font-semibold shadow-md transition-all duration-300 transform hover:scale-105">
+              {contactId ? "به‌روزرسانی مخاطب" : "ذخیره مخاطب"}
+            </Button>
+          </div>
         </form>
       </Form>
     </CardContent>
