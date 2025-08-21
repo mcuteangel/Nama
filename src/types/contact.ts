@@ -21,6 +21,7 @@ export const contactFormSchema = z.object({
   address: z.string().optional(),
   notes: z.string().optional(),
   groupId: z.string().optional(),
+  birthday: z.string().optional().nullable(), // New: Birthday field
   customFields: z.array(z.object({
     template_id: z.string(),
     value: z.string(),

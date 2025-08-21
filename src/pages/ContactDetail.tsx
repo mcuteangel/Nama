@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Phone, Mail, Building, Briefcase, MapPin, Info, User, Users, Tag, CalendarClock } from "lucide-react";
+import { Phone, Mail, Building, Briefcase, MapPin, Info, User, Users, Tag, CalendarClock, Gift } from "lucide-react"; // Import Gift icon
 import { MadeWithDyad } from "@/components/made-with-dyad";
 import { useJalaliCalendar } from "@/hooks/use-jalali-calendar";
 
@@ -57,6 +57,7 @@ interface ContactDetailType {
   email_addresses: EmailAddress[];
   contact_groups: ContactGroup[];
   custom_fields: CustomField[];
+  birthday?: string | null; // New: Birthday field
   created_at: string;
   updated_at: string;
   avatarUrl?: string;
@@ -83,7 +84,7 @@ const ContactDetail = () => {
       try {
         const { data, error } = await supabase
           .from("contacts")
-          .select("id, first_name, last_name, gender, position, company, address, notes, created_at, updated_at, phone_numbers(id, phone_type, phone_number, extension), email_addresses(id, email_type, email_address), contact_groups(group_id, groups(name, color)), custom_fields(id, template_id, field_value, custom_field_templates(name, type, options))")
+          .select("id, first_name, last_name, gender, position, company, address, notes, created_at, updated_at, birthday, phone_numbers(id, phone_type, phone_number, extension), email_addresses(id, email_type, email_address), contact_groups(group_id, groups(name, color)), custom_fields(id, template_id, field_value, custom_field_templates(name, type, options))")
           .eq("id", id)
           .single();
 
@@ -175,6 +176,12 @@ const ContactDetail = () => {
               <div>
                 <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><Users size={16} /> گروه</Label>
                 <Input value={assignedGroup.name} readOnly className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" style={{ backgroundColor: assignedGroup.color || 'transparent' }} />
+              </div>
+            )}
+            {contact.birthday && ( // New: Display Birthday
+              <div>
+                <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><Gift size={16} /> تاریخ تولد</Label>
+                <Input value={formatDate(new Date(contact.birthday), 'jYYYY/jMM/jDD')} readOnly className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
               </div>
             )}
           </div>

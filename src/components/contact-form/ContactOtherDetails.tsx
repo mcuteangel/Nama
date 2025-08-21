@@ -1,19 +1,19 @@
-import React, { useState } from 'react'; // Import useState
+import React, { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
-import AddGroupDialog from '@/components/AddGroupDialog'; // Updated import
+import AddGroupDialog from '@/components/AddGroupDialog';
 import { useGroups } from '@/hooks/use-groups';
 import { ContactFormValues } from '@/types/contact';
-import { Separator } from '@/components/ui/separator'; // Import Separator
-import { PlusCircle } from 'lucide-react'; // Import PlusCircle icon
+import { Separator } from '@/components/ui/separator';
+import { PlusCircle } from 'lucide-react';
 
-const ContactOptionalFields: React.FC = () => {
+const ContactOtherDetails: React.FC = () => {
   const form = useFormContext<ContactFormValues>();
   const { groups, fetchGroups } = useGroups();
-  const [isAddGroupDialogOpen, setIsAddGroupDialogOpen] = useState(false); // State to control AddGroupDialog
+  const [isAddGroupDialogOpen, setIsAddGroupDialogOpen] = useState(false);
 
   return (
     <>
@@ -29,8 +29,6 @@ const ContactOptionalFields: React.FC = () => {
                   onValueChange={(value) => {
                     if (value === "__ADD_NEW_GROUP__") {
                       setIsAddGroupDialogOpen(true);
-                      // Do not update the form field value for this special option
-                      // The actual group selection will be handled when a group is chosen
                     } else {
                       field.onChange(value === "no-group-selected" ? "" : value);
                     }
@@ -49,7 +47,7 @@ const ContactOptionalFields: React.FC = () => {
                         {group.name}
                       </SelectItem>
                     ))}
-                    <Separator className="my-1" /> {/* Add a separator for better UX */}
+                    <Separator className="my-1" />
                     <SelectItem value="__ADD_NEW_GROUP__" className="text-blue-600 dark:text-blue-400">
                       <div className="flex items-center gap-2">
                         <PlusCircle size={16} />
@@ -62,7 +60,6 @@ const ContactOptionalFields: React.FC = () => {
               </FormItem>
             )}
           />
-          {/* AddGroupDialog is now controlled by state and rendered directly */}
           <AddGroupDialog
             open={isAddGroupDialogOpen}
             onOpenChange={setIsAddGroupDialogOpen}
@@ -129,4 +126,4 @@ const ContactOptionalFields: React.FC = () => {
   );
 };
 
-export default ContactOptionalFields;
+export default ContactOtherDetails;

@@ -4,7 +4,7 @@ import { UseFormReturn } from "react-hook-form";
 import { Session } from "@supabase/supabase-js";
 import { NavigateFunction } from "react-router-dom";
 import { CustomFieldTemplate } from "@/domain/schemas/custom-field-template";
-import { ContactFormValues, CustomFieldFormData, PhoneNumberFormData, EmailAddressFormData } from "../types/contact.ts"; // Changed import path
+import { ContactFormValues, CustomFieldFormData, PhoneNumberFormData, EmailAddressFormData } from "../types/contact.ts";
 
 export const useContactFormLogic = (
   contactId: string | undefined,
@@ -39,6 +39,7 @@ export const useContactFormLogic = (
             company: values.company,
             address: values.address,
             notes: values.notes,
+            birthday: values.birthday || null, // New: Birthday update
           })
           .eq("id", contactId)
           .eq("user_id", user.id);
@@ -240,6 +241,7 @@ export const useContactFormLogic = (
             company: values.company,
             address: values.address,
             notes: values.notes,
+            birthday: values.birthday || null, // New: Birthday insert
           })
           .select('id')
           .single();
