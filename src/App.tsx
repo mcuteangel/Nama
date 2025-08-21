@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'; // Import BrowserRouter
 import Index from './pages/Contacts';
 import Login from './pages/Login';
 import AddContact from './pages/AddContact';
 import ContactDetail from './pages/ContactDetail';
 import Groups from './pages/Groups';
-import { SessionContextProvider } from './integrations/supabase/auth'; // Corrected import syntax
+import { SessionContextProvider } from './integrations/supabase/auth';
 import { supabase } from './integrations/supabase/client';
 import MobileHeader from './components/MobileHeader';
 import BottomNavigationBar from './components/BottomNavigationBar';
@@ -24,7 +24,7 @@ function App() {
 
     handleResize(); // Set initial state
     window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    return () => window.removeEventListener('change', handleResize); // Corrected event listener cleanup
   }, []);
 
   const isAuthPage = location.pathname === '/login';
@@ -58,4 +58,10 @@ function App() {
   );
 }
 
-export default App;
+export default function WrappedApp() { // Export a new component that wraps App with BrowserRouter
+  return (
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
+  );
+}
