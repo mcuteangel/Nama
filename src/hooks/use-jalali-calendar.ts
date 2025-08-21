@@ -41,10 +41,27 @@ export function useJalaliCalendar(options: CalendarOptions = {}): CalendarHookRe
     return type;
   });
 
-  // Update localStorage when calendarType changes
+  // Update localStorage when calendarType changes and set global moment locale
   useEffect(() => {
     if (typeof window !== 'undefined') {
       localStorage.setItem(CALENDAR_TYPE_STORAGE_KEY, calendarType);
+    }
+    if (calendarType === 'jalali') {
+      moment.updateLocale('fa', {
+        week: {
+          dow: 6, // شنبه اولین روز هفته (6)
+          doy: 6  // هفته‌ای که شامل 1 فروردین باشد هفته اول سال است
+        }
+      });
+      moment.locale('fa');
+    } else {
+      moment.updateLocale('en', {
+        week: {
+          dow: 0, // یکشنبه اولین روز هفته (0)
+          doy: 6  // تعریف استاندارد برای هفته اول سال
+        }
+      });
+      moment.locale('en');
     }
   }, [calendarType]);
 

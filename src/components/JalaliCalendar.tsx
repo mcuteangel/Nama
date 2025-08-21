@@ -17,7 +17,6 @@ interface JalaliCalendarProps {
   onSelect?: (date: Date) => void;
   className?: string;
   variant?: 'default' | 'glass';
-  locale?: 'fa' | 'en';
   showToggle?: boolean;
 }
 
@@ -26,9 +25,11 @@ export function JalaliCalendar({
   onSelect, 
   className, 
   variant = 'glass',
-  locale: initialLocale = 'fa',
-  showToggle = true
+  showToggle = false // Default to false, as global setting is preferred
 }: JalaliCalendarProps) {
+  const { calendarType, setCalendarType } = useJalaliCalendar(); // Use the hook
+  const isJalali = calendarType === 'jalali';
+
   // Store dates as timestamps to prevent infinite re-renders
   const [currentDate, setCurrentDate] = useState(() => {
     return selected ? moment(selected).valueOf() : moment().startOf('day').valueOf();
@@ -45,14 +46,6 @@ export function JalaliCalendar({
   // Create moment objects from timestamps
   const currentMoment = moment(currentDate);
   const selectedMoment = moment(selectedDate);
-
-  const [locale, setLocale] = useState<'fa' | 'en'>(initialLocale);
-  const isJalali = locale === 'fa';
-
-  // Sync with external locale changes
-  useEffect(() => {
-    setLocale(initialLocale);
-  }, [initialLocale]);
 
   const monthDays = React.useMemo(() => {
     const days: Array<{
@@ -72,35 +65,14 @@ export function JalaliCalendar({
       ? currentMoment.clone().endOf('jMonth')
       : currentMoment.clone().endOf('month');
     
-    // تنظیم اول هفته برای محاسبات بعدی
-    if (isJalali) {
-      // برای تقویم شمسی: شنبه اولین روز هفته
-      moment.updateLocale('fa', {
-        week: {
-          dow: 6, // شنبه اولین روز هفته (6)
-          doy: 6  // هفته‌ای که شامل 1 فروردین باشد هفته اول سال است
-        }
-      });
-      moment.locale('fa');
-    } else {
-      // برای تقویم میلادی: یکشنبه اولین روز هفته
-      moment.updateLocale('en', {
-        week: {
-          dow: 0, // یکشنبه اولین روز هفته (0)
-          doy: 6  // تعریف استاندارد برای هفته اول سال
-        }
-      });
-      moment.locale('en');
-    }
-
     // محاسبه شروع و پایان هفته با توجه به تقویم انتخاب شده
     const startOfWeek = isJalali
-      ? startOfMonth.clone().startOf('week') // استفاده از week برای تقویم شمسی
-      : startOfMonth.clone().startOf('week'); // استفاده از week برای تقویم میلادی
+      ? startOfMonth.clone().startOf('jWeek') // Use jWeek for Jalali
+      : startOfMonth.clone().startOf('week'); // Use week for Gregorian
       
     const endOfWeek = isJalali
-      ? endOfMonth.clone().endOf('week') // استفاده از week برای تقویم شمسی
-      : endOfMonth.clone().endOf('week'); // استفاده از week برای تقویم میلادی
+      ? endOfMonth.clone().endOf('jWeek') // Use jWeek for Jalali
+      : endOfMonth.clone().endOf('week'); // Use week for Gregorian
 
     let day = startOfWeek.clone();
     let dayIndex = 0;
@@ -168,10 +140,6 @@ export function JalaliCalendar({
     if (onSelect) {
       onSelect(today.toDate());
     }
-  };
-
-  const toggleCalendarType = () => {
-    setLocale(prev => prev === 'fa' ? 'en' : 'fa');
   };
 
   const handleDateClick = (date: moment.Moment) => {
@@ -292,7 +260,7 @@ export function JalaliCalendar({
           <Button
             variant="outline"
             size="sm"
-            onClick={toggleCalendarType}
+            onClick={() => setCalendarType(isJalali ? 'gregorian' : 'jalali')}
             className="text-xs h-7 px-2"
           >
             {isJalali ? 'میلادی' : 'شمسی'}
