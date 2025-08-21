@@ -402,8 +402,11 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
                                       !field.value && "text-muted-foreground"
                                     )}
                                   >
-                                    <CalendarIcon className="ml-2 h-4 w-4" />
-                                    {field.value ? format(new Date(field.value), "yyyy/MM/dd") : <span>تاریخ را انتخاب کنید</span>}
+                                    {/* Wrap the children in a single span */}
+                                    <span className="flex items-center">
+                                      <CalendarIcon className="ml-2 h-4 w-4" />
+                                      {field.value ? format(new Date(field.value), "yyyy/MM/dd") : <span>تاریخ را انتخاب کنید</span>}
+                                    </span>
                                   </Button>
                                 </PopoverTrigger>
                                 <PopoverContent className="w-auto p-0">
