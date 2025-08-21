@@ -211,7 +211,7 @@ export const ContactService = {
   },
 
   async getUpcomingBirthdays(): Promise<{ data: Array<{ first_name: string; last_name: string; birthday: string }> | null; error: string | null }> {
-    const { data, error } = await supabase.rpc('get_upcoming_birthdays');
+    const { data, error } = await supabase.rpc('get_upcoming_birthdays'); // بدون پارامتر user_id_param
 
     if (error) {
       console.error("Supabase RPC Error (get_upcoming_birthdays):", error);
