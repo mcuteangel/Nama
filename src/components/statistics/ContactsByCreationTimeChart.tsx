@@ -2,6 +2,7 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { useTranslation } from "react-i18next";
+import { useJalaliCalendar } from "@/hooks/use-jalali-calendar"; // Import useJalaliCalendar
 
 interface CreationTimeData {
   month_year: string;
@@ -14,14 +15,14 @@ interface ContactsByCreationTimeChartProps {
 
 const ContactsByCreationTimeChart: React.FC<ContactsByCreationTimeChartProps> = ({ data }) => {
   const { t } = useTranslation();
+  const { formatDate } = useJalaliCalendar(); // Use the hook
 
   // Add a defensive check for data being an array
   const chartData = (data && Array.isArray(data)) ? data.map(item => {
-    const [year, month] = item.month_year.split('-');
-    // You might want to convert month number to month name based on locale here
-    // For simplicity, we'll just use the YYYY-MM format for now
+    // Convert the YYYY-MM string to a Date object (assuming day 01 for parsing)
+    const date = new Date(`${item.month_year}-01`);
     return {
-      name: item.month_year, // Or format to a more readable month name
+      name: formatDate(date, 'jYYYY/jMM'), // Format to Jalali YYYY/MM
       [t('statistics.contacts_count')]: item.count,
     };
   }) : []; // If data is not an array, default to an empty array
