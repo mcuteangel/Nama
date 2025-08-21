@@ -15,13 +15,18 @@ export const contactFormSchema = z.object({
     email_type: z.string().min(1, { message: "نوع ایمیل الزامی است." }),
     email_address: z.string().email({ message: "آدرس ایمیل معتبر نیست." }),
   })).optional(),
+  socialLinks: z.array(z.object({ // New: Social Links field
+    id: z.string().optional(),
+    type: z.string().min(1, { message: "نوع شبکه اجتماعی الزامی است." }),
+    url: z.string().url({ message: "آدرس URL معتبر نیست." }),
+  })).optional(),
   gender: z.enum(["male", "female", "not_specified"], { message: "جنسیت معتبر نیست." }).default("not_specified"),
   position: z.string().optional(),
   company: z.string().optional(),
   address: z.string().optional(),
   notes: z.string().optional(),
   groupId: z.string().optional(),
-  birthday: z.string().optional().nullable(), // New: Birthday field
+  birthday: z.string().optional().nullable(),
   customFields: z.array(z.object({
     template_id: z.string(),
     value: z.string(),
@@ -47,4 +52,10 @@ export interface EmailAddressFormData {
   id?: string;
   email_type: string;
   email_address: string;
+}
+
+export interface SocialLinkFormData { // New: Social Link interface
+  id?: string;
+  type: string;
+  url: string;
 }

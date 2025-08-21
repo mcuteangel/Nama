@@ -15,8 +15,9 @@ import { ContactFormValues, contactFormSchema } from "../types/contact.ts";
 import ContactBasicInfo from "./contact-form/ContactBasicInfo.tsx";
 import ContactPhoneNumbers from "./contact-form/ContactPhoneNumbers.tsx";
 import ContactEmailAddresses from "./contact-form/ContactEmailAddresses.tsx";
-import ContactOtherDetails from "./contact-form/ContactOtherDetails.tsx"; // Renamed import
-import ContactImportantDates from "./contact-form/ContactImportantDates.tsx"; // New import
+import ContactSocialLinks from "./contact-form/ContactSocialLinks.tsx"; // New import
+import ContactOtherDetails from "./contact-form/ContactOtherDetails.tsx";
+import ContactImportantDates from "./contact-form/ContactImportantDates.tsx";
 import ContactCustomFields from "./contact-form/ContactCustomFields.tsx";
 import ContactFormActions from "./contact-form/ContactFormActions.tsx";
 
@@ -32,8 +33,9 @@ interface ContactFormProps {
     notes?: string;
     phone_numbers?: { id?: string; phone_type: string; phone_number: string; extension?: string | null }[];
     email_addresses?: { id?: string; email_type: string; email_address: string }[];
+    social_links?: { id?: string; type: string; url: string }[]; // New: Social Links
     groupId?: string;
-    birthday?: string | null; // New: Birthday field
+    birthday?: string | null;
     custom_fields?: {
       id: string;
       template_id: string;
@@ -83,9 +85,10 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
       address: initialData?.address || "",
       notes: initialData?.notes || "",
       groupId: initialData?.groupId || "",
-      birthday: initialData?.birthday || null, // New: Birthday default value
+      birthday: initialData?.birthday || null,
       phoneNumbers: initialData?.phone_numbers || [],
       emailAddresses: initialData?.email_addresses || [],
+      socialLinks: initialData?.social_links || [], // New: Social Links default value
       customFields: initialData?.custom_fields?.map(cf => ({
         template_id: cf.template_id,
         value: cf.field_value,
@@ -123,9 +126,10 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
         address: initialData.address,
         notes: initialData.notes,
         groupId: initialData.groupId || "",
-        birthday: initialData.birthday || null, // New: Birthday reset
+        birthday: initialData.birthday || null,
         phoneNumbers: initialData.phone_numbers || [],
         emailAddresses: initialData.email_addresses || [],
+        socialLinks: initialData.social_links || [], // New: Social Links reset
         customFields: initialData.custom_fields?.map(cf => ({
           template_id: cf.template_id,
           value: cf.field_value,
@@ -182,8 +186,9 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
           <ContactBasicInfo />
           <ContactPhoneNumbers />
           <ContactEmailAddresses />
-          <ContactImportantDates /> {/* New: Important Dates section */}
-          <ContactOtherDetails /> {/* Renamed: Other Details section */}
+          <ContactSocialLinks /> {/* New: Social Links section */}
+          <ContactImportantDates />
+          <ContactOtherDetails />
           <ContactCustomFields
             availableTemplates={availableTemplates}
             loadingTemplates={loadingTemplates}

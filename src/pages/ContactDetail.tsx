@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Phone, Mail, Building, Briefcase, MapPin, Info, User, Users, Tag, CalendarClock, Gift } from "lucide-react"; // Import Gift icon
+import { Phone, Mail, Building, Briefcase, MapPin, Info, User, Users, Tag, CalendarClock, Gift, Link as LinkIcon, Linkedin, Twitter, Instagram, Send } from "lucide-react"; // Import LinkIcon, social icons
 import { MadeWithDyad } from "@/components/made-with-dyad";
 import { useJalaliCalendar } from "@/hooks/use-jalali-calendar";
 
@@ -23,6 +23,12 @@ interface EmailAddress {
   id: string;
   email_type: string;
   email_address: string;
+}
+
+interface SocialLink { // New: Social Link interface
+  id: string;
+  type: string;
+  url: string;
 }
 
 interface ContactGroup {
@@ -55,13 +61,36 @@ interface ContactDetailType {
   notes?: string;
   phone_numbers: PhoneNumber[];
   email_addresses: EmailAddress[];
+  social_links: SocialLink[]; // New: Social Links
   contact_groups: ContactGroup[];
   custom_fields: CustomField[];
-  birthday?: string | null; // New: Birthday field
+  birthday?: string | null;
   created_at: string;
   updated_at: string;
   avatarUrl?: string;
 }
+
+const getSocialIcon = (type: string) => {
+  switch (type) {
+    case 'linkedin': return <Linkedin size={16} />;
+    case 'twitter': return <Twitter size={16} />;
+    case 'instagram': return <Instagram size={16} />;
+    case 'telegram': return <Send size={16} />; // Telegram icon
+    case 'website': return <LinkIcon size={16} />;
+    default: return <LinkIcon size={16} />;
+  }
+};
+
+const getSocialLabel = (type: string) => {
+  switch (type) {
+    case 'linkedin': return 'لینکدین';
+    case 'twitter': return 'توییتر';
+    case 'instagram': return 'اینستاگرام';
+    case 'telegram': return 'تلگرام';
+    case 'website': return 'وب‌سایت';
+    default: return 'سایر';
+  }
+};
 
 const ContactDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -84,7 +113,7 @@ const ContactDetail = () => {
       try {
         const { data, error } = await supabase
           .from("contacts")
-          .select("id, first_name, last_name, gender, position, company, address, notes, created_at, updated_at, birthday, phone_numbers(id, phone_type, phone_number, extension), email_addresses(id, email_type, email_address), contact_groups(group_id, groups(name, color)), custom_fields(id, template_id, field_value, custom_field_templates(name, type, options))")
+          .select("id, first_name, last_name, gender, position, company, address, notes, created_at, updated_at, birthday, phone_numbers(id, phone_type, phone_number, extension), email_addresses(id, email_type, email_address), social_links(id, type, url), contact_groups(group_id, groups(name, color)), custom_fields(id, template_id, field_value, custom_field_templates(name, type, options))")
           .eq("id", id)
           .single();
 
@@ -178,7 +207,7 @@ const ContactDetail = () => {
                 <Input value={assignedGroup.name} readOnly className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" style={{ backgroundColor: assignedGroup.color || 'transparent' }} />
               </div>
             )}
-            {contact.birthday && ( // New: Display Birthday
+            {contact.birthday && (
               <div>
                 <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><Gift size={16} /> تاریخ تولد</Label>
                 <Input value={formatDate(new Date(contact.birthday), 'jYYYY/jMM/jDD')} readOnly className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
@@ -200,6 +229,20 @@ const ContactDetail = () => {
               <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><Mail size={16} /> آدرس‌های ایمیل</Label>
               {contact.email_addresses.map((email) => (
                 <Input key={email.id} value={`${email.email_address} (${email.email_type})`} readOnly className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
+              ))}
+            </div>
+          )}
+
+          {contact.social_links.length > 0 && ( // New: Display Social Links
+            <div className="space-y-2">
+              <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><LinkIcon size={16} /> لینک‌های شبکه‌های اجتماعی</Label>
+              {contact.social_links.map((link) => (
+                <div key={link.id} className="flex items-center gap-2 bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 rounded-md p-2">
+                  {getSocialIcon(link.type)}
+                  <a href={link.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline dark:text-blue-400 text-sm">
+                    {getSocialLabel(link.type)}: {link.url}
+                  </a>
+                </div>
               ))}
             </div>
           )}

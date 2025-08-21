@@ -4,7 +4,7 @@ import { UseFormReturn } from "react-hook-form";
 import { Session } from "@supabase/supabase-js";
 import { NavigateFunction } from "react-router-dom";
 import { CustomFieldTemplate } from "@/domain/schemas/custom-field-template";
-import { ContactFormValues, CustomFieldFormData, PhoneNumberFormData, EmailAddressFormData } from "../types/contact.ts";
+import { ContactFormValues, CustomFieldFormData, PhoneNumberFormData, EmailAddressFormData, SocialLinkFormData } from "../types/contact.ts";
 
 export const useContactFormLogic = (
   contactId: string | undefined,
@@ -39,7 +39,7 @@ export const useContactFormLogic = (
             company: values.company,
             address: values.address,
             notes: values.notes,
-            birthday: values.birthday || null, // New: Birthday update
+            birthday: values.birthday || null,
           })
           .eq("id", contactId)
           .eq("user_id", user.id);
@@ -144,6 +144,54 @@ export const useContactFormLogic = (
           }
         }
 
+        // --- Handle Social Links ---
+        const existingSocialLinks = (await supabase
+          .from("social_links")
+          .select("id, type, url")
+          .eq("contact_id", contactId)
+          .eq("user_id", user.id)).data || [];
+
+        const newSocialLinks = values.socialLinks || [];
+
+        // Delete removed social links
+        const linksToDelete = existingSocialLinks.filter(
+          (existingLink) => !newSocialLinks.some((newLink) => newLink.id === existingLink.id)
+        );
+        if (linksToDelete.length > 0) {
+          const { error: deleteError } = await supabase
+            .from("social_links")
+            .delete()
+            .in("id", linksToDelete.map((l) => l.id));
+          if (deleteError) throw deleteError;
+        }
+
+        // Update or insert social links
+        for (const link of newSocialLinks) {
+          if (link.id) {
+            // Update existing social link
+            const { error: updateError } = await supabase
+              .from("social_links")
+              .update({
+                type: link.type,
+                url: link.url,
+              })
+              .eq("id", link.id)
+              .eq("user_id", user.id);
+            if (updateError) throw updateError;
+          } else {
+            // Insert new social link
+            const { error: insertError } = await supabase
+              .from("social_links")
+              .insert({
+                user_id: user.id,
+                contact_id: contactId,
+                type: link.type,
+                url: link.url,
+              });
+            if (insertError) throw insertError;
+          }
+        }
+
         // Handle group assignment
         if (values.groupId) {
           const { data: existingContactGroup, error: fetchGroupError } = await supabase
@@ -241,7 +289,7 @@ export const useContactFormLogic = (
             company: values.company,
             address: values.address,
             notes: values.notes,
-            birthday: values.birthday || null, // New: Birthday insert
+            birthday: values.birthday || null,
           })
           .select('id')
           .single();
@@ -277,6 +325,20 @@ export const useContactFormLogic = (
             .from("email_addresses")
             .insert(emailsToInsert);
           if (emailError) throw emailError;
+        }
+
+        // Insert social links
+        if (values.socialLinks && values.socialLinks.length > 0) {
+          const linksToInsert = values.socialLinks.map(link => ({
+            user_id: user.id,
+            contact_id: currentContactId,
+            type: link.type,
+            url: link.url,
+          }));
+          const { error: socialLinkError } = await supabase
+            .from("social_links")
+            .insert(linksToInsert);
+          if (socialLinkError) throw socialLinkError;
         }
 
         if (values.groupId) {
