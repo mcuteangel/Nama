@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
-import Index from './pages/Contacts';
+import Home from './pages/Home'; // Changed import from Index to Home
+import Contacts from './pages/Contacts'; // Import Contacts for its own route
 import Login from './pages/Login';
 import AddContact from './pages/AddContact';
 import ContactDetail from './pages/ContactDetail';
-import EditContact from './pages/EditContact'; // Import EditContact
+import EditContact from './pages/EditContact';
 import Groups from './pages/Groups';
 import { SessionContextProvider } from './integrations/supabase/auth';
 import { supabase } from './integrations/supabase/client';
@@ -44,13 +45,14 @@ function AppLayout() {
         "flex-grow",
         !isAuthPage && (isMobile ? "pt-[64px] pb-16" : "pr-64")
       )}>
-        <main className="h-full w-full flex flex-col items-center justify-center p-4 bg-gradient-to-br from-blue-100 to-purple-100 dark:from-gray-900 dark:to-gray-800">
+        <main className="h-full w-full flex flex-col items-center justify-center p-4"> {/* Removed background gradient from main */}
           <Routes>
-            <Route path="/" element={<Index />} />
+            <Route path="/" element={<Home />} /> {/* Changed to Home */}
+            <Route path="/contacts" element={<Contacts />} /> {/* New route for Contacts */}
             <Route path="/login" element={<Login />} />
             <Route path="/add-contact" element={<AddContact />} />
             <Route path="/contacts/:id" element={<ContactDetail />} />
-            <Route path="/contacts/edit/:id" element={<EditContact />} /> {/* New route for editing */}
+            <Route path="/contacts/edit/:id" element={<EditContact />} />
             <Route path="/groups" element={<Groups />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
