@@ -1,6 +1,7 @@
-import React from "react";
+import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
+import { PieChart } from "lucide-react";
+import { Pie, PieChart as RechartsPieChart, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 import { useTranslation } from "react-i18next";
 
 interface GenderData {
@@ -12,51 +13,47 @@ interface ContactsByGenderChartProps {
   data: GenderData[];
 }
 
-const COLORS = ['#8884d8', '#82ca9d', '#ffc658']; // Colors for male, female, not_specified
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#AF19FF'];
 
 const ContactsByGenderChart: React.FC<ContactsByGenderChartProps> = ({ data }) => {
   const { t } = useTranslation();
 
-  const chartData = data.map(item => ({
-    name: t(`statistics.${item.gender}`),
+  const formattedData = data.map(item => ({
+    name: t(`gender.${item.gender}`),
     value: item.count,
   }));
 
-  const hasData = chartData.some(item => item.value > 0);
-
   return (
-    <Card className="glass rounded-xl p-4">
+    <Card className="rounded-xl p-4 bg-white dark:bg-gray-800">
       <CardHeader className="pb-2">
-        <CardTitle className="text-2xl font-bold text-gray-800 dark:text-gray-100">
+        <CardTitle className="text-lg font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+          <PieChart size={20} className="text-green-500" />
           {t('statistics.contacts_by_gender')}
         </CardTitle>
       </CardHeader>
       <CardContent className="h-64 flex items-center justify-center">
-        {hasData ? (
+        {formattedData.length > 0 ? (
           <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
+            <RechartsPieChart>
               <Pie
-                data={chartData}
+                data={formattedData}
                 cx="50%"
                 cy="50%"
                 labelLine={false}
                 outerRadius={80}
                 fill="#8884d8"
                 dataKey="value"
-                nameKey="name"
               >
-                {chartData.map((entry, index) => (
+                {formattedData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>
-              <Tooltip formatter={(value: number) => `${value} (${((value / data.reduce((sum, d) => sum + d.count, 0)) * 100).toFixed(1)}%)`}/>
+              <Tooltip formatter={(value) => [`${value} ${t('common.contacts')}`, '']} />
               <Legend />
-            </PieChart>
+            </RechartsPieChart>
           </ResponsiveContainer>
         ) : (
-          <p className="text-center text-gray-500 dark:text-gray-400">
-            {t('statistics.no_data_available')}
-          </p>
+          <p className="text-gray-500 dark:text-gray-400">{t('statistics.no_gender_data')}</p>
         )}
       </CardContent>
     </Card>

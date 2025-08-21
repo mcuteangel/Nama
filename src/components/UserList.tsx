@@ -49,7 +49,7 @@ const UserItem = ({ user, onUserUpdated, onUserDeleted }: { user: UserProfile; o
   };
 
   return (
-    <Card className="flex items-center justify-between p-4 glass rounded-lg shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.01]">
+    <Card className="flex items-center justify-between p-4 rounded-lg shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.01] bg-white dark:bg-gray-800">
       <div className="flex items-center gap-4">
         <div className="w-10 h-10 rounded-full flex items-center justify-center bg-blue-500 text-white dark:bg-blue-700">
           <UserIcon size={20} />
@@ -94,7 +94,7 @@ const UserItem = ({ user, onUserUpdated, onUserDeleted }: { user: UserProfile; o
               <Trash2 size={20} />
             </Button>
           </AlertDialogTrigger>
-          <AlertDialogContent className="glass rounded-xl p-6">
+          <AlertDialogContent className="rounded-xl p-6 bg-white dark:bg-gray-800">
             <AlertDialogHeader>
               <AlertDialogTitle className="text-gray-800 dark:text-gray-100">{t('user_management.confirm_delete_title')}</AlertDialogTitle>
               <AlertDialogDescription className="text-gray-600 dark:text-gray-300">
@@ -189,14 +189,14 @@ const UserList: React.FC = () => {
           </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px] p-0 border-none bg-transparent shadow-none">
-          <UserForm
-            onSuccess={() => {
-              setIsAddUserDialogOpen(false);
-              fetchUsers();
-            }}
-            onCancel={() => setIsAddUserDialogOpen(false)}
-          />
-        </DialogContent>
+            <UserForm
+              onSuccess={() => {
+                setIsAddUserDialogOpen(false);
+                fetchUsers();
+              }}
+              onCancel={() => setIsAddUserDialogOpen(false)}
+            />
+          </DialogContent>
       </Dialog>
 
       {users.length === 0 ? (

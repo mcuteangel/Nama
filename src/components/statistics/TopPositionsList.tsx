@@ -1,6 +1,6 @@
-import React from "react";
+import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Briefcase } from "lucide-react";
+import { Briefcase } from "lucide-react"; // Using Briefcase for positions
 import { useTranslation } from "react-i18next";
 
 interface PositionData {
@@ -14,34 +14,29 @@ interface TopPositionsListProps {
 
 const TopPositionsList: React.FC<TopPositionsListProps> = ({ data }) => {
   const { t } = useTranslation();
-  const hasData = data && data.length > 0;
 
   return (
-    <Card className="glass rounded-xl p-4 col-span-1">
+    <Card className="rounded-xl p-4 col-span-1 bg-white dark:bg-gray-800">
       <CardHeader className="pb-2">
-        <CardTitle className="text-2xl font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
-          <Briefcase size={24} className="text-orange-600 dark:text-orange-400" />
+        <CardTitle className="text-lg font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+          <Briefcase size={20} className="text-cyan-500" />
           {t('statistics.top_positions')}
         </CardTitle>
       </CardHeader>
       <CardContent className="h-64 overflow-y-auto custom-scrollbar">
-        {hasData ? (
+        {data.length > 0 ? (
           <ul className="space-y-3">
             {data.map((item, index) => (
-              <li key={item.position || `no-position-${index}`} className="flex items-center justify-between p-2 rounded-md bg-gray-50 dark:bg-gray-800 shadow-sm">
-                <span className="font-medium text-gray-800 dark:text-gray-100">
-                  {item.position || t('statistics.not_specified')}
-                </span>
-                <span className="text-sm font-semibold text-orange-600 dark:text-orange-400">
-                  {item.count}
+              <li key={index} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg shadow-sm">
+                <p className="font-medium text-gray-800 dark:text-gray-100">{item.position}</p>
+                <span className="px-3 py-1 text-sm font-semibold rounded-full bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
+                  {item.count} {t('common.contacts')}
                 </span>
               </li>
             ))}
           </ul>
         ) : (
-          <p className="text-center text-gray-500 dark:text-gray-400">
-            {t('statistics.no_data_available')}
-          </p>
+          <p className="text-center text-gray-500 dark:text-gray-400">{t('statistics.no_position_data')}</p>
         )}
       </CardContent>
     </Card>

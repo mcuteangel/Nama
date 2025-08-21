@@ -23,6 +23,17 @@ interface UpdateUserRoleInput {
   role: 'user' | 'admin';
 }
 
+interface UpdateUserProfileInput {
+  userId: string;
+  first_name: string | null;
+  last_name: string | null;
+}
+
+interface UpdateUserPasswordInput {
+  userId: string;
+  newPassword: string;
+}
+
 export const UserManagementService = {
   async getAllUsers(): Promise<{ data: UserProfile[] | null; error: string | null }> {
     try {
@@ -89,6 +100,48 @@ export const UserManagementService = {
       return { success: true, error: null };
     } catch (err: any) {
       ErrorManager.logError(err, { context: 'UserManagementService.updateUserRole', input });
+      return { success: false, error: ErrorManager.getErrorMessage(err) };
+    }
+  },
+
+  async updateUserProfile(input: UpdateUserProfileInput): Promise<{ success: boolean; error: string | null }> {
+    try {
+      const { userId, first_name, last_name } = input;
+
+      // Invoke Edge Function to update user profile with service role key
+      const { data, error } = await supabase.functions.invoke('update-user-profile', {
+        body: JSON.stringify({ userId, first_name, last_name }),
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      return { success: true, error: null };
+    } catch (err: any) {
+      ErrorManager.logError(err, { context: 'UserManagementService.updateUserProfile', input });
+      return { success: false, error: ErrorManager.getErrorMessage(err) };
+    }
+  },
+
+  async updateUserPassword(input: UpdateUserPasswordInput): Promise<{ success: boolean; error: string | null }> {
+    try {
+      const { userId, newPassword } = input;
+
+      // Invoke Edge Function to update user password with service role key
+      const { data, error } = await supabase.functions.invoke('update-user-password', {
+        body: JSON.stringify({ userId, newPassword }),
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      return { success: true, error: null };
+    } catch (err: any) {
+      ErrorManager.logError(err, { context: 'UserManagementService.updateUserPassword', input });
       return { success: false, error: ErrorManager.getErrorMessage(err) };
     }
   },

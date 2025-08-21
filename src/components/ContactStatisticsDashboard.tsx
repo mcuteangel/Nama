@@ -246,7 +246,7 @@ const ContactStatisticsDashboard: React.FC = () => {
 
   const renderSkeleton = () => (
     <>
-      <Card className="glass rounded-xl p-4 flex flex-col items-center justify-center text-center">
+      <Card className="rounded-xl p-4 flex flex-col items-center justify-center text-center bg-white dark:bg-gray-800">
         <CardHeader className="pb-2">
           <Skeleton className="h-6 w-3/4 mb-2" />
         </CardHeader>
@@ -254,7 +254,7 @@ const ContactStatisticsDashboard: React.FC = () => {
           <Skeleton className="h-12 w-24" />
         </CardContent>
       </Card>
-      <Card className="glass rounded-xl p-4">
+      <Card className="rounded-xl p-4 bg-white dark:bg-gray-800">
         <CardHeader className="pb-2">
           <Skeleton className="h-6 w-3/4 mb-2" />
         </CardHeader>
@@ -262,7 +262,7 @@ const ContactStatisticsDashboard: React.FC = () => {
           <Skeleton className="h-full w-full rounded-full" />
         </CardContent>
       </Card>
-      <Card className="glass rounded-xl p-4">
+      <Card className="rounded-xl p-4 bg-white dark:bg-gray-800">
         <CardHeader className="pb-2">
           <Skeleton className="h-6 w-3/4 mb-2" />
         </CardHeader>
@@ -270,7 +270,7 @@ const ContactStatisticsDashboard: React.FC = () => {
           <Skeleton className="h-full w-full rounded-full" />
         </CardContent>
       </Card>
-      <Card className="glass rounded-xl p-4">
+      <Card className="rounded-xl p-4 bg-white dark:bg-gray-800">
         <CardHeader className="pb-2">
           <Skeleton className="h-6 w-3/4 mb-2" />
         </CardHeader>
@@ -278,7 +278,7 @@ const ContactStatisticsDashboard: React.FC = () => {
           <Skeleton className="h-full w-full rounded-full" />
         </CardContent>
       </Card>
-      <Card className="glass rounded-xl p-4 col-span-1 md:col-span-2 lg:col-span-1">
+      <Card className="rounded-xl p-4 col-span-1 md:col-span-2 lg:col-span-1 bg-white dark:bg-gray-800">
         <CardHeader className="pb-2">
           <Skeleton className="h-6 w-3/4 mb-2" />
         </CardHeader>
@@ -288,7 +288,7 @@ const ContactStatisticsDashboard: React.FC = () => {
           ))}
         </CardContent>
       </Card>
-      <Card className="glass rounded-xl p-4 col-span-1 md:col-span-2">
+      <Card className="rounded-xl p-4 col-span-1 md:col-span-2 bg-white dark:bg-gray-800">
         <CardHeader className="pb-2">
           <Skeleton className="h-6 w-3/4 mb-2" />
         </CardHeader>
@@ -296,7 +296,7 @@ const ContactStatisticsDashboard: React.FC = () => {
           <Skeleton className="h-full w-full" />
         </CardContent>
       </Card>
-      <Card className="glass rounded-xl p-4 col-span-1">
+      <Card className="rounded-xl p-4 col-span-1 bg-white dark:bg-gray-800">
         <CardHeader className="pb-2">
           <Skeleton className="h-6 w-3/4 mb-2" />
         </CardHeader>
@@ -306,7 +306,7 @@ const ContactStatisticsDashboard: React.FC = () => {
           ))}
         </CardContent>
       </Card>
-      <Card className="glass rounded-xl p-4 col-span-1">
+      <Card className="rounded-xl p-4 col-span-1 bg-white dark:bg-gray-800">
         <CardHeader className="pb-2">
           <Skeleton className="h-6 w-3/4 mb-2" />
         </CardHeader>

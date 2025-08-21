@@ -23,10 +23,9 @@
     /* Path Aliases */
     "baseUrl": "./",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["src/*"]
     }
   },
-  "include": ["src", "components.json"],
-  "references": [{ "path": "./tsconfig.node.json" }],
-  "exclude": ["supabase/functions"]
+  "include": ["src"],
+  "exclude": ["node_modules", "supabase"]
 }

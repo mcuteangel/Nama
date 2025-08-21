@@ -27,7 +27,7 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    const { userId } = await req.json();
+    const { userId, first_name, last_name } = await req.json();
 
     if (!userId) {
       return new Response(JSON.stringify({ error: 'User ID is required.' }), {
@@ -36,10 +36,13 @@ serve(async (req) => {
       });
     }
 
-    const { data, error } = await supabaseAdmin.auth.admin.deleteUser(userId);
+    const { data, error } = await supabaseAdmin
+      .from('profiles')
+      .update({ first_name, last_name })
+      .eq('id', userId);
 
     if (error) {
-      console.error("Delete user error:", error.message);
+      console.error("Update user profile error:", error.message);
       return new Response(JSON.stringify({ error: error.message }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 500,
@@ -52,7 +55,7 @@ serve(async (req) => {
     });
 
   } catch (error) {
-    console.error("General error in delete-user:", error.message);
+    console.error("General error in update-user-profile:", error.message);
     return new Response(JSON.stringify({ error: error.message }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 500,
