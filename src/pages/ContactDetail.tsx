@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Phone, Mail, Building, Briefcase, MapPin, Info, User } from "lucide-react";
+import { Phone, Mail, Building, Briefcase, MapPin, Info, User, Users } from "lucide-react";
 import { MadeWithDyad } from "@/components/made-with-dyad";
 
 interface PhoneNumber {
@@ -23,6 +23,14 @@ interface EmailAddress {
   email_address: string;
 }
 
+interface ContactGroup {
+  group_id: string;
+  groups: { // Nested group object to get group name
+    name: string;
+    color?: string;
+  };
+}
+
 interface ContactDetailType {
   id: string;
   first_name: string;
@@ -34,6 +42,7 @@ interface ContactDetailType {
   notes?: string;
   phone_numbers: PhoneNumber[];
   email_addresses: EmailAddress[];
+  contact_groups: ContactGroup[]; // Added for group information
   created_at: string;
   updated_at: string;
   avatarUrl?: string; // Placeholder for avatar, if we implement it later
@@ -59,7 +68,7 @@ const ContactDetail = () => {
       try {
         const { data, error } = await supabase
           .from("contacts")
-          .select("*, phone_numbers(id, phone_type, phone_number), email_addresses(id, email_type, email_address)")
+          .select("*, phone_numbers(id, phone_type, phone_number), email_addresses(id, email_type, email_address), contact_groups(group_id, groups(name, color))") // Include contact_groups and nested groups
           .eq("id", id)
           .single();
 
@@ -102,6 +111,8 @@ const ContactDetail = () => {
     );
   }
 
+  const assignedGroup = contact.contact_groups.length > 0 ? contact.contact_groups[0].groups : null;
+
   return (
     <div className="flex flex-col items-center justify-center p-4 h-full w-full">
       <Card className="w-full max-w-2xl glass rounded-xl p-6">
@@ -141,6 +152,12 @@ const ContactDetail = () => {
               <div className="md:col-span-2">
                 <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><MapPin size={16} /> آدرس</Label>
                 <Textarea value={contact.address} readOnly className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
+              </div>
+            )}
+            {assignedGroup && (
+              <div>
+                <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><Users size={16} /> گروه</Label>
+                <Input value={assignedGroup.name} readOnly className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" style={{ backgroundColor: assignedGroup.color || 'transparent' }} />
               </div>
             )}
           </div>

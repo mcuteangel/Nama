@@ -5,7 +5,7 @@ import { showSuccess, showError, showLoading, dismissToast } from "@/utils/toast
 import ContactForm from "@/components/ContactForm";
 import { MadeWithDyad } from "@/components/made-with-dyad";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Button } from "@/components/ui/button"; // Added import for Button
+import { Button } from "@/components/ui/button";
 
 interface PhoneNumber {
   id: string;
@@ -19,6 +19,10 @@ interface EmailAddress {
   email_address: string;
 }
 
+interface ContactGroup {
+  group_id: string;
+}
+
 interface ContactDetailType {
   id: string;
   first_name: string;
@@ -30,6 +34,7 @@ interface ContactDetailType {
   notes?: string;
   phone_numbers: PhoneNumber[];
   email_addresses: EmailAddress[];
+  contact_groups: ContactGroup[]; // Added for group information
   created_at: string;
   updated_at: string;
 }
@@ -54,7 +59,7 @@ const EditContact = () => {
       try {
         const { data, error } = await supabase
           .from("contacts")
-          .select("*, phone_numbers(id, phone_type, phone_number), email_addresses(id, email_type, email_address)")
+          .select("*, phone_numbers(id, phone_type, phone_number), email_addresses(id, email_type, email_address), contact_groups(group_id)") // Include contact_groups
           .eq("id", id)
           .single();
 
@@ -66,7 +71,8 @@ const EditContact = () => {
             ...data,
             phoneNumber: data.phone_numbers[0]?.phone_number || "",
             emailAddress: data.email_addresses[0]?.email_address || "",
-          } as ContactDetailType; // Type assertion to include phoneNumber and emailAddress
+            groupId: data.contact_groups[0]?.group_id || "", // Extract group_id
+          } as ContactDetailType;
 
           setInitialContactData(formattedData);
           showSuccess("اطلاعات مخاطب با موفقیت بارگذاری شد.");

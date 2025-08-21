@@ -10,7 +10,11 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { supabase } from "@/integrations/supabase/client";
 import { showSuccess, showError, showLoading, dismissToast } from "@/utils/toast";
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState, useCallback } from "react";
+import { useSession } from "@/integrations/supabase/auth";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import GroupForm from "./GroupForm";
+import { PlusCircle } from "lucide-react";
 
 // Define the schema for the form using Zod
 const formSchema = z.object({
@@ -23,7 +27,14 @@ const formSchema = z.object({
   company: z.string().optional(),
   address: z.string().optional(),
   notes: z.string().optional(),
+  groupId: z.string().optional(), // New field for group ID
 });
+
+interface Group {
+  id: string;
+  name: string;
+  color?: string;
+}
 
 interface ContactFormProps {
   initialData?: {
@@ -35,14 +46,18 @@ interface ContactFormProps {
     company?: string;
     address?: string;
     notes?: string;
-    phoneNumber?: string; // Added for initial data
-    emailAddress?: string; // Added for initial data
+    phoneNumber?: string;
+    emailAddress?: string;
+    groupId?: string; // Added for initial data
   };
-  contactId?: string; // Optional: ID of the contact being edited
+  contactId?: string;
 }
 
 const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => {
   const navigate = useNavigate();
+  const { session, isLoading: isSessionLoading } = useSession();
+  const [groups, setGroups] = useState<Group[]>([]);
+  const [isAddGroupDialogOpen, setIsAddGroupDialogOpen] = useState(false);
 
   // Initialize react-hook-form
   const form = useForm<z.infer<typeof formSchema>>({
@@ -57,8 +72,33 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
       company: initialData?.company || "",
       address: initialData?.address || "",
       notes: initialData?.notes || "",
+      groupId: initialData?.groupId || "", // Set initial group ID
     },
   });
+
+  const fetchGroups = useCallback(async () => {
+    if (isSessionLoading || !session?.user) {
+      setGroups([]);
+      return;
+    }
+    try {
+      const { data, error } = await supabase
+        .from("groups")
+        .select("id, name, color")
+        .eq("user_id", session.user.id)
+        .order("name", { ascending: true });
+
+      if (error) throw error;
+      setGroups(data as Group[]);
+    } catch (error: any) {
+      console.error("Error fetching groups:", error);
+      showError(`خطا در بارگذاری گروه‌ها: ${error.message || "خطای ناشناخته"}`);
+    }
+  }, [session, isSessionLoading]);
+
+  useEffect(() => {
+    fetchGroups();
+  }, [fetchGroups]);
 
   useEffect(() => {
     if (initialData) {
@@ -72,6 +112,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
         company: initialData.company,
         address: initialData.address,
         notes: initialData.notes,
+        groupId: initialData.groupId || "", // Ensure groupId is reset
       });
     }
   }, [initialData, form]);
@@ -191,6 +232,48 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
             .eq("user_id", user.id);
         }
 
+        // Handle group assignment
+        if (values.groupId) {
+          // Check if contact is already in a group
+          const { data: existingContactGroup, error: fetchGroupError } = await supabase
+            .from("contact_groups")
+            .select("contact_id, group_id")
+            .eq("contact_id", contactId)
+            .eq("user_id", user.id)
+            .single();
+
+          if (fetchGroupError && fetchGroupError.code !== 'PGRST116') {
+            throw fetchGroupError;
+          }
+
+          if (existingContactGroup) {
+            // Update existing group assignment
+            const { error: updateGroupError } = await supabase
+              .from("contact_groups")
+              .update({ group_id: values.groupId })
+              .eq("contact_id", contactId)
+              .eq("user_id", user.id);
+            if (updateGroupError) throw updateGroupError;
+          } else {
+            // Insert new group assignment
+            const { error: insertGroupError } = await supabase
+              .from("contact_groups")
+              .insert({
+                user_id: user.id,
+                contact_id: contactId,
+                group_id: values.groupId,
+              });
+            if (insertGroupError) throw insertGroupError;
+          }
+        } else {
+          // If group is cleared, delete existing assignment
+          await supabase
+            .from("contact_groups")
+            .delete()
+            .eq("contact_id", contactId)
+            .eq("user_id", user.id);
+        }
+
         showSuccess("مخاطب با موفقیت به‌روزرسانی شد!");
       } else {
         // Insert new contact
@@ -237,6 +320,18 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
               email_address: values.emailAddress,
             });
           if (emailError) throw emailError;
+        }
+
+        // Insert into contact_groups table if groupId exists
+        if (values.groupId) {
+          const { error: groupAssignmentError } = await supabase
+            .from("contact_groups")
+            .insert({
+              user_id: user.id,
+              contact_id: currentContactId,
+              group_id: values.groupId,
+            });
+          if (groupAssignmentError) throw groupAssignmentError;
         }
 
         showSuccess("مخاطب با موفقیت ذخیره شد!");
@@ -382,6 +477,54 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
               </FormItem>
             )}
           />
+          <div className="flex items-end gap-2">
+            <FormField
+              control={form.control}
+              name="groupId"
+              render={({ field }) => (
+                <FormItem className="flex-grow">
+                  <FormLabel className="text-gray-700 dark:text-gray-200">گروه</FormLabel>
+                  <Select onValueChange={field.onChange} value={field.value || ""}>
+                    <FormControl>
+                      <SelectTrigger className="w-full bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100">
+                        <SelectValue placeholder="انتخاب گروه" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent className="backdrop-blur-md bg-white/80 dark:bg-gray-800/80 border border-white/30 dark:border-gray-600/30">
+                      <SelectItem value="">بدون گروه</SelectItem>
+                      {groups.map((group) => (
+                        <SelectItem key={group.id} value={group.id}>
+                          {group.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Dialog open={isAddGroupDialogOpen} onOpenChange={setIsAddGroupDialogOpen}>
+              <DialogTrigger asChild>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  className="h-10 w-10 mt-auto bg-blue-500 hover:bg-blue-600 text-white border-blue-500 dark:bg-blue-700 dark:hover:bg-blue-800 dark:border-blue-700"
+                >
+                  <PlusCircle size={20} />
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px] p-0 border-none bg-transparent shadow-none">
+                <GroupForm
+                  onSuccess={() => {
+                    setIsAddGroupDialogOpen(false);
+                    fetchGroups(); // Re-fetch groups after a new one is added
+                  }}
+                  onCancel={() => setIsAddGroupDialogOpen(false)}
+                />
+              </DialogContent>
+            </Dialog>
+          </div>
           <Button type="submit" className="w-full px-6 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white font-semibold shadow-md transition-all duration-300 transform hover:scale-105">
             {contactId ? "به‌روزرسانی مخاطب" : "ذخیره مخاطب"}
           </Button>
