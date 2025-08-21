@@ -14,9 +14,10 @@ import { useErrorHandler } from '@/hooks/use-error-handler';
 import { ErrorManager } from '@/lib/error-manager';
 import { User } from 'lucide-react';
 
+// Schema: allow string or undefined. Empty strings will be converted to null for DB.
 const profileSchema = z.object({
-  first_name: z.string().min(1, { message: 'نام نمی‌تواند خالی باشد.' }).optional().or(z.literal('')),
-  last_name: z.string().min(1, { message: 'نام خانوادگی نمی‌تواند خالی باشد.' }).optional().or(z.literal('')),
+  first_name: z.string().optional(),
+  last_name: z.string().optional(),
 });
 
 type ProfileFormValues = z.infer<typeof profileSchema>;
@@ -40,7 +41,6 @@ const UserProfileForm: React.FC = () => {
       ErrorManager.notifyUser('پروفایل با موفقیت به‌روزرسانی شد.', 'success');
     },
     onError: (err) => {
-      // Log the detailed error from Supabase to the console
       console.error("Supabase profile update error:", err);
       ErrorManager.logError(err, {
         component: "UserProfileForm",
@@ -51,9 +51,10 @@ const UserProfileForm: React.FC = () => {
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
+    // Initialize with undefined to match optional() in schema
     defaultValues: {
-      first_name: '',
-      last_name: '',
+      first_name: undefined,
+      last_name: undefined,
     },
   });
 
@@ -74,18 +75,13 @@ const UserProfileForm: React.FC = () => {
           throw new Error(error.message || "خطا در دریافت اطلاعات پروفایل");
         }
 
-        if (data) {
-          form.reset({
-            first_name: data.first_name || '',
-            last_name: data.last_name || '',
-          });
-        } else {
-          // If no profile exists (data is null), initialize with empty strings
-          form.reset({
-            first_name: '',
-            last_name: '',
-          });
-        }
+        // Reset form with fetched data. If data.first_name/last_name is null,
+        // use nullish coalescing (??) to convert it to undefined for optional() in schema.
+        // If it's an empty string, it will be set as an empty string.
+        form.reset({
+          first_name: data?.first_name ?? undefined,
+          last_name: data?.last_name ?? undefined,
+        });
       }, {
         component: "UserProfileForm",
         action: "fetchProfile"
@@ -107,8 +103,9 @@ const UserProfileForm: React.FC = () => {
         .upsert(
           {
             id: session.user.id,
-            first_name: values.first_name || null,
-            last_name: values.last_name || null,
+            // Convert empty strings from form fields to null for database consistency
+            first_name: values.first_name === '' ? null : values.first_name,
+            last_name: values.last_name === '' ? null : values.last_name,
           },
           { onConflict: 'id' }
         );
