@@ -15,7 +15,8 @@ interface ContactsByCreationTimeChartProps {
 const ContactsByCreationTimeChart: React.FC<ContactsByCreationTimeChartProps> = ({ data }) => {
   const { t } = useTranslation();
 
-  const chartData = data.map(item => {
+  // Add a defensive check for data being an array
+  const chartData = (data && Array.isArray(data)) ? data.map(item => {
     const [year, month] = item.month_year.split('-');
     // You might want to convert month number to month name based on locale here
     // For simplicity, we'll just use the YYYY-MM format for now
@@ -23,7 +24,7 @@ const ContactsByCreationTimeChart: React.FC<ContactsByCreationTimeChartProps> = 
       name: item.month_year, // Or format to a more readable month name
       [t('statistics.contacts_count')]: item.count,
     };
-  });
+  }) : []; // If data is not an array, default to an empty array
 
   const hasData = chartData.some(item => (item[t('statistics.contacts_count')] as number) > 0);
 
