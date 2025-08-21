@@ -27,11 +27,11 @@ interface CustomField {
   id: string;
   template_id: string;
   field_value: string;
-  custom_field_templates: { // Nested template object to get name and type
+  custom_field_templates: Array<{ // Changed to Array<...>
     name: string;
     type: string;
     options?: string[];
-  };
+  }>;
 }
 
 interface ContactDetailType {
@@ -128,7 +128,7 @@ const EditContact = () => {
 
   return (
     <div className="flex flex-col items-center justify-center p-4 h-full w-full">
-      <Card className="w-full max-w-3xl glass rounded-xl p-4"> {/* Changed max-w-md to max-w-3xl and p-6 to p-4 */}
+      <Card className="w-full max-w-3xl glass rounded-xl p-4">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold text-gray-800 dark:text-gray-100">
             ویرایش مخاطب

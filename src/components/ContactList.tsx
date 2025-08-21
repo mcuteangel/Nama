@@ -172,7 +172,7 @@ const ContactList = ({ searchTerm, selectedGroup, companyFilter, sortOption }: C
     try {
       let query = supabase
         .from("contacts")
-        .select("*, phone_numbers(phone_number), email_addresses(email_address), contact_groups(group_id), custom_fields(id, template_id, field_value, custom_field_templates(name, type, options))")
+        .select("id, first_name, last_name, gender, position, company, address, notes, created_at, updated_at, phone_numbers(phone_number), email_addresses(email_address), contact_groups(group_id), custom_fields(id, template_id, field_value, custom_field_templates(name, type, options))")
         .eq("user_id", session.user.id);
 
       // Apply group filter

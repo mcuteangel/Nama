@@ -8,9 +8,9 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Phone, Mail, Building, Briefcase, MapPin, Info, User, Users, Tag, CalendarClock } from "lucide-react"; // Import CalendarClock icon
+import { Phone, Mail, Building, Briefcase, MapPin, Info, User, Users, Tag, CalendarClock } from "lucide-react";
 import { MadeWithDyad } from "@/components/made-with-dyad";
-import { useJalaliCalendar } from "@/hooks/use-jalali-calendar"; // Import useJalaliCalendar
+import { useJalaliCalendar } from "@/hooks/use-jalali-calendar";
 
 interface PhoneNumber {
   id: string;
@@ -26,21 +26,21 @@ interface EmailAddress {
 
 interface ContactGroup {
   group_id: string;
-  groups: {
+  groups: Array<{
     name: string;
     color?: string;
-  };
+  }> | null;
 }
 
 interface CustomField {
   id: string;
   template_id: string;
   field_value: string;
-  custom_field_templates: { // Nested template object to get name and type
+  custom_field_templates: Array<{ // Changed to Array<...>
     name: string;
     type: string;
     options?: string[];
-  };
+  }>;
 }
 
 interface ContactDetailType {
@@ -55,7 +55,7 @@ interface ContactDetailType {
   phone_numbers: PhoneNumber[];
   email_addresses: EmailAddress[];
   contact_groups: ContactGroup[];
-  custom_fields: CustomField[]; // Updated type for custom_fields
+  custom_fields: CustomField[];
   created_at: string;
   updated_at: string;
   avatarUrl?: string;
@@ -66,7 +66,7 @@ const ContactDetail = () => {
   const navigate = useNavigate();
   const [contact, setContact] = useState<ContactDetailType | null>(null);
   const [loading, setLoading] = useState(true);
-  const { formatDate } = useJalaliCalendar(); // Use the hook for date formatting
+  const { formatDate } = useJalaliCalendar();
 
   useEffect(() => {
     const fetchContactDetails = async () => {
@@ -82,7 +82,7 @@ const ContactDetail = () => {
       try {
         const { data, error } = await supabase
           .from("contacts")
-          .select("*, phone_numbers(id, phone_type, phone_number), email_addresses(id, email_type, email_address), contact_groups(group_id, groups(name, color)), custom_fields(id, template_id, field_value, custom_field_templates(name, type, options))") // Select custom_field_templates
+          .select("id, first_name, last_name, gender, position, company, address, notes, created_at, updated_at, phone_numbers(id, phone_type, phone_number), email_addresses(id, email_type, email_address), contact_groups(group_id, groups(name, color)), custom_fields(id, template_id, field_value, custom_field_templates(name, type, options))")
           .eq("id", id)
           .single();
 
@@ -125,7 +125,9 @@ const ContactDetail = () => {
     );
   }
 
-  const assignedGroup = contact.contact_groups.length > 0 ? contact.contact_groups[0].groups : null;
+  const assignedGroup = contact.contact_groups.length > 0 && contact.contact_groups[0].groups && contact.contact_groups[0].groups.length > 0
+    ? contact.contact_groups[0].groups[0]
+    : null;
 
   return (
     <div className="flex flex-col items-center justify-center p-4 h-full w-full">
@@ -199,8 +201,12 @@ const ContactDetail = () => {
               <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><Tag size={16} /> فیلدهای سفارشی</Label>
               {contact.custom_fields.map((field) => (
                 <div key={field.id} className="flex flex-col gap-1">
-                  <Label className="text-gray-700 dark:text-gray-200 text-sm font-medium">{field.custom_field_templates.name}:</Label>
-                  {field.custom_field_templates.type === 'date' ? (
+                  <Label className="text-gray-700 dark:text-gray-200 text-sm font-medium">
+                    {field.custom_field_templates && field.custom_field_templates.length > 0
+                      ? `${field.custom_field_templates[0].name}:`
+                      : 'نام فیلد نامشخص:'}
+                  </Label>
+                  {field.custom_field_templates && field.custom_field_templates.length > 0 && field.custom_field_templates[0].type === 'date' ? (
                     <Input value={formatDate(new Date(field.field_value), 'jYYYY/jMM/jDD')} readOnly className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
                   ) : (
                     <Input value={field.field_value} readOnly className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />

@@ -35,7 +35,16 @@ interface ContactFormProps {
     phoneNumber?: string;
     emailAddress?: string;
     groupId?: string;
-    custom_fields?: { id: string; template_id: string; field_value: string; custom_field_templates: { name: string; type: string; options?: string[] } }[];
+    custom_fields?: {
+      id: string;
+      template_id: string;
+      field_value: string;
+      custom_field_templates: Array<{ // Changed to Array<...>
+        name: string;
+        type: string;
+        options?: string[];
+      }>;
+    }[];
   };
   contactId?: string;
 }
