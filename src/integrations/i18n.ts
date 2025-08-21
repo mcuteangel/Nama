@@ -20,13 +20,13 @@ i18n
   .use(initReactI18next) // Pass i18n instance to react-i18next
   .init({
     resources,
-    fallbackLng: 'fa', // Default language if detection fails
+    fallbackLng: 'fa', // Default language if detection fails, set to Persian
     debug: false, // Set to true for debugging
     interpolation: {
       escapeValue: false, // React already escapes by default
     },
     detection: {
-      order: ['localStorage', 'navigator'], // Order of language detection
+      order: ['localStorage', 'navigator'], // Order of language detection, prioritize localStorage
       caches: ['localStorage'], // Cache user language in localStorage
     },
   });
