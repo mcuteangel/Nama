@@ -10,6 +10,7 @@ import { useContactFormLogic } from "@/hooks/use-contact-form-logic";
 import { ContactService } from "@/services/contact-service";
 import { CustomFieldTemplate } from "@/domain/schemas/custom-field-template";
 import { ContactFormValues, contactFormSchema } from "../types/contact.ts";
+import { fetchWithCache, invalidateCache } from "@/utils/cache-helpers"; // Import caching helpers
 
 // Import new modular components
 import ContactBasicInfo from "./contact-form/ContactBasicInfo.tsx";
@@ -114,7 +115,19 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
 
   const fetchTemplates = useCallback(async () => {
     setLoadingTemplates(true);
-    const { data, error } = await ContactService.getAllCustomFieldTemplates();
+    const cacheKey = `custom_field_templates_${session?.user?.id}`;
+    const { data, error } = await fetchWithCache<CustomFieldTemplate[]>(
+      cacheKey,
+      async () => {
+        const result = await ContactService.getAllCustomFieldTemplates();
+        return { data: result.data, error: result.error };
+      },
+      {
+        loadingMessage: "در حال بارگذاری قالب‌های فیلد سفارشی...",
+        errorMessage: "خطا در بارگذاری قالب‌های فیلد سفارشی",
+        showLoadingToast: false // Don't show toast here, handled by parent or GlobalCustomFieldsManagement
+      }
+    );
     if (error) {
       console.error("Error fetching custom field templates:", error);
       setAvailableTemplates([]);
@@ -122,7 +135,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
       setAvailableTemplates(data || []);
     }
     setLoadingTemplates(false);
-  }, []);
+  }, [session]);
 
   useEffect(() => {
     fetchTemplates();

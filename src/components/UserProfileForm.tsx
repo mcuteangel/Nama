@@ -13,6 +13,7 @@ import { useSession } from '@/integrations/supabase/auth';
 import { useErrorHandler } from '@/hooks/use-error-handler';
 import { ErrorManager } from '@/lib/error-manager';
 import { User } from 'lucide-react';
+import { fetchWithCache, invalidateCache } from "@/utils/cache-helpers"; // Import caching helpers
 
 // Schema: allow string or undefined. Empty strings will be converted to null for DB.
 const profileSchema = z.object({
@@ -28,7 +29,8 @@ const UserProfileForm: React.FC = () => {
   // Define callbacks using useCallback to ensure stability
   const handleSuccess = useCallback(() => {
     ErrorManager.notifyUser('پروفایل با موفقیت به‌روزرسانی شد.', 'success');
-  }, []);
+    invalidateCache(`user_profile_${session?.user?.id}`); // Invalidate cache on success
+  }, [session]);
 
   const handleError = useCallback((err: Error) => {
     console.error("Supabase profile operation error:", err);
@@ -68,16 +70,29 @@ const UserProfileForm: React.FC = () => {
         return;
       }
 
+      const cacheKey = `user_profile_${session.user.id}`;
       await executeAsync(async () => {
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('first_name, last_name')
-          .eq('id', session.user.id)
-          .maybeSingle();
+        const { data, error } = await fetchWithCache<{ first_name: string | null; last_name: string | null }>(
+          cacheKey,
+          async () => {
+            const { data, error } = await supabase
+              .from('profiles')
+              .select('first_name, last_name')
+              .eq('id', session.user.id)
+              .maybeSingle();
 
-        if (error) {
-          throw new Error(error.message || "خطا در دریافت اطلاعات پروفایل");
-        }
+            if (error) {
+              throw new Error(error.message || "خطا در دریافت اطلاعات پروفایل");
+            }
+            return { data: data, error: null };
+          },
+          {
+            loadingMessage: "در حال بارگذاری پروفایل...",
+            successMessage: "پروفایل با موفقیت بارگذاری شد.",
+            errorMessage: "خطا در دریافت اطلاعات پروفایل",
+            showLoadingToast: false // Handled by component's loading state
+          }
+        );
 
         form.reset({
           first_name: data?.first_name ?? undefined,

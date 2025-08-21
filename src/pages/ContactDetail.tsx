@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Phone, Mail, Building, Briefcase, MapPin, Info, User, Users, Tag, CalendarClock, Gift, Link as LinkIcon, Linkedin, Twitter, Instagram, Send, HomeIcon, Globe, Map, ClipboardList } from "lucide-react"; // Import ClipboardList
 import { MadeWithDyad } from "@/components/made-with-dyad";
 import { useJalaliCalendar } from "@/hooks/use-jalali-calendar";
+import { fetchWithCache, invalidateCache } from "@/utils/cache-helpers"; // Import caching helpers
 
 interface PhoneNumber {
   id: string;
@@ -122,33 +123,43 @@ const ContactDetail = () => {
         return;
       }
 
-      const toastId = showLoading("در حال بارگذاری جزئیات مخاطب...");
+      const cacheKey = `contact_detail_${id}`;
       setLoading(true);
 
-      try {
-        const { data, error } = await supabase
-          .from("contacts")
-          .select("id, first_name, last_name, gender, position, company, street, city, state, zip_code, country, notes, created_at, updated_at, birthday, avatar_url, preferred_contact_method, phone_numbers(id, phone_type, phone_number, extension), email_addresses(id, email_type, email_address), social_links(id, type, url), contact_groups(group_id, groups(name, color)), custom_fields(id, template_id, field_value, custom_field_templates(name, type, options))")
-          .eq("id", id)
-          .single();
+      const { data, error } = await fetchWithCache<ContactDetailType>(
+        cacheKey,
+        async () => {
+          const { data, error } = await supabase
+            .from("contacts")
+            .select("id, first_name, last_name, gender, position, company, street, city, state, zip_code, country, notes, created_at, updated_at, birthday, avatar_url, preferred_contact_method, phone_numbers(id, phone_type, phone_number, extension), email_addresses(id, email_type, email_address), social_links(id, type, url), contact_groups(group_id, groups(name, color)), custom_fields(id, template_id, field_value, custom_field_templates(name, type, options))")
+            .eq("id", id)
+            .single();
 
-        if (error) throw error;
+          if (error) throw error;
 
-        if (data) {
-          setContact(data as ContactDetailType);
-          showSuccess("جزئیات مخاطب با موفقیت بارگذاری شد.");
-        } else {
+          if (data) {
+            return { data: data as ContactDetailType, error: null };
+          }
+          return { data: null, error: "مخاطب یافت نشد." };
+        },
+        {
+          loadingMessage: "در حال بارگذاری جزئیات مخاطب...",
+          successMessage: "جزئیات مخاطب با موفقیت بارگذاری شد.",
+          errorMessage: "خطا در بارگذاری جزئیات مخاطب",
+        }
+      );
+
+      if (error) {
+        console.error("Error fetching contact details:", error);
+        navigate("/");
+      } else {
+        setContact(data || null);
+        if (!data) {
           showError("مخاطب یافت نشد.");
           navigate("/");
         }
-      } catch (error: any) {
-        console.error("Error fetching contact details:", error);
-        showError(`خطا در بارگذاری جزئیات مخاطب: ${error.message || "خطای ناشناخته"}`);
-        navigate("/");
-      } finally {
-        dismissToast(toastId);
-        setLoading(false);
       }
+      setLoading(false);
     };
 
     fetchContactDetails();

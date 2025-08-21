@@ -4,11 +4,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Edit, Trash2, Phone, Mail } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { useSession } from "@/integrations/supabase/auth";
 import { showSuccess, showError, showLoading, dismissToast } from "@/utils/toast";
 import { useNavigate } from "react-router-dom";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { ContactService } from "@/services/contact-service"; // Import ContactService
+import { fetchWithCache, invalidateCache } from "@/utils/cache-helpers"; // Import caching helpers
+import { useSession } from "@/integrations/supabase/auth"; // Import useSession
 
 // Define types for contact data
 interface PhoneNumber {
@@ -46,9 +47,6 @@ interface ContactListProps {
   companyFilter: string;
   sortOption: string;
 }
-
-// Cache invalidation period (e.g., 5 minutes)
-const CACHE_EXPIRATION_TIME = 5 * 60 * 1000; // 5 minutes in milliseconds
 
 const ContactItem = ({ contact, onContactDeleted, onContactEdited }: { contact: Contact; onContactDeleted: (id: string) => void; onContactEdited: (id: string) => void }) => {
   const navigate = useNavigate();
@@ -146,8 +144,11 @@ const ContactList = ({ searchTerm, selectedGroup, companyFilter, sortOption }: C
   const [loadingContacts, setLoadingContacts] = useState(true);
   const [isFetchingRemote, setIsFetchingRemote] = useState(false);
 
-  const fetchContacts = useCallback(async (showLoadingToast: boolean = true) => {
-    if (isSessionLoading) return;
+  const fetchContacts = useCallback(async () => {
+    if (isSessionLoading) {
+      setLoadingContacts(true);
+      return;
+    }
 
     if (!session?.user) {
       setContacts([]);
@@ -155,84 +156,56 @@ const ContactList = ({ searchTerm, selectedGroup, companyFilter, sortOption }: C
       return;
     }
 
-    const cacheKey = `contacts_cache_${session.user.id}_${searchTerm}_${selectedGroup}_${companyFilter}_${sortOption}`;
-    const cachedDataString = localStorage.getItem(cacheKey);
-    let cachedData: { timestamp: number; contacts: Contact[] } | null = null;
-
-    if (cachedDataString) {
-      try {
-        cachedData = JSON.parse(cachedDataString);
-        const now = Date.now();
-        const isCacheFresh = (now - cachedData.timestamp) < CACHE_EXPIRATION_TIME;
-
-        if (isCacheFresh) {
-          setContacts(cachedData.contacts);
-          setLoadingContacts(false);
-          setIsFetchingRemote(false); // No need to fetch remotely if cache is fresh
-          return; // Exit early if cache is fresh
-        } else {
-          // Cache is stale, use it but revalidate in background
-          setContacts(cachedData.contacts);
-          setLoadingContacts(false);
-          // Proceed to fetch remotely in background
-        }
-      } catch (e) {
-        console.error("Failed to parse cached contacts:", e);
-        localStorage.removeItem(cacheKey); // Clear corrupted cache
-      }
-    }
-
-    // If no fresh cache, or cache is stale and we need to revalidate
-    let toastId: string | number | undefined;
-    if (showLoadingToast && (!cachedData || !cachedData.contacts || cachedData.contacts.length === 0)) {
-      toastId = showLoading("در حال بارگذاری مخاطبین...");
-    }
+    const cacheKey = `contacts_list_${session.user.id}_${searchTerm}_${selectedGroup}_${companyFilter}_${sortOption}`;
     
+    setLoadingContacts(true);
     setIsFetchingRemote(true);
 
-    try {
-      const { data, error } = await ContactService.getFilteredContacts(
-        session.user.id,
-        searchTerm,
-        selectedGroup,
-        companyFilter,
-        sortOption
-      );
-
-      if (error) throw error;
-
-      setContacts(data as Contact[]);
-      localStorage.setItem(cacheKey, JSON.stringify({ timestamp: Date.now(), contacts: data }));
-      if (toastId) dismissToast(toastId);
-      if (showLoadingToast) showSuccess("مخاطبین با موفقیت بارگذاری شدند.");
-    } catch (error: any) {
-      console.error("Error fetching contacts from Supabase:", error);
-      if (toastId) dismissToast(toastId);
-      showError(`خطا در بارگذاری مخاطبین از سرور: ${error.message || "خطای ناشناخته"}`);
-      if (!cachedData) { // Only clear contacts if no cached data was available at all
-        setContacts([]);
+    const { data, error } = await fetchWithCache<Contact[]>(
+      cacheKey,
+      async () => {
+        const result = await ContactService.getFilteredContacts(
+          session.user.id,
+          searchTerm,
+          selectedGroup,
+          companyFilter,
+          sortOption
+        );
+        return { data: result.data as Contact[], error: result.error };
+      },
+      {
+        loadingMessage: "در حال بارگذاری مخاطبین...",
+        successMessage: "مخاطبین با موفقیت بارگذاری شدند.",
+        errorMessage: "خطا در بارگذاری مخاطبین از سرور",
       }
-    } finally {
-      setLoadingContacts(false);
-      setIsFetchingRemote(false);
+    );
+
+    if (error) {
+      console.error("Error fetching contacts:", error);
+      setContacts([]);
+    } else {
+      setContacts(data || []);
     }
+    setLoadingContacts(false);
+    setIsFetchingRemote(false);
   }, [session, isSessionLoading, searchTerm, selectedGroup, companyFilter, sortOption]);
 
   useEffect(() => {
-    // Initial fetch on component mount or when dependencies change
-    fetchContacts(true); // Show loading toast for initial fetch
+    fetchContacts();
   }, [fetchContacts]);
 
   const handleContactDeleted = (deletedId: string) => {
-    // Invalidate cache and refetch after deletion
-    localStorage.removeItem(`contacts_cache_${session?.user?.id}_${searchTerm}_${selectedGroup}_${companyFilter}_${sortOption}`);
-    fetchContacts(false); // Don't show loading toast for background refetch
+    // Invalidate cache for the current list and refetch
+    const cacheKey = `contacts_list_${session?.user?.id}_${searchTerm}_${selectedGroup}_${companyFilter}_${sortOption}`;
+    invalidateCache(cacheKey);
+    fetchContacts();
   };
 
   const handleContactEdited = (editedId: string) => {
-    // Invalidate cache and refetch after edit
-    localStorage.removeItem(`contacts_cache_${session?.user?.id}_${searchTerm}_${selectedGroup}_${companyFilter}_${sortOption}`);
-    fetchContacts(false); // Don't show loading toast for background refetch
+    // Invalidate cache for the current list and refetch
+    const cacheKey = `contacts_list_${session?.user?.id}_${searchTerm}_${selectedGroup}_${companyFilter}_${sortOption}`;
+    invalidateCache(cacheKey);
+    fetchContacts();
   };
 
   if (loadingContacts && !isFetchingRemote) {

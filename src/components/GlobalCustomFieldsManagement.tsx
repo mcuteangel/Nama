@@ -13,6 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { useSession } from "@/integrations/supabase/auth";
 import CustomFieldTemplateForm from "./CustomFieldTemplateForm";
 import AddCustomFieldTemplateDialog from "./AddCustomFieldTemplateDialog";
+import { fetchWithCache, invalidateCache } from "@/utils/cache-helpers"; // Import caching helpers
 
 type TemplateType = 'text' | 'number' | 'date' | 'list';
 
@@ -62,12 +63,28 @@ export function GlobalCustomFieldsManagement() {
       setCustomFields([]);
       return;
     }
-    await executeAsync(async () => {
-      const res = await ContactService.getAllCustomFieldTemplates();
-      if (res.error) {
-        throw new Error(res.error || "خطا در دریافت لیست قالب‌های فیلدهای سفارشی");
+    const cacheKey = `custom_field_templates_${session.user.id}`;
+    const { data, error } = await fetchWithCache<CustomFieldTemplate[]>(
+      cacheKey,
+      async () => {
+        const res = await ContactService.getAllCustomFieldTemplates();
+        if (res.error) {
+          throw new Error(res.error || "خطا در دریافت لیست قالب‌های فیلدهای سفارشی");
+        }
+        return { data: res.data, error: null };
+      },
+      {
+        loadingMessage: "در حال بارگذاری قالب‌های فیلد سفارشی...",
+        successMessage: "قالب‌های فیلد سفارشی با موفقیت بارگذاری شدند.",
+        errorMessage: "خطا در دریافت لیست قالب‌های فیلدهای سفارشی",
       }
-      setCustomFields(res.data!.map((t: CustomFieldTemplate) => ({
+    );
+
+    if (error) {
+      console.error("Error loading custom field templates:", error);
+      setCustomFields([]);
+    } else {
+      setCustomFields(data!.map((t: CustomFieldTemplate) => ({
         id: t.id,
         name: t.name,
         type: t.type as TemplateType,
@@ -75,10 +92,7 @@ export function GlobalCustomFieldsManagement() {
         description: t.description || "",
         required: t.required
       })));
-    }, {
-      component: "GlobalCustomFieldsManagement",
-      action: "loadTemplates"
-    });
+    }
   };
 
   useEffect(() => {
@@ -93,6 +107,7 @@ export function GlobalCustomFieldsManagement() {
       }
 
       ErrorManager.notifyUser("قالب با موفقیت حذف شد", "success");
+      invalidateCache(`custom_field_templates_${session?.user?.id}`); // Invalidate cache
       await loadTemplates();
     }, {
       component: "GlobalCustomFieldsManagement",
@@ -108,6 +123,7 @@ export function GlobalCustomFieldsManagement() {
   const handleEditSuccess = () => {
     setIsEditDialogOpen(false);
     setEditingField(null);
+    invalidateCache(`custom_field_templates_${session?.user?.id}`); // Invalidate cache
     loadTemplates();
   };
 

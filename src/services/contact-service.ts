@@ -1,6 +1,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { CustomFieldTemplate, CreateCustomFieldTemplateInput, UpdateCustomFieldTemplateInput } from '@/domain/schemas/custom-field-template';
 import moment from 'moment-jalaali'; // Import moment-jalaali for date calculations
+import { invalidateCache } from '@/utils/cache-helpers'; // Import invalidateCache
 
 export const ContactService = {
   async getAllCustomFieldTemplates(): Promise<{ data: CustomFieldTemplate[] | null; error: string | null }> {
@@ -30,6 +31,7 @@ export const ContactService = {
     if (error) {
       return { data: null, error: error.message };
     }
+    invalidateCache(`custom_field_templates_${user.id}`); // Invalidate cache after add
     return { data: data as CustomFieldTemplate, error: null };
   },
 
@@ -50,6 +52,7 @@ export const ContactService = {
     if (error) {
       return { data: null, error: error.message };
     }
+    invalidateCache(`custom_field_templates_${user.id}`); // Invalidate cache after update
     return { data: data as CustomFieldTemplate, error: null };
   },
 
@@ -68,6 +71,7 @@ export const ContactService = {
     if (error) {
       return { success: false, error: error.message };
     }
+    invalidateCache(`custom_field_templates_${user.id}`); // Invalidate cache after delete
     return { success: true, error: null };
   },
 

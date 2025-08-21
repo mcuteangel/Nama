@@ -6,6 +6,7 @@ import ContactForm from "@/components/ContactForm";
 import { MadeWithDyad } from "@/components/made-with-dyad";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { fetchWithCache, invalidateCache } from "@/utils/cache-helpers"; // Import caching helpers
 
 interface PhoneNumber {
   id: string;
@@ -80,42 +81,51 @@ const EditContact = () => {
         return;
       }
 
-      const toastId = showLoading("در حال بارگذاری اطلاعات مخاطب برای ویرایش...");
+      const cacheKey = `contact_detail_${id}`;
       setLoading(true);
 
-      try {
-        const { data, error } = await supabase
-          .from("contacts")
-          .select("id, first_name, last_name, gender, position, company, street, city, state, zip_code, country, notes, created_at, updated_at, birthday, avatar_url, preferred_contact_method, phone_numbers(id, phone_type, phone_number, extension), email_addresses(id, email_type, email_address), social_links(id, type, url), contact_groups(group_id), custom_fields(id, template_id, field_value, custom_field_templates(name, type, options))")
-          .eq("id", id)
-          .single();
+      const { data, error } = await fetchWithCache<ContactDetailType>(
+        cacheKey,
+        async () => {
+          const { data, error } = await supabase
+            .from("contacts")
+            .select("id, first_name, last_name, gender, position, company, street, city, state, zip_code, country, notes, created_at, updated_at, birthday, avatar_url, preferred_contact_method, phone_numbers(id, phone_type, phone_number, extension), email_addresses(id, email_type, email_address), social_links(id, type, url), contact_groups(group_id), custom_fields(id, template_id, field_value, custom_field_templates(name, type, options))")
+            .eq("id", id)
+            .single();
 
-        if (error) throw error;
+          if (error) throw error;
 
-        if (data) {
-          const formattedData: ContactDetailType = {
-            ...data,
-            phone_numbers: data.phone_numbers || [],
-            email_addresses: data.email_addresses || [],
-            social_links: data.social_links || [], // New: Social Links
-            groupId: data.contact_groups[0]?.group_id || null, // Ensure null for no group
-            custom_fields: data.custom_fields || [],
-          } as ContactDetailType;
+          if (data) {
+            const formattedData: ContactDetailType = {
+              ...data,
+              phone_numbers: data.phone_numbers || [],
+              email_addresses: data.email_addresses || [],
+              social_links: data.social_links || [], // New: Social Links
+              groupId: data.contact_groups[0]?.group_id || null, // Ensure null for no group
+              custom_fields: data.custom_fields || [],
+            } as ContactDetailType;
+            return { data: formattedData, error: null };
+          }
+          return { data: null, error: "مخاطب یافت نشد." };
+        },
+        {
+          loadingMessage: "در حال بارگذاری اطلاعات مخاطب برای ویرایش...",
+          successMessage: "اطلاعات مخاطب با موفقیت بارگذاری شد.",
+          errorMessage: "خطا در بارگذاری اطلاعات مخاطب",
+        }
+      );
 
-          setInitialContactData(formattedData);
-          showSuccess("اطلاعات مخاطب با موفقیت بارگذاری شد.");
-        } else {
+      if (error) {
+        console.error("Error fetching contact details for edit:", error);
+        navigate("/");
+      } else {
+        setInitialContactData(data || null);
+        if (!data) {
           showError("مخاطب برای ویرایش یافت نشد.");
           navigate("/");
         }
-      } catch (error: any) {
-        console.error("Error fetching contact details for edit:", error);
-        showError(`خطا در بارگذاری اطلاعات مخاطب: ${error.message || "خطای ناشناخته"}`);
-        navigate("/");
-      } finally {
-        dismissToast(toastId);
-        setLoading(false);
       }
+      setLoading(false);
     };
 
     fetchContactDetails();

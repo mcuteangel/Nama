@@ -8,6 +8,7 @@ import { showSuccess, showError, showLoading, dismissToast } from "@/utils/toast
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import GroupForm from "./GroupForm";
+import { invalidateCache } from "@/utils/cache-helpers"; // Import invalidateCache
 
 interface Group {
   id: string;
@@ -35,6 +36,7 @@ const GroupItem = ({ group, onGroupUpdated, onGroupDeleted }: { group: Group; on
 
       if (error) throw error;
       showSuccess("گروه با موفقیت حذف شد.");
+      invalidateCache(`user_groups_${session.user.id}`); // Invalidate groups cache
       onGroupDeleted();
     } catch (error: any) {
       console.error("Error deleting group:", error);
@@ -73,6 +75,7 @@ const GroupItem = ({ group, onGroupUpdated, onGroupDeleted }: { group: Group; on
               initialData={group}
               onSuccess={() => {
                 setIsEditDialogOpen(false);
+                invalidateCache(`user_groups_${session?.user?.id}`); // Invalidate groups cache
                 onGroupUpdated();
               }}
               onCancel={() => setIsEditDialogOpen(false)} // Pass onCancel to close dialog
@@ -169,6 +172,7 @@ const GroupList = () => {
           <GroupForm
             onSuccess={() => {
               setIsAddGroupDialogOpen(false);
+              invalidateCache(`user_groups_${session?.user?.id}`); // Invalidate groups cache
               fetchGroups();
             }}
             onCancel={() => setIsAddGroupDialogOpen(false)} // Pass onCancel to close dialog

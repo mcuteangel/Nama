@@ -5,6 +5,7 @@ import { Session } from "@supabase/supabase-js";
 import { NavigateFunction } from "react-router-dom";
 import { CustomFieldTemplate } from "@/domain/schemas/custom-field-template";
 import { ContactFormValues, CustomFieldFormData, PhoneNumberFormData, EmailAddressFormData, SocialLinkFormData } from "../types/contact.ts";
+import { invalidateCache } from "@/utils/cache-helpers"; // Import invalidateCache
 
 export const useContactFormLogic = (
   contactId: string | undefined,
@@ -288,6 +289,9 @@ export const useContactFormLogic = (
         }
 
         showSuccess("مخاطب با موفقیت به‌روزرسانی شد!");
+        invalidateCache(`contact_detail_${contactId}`); // Invalidate single contact cache
+        invalidateCache(`contacts_list_${user.id}_`); // Invalidate all contact lists for this user
+        invalidateCache(`statistics_dashboard_${user.id}`); // Invalidate statistics cache
         navigate("/");
       } else {
         // Insert new contact
@@ -389,6 +393,8 @@ export const useContactFormLogic = (
         }
 
         showSuccess("مخاطب با موفقیت ذخیره شد!");
+        invalidateCache(`contacts_list_${user.id}_`); // Invalidate all contact lists for this user
+        invalidateCache(`statistics_dashboard_${user.id}`); // Invalidate statistics cache
         form.reset();
       }
     } catch (error: any) {
