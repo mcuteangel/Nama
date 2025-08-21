@@ -1,4 +1,12 @@
-/// <reference lib="deno.ns" />
+/// <reference types="https://deno.land/std@0.190.0/http/server.d.ts" />
+/// <reference types="https://esm.sh/@supabase/supabase-js@2.45.0/dist/main.d.ts" />
+
+declare namespace Deno {
+  namespace env {
+    function get(key: string): string | undefined;
+  }
+}
+
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
 
@@ -27,12 +35,12 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Create user in Supabase Auth
+    // Create user in Supabase Auth, including the role in user_metadata
     const { data: userResponse, error: authError } = await supabaseAdmin.auth.admin.createUser({
       email,
       password,
       email_confirm: true, // Automatically confirm email
-      user_metadata: { first_name, last_name }, // Pass first_name and last_name to user_metadata
+      user_metadata: { first_name, last_name, role }, // Now includes role in user_metadata
     });
 
     if (authError) {
@@ -52,7 +60,7 @@ serve(async (req) => {
       });
     }
 
-    // Update profile with role and names
+    // Update profile with role and names (this is redundant for role if set in user_metadata, but good for consistency)
     const { data: profileData, error: profileError } = await supabaseAdmin
       .from('profiles')
       .upsert({
