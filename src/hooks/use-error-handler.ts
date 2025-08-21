@@ -1,22 +1,21 @@
 import { useState, useCallback } from 'react';
 import { ErrorManager } from '@/lib/error-manager';
 
-interface UseErrorHandlerOptions {
+interface UseErrorHandlerOptions<TResult = unknown> {
   maxRetries?: number;
   retryDelay?: number;
   showToast?: boolean;
   customErrorMessage?: string;
   onError?: (error: Error) => void;
-  onSuccess?: () => void;
+  onSuccess?: (result: TResult) => void;
 }
 
-export function useErrorHandler(initialError: Error | null = null, options?: UseErrorHandlerOptions) {
+export function useErrorHandler<TResult = unknown>(initialError: Error | null = null, options?: UseErrorHandlerOptions<TResult>) {
   const [error, setError] = useState<Error | null>(initialError);
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
-  // Change the type of lastOperation to accept Promise<unknown>
-  const [lastOperation, setLastOperation] = useState<(() => Promise<unknown>) | null>(null);
+  const [lastOperation, setLastOperation] = useState<(() => Promise<TResult>) | null>(null);
 
   const {
     maxRetries = 0,
@@ -27,19 +26,18 @@ export function useErrorHandler(initialError: Error | null = null, options?: Use
     onSuccess: onSuccessHandler,
   } = options || {};
 
-  const executeAsync = useCallback(async <T>(
-    asyncFunction: () => Promise<T>,
+  const executeAsync = useCallback(async (
+    asyncFunction: () => Promise<TResult>, // Changed T to TResult
     context?: Record<string, any>
-  ): Promise<T | undefined> => {
+  ): Promise<TResult | undefined> => { // Changed T to TResult
     setIsLoading(true);
     setError(null);
     setErrorMessage('');
-    // Store the function, wrapping it to ensure it returns Promise<unknown>
-    setLastOperation(() => async () => { await asyncFunction(); });
+    setLastOperation(() => asyncFunction); // No cast needed
 
     try {
       const result = await asyncFunction();
-      onSuccessHandler?.();
+      onSuccessHandler?.(result);
       setRetryCount(0); // Reset retry count on success
       return result;
     } catch (err: any) {
@@ -69,8 +67,8 @@ export function useErrorHandler(initialError: Error | null = null, options?: Use
       }
 
       try {
-        await lastOperation(); // This now correctly awaits a Promise<unknown>
-        onSuccessHandler?.();
+        const result = await lastOperation();
+        onSuccessHandler?.(result);
         setRetryCount(0); // Reset retry count on success
       } catch (err: any) {
         const errMessage = customErrorMessage || ErrorManager.getErrorMessage(err);
@@ -96,6 +94,6 @@ export function useErrorHandler(initialError: Error | null = null, options?: Use
     retryCount,
     retry,
     executeAsync,
-    setError, // Allow external setting of error for specific cases
+    setError,
   };
 }

@@ -86,13 +86,16 @@ const ContactStatisticsDashboard: React.FC = () => {
   const {
     isLoading, // This isLoading is from useErrorHandler
     executeAsync,
-  } = useErrorHandler(null, {
+  } = useErrorHandler<{ data: StatisticsData | null; error: string | null; fromCache: boolean }>(null, { // Explicitly define TResult here
     maxRetries: 3,
     retryDelay: 1000,
     showToast: true,
     customErrorMessage: t('statistics.error_loading_stats'),
-    onSuccess: () => {
-      ErrorManager.notifyUser(t('statistics.stats_loaded_success'), 'success');
+    onSuccess: (result) => {
+      // Only show success toast if data was NOT from cache
+      if (result && !result.fromCache) {
+        ErrorManager.notifyUser(t('statistics.stats_loaded_success'), 'success');
+      }
     },
     onError: (err) => {
       ErrorManager.logError(err, { component: 'ContactStatisticsDashboard', action: 'fetchStatistics' });
@@ -123,7 +126,7 @@ const ContactStatisticsDashboard: React.FC = () => {
     const cacheKey = `statistics_dashboard_${userId}`;
 
     await executeAsync(async () => {
-      const { data, error } = await fetchWithCache<StatisticsData>(
+      const { data, error, fromCache } = await fetchWithCache<StatisticsData>(
         cacheKey,
         async () => {
           const [
@@ -174,7 +177,7 @@ const ContactStatisticsDashboard: React.FC = () => {
       if (data) {
         setStatistics(data);
       }
-      return data;
+      return { data, fromCache }; // Return data and fromCache flag
     });
   }, [session, isSessionLoading, executeAsync, isLoading, t]); // Add isLoading to dependencies
 
