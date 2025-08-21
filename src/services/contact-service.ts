@@ -168,40 +168,14 @@ export const ContactService = {
   },
 
   async getContactsByGroup(userId: string): Promise<{ data: Array<{ name: string; color?: string; count: number }> | null; error: string | null }> {
-    // This query fetches contacts and their associated group names and colors, then counts them.
-    // Supabase's `group` on joined tables can be tricky. We'll fetch the raw data and process it in client.
-    const { data, error } = await supabase
-      .from('contact_groups')
-      .select('groups(name, color)')
-      .eq('user_id', userId);
+    // Now calling the new RPC function for server-side aggregation
+    const { data, error } = await supabase.rpc('get_contacts_by_group_counts', { user_id_param: userId });
 
     if (error) {
       return { data: null, error: error.message };
     }
-
-    const groupCounts: { [key: string]: { name: string; color?: string; count: number } } = {};
-
-    data.forEach((item: any) => {
-      const group = item.groups;
-      if (group) {
-        const groupName = group.name || 'بدون گروه';
-        if (groupCounts[groupName]) {
-          groupCounts[groupName].count++;
-        } else {
-          groupCounts[groupName] = { name: groupName, color: group.color, count: 1 };
-        }
-      } else {
-        // Handle contacts without a group explicitly
-        const noGroupName = 'بدون گروه';
-        if (groupCounts[noGroupName]) {
-          groupCounts[noGroupName].count++;
-        } else {
-          groupCounts[noGroupName] = { name: noGroupName, count: 1 };
-        }
-      }
-    });
-
-    return { data: Object.values(groupCounts), error: null };
+    // The RPC function already returns 'name', 'color', and 'count' in the correct format
+    return { data: data as Array<{ name: string; color?: string; count: number }>, error: null };
   },
 
   async getContactsByPreferredMethod(userId: string): Promise<{ data: Array<{ method: string; count: number }> | null; error: string | null }> {
