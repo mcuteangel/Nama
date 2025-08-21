@@ -8,18 +8,19 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useNavigate } from "react-router-dom";
-import React, { useEffect, useState } from "react"; // Import useState
+import React, { useEffect, useState, useCallback } from "react"; // Import useCallback
 import { useSession } from "@/integrations/supabase/auth";
 import AddGroupDialog from "./AddGroupDialog";
 import { useGroups } from "@/hooks/use-groups";
 import { useContactFormLogic } from "@/hooks/use-contact-form-logic";
-import { ContactService } from "@/services/contact-service"; // Import ContactService
-import { CustomFieldTemplate } from "@/domain/schemas/custom-field-template"; // Import CustomFieldTemplate type
-import { CalendarIcon } from "lucide-react"; // Import CalendarIcon
+import { ContactService } from "@/services/contact-service";
+import { CustomFieldTemplate } from "@/domain/schemas/custom-field-template";
+import { CalendarIcon } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns-jalali";
 import { JalaliCalendar } from "@/components/JalaliCalendar";
 import { cn } from "@/lib/utils";
+import AddCustomFieldTemplateDialog from "./AddCustomFieldTemplateDialog"; // Import the new dialog
 
 // Define the schema for the form using Zod
 const formSchema = z.object({
@@ -32,7 +33,7 @@ const formSchema = z.object({
   company: z.string().optional(),
   address: z.string().optional(),
   notes: z.string().optional(),
-  groupId: z.string().optional(), // New field for group ID
+  groupId: z.string().optional(),
   customFields: z.array(z.object({
     template_id: z.string().min(1, { message: "شناسه قالب فیلد سفارشی الزامی است." }),
     value: z.string().min(1, { message: "مقدار فیلد سفارشی نمی‌تواند خالی باشد." }),
@@ -52,7 +53,7 @@ interface ContactFormProps {
     phoneNumber?: string;
     emailAddress?: string;
     groupId?: string;
-    custom_fields?: { id: string; template_id: string; field_value: string; custom_field_templates: { name: string; type: string; options?: string[] } }[]; // Updated type for custom_fields
+    custom_fields?: { id: string; template_id: string; field_value: string; custom_field_templates: { name: string; type: string; options?: string[] } }[];
   };
   contactId?: string;
 }
@@ -86,20 +87,21 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
 
   const { onSubmit } = useContactFormLogic(contactId, navigate, session, form, availableTemplates);
 
-  useEffect(() => {
-    const fetchTemplates = async () => {
-      setLoadingTemplates(true);
-      const { data, error } = await ContactService.getAllCustomFieldTemplates();
-      if (error) {
-        console.error("Error fetching custom field templates:", error);
-        setAvailableTemplates([]);
-      } else {
-        setAvailableTemplates(data || []);
-      }
-      setLoadingTemplates(false);
-    };
-    fetchTemplates();
+  const fetchTemplates = useCallback(async () => {
+    setLoadingTemplates(true);
+    const { data, error } = await ContactService.getAllCustomFieldTemplates();
+    if (error) {
+      console.error("Error fetching custom field templates:", error);
+      setAvailableTemplates([]);
+    } else {
+      setAvailableTemplates(data || []);
+    }
+    setLoadingTemplates(false);
   }, []);
+
+  useEffect(() => {
+    fetchTemplates();
+  }, [fetchTemplates]);
 
   useEffect(() => {
     if (initialData) {
@@ -304,7 +306,10 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
 
           {/* Dynamic Custom Fields Section */}
           <div className="space-y-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">فیلدهای سفارشی</h3>
+            <div className="flex justify-between items-center mb-2">
+              <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">فیلدهای سفارشی</h3>
+              <AddCustomFieldTemplateDialog onTemplateAdded={fetchTemplates} />
+            </div>
             {loadingTemplates ? (
               <p className="text-center text-gray-500 dark:text-gray-400">در حال بارگذاری قالب‌های فیلد سفارشی...</p>
             ) : availableTemplates.length === 0 ? (
