@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useForm } from "react-hook-form"; // Keep useForm for the overall component state if needed, but not for the dialog form itself
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
@@ -12,13 +11,13 @@ import { ErrorManager } from "@/lib/error-manager";
 import { type CustomFieldTemplate } from "@/domain/schemas/custom-field-template";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { useSession } from "@/integrations/supabase/auth";
-import CustomFieldTemplateForm from "./CustomFieldTemplateForm"; // Import the new form component
-import AddCustomFieldTemplateDialog from "./AddCustomFieldTemplateDialog"; // Import the new dialog component
+import CustomFieldTemplateForm from "./CustomFieldTemplateForm";
+import AddCustomFieldTemplateDialog from "./AddCustomFieldTemplateDialog";
 
 type TemplateType = 'text' | 'number' | 'date' | 'list';
 
 interface TemplateViewModel {
-  id: string; // Changed to string as per UUID
+  id: string;
   name: string;
   type: TemplateType;
   options?: string[];
@@ -29,8 +28,8 @@ interface TemplateViewModel {
 export function GlobalCustomFieldsManagement() {
   const { session, isLoading: isSessionLoading } = useSession();
   const [customFields, setCustomFields] = useState<TemplateViewModel[]>([]);
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false); // State for edit dialog
-  const [editingField, setEditingField] = useState<CustomFieldTemplate | null>(null); // Use CustomFieldTemplate type
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editingField, setEditingField] = useState<CustomFieldTemplate | null>(null);
 
   const {
     isLoading: loading,
@@ -84,23 +83,26 @@ export function GlobalCustomFieldsManagement() {
 
   useEffect(() => {
     loadTemplates();
-  }, [session, isSessionLoading]); // Reload when session changes
+  }, [session, isSessionLoading]);
 
   const handleDeleteField = async (id: string) => {
-    if (window.confirm("آیا از حذف این فیلد مطمئن هستید؟ این عمل داده‌های موجود را حذف نمی‌کند.")) {
-      await executeAsync(async () => {
-        const res = await ContactService.deleteCustomFieldTemplate(id);
-        if (res.error) {
-          throw new Error(res.error || "خطا در حذف قالب فیلد سفارشی");
-        }
+    await executeAsync(async () => {
+      const res = await ContactService.deleteCustomFieldTemplate(id);
+      if (res.error) {
+        throw new Error(res.error || "خطا در حذف قالب فیلد سفارشی");
+      }
 
-        ErrorManager.notifyUser("قالب با موفقیت حذف شد", "success");
-        await loadTemplates();
-      }, {
-        component: "GlobalCustomFieldsManagement",
-        action: "deleteCustomField"
-      });
-    }
+      ErrorManager.notifyUser("قالب با موفقیت حذف شد", "success");
+      await loadTemplates();
+    }, {
+      component: "GlobalCustomFieldsManagement",
+      action: "deleteCustomField"
+    });
+  };
+
+  const handleEditClick = (field: CustomFieldTemplate) => {
+    setEditingField(field);
+    setIsEditDialogOpen(true);
   };
 
   const handleEditSuccess = () => {
@@ -162,30 +164,14 @@ export function GlobalCustomFieldsManagement() {
                     )}
                   </div>
                   <div className="flex gap-2">
-                    <Dialog open={isEditDialogOpen && editingField?.id === field.id} onOpenChange={setIsEditDialogOpen}>
-                      <DialogTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => {
-                            setEditingField(field as CustomFieldTemplate); // Cast to CustomFieldTemplate
-                            setIsEditDialogOpen(true);
-                          }}
-                          className="text-blue-600 hover:bg-blue-100 dark:text-blue-400 dark:hover:bg-gray-600/50 transition-all duration-200"
-                        >
-                          <Edit size={16} />
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="sm:max-w-[500px] glass rounded-xl p-6">
-                        {editingField && (
-                          <CustomFieldTemplateForm
-                            initialData={editingField}
-                            onSuccess={handleEditSuccess}
-                            onCancel={handleEditCancel}
-                          />
-                        )}
-                      </DialogContent>
-                    </Dialog>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleEditClick(field as CustomFieldTemplate)}
+                      className="text-blue-600 hover:bg-blue-100 dark:text-blue-400 dark:hover:bg-gray-600/50 transition-all duration-200"
+                    >
+                      <Edit size={16} />
+                    </Button>
 
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
@@ -213,6 +199,19 @@ export function GlobalCustomFieldsManagement() {
           </div>
         )}
       </CardContent>
+
+      {/* Single Edit Dialog for CustomFieldTemplateForm */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="sm:max-w-[500px] p-0 border-none bg-transparent shadow-none">
+          {editingField && (
+            <CustomFieldTemplateForm
+              initialData={editingField}
+              onSuccess={handleEditSuccess}
+              onCancel={handleEditCancel}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }
