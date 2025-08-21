@@ -61,8 +61,11 @@ const BottomNavigationBar = () => {
         onClick={handleLogout}
         className="flex flex-col items-center justify-center text-xs p-1 h-auto min-w-[60px] hover:bg-white/20"
       >
-        <LogOut size={20} className="mb-1" />
-        خروج
+        {/* Wrapped children in a single div */}
+        <div className="flex flex-col items-center justify-center">
+          <LogOut size={20} className="mb-1" />
+          خروج
+        </div>
       </Button>
     </div>
   );

@@ -74,7 +74,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
                 asChild
               >
                 <Link to={item.path}>
-                  <div className="flex items-center"> {/* Wrapped children in a div */}
+                  <div className="flex items-center">
                     <item.icon size={20} className={cn(isOpen ? "me-2" : "mx-auto")} />
                     {isOpen && <span className="whitespace-nowrap overflow-hidden">{item.name}</span>}
                   </div>
@@ -96,8 +96,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
                 isOpen ? "justify-start" : "justify-center"
               )}
             >
-              <LogOut size={20} className={cn(isOpen ? "me-2" : "mx-auto")} />
-              {isOpen && <span className="whitespace-nowrap overflow-hidden">خروج</span>}
+              {/* Wrapped children in a single div */}
+              <div className="flex items-center">
+                <LogOut size={20} className={cn(isOpen ? "me-2" : "mx-auto")} />
+                {isOpen && <span className="whitespace-nowrap overflow-hidden">خروج</span>}
+              </div>
             </Button>
           </TooltipTrigger>
           {!isOpen && <TooltipContent side="left">خروج</TooltipContent>}
