@@ -1,20 +1,21 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { LogOut, PlusCircle, Users, Home, Menu, Settings, User, BarChart2, ClipboardList } from "lucide-react";
+import { LogOut, PlusCircle, Users, Home, Menu, Settings, User, BarChart2, ClipboardList, ShieldCheck } from "lucide-react"; // Import ShieldCheck
 import { supabase } from "@/integrations/supabase/client";
 import { showError, showSuccess, showLoading, dismissToast } from "@/utils/toast";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { ThemeToggle } from "./ThemeToggle";
-import { useTranslation } from 'react-i18next'; // Fixed: Added 'from' keyword
+import { useTranslation } from 'react-i18next';
 
 interface SidebarProps {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
+  isAdmin: boolean; // New prop
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
+const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isAdmin }) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
@@ -27,6 +28,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
     { name: t('common.statistics'), icon: BarChart2, path: "/statistics" },
     { name: t('common.settings'), icon: Settings, path: "/settings" },
   ];
+
+  // Add User Management only if isAdmin is true
+  if (isAdmin) {
+    navItems.push({ name: t('user_management.title'), icon: ShieldCheck, path: "/user-management" });
+  }
 
   const handleLogout = async () => {
     const toastId = showLoading(t('common.logout_loading'));

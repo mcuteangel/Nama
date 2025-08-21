@@ -1,0 +1,212 @@
+import React, { useEffect, useState, useCallback } from "react";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Edit, Trash2, User as UserIcon, PlusCircle } from "lucide-react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { UserManagementService } from "@/services/user-management-service";
+import { useErrorHandler } from "@/hooks/use-error-handler";
+import { ErrorManager } from "@/lib/error-manager";
+import UserForm from "./UserForm";
+import { useTranslation } from "react-i18next";
+import { useSession } from "@/integrations/supabase/auth";
+
+interface UserProfile {
+  id: string;
+  email: string;
+  first_name: string | null;
+  last_name: string | null;
+  role: 'user' | 'admin';
+  created_at: string;
+}
+
+const UserItem = ({ user, onUserUpdated, onUserDeleted }: { user: UserProfile; onUserUpdated: () => void; onUserDeleted: () => void }) => {
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const { t } = useTranslation();
+
+  const {
+    isLoading: isDeleting,
+    executeAsync: executeDelete,
+  } = useErrorHandler(null, {
+    maxRetries: 3,
+    retryDelay: 1000,
+    showToast: true,
+    customErrorMessage: t('user_management.error_deleting_user'),
+    onSuccess: () => {
+      ErrorManager.notifyUser(t('user_management.user_deleted_success'), 'success');
+      onUserDeleted();
+    },
+    onError: (err) => {
+      ErrorManager.logError(err, { component: 'UserList', action: 'deleteUser', userId: user.id });
+    }
+  });
+
+  const handleDelete = async () => {
+    await executeDelete(async () => {
+      const res = await UserManagementService.deleteUser(user.id);
+      if (res.error) throw new Error(res.error);
+    });
+  };
+
+  return (
+    <Card className="flex items-center justify-between p-4 glass rounded-lg shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.01]">
+      <div className="flex items-center gap-4">
+        <div className="w-10 h-10 rounded-full flex items-center justify-center bg-blue-500 text-white dark:bg-blue-700">
+          <UserIcon size={20} />
+        </div>
+        <div>
+          <p className="font-semibold text-lg text-gray-800 dark:text-gray-100">
+            {user.first_name || user.email} {user.last_name}
+          </p>
+          <p className="text-sm text-gray-600 dark:text-gray-300">
+            {user.email}
+          </p>
+          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+            user.role === 'admin' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200' :
+            'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
+          }`}>
+            {user.role === 'admin' ? t('user_management.role_admin') : t('user_management.role_user')}
+          </span>
+        </div>
+      </div>
+      <div className="flex gap-2">
+        <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+          <DialogTrigger asChild>
+            <Button variant="ghost" size="icon" className="text-blue-600 hover:bg-blue-100 dark:text-blue-400 dark:hover:bg-gray-600/50 transition-all duration-200">
+              <Edit size={20} />
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px] p-0 border-none bg-transparent shadow-none">
+            <UserForm
+              initialData={user}
+              onSuccess={() => {
+                setIsEditDialogOpen(false);
+                onUserUpdated();
+              }}
+              onCancel={() => setIsEditDialogOpen(false)}
+            />
+          </DialogContent>
+        </Dialog>
+
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button variant="ghost" size="icon" className="text-red-600 hover:bg-red-100 dark:text-red-400 dark:hover:bg-gray-600/50 transition-all duration-200" disabled={isDeleting}>
+              <Trash2 size={20} />
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent className="glass rounded-xl p-6">
+            <AlertDialogHeader>
+              <AlertDialogTitle className="text-gray-800 dark:text-gray-100">{t('user_management.confirm_delete_title')}</AlertDialogTitle>
+              <AlertDialogDescription className="text-gray-600 dark:text-gray-300">
+                {t('user_management.confirm_delete_description', { email: user.email })}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-100">{t('common.cancel')}</AlertDialogCancel>
+              <AlertDialogAction onClick={handleDelete} className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold" disabled={isDeleting}>{t('common.delete')}</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </div>
+    </Card>
+  );
+};
+
+const UserList: React.FC = () => {
+  const { session, isLoading: isSessionLoading } = useSession();
+  const [users, setUsers] = useState<UserProfile[]>([]);
+  const [isAddUserDialogOpen, setIsAddUserDialogOpen] = useState(false);
+  const { t } = useTranslation();
+
+  const {
+    isLoading: loadingUsers,
+    executeAsync: executeFetchUsers,
+  } = useErrorHandler(null, {
+    maxRetries: 3,
+    retryDelay: 1000,
+    showToast: true,
+    customErrorMessage: t('user_management.error_loading_users'),
+    onSuccess: () => ErrorManager.notifyUser(t('user_management.users_loaded_success'), 'success'),
+    onError: (err) => {
+      ErrorManager.logError(err, { component: 'UserList', action: 'fetchUsers' });
+    }
+  });
+
+  const fetchUsers = useCallback(async () => {
+    if (isSessionLoading || !session?.user) {
+      setUsers([]);
+      return;
+    }
+    
+    // Only allow admins to fetch all users
+    if (session.user.user_metadata.role !== 'admin') {
+      setUsers([]);
+      ErrorManager.notifyUser(t('user_management.access_denied'), 'error');
+      return;
+    }
+
+    await executeFetchUsers(async () => {
+      const { data, error } = await UserManagementService.getAllUsers();
+      if (error) throw new Error(error);
+      setUsers(data || []);
+    });
+  }, [session, isSessionLoading, executeFetchUsers, t]);
+
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
+
+  if (loadingUsers) {
+    return <p className="text-center text-gray-500 dark:text-gray-400">{t('user_management.loading_users')}</p>;
+  }
+
+  // Check if the current user is an admin before rendering the list
+  if (session?.user?.user_metadata.role !== 'admin') {
+    return (
+      <div className="text-center text-red-500 dark:text-red-400 p-4">
+        <p>{t('user_management.admin_access_required')}</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <Dialog open={isAddUserDialogOpen} onOpenChange={setIsAddUserDialogOpen}>
+        <DialogTrigger asChild>
+          <Button
+            className="w-full px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-md transition-all duration-300 transform hover:scale-105"
+          >
+            <span className="flex items-center gap-2">
+              <PlusCircle size={20} className="me-2" />
+              {t('user_management.add_new_user')}
+            </span>
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-[425px] p-0 border-none bg-transparent shadow-none">
+          <UserForm
+            onSuccess={() => {
+              setIsAddUserDialogOpen(false);
+              fetchUsers();
+            }}
+            onCancel={() => setIsAddUserDialogOpen(false)}
+          />
+        </DialogContent>
+      </Dialog>
+
+      {users.length === 0 ? (
+        <p className="text-center text-gray-500 dark:text-gray-400">{t('user_management.no_users_found')}</p>
+      ) : (
+        users.map((user) => (
+          <UserItem
+            key={user.id}
+            user={user}
+            onUserUpdated={fetchUsers}
+            onUserDeleted={fetchUsers}
+          />
+        ))
+      )}
+    </div>
+  );
+};
+
+export default UserList;

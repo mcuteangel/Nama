@@ -1,13 +1,17 @@
 import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { LogOut, PlusCircle, Users, Home, User, BarChart2, ClipboardList } from "lucide-react"; // Import ClipboardList
+import { LogOut, PlusCircle, Users, Home, User, BarChart2, ClipboardList, ShieldCheck } from "lucide-react"; // Import ShieldCheck
 import { supabase } from "@/integrations/supabase/client";
 import { showError, showSuccess, showLoading, dismissToast } from "@/utils/toast";
 import { cn } from "@/lib/utils";
 import { useTranslation } from 'react-i18next';
 
-const BottomNavigationBar = () => {
+interface BottomNavigationBarProps {
+  isAdmin: boolean;
+}
+
+const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({ isAdmin }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useTranslation();
@@ -16,11 +20,16 @@ const BottomNavigationBar = () => {
     { name: t('common.home'), icon: Home, path: "/" },
     { name: t('common.add_contact'), icon: PlusCircle, path: "/add-contact" },
     { name: t('common.groups'), icon: Users, path: "/groups" },
-    { name: t('common.custom_fields'), icon: ClipboardList, path: "/custom-fields" }, // Changed icon to ClipboardList
+    { name: t('common.custom_fields'), icon: ClipboardList, path: "/custom-fields" },
     { name: t('common.profile'), icon: User, path: "/profile" },
     { name: t('common.statistics'), icon: BarChart2, path: "/statistics" },
-    { name: t('common.settings'), icon: ClipboardList, path: "/settings" }, // Keep Settings icon for general settings
+    { name: t('common.settings'), icon: ClipboardList, path: "/settings" },
   ];
+
+  // Add User Management only if isAdmin is true
+  if (isAdmin) {
+    navItems.push({ name: t('user_management.title'), icon: ShieldCheck, path: "/user-management" });
+  }
 
   const handleLogout = async () => {
     const toastId = showLoading(t('common.logout_loading'));

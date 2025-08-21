@@ -11,6 +11,7 @@ import CustomFields from './pages/CustomFields';
 import UserProfile from './pages/UserProfile';
 import Settings from './pages/Settings';
 import Statistics from './pages/Statistics'; // Import Statistics page
+import UserManagement from './pages/UserManagement'; // Import UserManagement page
 import { SessionContextProvider } from './integrations/supabase/auth';
 import { supabase } from './integrations/supabase/client';
 import MobileHeader from './components/MobileHeader';
@@ -23,11 +24,13 @@ import ProtectedRoute from './components/ProtectedRoute';
 import { TooltipProvider } from './components/ui/tooltip';
 import { ThemeProvider } from 'next-themes';
 import { useTranslation } from 'react-i18next';
+import { useSession } from './integrations/supabase/auth'; // Import useSession to check user role
 
 function AppLayout() {
   const location = useLocation();
   const mobileBreakpoint = 768; // Tailwind's 'md' breakpoint
   const { i18n } = useTranslation(); // Get i18n instance
+  const { session } = useSession(); // Get session to check user role
 
   const [isMobile, setIsMobile] = useState(() => window.innerWidth < mobileBreakpoint);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -53,12 +56,15 @@ function AppLayout() {
     ? (isSidebarOpen ? "pr-64" : "pr-20") // 256px for w-64, 80px for w-20
     : "";
 
+  // Check if the current user is an admin
+  const isAdmin = session?.user?.user_metadata?.role === 'admin';
+
   return (
     <div className="flex flex-col min-h-screen bg-background">
       {!isAuthPage && (
         <>
-          {isMobile ? <MobileHeader /> : <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />}
-          {isMobile && <BottomNavigationBar />}
+          {isMobile ? <MobileHeader /> : <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} isAdmin={isAdmin} />}
+          {isMobile && <BottomNavigationBar isAdmin={isAdmin} />}
         </>
       )}
       <div className={cn(
@@ -78,7 +84,10 @@ function AppLayout() {
             <Route path="/custom-fields" element={<ProtectedRoute><CustomFields /></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
             <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
-            <Route path="/statistics" element={<ProtectedRoute><Statistics /></ProtectedRoute>} /> {/* New Statistics route */}
+            <Route path="/statistics" element={<ProtectedRoute><Statistics /></ProtectedRoute>} />
+            {isAdmin && ( // Only render UserManagement route if user is admin
+              <Route path="/user-management" element={<ProtectedRoute><UserManagement /></ProtectedRoute>} />
+            )}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </main>

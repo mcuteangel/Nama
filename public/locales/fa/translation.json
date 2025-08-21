@@ -11,21 +11,23 @@
     "logout_loading": "در حال خروج...",
     "logout_success": "با موفقیت خارج شدید.",
     "logout_error": "خطا در خروج",
+    "cancel": "لغو",
+    "delete": "حذف",
     "unknown_error": "خطای ناشناخته"
   },
   "login": {
-    "title": "ورود به حساب کاربری",
+    "title": "ورود به Nama Contacts",
     "email_label": "ایمیل",
     "password_label": "رمز عبور",
     "email_input_placeholder": "ایمیل خود را وارد کنید",
     "password_input_placeholder": "رمز عبور خود را وارد کنید",
     "button_label": "ورود",
-    "social_provider_text": "ورود با {{provider}}",
-    "link_text": "قبلاً حساب کاربری دارید؟ وارد شوید"
+    "social_provider_text": "یا با استفاده از",
+    "link_text": "قبلاً حساب کاربری ندارید؟ ثبت نام کنید"
   },
   "settings": {
-    "title": "تنظیمات برنامه",
-    "description": "تنظیمات عمومی برنامه را مدیریت کنید.",
+    "title": "تنظیمات",
+    "description": "تنظیمات برنامه را مدیریت کنید.",
     "display_settings": "تنظیمات نمایش",
     "theme": "پوسته",
     "calendar_type": "نوع تقویم",
@@ -34,10 +36,10 @@
     "language": "زبان",
     "persian": "فارسی",
     "english": "انگلیسی",
-    "data_management": "مدیریت داده‌ها",
+    "data_management": "مدیریت داده",
     "export_contacts": "خروجی گرفتن از مخاطبین",
     "import_contacts": "ورودی گرفتن مخاطبین",
-    "user_profile": "مشاهده پروفایل کاربری"
+    "user_profile": "پروفایل کاربری"
   },
   "statistics": {
     "title": "آمار مخاطبین",
@@ -61,9 +63,25 @@
     "contacts_count": "تعداد مخاطبین",
     "top_companies": "شرکت‌های برتر",
     "top_positions": "سمت‌های برتر",
-    "no_data_available": "داده‌ای در دسترس نیست.",
+    "no_data_available": "داده‌ای برای نمایش وجود ندارد.",
     "loading_stats": "در حال بارگذاری آمار...",
     "stats_loaded_success": "آمار با موفقیت بارگذاری شد.",
     "error_loading_stats": "خطا در بارگذاری آمار"
+  },
+  "user_management": {
+    "title": "مدیریت کاربران",
+    "description": "ایجاد، ویرایش و حذف کاربران و تعیین نقش آن‌ها.",
+    "add_new_user": "افزودن کاربر جدید",
+    "role_user": "کاربر عادی",
+    "role_admin": "مدیر",
+    "confirm_delete_title": "آیا از حذف این کاربر مطمئن هستید؟",
+    "confirm_delete_description": "این عمل قابل بازگشت نیست. کاربر {{email}} برای همیشه حذف خواهد شد.",
+    "error_deleting_user": "خطا در حذف کاربر",
+    "user_deleted_success": "کاربر با موفقیت حذف شد.",
+    "error_loading_users": "خطا در بارگذاری کاربران",
+    "users_loaded_success": "کاربران با موفقیت بارگذاری شدند.",
+    "no_users_found": "هیچ کاربری یافت نشد.",
+    "access_denied": "دسترسی رد شد. شما اجازه دسترسی به این بخش را ندارید.",
+    "admin_access_required": "برای دسترسی به این بخش، نیاز به نقش مدیر دارید."
   }
 }
