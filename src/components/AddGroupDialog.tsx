@@ -24,12 +24,13 @@ const AddGroupDialog: React.FC<AddGroupDialogProps> = ({ onGroupAdded }) => {
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button
-          type="button"
-          variant="outline"
-          size="icon"
-          className="h-10 w-10 mt-auto bg-blue-500 hover:bg-blue-600 text-white border-blue-500 dark:bg-blue-700 dark:hover:bg-blue-800 dark:border-blue-700"
+          className="w-full px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-md transition-all duration-300 transform hover:scale-105"
         >
-          <PlusCircle size={20} />
+          {/* Wrap the children in a single span */}
+          <span className="flex items-center gap-2">
+            <PlusCircle size={20} className="me-2" />
+            افزودن گروه جدید
+          </span>
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px] p-0 border-none bg-transparent shadow-none">
