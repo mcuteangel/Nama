@@ -2,8 +2,8 @@ import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/integrations/supabase/auth";
 import { fetchWithCache, invalidateCache } from "@/utils/cache-helpers";
-import { useErrorHandler } from "./use-error-handler"; // Import useErrorHandler
-import { ErrorManager } from "@/lib/error-manager"; // Import ErrorManager
+import { useErrorHandler } from "./use-error-handler";
+import { ErrorManager } from "@/lib/error-manager";
 
 interface Group {
   id: string;
@@ -18,13 +18,16 @@ export const useGroups = () => {
   const {
     isLoading: loadingGroups,
     executeAsync,
-  } = useErrorHandler(null, {
+  } = useErrorHandler<{ data: Group[] | null; error: string | null; fromCache: boolean }>(null, { // Explicitly define TResult here
     maxRetries: 3,
     retryDelay: 1000,
     showToast: true,
     customErrorMessage: "خطا در بارگذاری گروه‌ها",
-    onSuccess: () => {
-      ErrorManager.notifyUser("گروه‌ها با موفقیت بارگذاری شدند.", 'success');
+    onSuccess: (result) => {
+      // Only show success toast if data was NOT from cache
+      if (result && !result.fromCache) {
+        ErrorManager.notifyUser("گروه‌ها با موفقیت بارگذاری شدند.", 'success');
+      }
     },
     onError: (err) => {
       ErrorManager.logError(err, { component: 'useGroups', action: 'fetchGroups' });
@@ -40,7 +43,7 @@ export const useGroups = () => {
     const cacheKey = `user_groups_${session.user.id}`;
     
     await executeAsync(async () => {
-      const { data, error } = await fetchWithCache<Group[]>(
+      const { data, error, fromCache } = await fetchWithCache<Group[]>(
         cacheKey,
         async () => {
           const { data, error } = await supabase
@@ -57,7 +60,7 @@ export const useGroups = () => {
         throw new Error(error);
       }
       setGroups(data || []);
-      return data;
+      return { data, error: null, fromCache }; // Added error: null
     });
   }, [session, isSessionLoading, executeAsync]);
 

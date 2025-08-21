@@ -177,7 +177,7 @@ const ContactStatisticsDashboard: React.FC = () => {
       if (data) {
         setStatistics(data);
       }
-      return { data, fromCache }; // Return data and fromCache flag
+      return { data, error: null, fromCache }; // Added error: null
     });
   }, [session, isSessionLoading, executeAsync, isLoading, t]); // Add isLoading to dependencies
 
