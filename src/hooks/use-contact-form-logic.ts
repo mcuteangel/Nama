@@ -233,7 +233,7 @@ export const useContactFormLogic = (
             address: values.address,
             notes: values.notes,
           })
-          .select()
+          .select('id') // Changed from .select() to .select('id')
           .single();
 
         if (contactError) throw contactError;
