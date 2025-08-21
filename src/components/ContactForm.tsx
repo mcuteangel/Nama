@@ -101,7 +101,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
               name="firstName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-gray-700 dark:text-gray-200">نام</FormLabel>
+                  <FormLabel className="text-gray-700 dark:text-gray-200">نام<span className="text-red-500">*</span></FormLabel>
                   <FormControl>
                     <Input placeholder="نام" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400" {...field} />
                   </FormControl>
@@ -114,7 +114,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
               name="lastName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-gray-700 dark:text-gray-200">نام خانوادگی</FormLabel>
+                  <FormLabel className="text-gray-700 dark:text-gray-200">نام خانوادگی<span className="text-red-500">*</span></FormLabel>
                   <FormControl>
                     <Input placeholder="نام خانوادگی" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400" {...field} />
                   </FormControl>
