@@ -11,8 +11,8 @@ const Login = () => {
   const { session, isLoading } = useSession();
 
   useEffect(() => {
-    if (!isLoading && session) {
-      // کاربر احراز هویت شده است، به صفحه اصلی هدایت شود
+    // کاربر احراز هویت شده است و شیء کاربر معتبر است، به صفحه اصلی هدایت شود
+    if (!isLoading && session?.user) {
       navigate('/');
     }
   }, [session, isLoading, navigate]);

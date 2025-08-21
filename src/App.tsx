@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
-import Home from './pages/Home'; // Changed import from Index to Home
-import Contacts from './pages/Contacts'; // Import Contacts for its own route
+import Home from './pages/Home';
+import Contacts from './pages/Contacts';
 import Login from './pages/Login';
 import AddContact from './pages/AddContact';
 import ContactDetail from './pages/ContactDetail';
@@ -15,6 +15,7 @@ import Sidebar from './components/Sidebar';
 import { Toaster } from 'sonner';
 import { cn } from './lib/utils';
 import NotFound from './pages/NotFound';
+import ProtectedRoute from './components/ProtectedRoute'; // New import
 
 // New component to handle routing and layout based on location
 function AppLayout() {
@@ -28,7 +29,7 @@ function AppLayout() {
 
     handleResize(); // Set initial state
     window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize); // Corrected event listener cleanup
   }, []);
 
   const isAuthPage = location.pathname === '/login';
@@ -45,15 +46,16 @@ function AppLayout() {
         "flex-grow",
         !isAuthPage && (isMobile ? "pt-[64px] pb-16" : "pr-64")
       )}>
-        <main className="h-full w-full flex flex-col items-center justify-center p-4"> {/* Removed background gradient from main */}
+        <main className="h-full w-full flex flex-col items-center justify-center p-4">
           <Routes>
-            <Route path="/" element={<Home />} /> {/* Changed to Home */}
-            <Route path="/contacts" element={<Contacts />} /> {/* New route for Contacts */}
             <Route path="/login" element={<Login />} />
-            <Route path="/add-contact" element={<AddContact />} />
-            <Route path="/contacts/:id" element={<ContactDetail />} />
-            <Route path="/contacts/edit/:id" element={<EditContact />} />
-            <Route path="/groups" element={<Groups />} />
+            {/* Protected Routes */}
+            <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+            <Route path="/contacts" element={<ProtectedRoute><Contacts /></ProtectedRoute>} />
+            <Route path="/add-contact" element={<ProtectedRoute><AddContact /></ProtectedRoute>} />
+            <Route path="/contacts/:id" element={<ProtectedRoute><ContactDetail /></ProtectedRoute>} />
+            <Route path="/contacts/edit/:id" element={<ProtectedRoute><EditContact /></ProtectedRoute>} />
+            <Route path="/groups" element={<ProtectedRoute><Groups /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </main>
