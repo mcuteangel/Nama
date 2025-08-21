@@ -2,19 +2,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { CardContent } from "@/components/ui/card";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { supabase } from "@/integrations/supabase/client";
-import { showSuccess, showError, showLoading, dismissToast } from "@/utils/toast";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect } from "react";
 import { useSession } from "@/integrations/supabase/auth";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import GroupForm from "./GroupForm";
-import { PlusCircle } from "lucide-react";
+import AddGroupDialog from "./AddGroupDialog"; // New import
+import { useGroups } from "@/hooks/use-groups"; // New import
+import { useContactFormLogic } from "@/hooks/use-contact-form-logic"; // New import
 
 // Define the schema for the form using Zod
 const formSchema = z.object({
@@ -29,12 +27,6 @@ const formSchema = z.object({
   notes: z.string().optional(),
   groupId: z.string().optional(), // New field for group ID
 });
-
-interface Group {
-  id: string;
-  name: string;
-  color?: string;
-}
 
 interface ContactFormProps {
   initialData?: {
@@ -55,9 +47,8 @@ interface ContactFormProps {
 
 const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => {
   const navigate = useNavigate();
-  const { session, isLoading: isSessionLoading } = useSession();
-  const [groups, setGroups] = useState<Group[]>([]);
-  const [isAddGroupDialogOpen, setIsAddGroupDialogOpen] = useState(false);
+  const { session } = useSession();
+  const { groups, fetchGroups } = useGroups(); // Use the new useGroups hook
 
   // Initialize react-hook-form
   const form = useForm<z.infer<typeof formSchema>>({
@@ -76,29 +67,8 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
     },
   });
 
-  const fetchGroups = useCallback(async () => {
-    if (isSessionLoading || !session?.user) {
-      setGroups([]);
-      return;
-    }
-    try {
-      const { data, error } = await supabase
-        .from("groups")
-        .select("id, name, color")
-        .eq("user_id", session.user.id)
-        .order("name", { ascending: true });
-
-      if (error) throw error;
-      setGroups(data as Group[]);
-    } catch (error: any) {
-      console.error("Error fetching groups:", error);
-      showError(`خطا در بارگذاری گروه‌ها: ${error.message || "خطای ناشناخته"}`);
-    }
-  }, [session, isSessionLoading]);
-
-  useEffect(() => {
-    fetchGroups();
-  }, [fetchGroups]);
+  // Use the new useContactFormLogic hook for submission
+  const { onSubmit } = useContactFormLogic(contactId, navigate, session, form);
 
   useEffect(() => {
     if (initialData) {
@@ -116,236 +86,6 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
       });
     }
   }, [initialData, form]);
-
-  // Handle form submission
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    const toastId = showLoading(contactId ? "در حال به‌روزرسانی مخاطب..." : "در حال ذخیره مخاطب...");
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-
-      if (!user) {
-        showError("برای افزودن/ویرایش مخاطب باید وارد شوید.");
-        dismissToast(toastId);
-        navigate("/login");
-        return;
-      }
-
-      let currentContactId = contactId;
-
-      if (contactId) {
-        // Update existing contact
-        const { error: contactError } = await supabase
-          .from("contacts")
-          .update({
-            first_name: values.firstName,
-            last_name: values.lastName,
-            gender: values.gender,
-            position: values.position,
-            company: values.company,
-            address: values.address,
-            notes: values.notes,
-          })
-          .eq("id", contactId)
-          .eq("user_id", user.id); // Ensure user owns the contact
-
-        if (contactError) throw contactError;
-
-        // Handle phone number update/insert/delete
-        if (values.phoneNumber) {
-          const { data: existingPhone, error: fetchPhoneError } = await supabase
-            .from("phone_numbers")
-            .select("id")
-            .eq("contact_id", contactId)
-            .eq("user_id", user.id)
-            .single();
-
-          if (fetchPhoneError && fetchPhoneError.code !== 'PGRST116') { // PGRST116 means no rows found
-            throw fetchPhoneError;
-          }
-
-          if (existingPhone) {
-            // Update existing phone number
-            const { error: updatePhoneError } = await supabase
-              .from("phone_numbers")
-              .update({ phone_number: values.phoneNumber })
-              .eq("id", existingPhone.id);
-            if (updatePhoneError) throw updatePhoneError;
-          } else {
-            // Insert new phone number
-            const { error: insertPhoneError } = await supabase
-              .from("phone_numbers")
-              .insert({
-                user_id: user.id,
-                contact_id: contactId,
-                phone_type: "mobile",
-                phone_number: values.phoneNumber,
-              });
-            if (insertPhoneError) throw insertPhoneError;
-          }
-        } else {
-          // If phone number is cleared, delete existing one
-          await supabase
-            .from("phone_numbers")
-            .delete()
-            .eq("contact_id", contactId)
-            .eq("user_id", user.id);
-        }
-
-        // Handle email address update/insert/delete
-        if (values.emailAddress) {
-          const { data: existingEmail, error: fetchEmailError } = await supabase
-            .from("email_addresses")
-            .select("id")
-            .eq("contact_id", contactId)
-            .eq("user_id", user.id)
-            .single();
-
-          if (fetchEmailError && fetchEmailError.code !== 'PGRST116') { // PGRST116 means no rows found
-            throw fetchEmailError;
-          }
-
-          if (existingEmail) {
-            // Update existing email address
-            const { error: updateEmailError } = await supabase
-              .from("email_addresses")
-              .update({ email_address: values.emailAddress })
-              .eq("id", existingEmail.id);
-            if (updateEmailError) throw updateEmailError;
-          } else {
-            // Insert new email address
-            const { error: insertEmailError } = await supabase
-              .from("email_addresses")
-              .insert({
-                user_id: user.id,
-                contact_id: contactId,
-                email_type: "personal",
-                email_address: values.emailAddress,
-              });
-            if (insertEmailError) throw insertEmailError;
-          }
-        } else {
-          // If email address is cleared, delete existing one
-          await supabase
-            .from("email_addresses")
-            .delete()
-            .eq("contact_id", contactId)
-            .eq("user_id", user.id);
-        }
-
-        // Handle group assignment
-        if (values.groupId) {
-          // Check if contact is already in a group
-          const { data: existingContactGroup, error: fetchGroupError } = await supabase
-            .from("contact_groups")
-            .select("contact_id, group_id")
-            .eq("contact_id", contactId)
-            .eq("user_id", user.id)
-            .single();
-
-          if (fetchGroupError && fetchGroupError.code !== 'PGRST116') {
-            throw fetchGroupError;
-          }
-
-          if (existingContactGroup) {
-            // Update existing group assignment
-            const { error: updateGroupError } = await supabase
-              .from("contact_groups")
-              .update({ group_id: values.groupId })
-              .eq("contact_id", contactId)
-              .eq("user_id", user.id);
-            if (updateGroupError) throw updateGroupError;
-          } else {
-            // Insert new group assignment
-            const { error: insertGroupError } = await supabase
-              .from("contact_groups")
-              .insert({
-                user_id: user.id,
-                contact_id: contactId,
-                group_id: values.groupId,
-              });
-            if (insertGroupError) throw insertGroupError;
-          }
-        } else {
-          // If group is cleared, delete existing assignment
-          await supabase
-            .from("contact_groups")
-            .delete()
-            .eq("contact_id", contactId)
-            .eq("user_id", user.id);
-        }
-
-        showSuccess("مخاطب با موفقیت به‌روزرسانی شد!");
-        navigate("/"); // Redirect to contacts list after successful update
-      } else {
-        // Insert new contact
-        const { data: contactData, error: contactError } = await supabase
-          .from("contacts")
-          .insert({
-            user_id: user.id,
-            first_name: values.firstName,
-            last_name: values.lastName,
-            gender: values.gender,
-            position: values.position,
-            company: values.company,
-            address: values.address,
-            notes: values.notes,
-          })
-          .select()
-          .single();
-
-        if (contactError) throw contactError;
-
-        currentContactId = contactData.id;
-
-        // Insert into phone_numbers table if phoneNumber exists
-        if (values.phoneNumber) {
-          const { error: phoneError } = await supabase
-            .from("phone_numbers")
-            .insert({
-              user_id: user.id,
-              contact_id: currentContactId,
-              phone_type: "mobile", // Defaulting to 'mobile'
-              phone_number: values.phoneNumber,
-            });
-          if (phoneError) throw phoneError;
-        }
-
-        // Insert into email_addresses table if emailAddress exists
-        if (values.emailAddress) {
-          const { error: emailError } = await supabase
-            .from("email_addresses")
-            .insert({
-              user_id: user.id,
-              contact_id: currentContactId,
-              email_type: "personal", // Defaulting to 'personal'
-              email_address: values.emailAddress,
-            });
-          if (emailError) throw emailError;
-        }
-
-        // Insert into contact_groups table if groupId exists
-        if (values.groupId) {
-          const { error: groupAssignmentError } = await supabase
-            .from("contact_groups")
-            .insert({
-              user_id: user.id,
-              contact_id: currentContactId,
-              group_id: values.groupId,
-            });
-          if (groupAssignmentError) throw groupAssignmentError;
-        }
-
-        showSuccess("مخاطب با موفقیت ذخیره شد!");
-        form.reset(); // Reset form after successful submission for new contact
-        // Do NOT navigate for new contact, stay on the form
-      }
-    } catch (error: any) {
-      console.error("Error saving contact:", error);
-      showError(`خطا در ذخیره مخاطب: ${error.message || "خطای ناشناخته"}`);
-    } finally {
-      dismissToast(toastId);
-    }
-  }
 
   return (
     <CardContent className="space-y-4">
@@ -432,27 +172,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
                 </FormItem>
               )}
             />
-            <Dialog open={isAddGroupDialogOpen} onOpenChange={setIsAddGroupDialogOpen}>
-              <DialogTrigger asChild>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  className="h-10 w-10 mt-auto bg-blue-500 hover:bg-blue-600 text-white border-blue-500 dark:bg-blue-700 dark:hover:bg-blue-800 dark:border-blue-700"
-                >
-                  <PlusCircle size={20} />
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[425px] p-0 border-none bg-transparent shadow-none">
-                <GroupForm
-                  onSuccess={() => {
-                    setIsAddGroupDialogOpen(false);
-                    fetchGroups(); // Re-fetch groups after a new one is added
-                  }}
-                  onCancel={() => setIsAddGroupDialogOpen(false)}
-                />
-              </DialogContent>
-            </Dialog>
+            <AddGroupDialog onGroupAdded={fetchGroups} /> {/* Use the new AddGroupDialog component */}
           </div>
           <FormField
             control={form.control}
