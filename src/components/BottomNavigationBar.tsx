@@ -49,8 +49,10 @@ const BottomNavigationBar = () => {
           asChild
         >
           <Link to={item.path}>
-            <item.icon size={20} className="mb-1" />
-            {item.name}
+            <div className="flex flex-col items-center justify-center"> {/* Wrapped children in a div */}
+              <item.icon size={20} className="mb-1" />
+              {item.name}
+            </div>
           </Link>
         </Button>
       ))}

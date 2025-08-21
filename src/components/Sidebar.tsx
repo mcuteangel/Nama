@@ -73,9 +73,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
                 )}
                 asChild
               >
-                <Link to={item.path} className="flex items-center">
-                  <item.icon size={20} className={cn(isOpen ? "me-2" : "mx-auto")} />
-                  {isOpen && <span className="whitespace-nowrap overflow-hidden">{item.name}</span>}
+                <Link to={item.path}>
+                  <div className="flex items-center"> {/* Wrapped children in a div */}
+                    <item.icon size={20} className={cn(isOpen ? "me-2" : "mx-auto")} />
+                    {isOpen && <span className="whitespace-nowrap overflow-hidden">{item.name}</span>}
+                  </div>
                 </Link>
               </Button>
             </TooltipTrigger>
