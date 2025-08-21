@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useCallback } from 'react'; // Import useCallback
+import React, { useEffect, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -13,9 +13,9 @@ import { useSession } from '@/integrations/supabase/auth';
 import { useErrorHandler } from '@/hooks/use-error-handler';
 import { ErrorManager } from '@/lib/error-manager';
 import { User } from 'lucide-react';
-import { fetchWithCache, invalidateCache } from "@/utils/cache-helpers"; // Import caching helpers
+import { fetchWithCache, invalidateCache } from "@/utils/cache-helpers";
+import LoadingMessage from './LoadingMessage'; // Import LoadingMessage
 
-// Schema: allow string or undefined. Empty strings will be converted to null for DB.
 const profileSchema = z.object({
   first_name: z.string().optional(),
   last_name: z.string().optional(),
@@ -26,10 +26,9 @@ type ProfileFormValues = z.infer<typeof profileSchema>;
 const UserProfileForm: React.FC = () => {
   const { session, isLoading: isSessionLoading } = useSession();
 
-  // Define callbacks using useCallback to ensure stability
   const handleSuccess = useCallback(() => {
     ErrorManager.notifyUser('پروفایل با موفقیت به‌روزرسانی شد.', 'success');
-    invalidateCache(`user_profile_${session?.user?.id}`); // Invalidate cache on success
+    invalidateCache(`user_profile_${session?.user?.id}`);
   }, [session]);
 
   const handleError = useCallback((err: Error) => {
@@ -52,8 +51,8 @@ const UserProfileForm: React.FC = () => {
     retryDelay: 1000,
     showToast: true,
     customErrorMessage: "خطایی در به‌روزرسانی پروفایل رخ داد",
-    onSuccess: handleSuccess, // Use the stable callback
-    onError: handleError,     // Use the stable callback
+    onSuccess: handleSuccess,
+    onError: handleError,
   });
 
   const form = useForm<ProfileFormValues>({
@@ -90,7 +89,7 @@ const UserProfileForm: React.FC = () => {
             loadingMessage: "در حال بارگذاری پروفایل...",
             successMessage: "پروفایل با موفقیت بارگذاری شد.",
             errorMessage: "خطا در دریافت اطلاعات پروفایل",
-            showLoadingToast: false // Handled by component's loading state
+            showLoadingToast: false
           }
         );
 
@@ -135,18 +134,7 @@ const UserProfileForm: React.FC = () => {
   };
 
   if (isSessionLoading) {
-    return (
-      <Card className="w-full max-w-md glass rounded-xl p-6 bg-white/90 dark:bg-gray-900/90">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold text-gray-800 dark:text-gray-100">
-            در حال بارگذاری پروفایل...
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-center text-gray-500 dark:text-gray-400">لطفاً صبر کنید.</p>
-        </CardContent>
-      </Card>
-    );
+    return <LoadingMessage message="در حال بارگذاری پروفایل..." />;
   }
 
   return (
@@ -158,7 +146,7 @@ const UserProfileForm: React.FC = () => {
         {error && (
           <div className="text-sm text-destructive flex items-center justify-center gap-2 mt-2">
             <span>{errorMessage}</span>
-            {retryLastOperation && (
+            {retryCount > 0 && (
               <Button
                 variant="ghost"
                 size="sm"
@@ -198,7 +186,6 @@ const UserProfileForm: React.FC = () => {
             {form.formState.errors.last_name && <p className="text-red-500 text-sm mt-1">{form.formState.errors.last_name.message}</p>}
           </div>
 
-          {/* Display user's email (read-only) */}
           <div>
             <Label className="text-gray-700 dark:text-gray-200">ایمیل</Label>
             <Input

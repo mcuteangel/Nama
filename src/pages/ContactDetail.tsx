@@ -1,17 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { showSuccess, showError, showLoading, dismissToast } from "@/utils/toast";
+import { showError } from "@/utils/toast";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Phone, Mail, Building, Briefcase, MapPin, Info, User, Users, Tag, CalendarClock, Gift, Link as LinkIcon, Linkedin, Twitter, Instagram, Send, HomeIcon, Globe, Map, ClipboardList } from "lucide-react"; // Import ClipboardList
+import { Phone, Mail, Building, Briefcase, MapPin, Info, User, Users, Tag, CalendarClock, Gift, Link as LinkIcon, Linkedin, Twitter, Instagram, Send, HomeIcon, Globe, Map, ClipboardList } from "lucide-react";
 import { MadeWithDyad } from "@/components/made-with-dyad";
 import { useJalaliCalendar } from "@/hooks/use-jalali-calendar";
-import { fetchWithCache, invalidateCache } from "@/utils/cache-helpers"; // Import caching helpers
+import { fetchWithCache } from "@/utils/cache-helpers";
+import LoadingMessage from "@/components/LoadingMessage"; // Import LoadingMessage
+import CancelButton from "@/components/CancelButton"; // Import CancelButton
 
 interface PhoneNumber {
   id: string;
@@ -58,11 +60,11 @@ interface ContactDetailType {
   gender: string;
   position?: string | null;
   company?: string | null;
-  street?: string | null; // New: Detailed address field
-  city?: string | null;    // New: Detailed address field
-  state?: string | null;   // New: Detailed address field
-  zip_code?: string | null; // New: Detailed address field
-  country?: string | null; // New: Detailed address field
+  street?: string | null;
+  city?: string | null;
+  state?: string | null;
+  zip_code?: string | null;
+  country?: string | null;
   notes?: string | null;
   phone_numbers: PhoneNumber[];
   email_addresses: EmailAddress[];
@@ -70,8 +72,8 @@ interface ContactDetailType {
   contact_groups: ContactGroup[];
   custom_fields: CustomField[];
   birthday?: string | null;
-  avatar_url?: string | null; // New: Avatar URL
-  preferred_contact_method?: 'email' | 'phone' | 'sms' | 'any' | null; // New: Preferred contact method
+  avatar_url?: string | null;
+  preferred_contact_method?: 'email' | 'phone' | 'sms' | 'any' | null;
   created_at: string;
   updated_at: string;
 }
@@ -166,18 +168,14 @@ const ContactDetail = () => {
   }, [id, navigate]);
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-full w-full">
-        <p className="text-gray-700 dark:text-gray-300">در حال بارگذاری جزئیات مخاطب...</p>
-      </div>
-    );
+    return <LoadingMessage message="در حال بارگذاری جزئیات مخاطب..." />;
   }
 
   if (!contact) {
     return (
       <div className="flex flex-col items-center justify-center h-full w-full p-4">
         <p className="text-gray-700 dark:text-gray-300">مخاطب یافت نشد.</p>
-        <Button onClick={() => navigate('/')} className="mt-4 px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-md transition-all duration-300 transform hover:scale-105">بازگشت به لیست مخاطبین</Button>
+        <CancelButton text="بازگشت به لیست مخاطبین" /> {/* Use CancelButton */}
       </div>
     );
   }
@@ -342,9 +340,7 @@ const ContactDetail = () => {
           </div>
 
           <div className="flex justify-end gap-2 mt-6">
-            <Button onClick={() => navigate('/')} variant="outline" className="px-6 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold shadow-md transition-all duration-300 transform hover:scale-105 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-100 dark:border-gray-600">
-              بازگشت
-            </Button>
+            <CancelButton /> {/* Use CancelButton */}
           </div>
         </CardContent>
       </Card>

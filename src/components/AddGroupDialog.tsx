@@ -1,11 +1,14 @@
 import React from "react";
-import { Dialog, DialogContent } from "@/components/ui/dialog"; // Removed DialogHeader, DialogTitle, DialogTrigger
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
 import GroupForm from "./GroupForm";
+import FormDialogWrapper from "./FormDialogWrapper"; // Import the new wrapper
 
 interface AddGroupDialogProps {
   onGroupAdded: () => void;
-  open: boolean; // New prop to control dialog open state
-  onOpenChange: (open: boolean) => void; // New prop to update open state
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
 const AddGroupDialog: React.FC<AddGroupDialogProps> = ({ onGroupAdded, open, onOpenChange }) => {
@@ -19,13 +22,26 @@ const AddGroupDialog: React.FC<AddGroupDialogProps> = ({ onGroupAdded, open, onO
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}> {/* Use controlled props */}
-      <DialogContent className="sm:max-w-[425px] p-0 border-none bg-transparent shadow-none">
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogTrigger asChild>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="flex items-center gap-1 px-3 py-1 rounded-lg bg-blue-500 hover:bg-blue-600 text-white font-semibold shadow-md transition-all duration-300 transform hover:scale-105 dark:bg-blue-700 dark:hover:bg-blue-800"
+        >
+          <span className="flex items-center gap-1">
+            <Plus size={16} />
+            افزودن گروه جدید
+          </span>
+        </Button>
+      </DialogTrigger>
+      <FormDialogWrapper> {/* Use the new wrapper */}
         <GroupForm
           onSuccess={handleSuccess}
           onCancel={handleCancel}
         />
-      </DialogContent>
+      </FormDialogWrapper>
     </Dialog>
   );
 };

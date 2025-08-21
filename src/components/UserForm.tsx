@@ -11,6 +11,7 @@ import { useErrorHandler } from "@/hooks/use-error-handler";
 import { ErrorManager } from "@/lib/error-manager";
 import { useTranslation } from "react-i18next";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import CancelButton from "./CancelButton"; // Import CancelButton
 
 const formSchema = z.object({
   email: z.string().email({ message: "ایمیل نامعتبر است." }),
@@ -20,12 +21,12 @@ const formSchema = z.object({
   role: z.enum(["user", "admin"], { message: "نقش نامعتبر است." }),
 }).refine(data => {
   if (!data.first_name && !data.last_name && !data.email) {
-    return false; // At least one field must be provided for a new user
+    return false;
   }
   return true;
 }, {
   message: "حداقل یکی از فیلدهای نام، نام خانوادگی یا ایمیل باید پر شود.",
-  path: ["email"], // Attach error to email field for visibility
+  path: ["email"],
 });
 
 interface UserFormProps {
@@ -60,7 +61,7 @@ const UserForm: React.FC<UserFormProps> = ({ initialData, onSuccess, onCancel })
         first_name: initialData.first_name || "",
         last_name: initialData.last_name || "",
         role: initialData.role,
-        password: "", // Password should not be pre-filled for security
+        password: "",
       });
     }
   }, [initialData, form]);
@@ -83,14 +84,12 @@ const UserForm: React.FC<UserFormProps> = ({ initialData, onSuccess, onCancel })
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     await executeAsync(async () => {
       if (initialData) {
-        // Update user role and profile
         const updateRoleRes = await UserManagementService.updateUserRole({
           userId: initialData.id,
           role: values.role,
         });
         if (updateRoleRes.error) throw new Error(updateRoleRes.error);
 
-        // Update profile fields (first_name, last_name)
         const updateProfileRes = await UserManagementService.updateUserProfile({
           userId: initialData.id,
           first_name: values.first_name || null,
@@ -98,7 +97,6 @@ const UserForm: React.FC<UserFormProps> = ({ initialData, onSuccess, onCancel })
         });
         if (updateProfileRes.error) throw new Error(updateProfileRes.error);
 
-        // If password is provided, update it
         if (values.password) {
           const updatePasswordRes = await UserManagementService.updateUserPassword({
             userId: initialData.id,
@@ -107,10 +105,9 @@ const UserForm: React.FC<UserFormProps> = ({ initialData, onSuccess, onCancel })
           if (updatePasswordRes.error) throw new Error(updatePasswordRes.error);
         }
       } else {
-        // Create new user
         const res = await UserManagementService.createUser({
           email: values.email,
-          password: values.password || undefined, // Password is required for new user creation
+          password: values.password || undefined,
           first_name: values.first_name || undefined,
           last_name: values.last_name || undefined,
           role: values.role,
@@ -141,7 +138,7 @@ const UserForm: React.FC<UserFormProps> = ({ initialData, onSuccess, onCancel })
                       placeholder={t('common.email_placeholder')}
                       {...field}
                       type="email"
-                      disabled={!!initialData} // Email cannot be changed for existing users
+                      disabled={!!initialData}
                       className="bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 focus:ring-blue-500 focus:border-blue-500"
                     />
                   </FormControl>
@@ -223,15 +220,7 @@ const UserForm: React.FC<UserFormProps> = ({ initialData, onSuccess, onCancel })
               )}
             />
             <div className="flex justify-end gap-2 mt-6">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={onCancel}
-                className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-100"
-                disabled={isLoading}
-              >
-                {t('common.cancel')}
-              </Button>
+              <CancelButton onClick={onCancel} disabled={isLoading} /> {/* Use CancelButton */}
               <Button
                 type="submit"
                 className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold"

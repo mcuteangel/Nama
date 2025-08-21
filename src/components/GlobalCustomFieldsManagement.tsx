@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Trash2, Edit } from "lucide-react";
 import { ContactService } from "@/services/contact-service";
@@ -13,7 +13,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { useSession } from "@/integrations/supabase/auth";
 import CustomFieldTemplateForm from "./CustomFieldTemplateForm";
 import AddCustomFieldTemplateDialog from "./AddCustomFieldTemplateDialog";
-import { fetchWithCache, invalidateCache } from "@/utils/cache-helpers"; // Import caching helpers
+import { fetchWithCache, invalidateCache } from "@/utils/cache-helpers";
+import FormDialogWrapper from "./FormDialogWrapper"; // Import the new wrapper
+import LoadingMessage from "./LoadingMessage"; // Import LoadingMessage
+import CancelButton from "./CancelButton"; // Import CancelButton
 
 type TemplateType = 'text' | 'number' | 'date' | 'list';
 
@@ -107,7 +110,7 @@ export function GlobalCustomFieldsManagement() {
       }
 
       ErrorManager.notifyUser("قالب با موفقیت حذف شد", "success");
-      invalidateCache(`custom_field_templates_${session?.user?.id}`); // Invalidate cache
+      invalidateCache(`custom_field_templates_${session?.user?.id}`);
       await loadTemplates();
     }, {
       component: "GlobalCustomFieldsManagement",
@@ -123,7 +126,7 @@ export function GlobalCustomFieldsManagement() {
   const handleEditSuccess = () => {
     setIsEditDialogOpen(false);
     setEditingField(null);
-    invalidateCache(`custom_field_templates_${session?.user?.id}`); // Invalidate cache
+    invalidateCache(`custom_field_templates_${session?.user?.id}`);
     loadTemplates();
   };
 
@@ -145,7 +148,7 @@ export function GlobalCustomFieldsManagement() {
         </div>
 
         {loading && customFields.length === 0 ? (
-          <p className="text-center text-gray-500 dark:text-gray-400">در حال بارگذاری فیلدهای سفارشی...</p>
+          <LoadingMessage message="در حال بارگذاری فیلدهای سفارشی..." />
         ) : customFields.length === 0 ? (
           <div className="glass p-8 rounded-lg text-center">
             <p className="text-muted-foreground mb-4">هنوز فیلد سفارشی تعریف نشده است.</p>
@@ -203,7 +206,7 @@ export function GlobalCustomFieldsManagement() {
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
-                          <AlertDialogCancel className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-100">لغو</AlertDialogCancel>
+                          <CancelButton onClick={() => {}} text="لغو" /> {/* Use CancelButton */}
                           <AlertDialogAction onClick={() => handleDeleteField(field.id)} className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold">حذف</AlertDialogAction>
                         </AlertDialogFooter>
                       </AlertDialogContent>
@@ -216,16 +219,14 @@ export function GlobalCustomFieldsManagement() {
         )}
       </CardContent>
 
-      {/* Single Edit Dialog for CustomFieldTemplateForm */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="sm:max-w-[500px] p-0 border-none bg-transparent shadow-none">
-          {/* Always render CustomFieldTemplateForm, pass editingField as initialData */}
+        <FormDialogWrapper> {/* Use the new wrapper */}
           <CustomFieldTemplateForm
             initialData={editingField || undefined}
             onSuccess={handleEditSuccess}
             onCancel={handleEditCancel}
           />
-        </DialogContent>
+        </FormDialogWrapper>
       </Dialog>
     </Card>
   );

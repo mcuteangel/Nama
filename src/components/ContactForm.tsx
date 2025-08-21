@@ -9,8 +9,9 @@ import { useSession } from "@/integrations/supabase/auth";
 import { useContactFormLogic } from "@/hooks/use-contact-form-logic";
 import { ContactService } from "@/services/contact-service";
 import { CustomFieldTemplate } from "@/domain/schemas/custom-field-template";
-import { ContactFormValues, contactFormSchema } from "../types/contact.ts";
-import { fetchWithCache, invalidateCache } from "@/utils/cache-helpers"; // Import caching helpers
+import { ContactFormValues, contactFormSchema } from "../types/contact.ts"; // Import contactFormSchema
+import { fetchWithCache } from "@/utils/cache-helpers";
+import { Button } from "./ui/button.tsx"; // Import Button for retry
 
 // Import new modular components
 import ContactBasicInfo from "./contact-form/ContactBasicInfo.tsx";
@@ -21,7 +22,8 @@ import ContactOtherDetails from "./contact-form/ContactOtherDetails.tsx";
 import ContactImportantDates from "./contact-form/ContactImportantDates.tsx";
 import ContactCustomFields from "./contact-form/ContactCustomFields.tsx";
 import ContactFormActions from "./contact-form/ContactFormActions.tsx";
-import ContactAvatarUpload from "./ContactAvatarUpload.tsx"; // New import
+import ContactAvatarUpload from "./ContactAvatarUpload.tsx";
+import { ErrorManager } from "@/lib/error-manager.ts"; // Import ErrorManager for error display
 
 interface ContactFormProps {
   initialData?: {
@@ -31,19 +33,19 @@ interface ContactFormProps {
     gender: "male" | "female" | "not_specified";
     position?: string;
     company?: string;
-    street?: string | null; // New: Detailed address field
-    city?: string | null;    // New: Detailed address field
-    state?: string | null;   // New: Detailed address field
-    zip_code?: string | null; // New: Detailed address field
-    country?: string | null; // New: Detailed address field
+    street?: string | null;
+    city?: string | null;
+    state?: string | null;
+    zip_code?: string | null;
+    country?: string | null;
     notes?: string | null;
     phone_numbers?: { id?: string; phone_type: string; phone_number: string; extension?: string | null }[];
     email_addresses?: { id?: string; email_type: string; email_address: string }[];
     social_links?: { id?: string; type: string; url: string }[];
     groupId?: string | null;
     birthday?: string | null;
-    avatar_url?: string | null; // New: Avatar URL
-    preferred_contact_method?: 'email' | 'phone' | 'sms' | 'any' | null; // New: Preferred contact method
+    avatar_url?: string | null;
+    preferred_contact_method?: 'email' | 'phone' | 'sms' | 'any' | null;
     custom_fields?: {
       id: string;
       template_id: string;
@@ -64,7 +66,6 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
   const [availableTemplates, setAvailableTemplates] = useState<CustomFieldTemplate[]>([]);
   const [loadingTemplates, setLoadingTemplates] = useState(true);
 
-  // Define formSchema inside the component using useMemo
   const formSchema = useMemo(() => {
     return contactFormSchema.superRefine((data, ctx) => {
       if (data.customFields) {
@@ -80,7 +81,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
         });
       }
     });
-  }, [availableTemplates]); // Re-create schema only if availableTemplates changes
+  }, [availableTemplates]);
 
   const form = useForm<ContactFormValues>({
     resolver: zodResolver(formSchema),
@@ -90,16 +91,16 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
       gender: initialData?.gender || "not_specified",
       position: initialData?.position || "",
       company: initialData?.company || "",
-      street: initialData?.street ?? null, // New: Detailed address field
-      city: initialData?.city ?? null,      // New: Detailed address field
-      state: initialData?.state ?? null,   // New: Detailed address field
-      zipCode: initialData?.zip_code ?? null, // New: Detailed address field
-      country: initialData?.country ?? null, // New: Detailed address field
+      street: initialData?.street ?? null,
+      city: initialData?.city ?? null,
+      state: initialData?.state ?? null,
+      zipCode: initialData?.zip_code ?? null,
+      country: initialData?.country ?? null,
       notes: initialData?.notes ?? null,
       groupId: initialData?.groupId ?? null,
       birthday: initialData?.birthday ?? null,
-      avatarUrl: initialData?.avatar_url ?? null, // New: Avatar URL
-      preferredContactMethod: initialData?.preferred_contact_method ?? null, // New: Preferred contact method
+      avatarUrl: initialData?.avatar_url ?? null,
+      preferredContactMethod: initialData?.preferred_contact_method ?? null,
       phoneNumbers: initialData?.phone_numbers || [],
       emailAddresses: initialData?.email_addresses || [],
       socialLinks: initialData?.social_links || [],
@@ -108,10 +109,10 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
         value: cf.field_value,
       })) || [],
     },
-    context: { availableTemplates }, // Pass availableTemplates to Zod context for superRefine
+    context: { availableTemplates },
   });
 
-  const { onSubmit } = useContactFormLogic(contactId, navigate, session, form, availableTemplates);
+  const { onSubmit, isSubmitting, error, errorMessage, retrySave, retryCount } = useContactFormLogic(contactId, navigate, session, form, availableTemplates);
 
   const fetchTemplates = useCallback(async () => {
     setLoadingTemplates(true);
@@ -125,7 +126,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
       {
         loadingMessage: "در حال بارگذاری قالب‌های فیلد سفارشی...",
         errorMessage: "خطا در بارگذاری قالب‌های فیلد سفارشی",
-        showLoadingToast: false // Don't show toast here, handled by parent or GlobalCustomFieldsManagement
+        showLoadingToast: false
       }
     );
     if (error) {
@@ -149,16 +150,16 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
         gender: initialData.gender,
         position: initialData.position,
         company: initialData.company,
-        street: initialData.street ?? null, // New: Detailed address field
-        city: initialData.city ?? null,      // New: Detailed address field
-        state: initialData.state ?? null,    // New: Detailed address field
-        zipCode: initialData.zip_code ?? null, // New: Detailed address field
-        country: initialData.country ?? null, // New: Detailed address field
+        street: initialData.street ?? null,
+        city: initialData.city ?? null,
+        state: initialData.state ?? null,
+        zipCode: initialData.zip_code ?? null,
+        country: initialData.country ?? null,
         notes: initialData.notes ?? null,
         groupId: initialData.groupId ?? null,
         birthday: initialData.birthday ?? null,
-        avatarUrl: initialData.avatar_url ?? null, // New: Avatar URL
-        preferredContactMethod: initialData.preferred_contact_method ?? null, // New: Preferred contact method
+        avatarUrl: initialData.avatar_url ?? null,
+        preferredContactMethod: initialData.preferred_contact_method ?? null,
         phoneNumbers: initialData.phone_numbers || [],
         emailAddresses: initialData.email_addresses || [],
         socialLinks: initialData.social_links || [],
@@ -213,12 +214,28 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
 
   return (
     <CardContent className="space-y-4">
+      {error && (
+        <div className="text-sm text-destructive flex items-center justify-center gap-2 mt-2">
+          <span>{errorMessage}</span>
+          {retryCount > 0 && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={retrySave}
+              disabled={isSubmitting}
+              className="text-destructive hover:bg-destructive/10"
+            >
+              تلاش مجدد ({retryCount} از ۳)
+            </Button>
+          )}
+        </div>
+      )}
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <ContactAvatarUpload
             initialAvatarUrl={form.watch('avatarUrl')}
             onAvatarChange={(url) => form.setValue('avatarUrl', url)}
-            disabled={form.formState.isSubmitting}
+            disabled={isSubmitting}
           />
           <ContactBasicInfo />
           <ContactPhoneNumbers />
@@ -232,7 +249,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
             fetchTemplates={fetchTemplates}
           />
           <ContactFormActions
-            isSubmitting={form.formState.isSubmitting}
+            isSubmitting={isSubmitting}
             onCancel={handleCancel}
             contactId={contactId}
           />

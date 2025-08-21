@@ -7,8 +7,9 @@ import { useSession } from '@/integrations/supabase/auth';
 import { MadeWithDyad } from '@/components/made-with-dyad';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
-import IranFlag from '@/assets/icons/flags/IranFlag'; // Import IranFlag SVG component
-import UKFlag from '@/assets/icons/flags/UKFlag';     // Import UKFlag SVG component
+import IranFlag from '@/assets/icons/flags/IranFlag';
+import UKFlag from '@/assets/icons/flags/UKFlag';
+import LoadingMessage from '@/components/LoadingMessage'; // Import LoadingMessage
 
 const Login = () => {
   const navigate = useNavigate();
@@ -16,7 +17,6 @@ const Login = () => {
   const { i18n, t } = useTranslation();
 
   useEffect(() => {
-    // کاربر احراز هویت شده است و شیء کاربر معتبر است، به صفحه اصلی هدایت شود
     if (!isLoading && session?.user) {
       navigate('/');
     }
@@ -24,15 +24,11 @@ const Login = () => {
 
   const handleLanguageChange = (lng: string) => {
     i18n.changeLanguage(lng);
-    localStorage.setItem('i18nextLng', lng); // Persist language preference
+    localStorage.setItem('i18nextLng', lng);
   };
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-full w-full">
-        <p className="text-gray-700 dark:text-gray-300">در حال بارگذاری...</p>
-      </div>
-    );
+    return <LoadingMessage message={t('common.loading')} />;
   }
 
   return (
@@ -42,7 +38,6 @@ const Login = () => {
           {t('login.title')}
         </h2>
 
-        {/* Language Selector with Flag Buttons */}
         <div className="flex justify-center gap-4 mb-6">
           <Button
             variant="outline"
@@ -54,7 +49,7 @@ const Login = () => {
                 : 'bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-100 dark:hover:bg-gray-600'
             }`}
           >
-            <IranFlag className="w-6 h-6" /> {/* Use IranFlag SVG component */}
+            <IranFlag className="w-6 h-6" />
             <span className="font-semibold">{t('settings.persian')}</span>
           </Button>
           <Button
@@ -67,7 +62,7 @@ const Login = () => {
                 : 'bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-100 dark:hover:bg-gray-600'
             }`}
           >
-            <UKFlag className="w-6 h-6" /> {/* Use UKFlag SVG component */}
+            <UKFlag className="w-6 h-6" />
             <span className="font-semibold">{t('settings.english')}</span>
           </Button>
         </div>

@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import CustomFieldTemplateForm from "./CustomFieldTemplateForm";
+import FormDialogWrapper from "./FormDialogWrapper"; // Import the new wrapper
 
 interface AddCustomFieldTemplateDialogProps {
   onTemplateAdded: () => void;
@@ -29,19 +30,18 @@ const AddCustomFieldTemplateDialog: React.FC<AddCustomFieldTemplateDialogProps> 
           size="sm"
           className="flex items-center gap-1 px-3 py-1 rounded-lg bg-blue-500 hover:bg-blue-600 text-white font-semibold shadow-md transition-all duration-300 transform hover:scale-105 dark:bg-blue-700 dark:hover:bg-blue-800"
         >
-          {/* Wrap the children in a single span */}
           <span className="flex items-center gap-1">
             <Plus size={16} />
             افزودن فیلد جدید
           </span>
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px] p-0 border-none bg-transparent shadow-none">
+      <FormDialogWrapper> {/* Use the new wrapper */}
         <CustomFieldTemplateForm
           onSuccess={handleSuccess}
           onCancel={handleCancel}
         />
-      </DialogContent>
+      </FormDialogWrapper>
     </Dialog>
   );
 };

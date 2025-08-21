@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { showSuccess, showError, showLoading, dismissToast } from "@/utils/toast";
+import { showError } from "@/utils/toast";
 import ContactForm from "@/components/ContactForm";
 import { MadeWithDyad } from "@/components/made-with-dyad";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { fetchWithCache, invalidateCache } from "@/utils/cache-helpers"; // Import caching helpers
+import { fetchWithCache } from "@/utils/cache-helpers";
+import LoadingMessage from "@/components/LoadingMessage"; // Import LoadingMessage
+import CancelButton from "@/components/CancelButton"; // Import CancelButton
 
 interface PhoneNumber {
   id: string;
@@ -49,19 +51,19 @@ interface ContactDetailType {
   gender: "male" | "female" | "not_specified";
   position?: string | null;
   company?: string | null;
-  street?: string | null; // New: Detailed address field
-  city?: string | null;    // New: Detailed address field
-  state?: string | null;   // New: Detailed address field
-  zip_code?: string | null; // New: Detailed address field
-  country?: string | null; // New: Detailed address field
+  street?: string | null;
+  city?: string | null;
+  state?: string | null;
+  zip_code?: string | null;
+  country?: string | null;
   notes?: string | null;
-  phone_numbers: PhoneNumber[]; // Now an array
-  email_addresses: EmailAddress[]; // Now an array
-  social_links: SocialLink[]; // New: Social Links
+  phone_numbers: PhoneNumber[];
+  email_addresses: EmailAddress[];
+  social_links: SocialLink[];
   groupId?: string | null;
   birthday?: string | null;
-  avatar_url?: string | null; // New: Avatar URL
-  preferred_contact_method?: 'email' | 'phone' | 'sms' | 'any' | null; // New: Preferred contact method
+  avatar_url?: string | null;
+  preferred_contact_method?: 'email' | 'phone' | 'sms' | 'any' | null;
   custom_fields: CustomField[];
   created_at: string;
   updated_at: string;
@@ -100,8 +102,8 @@ const EditContact = () => {
               ...data,
               phone_numbers: data.phone_numbers || [],
               email_addresses: data.email_addresses || [],
-              social_links: data.social_links || [], // New: Social Links
-              groupId: data.contact_groups[0]?.group_id || null, // Ensure null for no group
+              social_links: data.social_links || [],
+              groupId: data.contact_groups[0]?.group_id || null,
               custom_fields: data.custom_fields || [],
             } as ContactDetailType;
             return { data: formattedData, error: null };
@@ -132,18 +134,14 @@ const EditContact = () => {
   }, [id, navigate]);
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-full w-full">
-        <p className="text-gray-700 dark:text-gray-300">در حال بارگذاری اطلاعات مخاطب...</p>
-      </div>
-    );
+    return <LoadingMessage message="در حال بارگذاری اطلاعات مخاطب..." />;
   }
 
   if (!initialContactData) {
     return (
       <div className="flex flex-col items-center justify-center h-full w-full p-4">
         <p className="text-gray-700 dark:text-gray-300">مخاطب برای ویرایش یافت نشد.</p>
-        <Button onClick={() => navigate('/')} className="mt-4 px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-md transition-all duration-300 transform hover:scale-105">بازگشت به لیست مخاطبین</Button>
+        <CancelButton text="بازگشت به لیست مخاطبین" /> {/* Use CancelButton */}
       </div>
     );
   }

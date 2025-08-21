@@ -8,7 +8,9 @@ import { showSuccess, showError, showLoading, dismissToast } from "@/utils/toast
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import GroupForm from "./GroupForm";
-import { invalidateCache } from "@/utils/cache-helpers"; // Import invalidateCache
+import { invalidateCache } from "@/utils/cache-helpers";
+import LoadingMessage from "./LoadingMessage"; // Import LoadingMessage
+import CancelButton from "./CancelButton"; // Import CancelButton
 
 interface Group {
   id: string;
@@ -32,11 +34,11 @@ const GroupItem = ({ group, onGroupUpdated, onGroupDeleted }: { group: Group; on
         .from("groups")
         .delete()
         .eq("id", group.id)
-        .eq("user_id", session.user.id); // Ensure user owns the group
+        .eq("user_id", session.user.id);
 
       if (error) throw error;
       showSuccess("گروه با موفقیت حذف شد.");
-      invalidateCache(`user_groups_${session.user.id}`); // Invalidate groups cache
+      invalidateCache(`user_groups_${session.user.id}`);
       onGroupDeleted();
     } catch (error: any) {
       console.error("Error deleting group:", error);
@@ -75,10 +77,10 @@ const GroupItem = ({ group, onGroupUpdated, onGroupDeleted }: { group: Group; on
               initialData={group}
               onSuccess={() => {
                 setIsEditDialogOpen(false);
-                invalidateCache(`user_groups_${session?.user?.id}`); // Invalidate groups cache
+                invalidateCache(`user_groups_${session?.user?.id}`);
                 onGroupUpdated();
               }}
-              onCancel={() => setIsEditDialogOpen(false)} // Pass onCancel to close dialog
+              onCancel={() => setIsEditDialogOpen(false)}
             />
           </DialogContent>
         </Dialog>
@@ -97,7 +99,7 @@ const GroupItem = ({ group, onGroupUpdated, onGroupDeleted }: { group: Group; on
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-100">لغو</AlertDialogCancel>
+              <CancelButton onClick={() => {}} text="لغو" /> {/* Use CancelButton */}
               <AlertDialogAction onClick={handleDelete} className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold">حذف</AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
@@ -151,7 +153,7 @@ const GroupList = () => {
   }, [fetchGroups]);
 
   if (loadingGroups) {
-    return <p className="text-center text-gray-500 dark:text-gray-400">در حال بارگذاری گروه‌ها...</p>;
+    return <LoadingMessage message="در حال بارگذاری گروه‌ها..." />;
   }
 
   return (
@@ -161,7 +163,6 @@ const GroupList = () => {
           <Button
             className="w-full px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-md transition-all duration-300 transform hover:scale-105"
           >
-            {/* Wrap the children in a single span */}
             <span className="flex items-center gap-2">
               <PlusCircle size={20} className="me-2" />
               افزودن گروه جدید
@@ -172,10 +173,10 @@ const GroupList = () => {
           <GroupForm
             onSuccess={() => {
               setIsAddGroupDialogOpen(false);
-              invalidateCache(`user_groups_${session?.user?.id}`); // Invalidate groups cache
+              invalidateCache(`user_groups_${session?.user?.id}`);
               fetchGroups();
             }}
-            onCancel={() => setIsAddGroupDialogOpen(false)} // Pass onCancel to close dialog
+            onCancel={() => setIsAddGroupDialogOpen(false)}
           />
         </DialogContent>
       </Dialog>

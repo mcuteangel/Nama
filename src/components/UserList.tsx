@@ -3,13 +3,16 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Edit, Trash2, User as UserIcon, PlusCircle } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { UserManagementService } from "@/services/user-management-service";
 import { useErrorHandler } from "@/hooks/use-error-handler";
 import { ErrorManager } from "@/lib/error-manager";
 import UserForm from "./UserForm";
 import { useTranslation } from "react-i18next";
 import { useSession } from "@/integrations/supabase/auth";
+import FormDialogWrapper from "./FormDialogWrapper"; // Import the new wrapper
+import LoadingMessage from "./LoadingMessage"; // Import LoadingMessage
+import CancelButton from "./CancelButton"; // Import CancelButton
 
 interface UserProfile {
   id: string;
@@ -32,13 +35,13 @@ const UserItem = ({ user, onUserUpdated, onUserDeleted }: { user: UserProfile; o
     retryDelay: 1000,
     showToast: true,
     customErrorMessage: t('user_management.error_deleting_user'),
-    onSuccess: useCallback(() => { // Wrapped in useCallback
+    onSuccess: useCallback(() => {
       ErrorManager.notifyUser(t('user_management.user_deleted_success'), 'success');
       onUserDeleted();
-    }, [t, onUserDeleted]), // Dependencies for useCallback
-    onError: useCallback((err) => { // Wrapped in useCallback
+    }, [t, onUserDeleted]),
+    onError: useCallback((err) => {
       ErrorManager.logError(err, { component: 'UserList', action: 'deleteUser', userId: user.id });
-    }, [user.id]), // Dependencies for useCallback
+    }, [user.id]),
   });
 
   const handleDelete = async () => {
@@ -76,7 +79,7 @@ const UserItem = ({ user, onUserUpdated, onUserDeleted }: { user: UserProfile; o
               <Edit size={20} />
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px] p-0 border-none bg-transparent shadow-none">
+          <FormDialogWrapper> {/* Use the new wrapper */}
             <UserForm
               initialData={user}
               onSuccess={() => {
@@ -85,7 +88,7 @@ const UserItem = ({ user, onUserUpdated, onUserDeleted }: { user: UserProfile; o
               }}
               onCancel={() => setIsEditDialogOpen(false)}
             />
-          </DialogContent>
+          </FormDialogWrapper>
         </Dialog>
 
         <AlertDialog>
@@ -102,7 +105,7 @@ const UserItem = ({ user, onUserUpdated, onUserDeleted }: { user: UserProfile; o
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-100">{t('common.cancel')}</AlertDialogCancel>
+              <CancelButton onClick={() => {}} text={t('common.cancel')} /> {/* Use CancelButton */}
               <AlertDialogAction onClick={handleDelete} className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold" disabled={isDeleting}>{t('common.delete')}</AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
@@ -119,7 +122,7 @@ const UserList: React.FC = () => {
   const { t } = useTranslation();
 
   const onSuccessFetchUsers = useCallback(() => {
-    ErrorManager.notifyUser(t('user_management.users_loaded_success'), 'success');
+    // ErrorManager.notifyUser(t('user_management.users_loaded_success'), 'success'); // Removed as per useErrorHandler's showToast
   }, [t]);
 
   const onErrorFetchUsers = useCallback((err: Error) => {
@@ -134,20 +137,24 @@ const UserList: React.FC = () => {
     retryDelay: 1000,
     showToast: true,
     customErrorMessage: t('user_management.error_loading_users'),
-    onSuccess: onSuccessFetchUsers, // Use the memoized callback
-    onError: onErrorFetchUsers,     // Use the memoized callback
+    onSuccess: onSuccessFetchUsers,
+    onError: onErrorFetchUsers,
   });
 
   const fetchUsers = useCallback(async () => {
-    if (isSessionLoading || !session?.user) {
+    if (isSessionLoading) {
       setUsers([]);
       return;
     }
     
-    // Only allow admins to fetch all users
+    if (!session?.user) {
+      setUsers([]);
+      return;
+    }
+    
     if (session.user.user_metadata.role !== 'admin') {
       setUsers([]);
-      ErrorManager.notifyUser(t('user_management.access_denied'), 'error');
+      ErrorManager.notifyUser(t('user_management.admin_access_required'), 'error');
       return;
     }
 
@@ -163,10 +170,9 @@ const UserList: React.FC = () => {
   }, [fetchUsers]);
 
   if (loadingUsers) {
-    return <p className="text-center text-gray-500 dark:text-gray-400">{t('user_management.loading_users')}</p>;
+    return <LoadingMessage message={t('user_management.loading_users')} />;
   }
 
-  // Check if the current user is an admin before rendering the list
   if (session?.user?.user_metadata.role !== 'admin') {
     return (
       <div className="text-center text-red-500 dark:text-red-400 p-4">
@@ -188,7 +194,7 @@ const UserList: React.FC = () => {
             </span>
           </Button>
         </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px] p-0 border-none bg-transparent shadow-none">
+        <FormDialogWrapper> {/* Use the new wrapper */}
             <UserForm
               onSuccess={() => {
                 setIsAddUserDialogOpen(false);
@@ -196,7 +202,7 @@ const UserList: React.FC = () => {
               }}
               onCancel={() => setIsAddUserDialogOpen(false)}
             />
-          </DialogContent>
+          </FormDialogWrapper>
       </Dialog>
 
       {users.length === 0 ? (

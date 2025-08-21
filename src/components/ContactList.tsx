@@ -7,11 +7,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { showSuccess, showError, showLoading, dismissToast } from "@/utils/toast";
 import { useNavigate } from "react-router-dom";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { ContactService } from "@/services/contact-service"; // Import ContactService
-import { fetchWithCache, invalidateCache } from "@/utils/cache-helpers"; // Import caching helpers
-import { useSession } from "@/integrations/supabase/auth"; // Import useSession
+import { ContactService } from "@/services/contact-service";
+import { fetchWithCache, invalidateCache } from "@/utils/cache-helpers";
+import { useSession } from "@/integrations/supabase/auth";
+import LoadingMessage from "./LoadingMessage"; // Import LoadingMessage
 
-// Define types for contact data
 interface PhoneNumber {
   phone_number: string;
   phone_type: string;
@@ -30,15 +30,15 @@ interface Contact {
   gender: string;
   position?: string | null;
   company?: string | null;
-  street?: string | null; // New: Detailed address field
-  city?: string | null;    // New: Detailed address field
-  state?: string | null;   // New: Detailed address field
-  zip_code?: string | null; // New: Detailed address field
-  country?: string | null; // New: Detailed address field
+  street?: string | null;
+  city?: string | null;
+  state?: string | null;
+  zip_code?: string | null;
+  country?: string | null;
   notes?: string | null;
   phone_numbers: PhoneNumber[];
   email_addresses: EmailAddress[];
-  avatar_url?: string | null; // New: Avatar URL
+  avatar_url?: string | null;
 }
 
 interface ContactListProps {
@@ -195,21 +195,19 @@ const ContactList = ({ searchTerm, selectedGroup, companyFilter, sortOption }: C
   }, [fetchContacts]);
 
   const handleContactDeleted = (deletedId: string) => {
-    // Invalidate cache for the current list and refetch
     const cacheKey = `contacts_list_${session?.user?.id}_${searchTerm}_${selectedGroup}_${companyFilter}_${sortOption}`;
     invalidateCache(cacheKey);
     fetchContacts();
   };
 
   const handleContactEdited = (editedId: string) => {
-    // Invalidate cache for the current list and refetch
     const cacheKey = `contacts_list_${session?.user?.id}_${searchTerm}_${selectedGroup}_${companyFilter}_${sortOption}`;
     invalidateCache(cacheKey);
     fetchContacts();
   };
 
   if (loadingContacts && !isFetchingRemote) {
-    return <p className="text-center text-gray-500 dark:text-gray-400">در حال بارگذاری مخاطبین...</p>;
+    return <LoadingMessage message="در حال بارگذاری مخاطبین..." />;
   }
 
   return (
