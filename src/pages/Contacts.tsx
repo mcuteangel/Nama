@@ -2,15 +2,21 @@ import { MadeWithDyad } from "@/components/made-with-dyad";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, Search } from "lucide-react"; // Remove Users icon
+import { PlusCircle, Search } from "lucide-react";
 import ContactList from "@/components/ContactList";
 import { useNavigate } from "react-router-dom";
+import React, { useState } from "react"; // Import useState
 
 const Contacts = () => {
   const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState(""); // State for search term
 
   const handleAddContactClick = () => {
     navigate("/add-contact");
+  };
+
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
   };
 
   return (
@@ -31,6 +37,8 @@ const Contacts = () => {
                 type="text"
                 placeholder="جستجوی مخاطبین..."
                 className="w-full ps-10 pe-4 py-2 rounded-lg bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all duration-300"
+                value={searchTerm} // Bind input value to state
+                onChange={handleSearchChange} // Handle input changes
               />
               <Search className="absolute inset-inline-start-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400" size={20} />
             </div>
@@ -43,7 +51,7 @@ const Contacts = () => {
             </Button>
           </div>
 
-          <ContactList />
+          <ContactList searchTerm={searchTerm} /> {/* Pass search term to ContactList */}
         </CardContent>
       </Card>
       <MadeWithDyad />

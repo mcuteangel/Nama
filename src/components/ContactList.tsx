@@ -32,6 +32,10 @@ interface Contact {
   avatarUrl?: string; // Assuming this might come from profiles or be generated
 }
 
+interface ContactListProps {
+  searchTerm: string; // Add searchTerm prop
+}
+
 const ContactItem = ({ contact, onContactDeleted, onContactEdited }: { contact: Contact; onContactDeleted: (id: string) => void; onContactEdited: (id: string) => void }) => {
   const navigate = useNavigate();
   const displayPhoneNumber = contact.phone_numbers.length > 0 ? contact.phone_numbers[0].phone_number : "بدون شماره";
@@ -126,7 +130,7 @@ const ContactItem = ({ contact, onContactDeleted, onContactEdited }: { contact: 
   );
 };
 
-const ContactList = () => {
+const ContactList = ({ searchTerm }: ContactListProps) => {
   const { session, isLoading: isSessionLoading } = useSession();
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [loadingContacts, setLoadingContacts] = useState(true);
@@ -207,16 +211,27 @@ const ContactList = () => {
     fetchContacts();
   };
 
+  // Filter contacts based on searchTerm
+  const filteredContacts = contacts.filter(contact => {
+    const lowerCaseSearchTerm = searchTerm.toLowerCase();
+    const matchesName = contact.first_name.toLowerCase().includes(lowerCaseSearchTerm) ||
+                        contact.last_name.toLowerCase().includes(lowerCaseSearchTerm);
+    const matchesPhoneNumber = contact.phone_numbers.some(pn => pn.phone_number.includes(lowerCaseSearchTerm));
+    const matchesEmail = contact.email_addresses.some(ea => ea.email_address.toLowerCase().includes(lowerCaseSearchTerm));
+    
+    return matchesName || matchesPhoneNumber || matchesEmail;
+  });
+
   if (loadingContacts && !isFetchingRemote) {
     return <p className="text-center text-gray-500 dark:text-gray-400">در حال بارگذاری مخاطبین...</p>;
   }
 
   return (
     <div className="space-y-4">
-      {contacts.length === 0 ? (
+      {filteredContacts.length === 0 ? (
         <p className="text-center text-gray-500 dark:text-gray-400">هیچ مخاطبی یافت نشد.</p>
       ) : (
-        contacts.map((contact) => (
+        filteredContacts.map((contact) => (
           <ContactItem
             key={contact.id}
             contact={contact}
