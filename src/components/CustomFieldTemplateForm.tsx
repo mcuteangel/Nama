@@ -43,6 +43,18 @@ const CustomFieldTemplateForm: React.FC<CustomFieldTemplateFormProps> = ({ initi
     retryDelay: 1000,
     showToast: true,
     customErrorMessage: initialData ? "خطایی در ویرایش قالب فیلد سفارشی رخ داد" : "خطایی در افزودن قالب فیلد سفارشی رخ داد",
+    onSuccess: () => {
+      console.log("CustomFieldTemplateForm: useErrorHandler onSuccess triggered.");
+      ErrorManager.notifyUser(initialData ? 'قالب با موفقیت ویرایش شد.' : 'قالب با موفقیت اضافه شد.', 'success');
+      onSuccess?.();
+    },
+    onError: (err) => {
+      console.error("CustomFieldTemplateForm: useErrorHandler onError triggered.", err);
+      ErrorManager.logError(err, {
+        component: "CustomFieldTemplateForm",
+        action: initialData ? "updateTemplate" : "addTemplate",
+      });
+    }
   });
 
   const form = useForm<CreateCustomFieldTemplateInput>({
@@ -57,7 +69,7 @@ const CustomFieldTemplateForm: React.FC<CustomFieldTemplateFormProps> = ({ initi
     mode: "onChange",
   });
 
-  const values = form.watch(); // Watch all form values to react to changes
+  const values = form.watch();
 
   useEffect(() => {
     if (initialData) {
@@ -72,6 +84,7 @@ const CustomFieldTemplateForm: React.FC<CustomFieldTemplateFormProps> = ({ initi
   }, [initialData, form]);
 
   const onSubmit = async (data: CreateCustomFieldTemplateInput) => {
+    console.log("CustomFieldTemplateForm: onSubmit triggered. Data:", data);
     if (!session?.user) {
       ErrorManager.notifyUser('برای افزودن/ویرایش قالب فیلد سفارشی باید وارد شوید.', 'error');
       navigate('/login');
@@ -79,6 +92,7 @@ const CustomFieldTemplateForm: React.FC<CustomFieldTemplateFormProps> = ({ initi
     }
 
     await executeAsync(async () => {
+      console.log("CustomFieldTemplateForm: Executing async Supabase operation.");
       let res;
       if (initialData) {
         res = await ContactService.updateCustomFieldTemplate(initialData.id, {
@@ -99,14 +113,11 @@ const CustomFieldTemplateForm: React.FC<CustomFieldTemplateFormProps> = ({ initi
       }
 
       if (res.error) {
+        console.error("CustomFieldTemplateForm: Supabase service call returned error:", res.error);
         throw new Error(res.error);
       }
-
-      ErrorManager.notifyUser(initialData ? 'قالب با موفقیت ویرایش شد.' : 'قالب با موفقیت اضافه شد.', 'success');
-      onSuccess?.();
-    }, {
-      component: "CustomFieldTemplateForm",
-      action: initialData ? "updateTemplate" : "addTemplate",
+      console.log("CustomFieldTemplateForm: Supabase service call successful. Result:", res.data);
+      return res.data;
     });
   };
 
@@ -161,7 +172,7 @@ const CustomFieldTemplateForm: React.FC<CustomFieldTemplateFormProps> = ({ initi
               disabled={isSubmitting}
             />
             {form.formState.errors.name && (
-              <p className="text-xs text-red-500 mt-1">{form.formState.errors.name.message}</p>
+              <p className="text-sm text-red-500 font-medium mt-1">{form.formState.errors.name.message}</p>
             )}
           </div>
 
@@ -190,7 +201,7 @@ const CustomFieldTemplateForm: React.FC<CustomFieldTemplateFormProps> = ({ initi
               </SelectContent>
             </Select>
             {form.formState.errors.type && (
-              <p className="text-xs text-red-500 mt-1">{form.formState.errors.type.message}</p>
+              <p className="text-sm text-red-500 font-medium mt-1">{form.formState.errors.type.message}</p>
             )}
           </div>
 
@@ -225,7 +236,7 @@ const CustomFieldTemplateForm: React.FC<CustomFieldTemplateFormProps> = ({ initi
                 <Plus size={16} className="me-2" /> افزودن گزینه
               </Button>
               {form.formState.errors.options && (
-                <p className="text-xs text-red-500 mt-1">{(form.formState.errors.options as any)?.message}</p>
+                <p className="text-sm text-red-500 font-medium mt-1">{(form.formState.errors.options as any)?.message}</p>
               )}
             </div>
           )}
