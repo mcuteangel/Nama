@@ -8,9 +8,9 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Phone, Mail, Building, Briefcase, MapPin, Info, User, Users, Tag } from "lucide-react";
+import { Phone, Mail, Building, Briefcase, MapPin, Info, User, Users, Tag, CalendarClock } from "lucide-react"; // Import CalendarClock icon
 import { MadeWithDyad } from "@/components/made-with-dyad";
-import { format } from "date-fns-jalali"; // Import format for date display
+import { useJalaliCalendar } from "@/hooks/use-jalali-calendar"; // Import useJalaliCalendar
 
 interface PhoneNumber {
   id: string;
@@ -66,6 +66,7 @@ const ContactDetail = () => {
   const navigate = useNavigate();
   const [contact, setContact] = useState<ContactDetailType | null>(null);
   const [loading, setLoading] = useState(true);
+  const { formatDate } = useJalaliCalendar(); // Use the hook for date formatting
 
   useEffect(() => {
     const fetchContactDetails = async () => {
@@ -200,7 +201,7 @@ const ContactDetail = () => {
                 <div key={field.id} className="flex flex-col gap-1">
                   <Label className="text-gray-700 dark:text-gray-200 text-sm font-medium">{field.custom_field_templates.name}:</Label>
                   {field.custom_field_templates.type === 'date' ? (
-                    <Input value={format(new Date(field.field_value), 'yyyy/MM/dd')} readOnly className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
+                    <Input value={formatDate(new Date(field.field_value), 'jYYYY/jMM/jDD')} readOnly className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
                   ) : (
                     <Input value={field.field_value} readOnly className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
                   )}
@@ -215,6 +216,18 @@ const ContactDetail = () => {
               <Textarea value={contact.notes} readOnly className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
             </div>
           )}
+
+          {/* Display Created At and Updated At */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <div>
+              <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><CalendarClock size={16} /> تاریخ ایجاد</Label>
+              <Input value={formatDate(new Date(contact.created_at), 'jYYYY/jMM/jDD HH:mm')} readOnly className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
+            </div>
+            <div>
+              <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><CalendarClock size={16} /> آخرین ویرایش</Label>
+              <Input value={formatDate(new Date(contact.updated_at), 'jYYYY/jMM/jDD HH:mm')} readOnly className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
+            </div>
+          </div>
 
           <div className="flex justify-end gap-2 mt-6">
             <Button onClick={() => navigate('/')} variant="outline" className="px-6 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold shadow-md transition-all duration-300 transform hover:scale-105 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-100 dark:border-gray-600">
