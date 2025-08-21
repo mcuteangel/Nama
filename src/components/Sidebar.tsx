@@ -1,11 +1,11 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { LogOut, PlusCircle, Users, Home, Menu } from "lucide-react";
+import { LogOut, PlusCircle, Users, Home, Menu, Settings } from "lucide-react"; // Import Settings icon
 import { supabase } from "@/integrations/supabase/client";
 import { showError, showSuccess, showLoading, dismissToast } from "@/utils/toast";
 import { cn } from "@/lib/utils";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"; // Import Tooltip components
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -16,6 +16,7 @@ const navItems = [
   { name: "خانه", icon: Home, path: "/" },
   { name: "افزودن مخاطب", icon: PlusCircle, path: "/add-contact" },
   { name: "گروه‌ها", icon: Users, path: "/groups" },
+  { name: "فیلدهای سفارشی", icon: Settings, path: "/custom-fields" }, // New navigation item
 ];
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
@@ -40,7 +41,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
     <aside className={cn(
       "fixed right-0 top-0 h-full shadow-lg flex flex-col z-40 transition-all duration-300 ease-in-out",
       "glass border-l",
-      isOpen ? "w-64" : "w-20" // Dynamic width
+      isOpen ? "w-64" : "w-20"
     )}>
       <div className="p-4 border-b border-sidebar-border dark:border-sidebar-border flex items-center justify-between">
         {isOpen && (
@@ -54,7 +55,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
           onClick={() => setIsOpen(!isOpen)}
           className={cn(
             "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-            isOpen ? "" : "mx-auto" // Center icon when closed
+            isOpen ? "" : "mx-auto"
           )}
         >
           <Menu size={24} />
@@ -68,7 +69,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
                 variant="ghost"
                 className={cn(
                   "w-full text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-                  isOpen ? "justify-start" : "justify-center" // Align content based on open state
+                  isOpen ? "justify-start" : "justify-center"
                 )}
                 asChild
               >
@@ -90,7 +91,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
               onClick={handleLogout}
               className={cn(
                 "w-full text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-                isOpen ? "justify-start" : "justify-center" // Align content based on open state
+                isOpen ? "justify-start" : "justify-center"
               )}
             >
               <LogOut size={20} className={cn(isOpen ? "me-2" : "mx-auto")} />

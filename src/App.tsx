@@ -7,6 +7,7 @@ import AddContact from './pages/AddContact';
 import ContactDetail from './pages/ContactDetail';
 import EditContact from './pages/EditContact';
 import Groups from './pages/Groups';
+import CustomFields from './pages/CustomFields'; // Import the new CustomFields page
 import { SessionContextProvider } from './integrations/supabase/auth';
 import { supabase } from './integrations/supabase/client';
 import MobileHeader from './components/MobileHeader';
@@ -16,14 +17,14 @@ import { Toaster } from 'sonner';
 import { cn } from './lib/utils';
 import NotFound from './pages/NotFound';
 import ProtectedRoute from './components/ProtectedRoute';
-import { TooltipProvider } from './components/ui/tooltip'; // Import TooltipProvider
+import { TooltipProvider } from './components/ui/tooltip';
 
 function AppLayout() {
   const location = useLocation();
   const mobileBreakpoint = 768; // Tailwind's 'md' breakpoint
 
   const [isMobile, setIsMobile] = useState(() => window.innerWidth < mobileBreakpoint);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Changed to false for default closed state
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
@@ -45,7 +46,7 @@ function AppLayout() {
     <div className="flex flex-col min-h-screen bg-background">
       {!isAuthPage && (
         <>
-          {isMobile ? <MobileHeader /> : <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />}
+          {isMobile ? <MobileHeader /> : <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsOpen} />}
           {isMobile && <BottomNavigationBar />}
         </>
       )}
@@ -63,6 +64,7 @@ function AppLayout() {
             <Route path="/contacts/:id" element={<ProtectedRoute><ContactDetail /></ProtectedRoute>} />
             <Route path="/contacts/edit/:id" element={<ProtectedRoute><EditContact /></ProtectedRoute>} />
             <Route path="/groups" element={<ProtectedRoute><Groups /></ProtectedRoute>} />
+            <Route path="/custom-fields" element={<ProtectedRoute><CustomFields /></ProtectedRoute>} /> {/* New route */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </main>
@@ -76,7 +78,7 @@ export default function App() {
     <SessionContextProvider supabaseClient={supabase}>
       <Toaster />
       <BrowserRouter>
-        <TooltipProvider> {/* Wrap AppLayout with TooltipProvider */}
+        <TooltipProvider>
           <AppLayout />
         </TooltipProvider>
       </BrowserRouter>
