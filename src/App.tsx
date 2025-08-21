@@ -15,36 +15,46 @@ import Sidebar from './components/Sidebar';
 import { Toaster } from 'sonner';
 import { cn } from './lib/utils';
 import NotFound from './pages/NotFound';
-import ProtectedRoute from './components/ProtectedRoute'; // New import
+import ProtectedRoute from './components/ProtectedRoute';
 
-// New component to handle routing and layout based on location
 function AppLayout() {
   const location = useLocation();
   const [isMobile, setIsMobile] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true); // State for sidebar open/close
 
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth < 768); // Tailwind's 'md' breakpoint
+      const mobileBreakpoint = 768; // Tailwind's 'md' breakpoint
+      setIsMobile(window.innerWidth < mobileBreakpoint);
+      // If resizing from mobile to desktop, ensure sidebar is open by default
+      if (window.innerWidth >= mobileBreakpoint && !isSidebarOpen) {
+        setIsSidebarOpen(true);
+      }
     };
 
     handleResize(); // Set initial state
     window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize); // Corrected event listener cleanup
-  }, []);
+    return () => window.removeEventListener('change', handleResize); // Corrected event listener cleanup
+  }, [isSidebarOpen]);
 
   const isAuthPage = location.pathname === '/login';
+
+  // Calculate padding for main content based on sidebar state
+  const mainContentPaddingRight = !isAuthPage && !isMobile
+    ? (isSidebarOpen ? "pr-64" : "pr-20") // 256px for w-64, 80px for w-20
+    : "";
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
       {!isAuthPage && (
         <>
-          {isMobile ? <MobileHeader /> : <Sidebar />}
+          {isMobile ? <MobileHeader /> : <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />}
           {isMobile && <BottomNavigationBar />}
         </>
       )}
       <div className={cn(
         "flex-grow",
-        !isAuthPage && (isMobile ? "pt-[64px] pb-16" : "pr-64")
+        !isAuthPage && (isMobile ? "pt-[64px] pb-16" : mainContentPaddingRight) // Apply dynamic padding
       )}>
         <main className="h-full w-full flex flex-col items-center justify-center p-4">
           <Routes>

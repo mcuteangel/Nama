@@ -1,10 +1,15 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { LogOut, PlusCircle, Users, Home } from "lucide-react";
+import { LogOut, PlusCircle, Users, Home, Menu } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { showError, showSuccess, showLoading, dismissToast } from "@/utils/toast";
 import { cn } from "@/lib/utils";
+
+interface SidebarProps {
+  isOpen: boolean;
+  setIsOpen: (isOpen: boolean) => void;
+}
 
 const navItems = [
   { name: "خانه", icon: Home, path: "/" },
@@ -12,7 +17,7 @@ const navItems = [
   { name: "گروه‌ها", icon: Users, path: "/groups" },
 ];
 
-const Sidebar = () => {
+const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -32,37 +37,59 @@ const Sidebar = () => {
 
   return (
     <aside className={cn(
-      "fixed right-0 top-0 h-full w-64 text-sidebar-foreground shadow-lg flex flex-col z-40",
-      "glass border-l"
+      "fixed right-0 top-0 h-full shadow-lg flex flex-col z-40 transition-all duration-300 ease-in-out",
+      "glass border-l",
+      isOpen ? "w-64" : "w-20" // Dynamic width
     )}>
-      <div className="p-4 border-b border-sidebar-border dark:border-sidebar-border">
-        <h2 className="text-2xl font-bold text-sidebar-primary dark:text-sidebar-primary-foreground">
-          Nama Contacts
-        </h2>
+      <div className="p-4 border-b border-sidebar-border dark:border-sidebar-border flex items-center justify-between">
+        {isOpen && (
+          <h2 className="text-2xl font-bold text-sidebar-primary dark:text-sidebar-primary-foreground whitespace-nowrap overflow-hidden">
+            Nama Contacts
+          </h2>
+        )}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setIsOpen(!isOpen)}
+          className={cn(
+            "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+            isOpen ? "" : "mx-auto" // Center icon when closed
+          )}
+        >
+          <Menu size={24} />
+        </Button>
       </div>
-      <nav className="flex flex-col gap-2 p-4">
+      <nav className="flex flex-col gap-2 p-4 flex-grow">
         {navItems.map((item) => (
           <Button
             key={item.path}
             variant="ghost"
-            className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+            className={cn(
+              "w-full text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+              isOpen ? "justify-start" : "justify-center" // Align content based on open state
+            )}
             asChild
           >
-            <Link to={item.path}>
-              <item.icon size={20} className="ms-2" />
-              {item.name}
+            <Link to={item.path} className="flex items-center">
+              <item.icon size={20} className={cn(isOpen ? "me-2" : "mx-auto")} />
+              {isOpen && <span className="whitespace-nowrap overflow-hidden">{item.name}</span>}
             </Link>
           </Button>
         ))}
+      </nav>
+      <div className="p-4 border-t border-sidebar-border dark:border-sidebar-border">
         <Button
           variant="ghost"
           onClick={handleLogout}
-          className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground mt-auto"
+          className={cn(
+            "w-full text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+            isOpen ? "justify-start" : "justify-center" // Align content based on open state
+          )}
         >
-          <LogOut size={20} className="ms-2" />
-          خروج
+          <LogOut size={20} className={cn(isOpen ? "me-2" : "mx-auto")} />
+          {isOpen && <span className="whitespace-nowrap overflow-hidden">خروج</span>}
         </Button>
-      </nav>
+      </div>
     </aside>
   );
 };
