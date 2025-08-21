@@ -172,7 +172,7 @@ const ContactList = ({ searchTerm, selectedGroup, companyFilter, sortOption }: C
   } = useErrorHandler<{ data: Contact[] | null; error: string | null; fromCache: boolean }>(null, {
     maxRetries: 3,
     retryDelay: 1000,
-    showToast: true,
+    showToast: false, // Changed to false to manually control success toast
     customErrorMessage: "خطا در بارگذاری مخاطبین",
     onSuccess: onSuccessFetch,
     onError: onErrorFetch,

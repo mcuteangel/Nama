@@ -60,65 +60,68 @@ const UserProfileForm: React.FC = () => {
     },
   });
 
-  const [loadingProfile, setLoadingProfile] = useState(true); // New state for loading profile
-  const [profileFetchError, setProfileFetchError] = useState<string | null>(null); // New state for fetch error
-
-  const fetchProfile = useCallback(async () => {
-    if (isSessionLoading || !session?.user) {
-      setLoadingProfile(false);
-      return;
-    }
-
-    setLoadingProfile(true);
-    setProfileFetchError(null);
-    const toastId = showLoading("در حال بارگذاری پروفایل...");
-
-    try {
-      const cacheKey = `user_profile_${session.user.id}`;
-      const { data, error, fromCache } = await fetchWithCache<{ first_name: string | null; last_name: string | null }>(
-        cacheKey,
-        async () => {
-          const { data, error } = await supabase
-            .from('profiles')
-            .select('first_name, last_name')
-            .eq('id', session.user.id)
-            .maybeSingle();
-
-          if (error) {
-            throw new Error(error.message || "خطا در دریافت اطلاعات پروفایل");
-          }
-          return { data: data, error: null };
-        }
-      );
-
-      if (error) {
-        throw new Error(error);
-      }
-
+  const onSuccessFetchProfile = useCallback((result: { data: { first_name: string | null; last_name: string | null } | null; error: string | null; fromCache: boolean }) => {
+    if (result.data) {
       form.reset({
-        first_name: data?.first_name ?? undefined,
-        last_name: data?.last_name ?? undefined,
+        first_name: result.data.first_name ?? undefined,
+        last_name: result.data.last_name ?? undefined,
       });
-
-      if (!fromCache) { // Only show success toast if not from cache
-        showSuccess("پروفایل با موفقیت بارگذاری شد.");
-      }
-    } catch (err: any) {
-      const msg = ErrorManager.getErrorMessage(err);
-      setProfileFetchError(msg);
-      showError(`خطا در بارگذاری پروفایل: ${msg}`);
-      ErrorManager.logError(err, { component: "UserProfileForm", action: "fetchProfile" });
-    } finally {
-      dismissToast(toastId);
-      setLoadingProfile(false);
     }
-  }, [session, isSessionLoading, form]);
+    if (!result.fromCache) {
+      showSuccess("پروفایل با موفقیت بارگذاری شد.");
+    }
+  }, [form]);
+
+  const onErrorFetchProfile = useCallback((err: Error) => {
+    const msg = ErrorManager.getErrorMessage(err);
+    showError(`خطا در بارگذاری پروفایل: ${msg}`);
+    ErrorManager.logError(err, { component: "UserProfileForm", action: "fetchProfile" });
+  }, []);
+
+  const {
+    isLoading: loadingProfile,
+    executeAsync: executeFetchProfile,
+  } = useErrorHandler<{ data: { first_name: string | null; last_name: string | null } | null; error: string | null; fromCache: boolean }>(null, {
+    showToast: false, // Control toasts manually
+    onSuccess: onSuccessFetchProfile,
+    onError: onErrorFetchProfile,
+  });
 
   useEffect(() => {
-    fetchProfile();
-  }, [fetchProfile]);
+    const fetchProfileData = async () => {
+      if (isSessionLoading || !session?.user) {
+        return;
+      }
 
-  const onSubmit = async (values: ProfileFormValues) => {
+      await executeFetchProfile(async () => {
+        const cacheKey = `user_profile_${session.user.id}`;
+        const { data, error, fromCache } = await fetchWithCache<{ first_name: string | null; last_name: string | null }>(
+          cacheKey,
+          async () => {
+            const { data, error } = await supabase
+              .from('profiles')
+              .select('first_name, last_name')
+              .eq('id', session.user.id)
+              .maybeSingle();
+
+            if (error) {
+              throw new Error(error.message || "خطا در دریافت اطلاعات پروفایل");
+            }
+            return { data: data, error: null };
+          }
+        );
+
+        if (error) {
+          throw new Error(error);
+        }
+        return { data, error: null, fromCache };
+      });
+    };
+
+    fetchProfileData();
+  }, [session, isSessionLoading, executeFetchProfile]);
+
+  const onSubmit = useCallback(async (values: ProfileFormValues) => {
     if (!session?.user) {
       ErrorManager.notifyUser('برای به‌روزرسانی پروفایل باید وارد شوید.', 'error');
       return;
@@ -140,7 +143,7 @@ const UserProfileForm: React.FC = () => {
         throw new Error(error.message || "خطا در ذخیره پروفایل");
       }
     });
-  };
+  }, [session, executeSubmit]); // Add dependencies for useCallback
 
   if (loadingProfile) { // Use new loading state
     return <LoadingMessage message="در حال بارگذاری پروفایل..." />;

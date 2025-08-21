@@ -99,7 +99,7 @@ const ContactStatisticsDashboard: React.FC = () => {
   } = useErrorHandler<{ data: StatisticsData | null; error: string | null; fromCache: boolean }>(null, { // Explicitly define TResult here
     maxRetries: 3,
     retryDelay: 1000,
-    showToast: true,
+    showToast: false, // Changed to false to manually control success toast
     customErrorMessage: t('statistics.error_loading_stats'),
     onSuccess: onSuccessStats,
     onError: onErrorStats,

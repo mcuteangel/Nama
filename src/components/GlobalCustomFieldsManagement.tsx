@@ -35,19 +35,43 @@ export function GlobalCustomFieldsManagement() {
   const [customFields, setCustomFields] = useState<TemplateViewModel[]>([]);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingField, setEditingField] = useState<CustomFieldTemplate | null>(null);
-  const [loadingTemplates, setLoadingTemplates] = useState(true); // Declared here
+
+  const onSuccessFetchTemplates = useCallback((result: { data: CustomFieldTemplate[] | null; error: string | null; fromCache: boolean }) => {
+    setCustomFields(result.data!.map((t: CustomFieldTemplate) => ({
+      id: t.id,
+      name: t.name,
+      type: t.type as TemplateType,
+      options: t.options || [],
+      description: t.description || "",
+      required: t.required
+    })));
+    if (!result.fromCache) {
+      showSuccess("قالب‌های فیلد سفارشی با موفقیت بارگذاری شدند.");
+    }
+  }, []);
+
+  const onErrorFetchTemplates = useCallback((err: Error) => {
+    console.error("Error loading custom field templates:", err);
+    showError(`خطا در دریافت لیست قالب‌های فیلدهای سفارشی: ${ErrorManager.getErrorMessage(err) || "خطای ناشناخته"}`);
+    setCustomFields([]);
+  }, []);
+
+  const {
+    isLoading: loadingTemplates,
+    executeAsync: executeLoadTemplates,
+  } = useErrorHandler<{ data: CustomFieldTemplate[] | null; error: string | null; fromCache: boolean }>(null, {
+    showToast: false, // Control toasts manually
+    onSuccess: onSuccessFetchTemplates,
+    onError: onErrorFetchTemplates,
+  });
 
   const loadTemplates = useCallback(async () => {
     if (isSessionLoading || !session?.user) {
       setCustomFields([]);
-      setLoadingTemplates(false);
       return;
     }
-    setLoadingTemplates(true);
-    const cacheKey = `custom_field_templates_${session.user.id}`;
-    const toastId = showLoading("در حال بارگذاری قالب‌های فیلد سفارشی...");
-
-    try {
+    await executeLoadTemplates(async () => {
+      const cacheKey = `custom_field_templates_${session.user.id}`;
       const { data, error, fromCache } = await fetchWithCache<CustomFieldTemplate[]>(
         cacheKey,
         async () => {
@@ -58,32 +82,12 @@ export function GlobalCustomFieldsManagement() {
           return { data: res.data, error: null };
         }
       );
-
       if (error) {
         throw new Error(error);
       }
-
-      setCustomFields(data!.map((t: CustomFieldTemplate) => ({
-        id: t.id,
-        name: t.name,
-        type: t.type as TemplateType,
-        options: t.options || [],
-        description: t.description || "",
-        required: t.required
-      })));
-
-      if (!fromCache) { // Only show success toast if not from cache
-        showSuccess("قالب‌های فیلد سفارشی با موفقیت بارگذاری شدند.");
-      }
-    } catch (err: any) {
-      console.error("Error loading custom field templates:", err);
-      showError(`خطا در دریافت لیست قالب‌های فیلدهای سفارشی: ${ErrorManager.getErrorMessage(err) || "خطای ناشناخته"}`);
-      setCustomFields([]);
-    } finally {
-      dismissToast(toastId);
-      setLoadingTemplates(false);
-    }
-  }, [session, isSessionLoading]);
+      return { data, error: null, fromCache };
+    });
+  }, [session, isSessionLoading, executeLoadTemplates]);
 
   const onSuccessOperation = useCallback(() => {
     ErrorManager.notifyUser("قالب با موفقیت حذف شد", "success");

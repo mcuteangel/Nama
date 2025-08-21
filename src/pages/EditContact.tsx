@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { showError, showLoading, showSuccess, dismissToast } from "@/utils/toast"; // Import toast functions
@@ -10,6 +10,7 @@ import { fetchWithCache } from "@/utils/cache-helpers";
 import LoadingMessage from "@/components/LoadingMessage"; // Import LoadingMessage
 import CancelButton from "@/components/CancelButton"; // Import CancelButton
 import { ErrorManager } from "@/lib/error-manager"; // Import ErrorManager
+import { useErrorHandler } from "@/hooks/use-error-handler"; // Import useErrorHandler
 
 interface PhoneNumber {
   id: string;
@@ -74,21 +75,44 @@ const EditContact = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [initialContactData, setInitialContactData] = useState<ContactDetailType | null>(null);
-  const [loading, setLoading] = useState(true);
+
+  const onSuccessFetchContact = useCallback((result: { data: ContactDetailType | null; error: string | null; fromCache: boolean }) => {
+    setInitialContactData(result.data || null);
+    if (!result.data) {
+      showError("مخاطب برای ویرایش یافت نشد.");
+      navigate("/");
+    } else {
+      if (!result.fromCache) {
+        showSuccess("اطلاعات مخاطب با موفقیت بارگذاری شد.");
+      }
+    }
+  }, [navigate]);
+
+  const onErrorFetchContact = useCallback((err: Error) => {
+    console.error("Error fetching contact details for edit:", err);
+    showError(`خطا در بارگذاری اطلاعات مخاطب: ${ErrorManager.getErrorMessage(err) || "خطای ناشناخته"}`);
+    navigate("/");
+  }, [navigate]);
+
+  const {
+    isLoading: loading,
+    executeAsync: executeFetchContact,
+  } = useErrorHandler<{ data: ContactDetailType | null; error: string | null; fromCache: boolean }>(null, {
+    showToast: false, // Control toasts manually
+    onSuccess: onSuccessFetchContact,
+    onError: onErrorFetchContact,
+  });
 
   useEffect(() => {
-    const fetchContactDetails = async () => {
+    const fetchDetails = async () => {
       if (!id) {
         showError("شناسه مخاطب برای ویرایش یافت نشد.");
         navigate("/");
         return;
       }
 
-      const cacheKey = `contact_detail_${id}`;
-      setLoading(true);
-      const toastId = showLoading("در حال بارگذاری اطلاعات مخاطب برای ویرایش..."); // Add toast
-
-      try {
+      await executeFetchContact(async () => {
+        const cacheKey = `contact_detail_${id}`;
         const { data, error, fromCache } = await fetchWithCache<ContactDetailType>(
           cacheKey,
           async () => {
@@ -118,28 +142,12 @@ const EditContact = () => {
         if (error) {
           throw new Error(error);
         }
-
-        setInitialContactData(data || null);
-        if (!data) {
-          showError("مخاطب برای ویرایش یافت نشد.");
-          navigate("/");
-        } else {
-          if (!fromCache) { // Only show success toast if not from cache
-            showSuccess("اطلاعات مخاطب با موفقیت بارگذاری شد.");
-          }
-        }
-      } catch (err: any) {
-        console.error("Error fetching contact details for edit:", err);
-        showError(`خطا در بارگذاری اطلاعات مخاطب: ${ErrorManager.getErrorMessage(err) || "خطای ناشناخته"}`); // Fixed: Use error directly
-        navigate("/");
-      } finally {
-        dismissToast(toastId); // Dismiss toast
-        setLoading(false);
-      }
+        return { data, error: null, fromCache };
+      });
     };
 
-    fetchContactDetails();
-  }, [id, navigate]);
+    fetchDetails();
+  }, [id, navigate, executeFetchContact]);
 
   if (loading) {
     return (

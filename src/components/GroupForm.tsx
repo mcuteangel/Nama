@@ -35,7 +35,6 @@ const GroupForm: React.FC<GroupFormProps> = ({ initialData, onSuccess, onCancel 
   const navigate = useNavigate();
   const { session, isLoading: isSessionLoading } = useSession();
   const [existingGroupColors, setExistingGroupColors] = useState<string[]>([]);
-  const [isFetchingColors, setIsFetchingColors] = useState(true);
 
   const {
     register,
@@ -84,24 +83,35 @@ const GroupForm: React.FC<GroupFormProps> = ({ initialData, onSuccess, onCancel 
     onError: onErrorCallback,
   });
 
+  const {
+    isLoading: isFetchingColors,
+    executeAsync: executeFetchColors,
+  } = useErrorHandler(null, {
+    showToast: false, // Don't show toast for this fetch
+    onError: (err) => {
+      console.error("Error fetching existing group colors:", err);
+      // Fallback to default color if fetch fails
+      if (!initialData) {
+        setValue('color', '#60A5FA');
+      }
+    }
+  });
+
   useEffect(() => {
-    const fetchExistingColorsAndSetDefault = async () => {
+    const fetchColors = async () => {
       if (isSessionLoading) {
-        setIsFetchingColors(true);
         return;
       }
 
       if (!session?.user) {
         setExistingGroupColors([]);
-        setIsFetchingColors(false);
         if (!initialData) {
           setValue('color', '#60A5FA');
         }
         return;
       }
 
-      setIsFetchingColors(true);
-      try {
+      await executeFetchColors(async () => {
         const { data, error } = await supabase
           .from('groups')
           .select('color')
@@ -118,18 +128,11 @@ const GroupForm: React.FC<GroupFormProps> = ({ initialData, onSuccess, onCancel 
         } else {
           setValue('color', initialData.color || findUniqueColor(currentColors));
         }
-      } catch (error: any) {
-        console.error("Error fetching existing group colors:", error);
-        if (!initialData) {
-          setValue('color', '#60A5FA');
-        }
-      } finally {
-        setIsFetchingColors(false);
-      }
+      });
     };
 
-    fetchExistingColorsAndSetDefault();
-  }, [session, isSessionLoading, initialData, setValue, findUniqueColor]);
+    fetchColors();
+  }, [session, isSessionLoading, initialData, setValue, findUniqueColor, executeFetchColors]);
 
   const onSubmit = async (values: GroupFormValues) => {
     if (!session?.user) {
