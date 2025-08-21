@@ -25,9 +25,10 @@ interface GroupFormProps {
     color?: string;
   };
   onSuccess?: () => void;
+  onCancel?: () => void; // New optional prop for cancel action
 }
 
-const GroupForm: React.FC<GroupFormProps> = ({ initialData, onSuccess }) => {
+const GroupForm: React.FC<GroupFormProps> = ({ initialData, onSuccess, onCancel }) => {
   const navigate = useNavigate();
   const {
     register,
@@ -88,6 +89,14 @@ const GroupForm: React.FC<GroupFormProps> = ({ initialData, onSuccess }) => {
     }
   };
 
+  const handleCancelClick = () => {
+    if (onCancel) {
+      onCancel();
+    } else {
+      navigate('/groups');
+    }
+  };
+
   return (
     <Card className="w-full max-w-md glass rounded-xl p-6 bg-white/90 dark:bg-gray-900/90">
       <CardHeader className="text-center">
@@ -118,7 +127,7 @@ const GroupForm: React.FC<GroupFormProps> = ({ initialData, onSuccess }) => {
             <Button
               type="button"
               variant="outline"
-              onClick={() => navigate('/groups')}
+              onClick={handleCancelClick}
               className="px-6 py-2 rounded-md text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
               disabled={isSubmitting}
             >

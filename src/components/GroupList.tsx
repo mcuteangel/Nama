@@ -75,6 +75,7 @@ const GroupItem = ({ group, onGroupUpdated, onGroupDeleted }: { group: Group; on
                 setIsEditDialogOpen(false);
                 onGroupUpdated();
               }}
+              onCancel={() => setIsEditDialogOpen(false)} // Pass onCancel to close dialog
             />
           </DialogContent>
         </Dialog>
@@ -162,10 +163,13 @@ const GroupList = () => {
           </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px] p-0 border-none bg-transparent shadow-none">
-          <GroupForm onSuccess={() => {
-            setIsAddGroupDialogOpen(false);
-            fetchGroups();
-          }} />
+          <GroupForm
+            onSuccess={() => {
+              setIsAddGroupDialogOpen(false);
+              fetchGroups();
+            }}
+            onCancel={() => setIsAddGroupDialogOpen(false)} // Pass onCancel to close dialog
+          />
         </DialogContent>
       </Dialog>
 
