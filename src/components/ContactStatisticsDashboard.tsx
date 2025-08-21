@@ -142,7 +142,7 @@ const ContactStatisticsDashboard: React.FC = () => {
         ContactService.getContactsByGender(userId),
         ContactService.getContactsByGroup(userId),
         ContactService.getContactsByPreferredMethod(userId),
-        ContactService.getUpcomingBirthdays(userId),
+        ContactService.getUpcomingBirthdays(), // فراخوانی بدون پارامتر
       ]);
 
       if (totalError) throw new Error(totalError);

@@ -210,8 +210,8 @@ export const ContactService = {
     return { data: data as Array<{ method: string; count: number }>, error: null };
   },
 
-  async getUpcomingBirthdays(userId: string): Promise<{ data: Array<{ first_name: string; last_name: string; birthday: string }> | null; error: string | null }> {
-    const { data, error } = await supabase.rpc('get_upcoming_birthdays', { user_id_param: userId });
+  async getUpcomingBirthdays(): Promise<{ data: Array<{ first_name: string; last_name: string; birthday: string }> | null; error: string | null }> {
+    const { data, error } = await supabase.rpc('get_upcoming_birthdays'); // بدون پارامتر user_id_param
 
     if (error) {
       return { data: null, error: error.message };
