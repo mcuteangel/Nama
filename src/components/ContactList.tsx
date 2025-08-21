@@ -155,13 +155,16 @@ const ContactList = ({ searchTerm, selectedGroup, companyFilter, sortOption }: C
   const {
     isLoading,
     executeAsync,
-  } = useErrorHandler(null, {
+  } = useErrorHandler<{ data: Contact[] | null; error: string | null; fromCache: boolean }>(null, {
     maxRetries: 3,
     retryDelay: 1000,
     showToast: true,
     customErrorMessage: "خطا در بارگذاری مخاطبین",
-    onSuccess: () => {
-      ErrorManager.notifyUser("مخاطبین با موفقیت بارگذاری شدند.", 'success');
+    onSuccess: (result) => { // Added result parameter
+      // Only show success toast if data was NOT from cache
+      if (result && !result.fromCache) {
+        ErrorManager.notifyUser("مخاطبین با موفقیت بارگذاری شدند.", 'success');
+      }
     },
     onError: (err) => {
       ErrorManager.logError(err, { component: 'ContactList', action: 'fetchContacts' });
@@ -177,7 +180,7 @@ const ContactList = ({ searchTerm, selectedGroup, companyFilter, sortOption }: C
     const cacheKey = `contacts_list_${session.user.id}_${searchTerm}_${selectedGroup}_${companyFilter}_${sortOption}`;
     
     await executeAsync(async () => {
-      const { data, error } = await fetchWithCache<Contact[]>(
+      const { data, error, fromCache } = await fetchWithCache<Contact[]>(
         cacheKey,
         async () => {
           const result = await ContactService.getFilteredContacts(
@@ -195,7 +198,7 @@ const ContactList = ({ searchTerm, selectedGroup, companyFilter, sortOption }: C
         throw new Error(error);
       }
       setContacts(data || []);
-      return data;
+      return { data, error: null, fromCache }; // Ensure error: null is returned
     });
   }, [session, isSessionLoading, searchTerm, selectedGroup, companyFilter, sortOption, executeAsync]);
 
