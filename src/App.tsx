@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'; // Import BrowserRouter
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import Index from './pages/Contacts';
 import Login from './pages/Login';
 import AddContact from './pages/AddContact';
@@ -12,8 +12,10 @@ import BottomNavigationBar from './components/BottomNavigationBar';
 import Sidebar from './components/Sidebar';
 import { Toaster } from 'sonner';
 import { cn } from './lib/utils';
+import NotFound from './pages/NotFound'; // Import NotFound component
 
-function App() {
+// New component to handle routing and layout based on location
+function AppLayout() {
   const location = useLocation();
   const [isMobile, setIsMobile] = useState(false);
 
@@ -24,44 +26,45 @@ function App() {
 
     handleResize(); // Set initial state
     window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('change', handleResize); // Corrected event listener cleanup
+    return () => window.removeEventListener('resize', handleResize); // Corrected event listener cleanup
   }, []);
 
   const isAuthPage = location.pathname === '/login';
 
   return (
-    <SessionContextProvider supabaseClient={supabase}>
-      <Toaster />
-      <div className="flex flex-col min-h-screen bg-background">
-        {!isAuthPage && (
-          <>
-            {isMobile ? <MobileHeader /> : <Sidebar />}
-            {isMobile && <BottomNavigationBar />}
-          </>
-        )}
-        <div className={cn(
-          "flex-grow",
-          !isAuthPage && (isMobile ? "pt-[64px] pb-16" : "pr-64")
-        )}>
-          <main className="h-full w-full flex flex-col items-center justify-center p-4 bg-gradient-to-br from-blue-100 to-purple-100 dark:from-gray-900 dark:to-gray-800">
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/add-contact" element={<AddContact />} />
-              <Route path="/contacts/:id" element={<ContactDetail />} />
-              <Route path="/groups" element={<Groups />} />
-            </Routes>
-          </main>
-        </div>
+    <div className="flex flex-col min-h-screen bg-background">
+      {!isAuthPage && (
+        <>
+          {isMobile ? <MobileHeader /> : <Sidebar />}
+          {isMobile && <BottomNavigationBar />}
+        </>
+      )}
+      <div className={cn(
+        "flex-grow",
+        !isAuthPage && (isMobile ? "pt-[64px] pb-16" : "pr-64")
+      )}>
+        <main className="h-full w-full flex flex-col items-center justify-center p-4 bg-gradient-to-br from-blue-100 to-purple-100 dark:from-gray-900 dark:to-gray-800">
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/add-contact" element={<AddContact />} />
+            <Route path="/contacts/:id" element={<ContactDetail />} />
+            <Route path="/groups" element={<Groups />} />
+            <Route path="*" element={<NotFound />} /> {/* Add catch-all route for 404 */}
+          </Routes>
+        </main>
       </div>
-    </SessionContextProvider>
+    </div>
   );
 }
 
-export default function WrappedApp() { // Export a new component that wraps App with BrowserRouter
+export default function App() {
   return (
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
+    <SessionContextProvider supabaseClient={supabase}>
+      <Toaster />
+      <BrowserRouter>
+        <AppLayout />
+      </BrowserRouter>
+    </SessionContextProvider>
   );
 }
