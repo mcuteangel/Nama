@@ -16,24 +16,23 @@ import { Toaster } from 'sonner';
 import { cn } from './lib/utils';
 import NotFound from './pages/NotFound';
 import ProtectedRoute from './components/ProtectedRoute';
+import { TooltipProvider } from './components/ui/tooltip'; // Import TooltipProvider
 
 function AppLayout() {
   const location = useLocation();
   const mobileBreakpoint = 768; // Tailwind's 'md' breakpoint
 
   const [isMobile, setIsMobile] = useState(() => window.innerWidth < mobileBreakpoint);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(() => window.innerWidth >= mobileBreakpoint); // Open by default on desktop
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Changed to false for default closed state
 
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < mobileBreakpoint);
-      // Do NOT force isSidebarOpen here. It should be controlled by user interaction.
-      // If it transitions from mobile to desktop, the initial state will handle it.
     };
 
     window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize); // Corrected event listener cleanup
-  }, []); // Empty dependency array to run once on mount
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const isAuthPage = location.pathname === '/login';
 
@@ -77,7 +76,9 @@ export default function App() {
     <SessionContextProvider supabaseClient={supabase}>
       <Toaster />
       <BrowserRouter>
-        <AppLayout />
+        <TooltipProvider> {/* Wrap AppLayout with TooltipProvider */}
+          <AppLayout />
+        </TooltipProvider>
       </BrowserRouter>
     </SessionContextProvider>
   );

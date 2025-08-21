@@ -5,6 +5,7 @@ import { LogOut, PlusCircle, Users, Home, Menu } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { showError, showSuccess, showLoading, dismissToast } from "@/utils/toast";
 import { cn } from "@/lib/utils";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"; // Import Tooltip components
 
 interface SidebarProps {
   isOpen: boolean;
@@ -61,34 +62,43 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
       </div>
       <nav className="flex flex-col gap-2 p-4 flex-grow">
         {navItems.map((item) => (
-          <Button
-            key={item.path}
-            variant="ghost"
-            className={cn(
-              "w-full text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-              isOpen ? "justify-start" : "justify-center" // Align content based on open state
-            )}
-            asChild
-          >
-            <Link to={item.path} className="flex items-center">
-              <item.icon size={20} className={cn(isOpen ? "me-2" : "mx-auto")} />
-              {isOpen && <span className="whitespace-nowrap overflow-hidden">{item.name}</span>}
-            </Link>
-          </Button>
+          <Tooltip key={item.path}>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                className={cn(
+                  "w-full text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                  isOpen ? "justify-start" : "justify-center" // Align content based on open state
+                )}
+                asChild
+              >
+                <Link to={item.path} className="flex items-center">
+                  <item.icon size={20} className={cn(isOpen ? "me-2" : "mx-auto")} />
+                  {isOpen && <span className="whitespace-nowrap overflow-hidden">{item.name}</span>}
+                </Link>
+              </Button>
+            </TooltipTrigger>
+            {!isOpen && <TooltipContent side="left">{item.name}</TooltipContent>}
+          </Tooltip>
         ))}
       </nav>
       <div className="p-4 border-t border-sidebar-border dark:border-sidebar-border">
-        <Button
-          variant="ghost"
-          onClick={handleLogout}
-          className={cn(
-            "w-full text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-            isOpen ? "justify-start" : "justify-center" // Align content based on open state
-          )}
-        >
-          <LogOut size={20} className={cn(isOpen ? "me-2" : "mx-auto")} />
-          {isOpen && <span className="whitespace-nowrap overflow-hidden">خروج</span>}
-        </Button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              onClick={handleLogout}
+              className={cn(
+                "w-full text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                isOpen ? "justify-start" : "justify-center" // Align content based on open state
+              )}
+            >
+              <LogOut size={20} className={cn(isOpen ? "me-2" : "mx-auto")} />
+              {isOpen && <span className="whitespace-nowrap overflow-hidden">خروج</span>}
+            </Button>
+          </TooltipTrigger>
+          {!isOpen && <TooltipContent side="left">خروج</TooltipContent>}
+        </Tooltip>
       </div>
     </aside>
   );
