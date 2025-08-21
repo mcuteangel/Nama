@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -14,7 +14,8 @@ import { useErrorHandler } from '@/hooks/use-error-handler';
 import { ErrorManager } from '@/lib/error-manager';
 import { User } from 'lucide-react';
 import { fetchWithCache, invalidateCache } from "@/utils/cache-helpers";
-import LoadingMessage from './LoadingMessage'; // Import LoadingMessage
+import LoadingMessage from './LoadingMessage';
+import { showLoading, dismissToast, showSuccess, showError } from '@/utils/toast'; // Import toast functions
 
 const profileSchema = z.object({
   first_name: z.string().optional(),
@@ -26,33 +27,26 @@ type ProfileFormValues = z.infer<typeof profileSchema>;
 const UserProfileForm: React.FC = () => {
   const { session, isLoading: isSessionLoading } = useSession();
 
-  const handleSuccess = useCallback(() => {
-    ErrorManager.notifyUser('پروفایل با موفقیت به‌روزرسانی شد.', 'success');
-    invalidateCache(`user_profile_${session?.user?.id}`);
-  }, [session]);
-
-  const handleError = useCallback((err: Error) => {
-    console.error("Supabase profile operation error:", err);
-    ErrorManager.logError(err, {
-      component: "UserProfileForm",
-      action: "profileOperation",
-    });
-  }, []);
-
+  // This useErrorHandler instance is primarily for the SUBMIT operation
   const {
     isLoading: isSubmitting,
-    error,
-    errorMessage,
-    retry: retryLastOperation,
-    executeAsync,
-    retryCount,
+    error: submitError, // Renamed to avoid conflict
+    errorMessage: submitErrorMessage, // Renamed
+    retry: retrySubmit, // Renamed
+    executeAsync: executeSubmit, // Renamed
+    retryCount: submitRetryCount, // Renamed
   } = useErrorHandler(null, {
     maxRetries: 3,
     retryDelay: 1000,
-    showToast: true,
+    showToast: true, // We want toast for submit success/error
     customErrorMessage: "خطایی در به‌روزرسانی پروفایل رخ داد",
-    onSuccess: handleSuccess,
-    onError: handleError,
+    onSuccess: () => {
+      ErrorManager.notifyUser('پروفایل با موفقیت به‌روزرسانی شد.', 'success');
+      invalidateCache(`user_profile_${session?.user?.id}`);
+    },
+    onError: (err) => {
+      ErrorManager.logError(err, { component: "UserProfileForm", action: "submitProfile" });
+    },
   });
 
   const form = useForm<ProfileFormValues>({
@@ -63,45 +57,63 @@ const UserProfileForm: React.FC = () => {
     },
   });
 
-  useEffect(() => {
-    const fetchProfile = async () => {
-      if (isSessionLoading || !session?.user) {
-        return;
+  const [loadingProfile, setLoadingProfile] = useState(true); // New state for loading profile
+  const [profileFetchError, setProfileFetchError] = useState<string | null>(null); // New state for fetch error
+
+  const fetchProfile = useCallback(async () => {
+    if (isSessionLoading || !session?.user) {
+      setLoadingProfile(false);
+      return;
+    }
+
+    setLoadingProfile(true);
+    setProfileFetchError(null);
+    const toastId = showLoading("در حال بارگذاری پروفایل...");
+
+    try {
+      const cacheKey = `user_profile_${session.user.id}`;
+      const { data, error, fromCache } = await fetchWithCache<{ first_name: string | null; last_name: string | null }>(
+        cacheKey,
+        async () => {
+          const { data, error } = await supabase
+            .from('profiles')
+            .select('first_name, last_name')
+            .eq('id', session.user.id)
+            .maybeSingle();
+
+          if (error) {
+            throw new Error(error.message || "خطا در دریافت اطلاعات پروفایل");
+          }
+          return { data: data, error: null };
+        }
+      );
+
+      if (error) {
+        throw new Error(error);
       }
 
-      const cacheKey = `user_profile_${session.user.id}`;
-      await executeAsync(async () => {
-        const { data, error } = await fetchWithCache<{ first_name: string | null; last_name: string | null }>(
-          cacheKey,
-          async () => {
-            const { data, error } = await supabase
-              .from('profiles')
-              .select('first_name, last_name')
-              .eq('id', session.user.id)
-              .maybeSingle();
-
-            if (error) {
-              throw new Error(error.message || "خطا در دریافت اطلاعات پروفایل");
-            }
-            return { data: data, error: null };
-          }
-        );
-
-        form.reset({
-          first_name: data?.first_name ?? undefined,
-          last_name: data?.last_name ?? undefined,
-        });
-      }, {
-        component: "UserProfileForm",
-        action: "fetchProfile",
-        loadingMessage: "در حال بارگذاری پروفایل...", // Added to executeAsync
-        successMessage: "پروفایل با موفقیت بارگذاری شد.", // Added to executeAsync
-        errorMessage: "خطا در دریافت اطلاعات پروفایل", // Added to executeAsync
+      form.reset({
+        first_name: data?.first_name ?? undefined,
+        last_name: data?.last_name ?? undefined,
       });
-    };
 
+      if (!fromCache) { // Only show success toast if not from cache
+        showSuccess("پروفایل با موفقیت بارگذاری شد.");
+      }
+    } catch (err: any) {
+      const msg = ErrorManager.getErrorMessage(err);
+      setProfileFetchError(msg);
+      showError(`خطا در بارگذاری پروفایل: ${msg}`);
+      ErrorManager.logError(err, { component: "UserProfileForm", action: "fetchProfile" });
+    } finally {
+      dismissToast(toastId);
+      setLoadingProfile(false);
+    }
+  }, [session, isSessionLoading, form]);
+
+  useEffect(() => {
     fetchProfile();
-  }, [session, isSessionLoading, form, executeAsync]);
+  }, [fetchProfile]);
 
   const onSubmit = async (values: ProfileFormValues) => {
     if (!session?.user) {
@@ -109,7 +121,7 @@ const UserProfileForm: React.FC = () => {
       return;
     }
 
-    await executeAsync(async () => {
+    await executeSubmit(async () => { // Use executeSubmit here
       const { error } = await supabase
         .from('profiles')
         .upsert(
@@ -124,13 +136,10 @@ const UserProfileForm: React.FC = () => {
       if (error) {
         throw new Error(error.message || "خطا در ذخیره پروفایل");
       }
-    }, {
-      component: "UserProfileForm",
-      action: "submitProfile"
     });
   };
 
-  if (isSessionLoading) {
+  if (loadingProfile) { // Use new loading state
     return <LoadingMessage message="در حال بارگذاری پروفایل..." />;
   }
 
@@ -140,18 +149,18 @@ const UserProfileForm: React.FC = () => {
         <CardTitle className="text-2xl font-bold text-gray-800 dark:text-gray-100">
           پروفایل کاربری
         </CardTitle>
-        {error && (
+        {submitError && ( // Use submitError
           <div className="text-sm text-destructive flex items-center justify-center gap-2 mt-2">
-            <span>{errorMessage}</span>
-            {retryCount > 0 && (
+            <span>{submitErrorMessage}</span>
+            {submitRetryCount > 0 && (
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={retryLastOperation}
+                onClick={retrySubmit}
                 disabled={isSubmitting}
                 className="text-destructive hover:bg-destructive/10"
               >
-                تلاش مجدد ({retryCount} از ۳)
+                تلاش مجدد ({submitRetryCount} از ۳)
               </Button>
             )}
           </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
@@ -36,13 +36,14 @@ export function GlobalCustomFieldsManagement() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingField, setEditingField] = useState<CustomFieldTemplate | null>(null);
 
+  // This useErrorHandler is for DELETE and EDIT operations, not for initial load
   const {
-    isLoading: loading,
-    error,
-    errorMessage,
-    retryCount,
-    retry: retryLastOperation,
-    executeAsync,
+    isLoading: isOperationLoading, // Renamed to avoid conflict with loadTemplates's loading
+    error: operationError,
+    errorMessage: operationErrorMessage,
+    retryCount: operationRetryCount,
+    retry: retryOperation,
+    executeAsync: executeOperation,
   } = useErrorHandler(null, {
     maxRetries: 3,
     retryDelay: 1000,
@@ -62,30 +63,34 @@ export function GlobalCustomFieldsManagement() {
     }
   });
 
-  const loadTemplates = async () => {
+  const [loadingTemplates, setLoadingTemplates] = useState(true); // New state for loading templates
+
+  const loadTemplates = useCallback(async () => {
     if (isSessionLoading || !session?.user) {
       setCustomFields([]);
+      setLoadingTemplates(false);
       return;
     }
+    setLoadingTemplates(true);
     const cacheKey = `custom_field_templates_${session.user.id}`;
-    const toastId = showLoading("در حال بارگذاری قالب‌های فیلد سفارشی..."); // Add toast
+    const toastId = showLoading("در حال بارگذاری قالب‌های فیلد سفارشی...");
 
-    const { data, error } = await fetchWithCache<CustomFieldTemplate[]>(
-      cacheKey,
-      async () => {
-        const res = await ContactService.getAllCustomFieldTemplates();
-        if (res.error) {
-          throw new Error(res.error || "خطا در دریافت لیست قالب‌های فیلدهای سفارشی");
+    try {
+      const { data, error, fromCache } = await fetchWithCache<CustomFieldTemplate[]>(
+        cacheKey,
+        async () => {
+          const res = await ContactService.getAllCustomFieldTemplates();
+          if (res.error) {
+            throw new Error(res.error || "خطا در دریافت لیست قالب‌های فیلدهای سفارشی");
+          }
+          return { data: res.data, error: null };
         }
-        return { data: res.data, error: null };
-      }
-    );
+      );
 
-    if (error) {
-      console.error("Error loading custom field templates:", error);
-      showError(`خطا در دریافت لیست قالب‌های فیلدهای سفارشی: ${error || "خطای ناشناخته"}`); // Fixed: Use error directly
-      setCustomFields([]);
-    } else {
+      if (error) {
+        throw new Error(error);
+      }
+
       setCustomFields(data!.map((t: CustomFieldTemplate) => ({
         id: t.id,
         name: t.name,
@@ -94,17 +99,26 @@ export function GlobalCustomFieldsManagement() {
         description: t.description || "",
         required: t.required
       })));
-      showSuccess("قالب‌های فیلد سفارشی با موفقیت بارگذاری شدند."); // Add success toast
+
+      if (!fromCache) { // Only show success toast if not from cache
+        showSuccess("قالب‌های فیلد سفارشی با موفقیت بارگذاری شدند.");
+      }
+    } catch (err: any) {
+      console.error("Error loading custom field templates:", err);
+      showError(`خطا در دریافت لیست قالب‌های فیلدهای سفارشی: ${ErrorManager.getErrorMessage(err) || "خطای ناشناخته"}`);
+      setCustomFields([]);
+    } finally {
+      dismissToast(toastId);
+      setLoadingTemplates(false);
     }
-    dismissToast(toastId); // Dismiss toast
-  };
+  }, [session, isSessionLoading]);
 
   useEffect(() => {
     loadTemplates();
-  }, [session, isSessionLoading]);
+  }, [loadTemplates]);
 
   const handleDeleteField = async (id: string) => {
-    await executeAsync(async () => {
+    await executeOperation(async () => { // Use executeOperation
       const res = await ContactService.deleteCustomFieldTemplate(id);
       if (res.error) {
         throw new Error(res.error || "خطا در حذف قالب فیلد سفارشی");
@@ -113,9 +127,6 @@ export function GlobalCustomFieldsManagement() {
       ErrorManager.notifyUser("قالب با موفقیت حذف شد", "success");
       invalidateCache(`custom_field_templates_${session?.user?.id}`);
       await loadTemplates();
-    }, {
-      component: "GlobalCustomFieldsManagement",
-      action: "deleteCustomField"
     });
   };
 
@@ -148,7 +159,7 @@ export function GlobalCustomFieldsManagement() {
           <AddCustomFieldTemplateDialog onTemplateAdded={loadTemplates} />
         </div>
 
-        {loading && customFields.length === 0 ? (
+        {loadingTemplates && customFields.length === 0 ? (
           <LoadingMessage message="در حال بارگذاری فیلدهای سفارشی..." />
         ) : customFields.length === 0 ? (
           <div className="glass p-8 rounded-lg text-center">
@@ -207,7 +218,7 @@ export function GlobalCustomFieldsManagement() {
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
-                          <CancelButton onClick={() => {}} text="لغو" /> {/* Use CancelButton */}
+                          <CancelButton onClick={() => {}} text="لغو" />
                           <AlertDialogAction onClick={() => handleDeleteField(field.id)} className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold">حذف</AlertDialogAction>
                         </AlertDialogFooter>
                       </AlertDialogContent>
@@ -221,7 +232,7 @@ export function GlobalCustomFieldsManagement() {
       </CardContent>
 
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <FormDialogWrapper> {/* Use the new wrapper */}
+        <FormDialogWrapper>
           <CustomFieldTemplateForm
             initialData={editingField || undefined}
             onSuccess={handleEditSuccess}

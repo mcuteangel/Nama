@@ -8,9 +8,10 @@ import { showSuccess, showError, showLoading, dismissToast } from "@/utils/toast
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import GroupForm from "./GroupForm";
-import { invalidateCache } from "@/utils/cache-helpers";
+import { invalidateCache, fetchWithCache } from "@/utils/cache-helpers"; // Import fetchWithCache
 import LoadingMessage from "./LoadingMessage"; // Import LoadingMessage
 import CancelButton from "./CancelButton"; // Import CancelButton
+import { ErrorManager } from "@/lib/error-manager"; // Import ErrorManager
 
 interface Group {
   id: string;
@@ -124,23 +125,37 @@ const GroupList = () => {
       return;
     }
 
-    const toastId = showLoading("در حال بارگذاری گروه‌ها...");
     setLoadingGroups(true);
+    const cacheKey = `user_groups_${session.user.id}`;
+    const toastId = showLoading("در حال بارگذاری گروه‌ها...");
 
     try {
-      const { data, error } = await supabase
-        .from("groups")
-        .select("*")
-        .eq("user_id", session.user.id)
-        .order("name", { ascending: true });
+      const { data, error, fromCache } = await fetchWithCache<Group[]>(
+        cacheKey,
+        async () => {
+          const { data, error } = await supabase
+            .from("groups")
+            .select("*")
+            .eq("user_id", session.user.id)
+            .order("name", { ascending: true });
 
-      if (error) throw error;
+          if (error) throw error;
+
+          return { data: data as Group[], error: null };
+        }
+      );
+
+      if (error) {
+        throw new Error(error);
+      }
 
       setGroups(data as Group[]);
-      showSuccess("گروه‌ها با موفقیت بارگذاری شدند.");
+      if (!fromCache) { // Only show success toast if not from cache
+        showSuccess("گروه‌ها با موفقیت بارگذاری شدند.");
+      }
     } catch (error: any) {
       console.error("Error fetching groups:", error);
-      showError(`خطا در بارگذاری گروه‌ها: ${error.message || "خطای ناشناخته"}`);
+      showError(`خطا در بارگذاری گروه‌ها: ${ErrorManager.getErrorMessage(error) || "خطای ناشناخته"}`);
       setGroups([]);
     } finally {
       dismissToast(toastId);

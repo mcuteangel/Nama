@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { fetchWithCache } from "@/utils/cache-helpers";
 import LoadingMessage from "@/components/LoadingMessage"; // Import LoadingMessage
 import CancelButton from "@/components/CancelButton"; // Import CancelButton
+import { ErrorManager } from "@/lib/error-manager"; // Import ErrorManager
 
 interface PhoneNumber {
   id: string;
@@ -87,47 +88,54 @@ const EditContact = () => {
       setLoading(true);
       const toastId = showLoading("در حال بارگذاری اطلاعات مخاطب برای ویرایش..."); // Add toast
 
-      const { data, error } = await fetchWithCache<ContactDetailType>(
-        cacheKey,
-        async () => {
-          const { data, error } = await supabase
-            .from("contacts")
-            .select("id, first_name, last_name, gender, position, company, street, city, state, zip_code, country, notes, created_at, updated_at, birthday, avatar_url, preferred_contact_method, phone_numbers(id, phone_type, phone_number, extension), email_addresses(id, email_type, email_address), social_links(id, type, url), contact_groups(group_id), custom_fields(id, template_id, field_value, custom_field_templates(name, type, options))")
-            .eq("id", id)
-            .single();
+      try {
+        const { data, error, fromCache } = await fetchWithCache<ContactDetailType>(
+          cacheKey,
+          async () => {
+            const { data, error } = await supabase
+              .from("contacts")
+              .select("id, first_name, last_name, gender, position, company, street, city, state, zip_code, country, notes, created_at, updated_at, birthday, avatar_url, preferred_contact_method, phone_numbers(id, phone_type, phone_number, extension), email_addresses(id, email_type, email_address), social_links(id, type, url), contact_groups(group_id), custom_fields(id, template_id, field_value, custom_field_templates(name, type, options))")
+              .eq("id", id)
+              .single();
 
-          if (error) throw error;
+            if (error) throw error;
 
-          if (data) {
-            const formattedData: ContactDetailType = {
-              ...data,
-              phone_numbers: data.phone_numbers || [],
-              email_addresses: data.email_addresses || [],
-              social_links: data.social_links || [],
-              groupId: data.contact_groups[0]?.group_id || null,
-              custom_fields: data.custom_fields || [],
-            } as ContactDetailType;
-            return { data: formattedData, error: null };
+            if (data) {
+              const formattedData: ContactDetailType = {
+                ...data,
+                phone_numbers: data.phone_numbers || [],
+                email_addresses: data.email_addresses || [],
+                social_links: data.social_links || [],
+                groupId: data.contact_groups[0]?.group_id || null,
+                custom_fields: data.custom_fields || [],
+              } as ContactDetailType;
+              return { data: formattedData, error: null };
+            }
+            return { data: null, error: "مخاطب برای ویرایش یافت نشد." };
           }
-          return { data: null, error: "مخاطب یافت نشد." };
-        }
-      );
+        );
 
-      if (error) {
-        console.error("Error fetching contact details for edit:", error);
-        showError(`خطا در بارگذاری اطلاعات مخاطب: ${error || "خطای ناشناخته"}`); // Fixed: Use error directly
-        navigate("/");
-      } else {
+        if (error) {
+          throw new Error(error);
+        }
+
         setInitialContactData(data || null);
         if (!data) {
           showError("مخاطب برای ویرایش یافت نشد.");
           navigate("/");
         } else {
-          showSuccess("اطلاعات مخاطب با موفقیت بارگذاری شد."); // Add success toast
+          if (!fromCache) { // Only show success toast if not from cache
+            showSuccess("اطلاعات مخاطب با موفقیت بارگذاری شد.");
+          }
         }
+      } catch (err: any) {
+        console.error("Error fetching contact details for edit:", err);
+        showError(`خطا در بارگذاری اطلاعات مخاطب: ${ErrorManager.getErrorMessage(err) || "خطای ناشناخته"}`); // Fixed: Use error directly
+        navigate("/");
+      } finally {
+        dismissToast(toastId); // Dismiss toast
+        setLoading(false);
       }
-      dismissToast(toastId); // Dismiss toast
-      setLoading(false);
     };
 
     fetchContactDetails();

@@ -13,6 +13,7 @@ import { useSession } from "@/integrations/supabase/auth";
 import FormDialogWrapper from "./FormDialogWrapper"; // Import the new wrapper
 import LoadingMessage from "./LoadingMessage"; // Import LoadingMessage
 import CancelButton from "./CancelButton"; // Import CancelButton
+import { fetchWithCache } from "@/utils/cache-helpers"; // Import fetchWithCache
 
 interface UserProfile {
   id: string;
@@ -121,24 +122,43 @@ const UserList: React.FC = () => {
   const [isAddUserDialogOpen, setIsAddUserDialogOpen] = useState(false);
   const { t } = useTranslation();
 
-  const onSuccessFetchUsers = useCallback(() => {
-    // ErrorManager.notifyUser(t('user_management.users_loaded_success'), 'success'); // Removed as per useErrorHandler's showToast
-  }, [t]);
-
-  const onErrorFetchUsers = useCallback((err: Error) => {
-    ErrorManager.logError(err, { component: 'UserList', action: 'fetchUsers' });
-  }, []);
-
+  // This useErrorHandler is for the DELETE operation
   const {
-    isLoading: loadingUsers,
-    executeAsync: executeFetchUsers,
+    isLoading: isDeleting,
+    executeAsync: executeDelete,
   } = useErrorHandler(null, {
     maxRetries: 3,
     retryDelay: 1000,
     showToast: true,
+    customErrorMessage: t('user_management.error_deleting_user'),
+    onSuccess: useCallback(() => {
+      ErrorManager.notifyUser(t('user_management.user_deleted_success'), 'success');
+      // No need to call onUserDeleted here, fetchUsers will be called after this.
+    }, [t]),
+    onError: useCallback((err) => {
+      // This onError is for the overall hook, specific user.id is not available here.
+      // The UserItem's onError will log the specific user.id.
+      ErrorManager.logError(err, { component: 'UserList', action: 'deleteUser' });
+    }, []),
+  });
+
+  // New useErrorHandler for FETCHING users
+  const {
+    isLoading: loadingUsers,
+    executeAsync: executeFetchUsers,
+  } = useErrorHandler<{ data: UserProfile[] | null; error: string | null; fromCache: boolean }>(null, {
+    maxRetries: 3,
+    retryDelay: 1000,
+    showToast: false, // IMPORTANT: Set to false to control toast manually
     customErrorMessage: t('user_management.error_loading_users'),
-    onSuccess: onSuccessFetchUsers,
-    onError: onErrorFetchUsers,
+    onSuccess: (result) => {
+      if (result && !result.fromCache) {
+        ErrorManager.notifyUser(t('user_management.users_loaded_success'), 'success');
+      }
+    },
+    onError: (err) => {
+      ErrorManager.logError(err, { component: 'UserList', action: 'fetchUsers' });
+    },
   });
 
   const fetchUsers = useCallback(async () => {
@@ -158,10 +178,18 @@ const UserList: React.FC = () => {
       return;
     }
 
+    const cacheKey = `user_list_${session.user.id}`; // Add cache key for user list
     await executeFetchUsers(async () => {
-      const { data, error } = await UserManagementService.getAllUsers();
+      const { data, error, fromCache } = await fetchWithCache<UserProfile[]>(
+        cacheKey,
+        async () => {
+          const res = await UserManagementService.getAllUsers();
+          return { data: res.data, error: res.error };
+        }
+      );
       if (error) throw new Error(error);
       setUsers(data || []);
+      return { data, error: null, fromCache }; // Ensure error: null is returned
     });
   }, [session, isSessionLoading, executeFetchUsers, t]);
 
