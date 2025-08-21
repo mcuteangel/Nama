@@ -3,17 +3,23 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CardContent } from "@/components/ui/card";
-import { useForm, useFieldArray } from "react-hook-form"; // Import useFieldArray
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import React, { useEffect, useState } from "react"; // Import useState
 import { useSession } from "@/integrations/supabase/auth";
 import AddGroupDialog from "./AddGroupDialog";
 import { useGroups } from "@/hooks/use-groups";
 import { useContactFormLogic } from "@/hooks/use-contact-form-logic";
-import { PlusCircle, XCircle } from "lucide-react"; // Import icons
+import { ContactService } from "@/services/contact-service"; // Import ContactService
+import { CustomFieldTemplate } from "@/domain/schemas/custom-field-template"; // Import CustomFieldTemplate type
+import { CalendarIcon } from "lucide-react"; // Import CalendarIcon
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { format } from "date-fns-jalali";
+import { JalaliCalendar } from "@/components/JalaliCalendar";
+import { cn } from "@/lib/utils";
 
 // Define the schema for the form using Zod
 const formSchema = z.object({
@@ -28,9 +34,8 @@ const formSchema = z.object({
   notes: z.string().optional(),
   groupId: z.string().optional(), // New field for group ID
   customFields: z.array(z.object({
-    id: z.string().optional(), // For existing custom fields
-    field_name: z.string().min(1, { message: "نام فیلد سفارشی نمی‌تواند خالی باشد." }),
-    field_value: z.string().min(1, { message: "مقدار فیلد سفارشی نمی‌تواند خالی باشد." }),
+    template_id: z.string().min(1, { message: "شناسه قالب فیلد سفارشی الزامی است." }),
+    value: z.string().min(1, { message: "مقدار فیلد سفارشی نمی‌تواند خالی باشد." }),
   })).optional(),
 });
 
@@ -46,8 +51,8 @@ interface ContactFormProps {
     notes?: string;
     phoneNumber?: string;
     emailAddress?: string;
-    groupId?: string; // Added for initial data
-    custom_fields?: { id: string; field_name: string; field_value: string }[]; // Added for initial custom fields
+    groupId?: string;
+    custom_fields?: { id: string; template_id: string; field_value: string; custom_field_templates: { name: string; type: string; options?: string[] } }[]; // Updated type for custom_fields
   };
   contactId?: string;
 }
@@ -55,9 +60,10 @@ interface ContactFormProps {
 const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => {
   const navigate = useNavigate();
   const { session } = useSession();
-  const { groups, fetchGroups } = useGroups(); // Use the new useGroups hook
+  const { groups, fetchGroups } = useGroups();
+  const [availableTemplates, setAvailableTemplates] = useState<CustomFieldTemplate[]>([]);
+  const [loadingTemplates, setLoadingTemplates] = useState(true);
 
-  // Initialize react-hook-form
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -70,19 +76,30 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
       company: initialData?.company || "",
       address: initialData?.address || "",
       notes: initialData?.notes || "",
-      groupId: initialData?.groupId || "", // Set initial group ID
-      customFields: initialData?.custom_fields || [], // Set initial custom fields
+      groupId: initialData?.groupId || "",
+      customFields: initialData?.custom_fields?.map(cf => ({
+        template_id: cf.template_id,
+        value: cf.field_value,
+      })) || [],
     },
   });
 
-  // Use useFieldArray for dynamic custom fields
-  const { fields, append, remove } = useFieldArray({
-    control: form.control,
-    name: "customFields",
-  });
+  const { onSubmit } = useContactFormLogic(contactId, navigate, session, form, availableTemplates);
 
-  // Use the new useContactFormLogic hook for submission
-  const { onSubmit } = useContactFormLogic(contactId, navigate, session, form);
+  useEffect(() => {
+    const fetchTemplates = async () => {
+      setLoadingTemplates(true);
+      const { data, error } = await ContactService.getAllCustomFieldTemplates();
+      if (error) {
+        console.error("Error fetching custom field templates:", error);
+        setAvailableTemplates([]);
+      } else {
+        setAvailableTemplates(data || []);
+      }
+      setLoadingTemplates(false);
+    };
+    fetchTemplates();
+  }, []);
 
   useEffect(() => {
     if (initialData) {
@@ -96,15 +113,20 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
         company: initialData.company,
         address: initialData.address,
         notes: initialData.notes,
-        groupId: initialData.groupId || "", // Ensure groupId is reset
-        customFields: initialData.custom_fields || [], // Ensure customFields are reset
+        groupId: initialData.groupId || "",
+        customFields: initialData.custom_fields?.map(cf => ({
+          template_id: cf.template_id,
+          value: cf.field_value,
+        })) || [],
       });
     }
   }, [initialData, form]);
 
   const handleCancel = () => {
-    navigate(-1); // Go back to the previous page
+    navigate(-1);
   };
+
+  const customFieldsWatch = form.watch("customFields");
 
   return (
     <CardContent className="space-y-4">
@@ -280,57 +302,107 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
             )}
           />
 
-          {/* Custom Fields Section */}
+          {/* Dynamic Custom Fields Section */}
           <div className="space-y-4 pt-4 border-t border-gray-200 dark:border-gray-700">
             <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">فیلدهای سفارشی</h3>
-            {fields.map((item, index) => (
-              <div key={item.id} className="flex flex-col md:flex-row gap-2 items-end">
-                <FormField
-                  control={form.control}
-                  name={`customFields.${index}.field_name`}
-                  render={({ field }) => (
-                    <FormItem className="flex-grow">
-                      <FormLabel className="text-gray-700 dark:text-gray-200 sr-only">نام فیلد</FormLabel>
-                      <FormControl>
-                        <Input placeholder="نام فیلد (مثال: وب‌سایت)" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name={`customFields.${index}.field_value`}
-                  render={({ field }) => (
-                    <FormItem className="flex-grow">
-                      <FormLabel className="text-gray-700 dark:text-gray-200 sr-only">مقدار فیلد</FormLabel>
-                      <FormControl>
-                        <Input placeholder="مقدار فیلد (مثال: www.example.com)" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => remove(index)}
-                  className="text-red-500 hover:bg-red-100 dark:hover:bg-gray-700/50"
-                >
-                  <XCircle size={20} />
-                </Button>
-              </div>
-            ))}
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => append({ field_name: "", field_value: "" })}
-              className="w-full flex items-center gap-2 px-6 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold shadow-sm transition-all duration-300 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-200 dark:border-gray-600"
-            >
-              <PlusCircle size={20} />
-              افزودن فیلد سفارشی
-            </Button>
+            {loadingTemplates ? (
+              <p className="text-center text-gray-500 dark:text-gray-400">در حال بارگذاری قالب‌های فیلد سفارشی...</p>
+            ) : availableTemplates.length === 0 ? (
+              <p className="text-center text-gray-500 dark:text-gray-400">هیچ قالب فیلد سفارشی تعریف نشده است.</p>
+            ) : (
+              availableTemplates.map((template, index) => {
+                const fieldName = `customFields.${index}.value` as const;
+                const currentCustomFieldValue = customFieldsWatch?.[index]?.value;
+                const initialValueForTemplate = initialData?.custom_fields?.find(cf => cf.template_id === template.id)?.field_value || "";
+
+                // Set default value for new fields if not already set
+                useEffect(() => {
+                  if (!contactId && !form.getValues(`customFields.${index}.value`)) {
+                    form.setValue(`customFields.${index}.template_id`, template.id!);
+                    form.setValue(`customFields.${index}.value`, initialValueForTemplate);
+                  }
+                }, [template.id, initialValueForTemplate, form, index, contactId]);
+
+                return (
+                  <FormField
+                    key={template.id}
+                    control={form.control}
+                    name={fieldName}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-700 dark:text-gray-200">
+                          {template.name}
+                          {template.required && <span className="text-red-500">*</span>}
+                        </FormLabel>
+                        <FormControl>
+                          {template.type === 'text' && (
+                            <Input
+                              placeholder={template.description || `مقدار ${template.name}`}
+                              className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
+                              {...field}
+                              value={field.value || ''} // Ensure controlled component
+                            />
+                          )}
+                          {template.type === 'number' && (
+                            <Input
+                              type="number"
+                              placeholder={template.description || `مقدار ${template.name}`}
+                              className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
+                              {...field}
+                              value={field.value || ''}
+                              onChange={(e) => field.onChange(e.target.value === '' ? undefined : Number(e.target.value))}
+                            />
+                          )}
+                          {template.type === 'date' && (
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <Button
+                                  variant={"outline"}
+                                  className={cn(
+                                    "w-full justify-start text-left font-normal bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100",
+                                    !field.value && "text-muted-foreground"
+                                  )}
+                                >
+                                  <CalendarIcon className="ml-2 h-4 w-4" />
+                                  {field.value ? format(new Date(field.value), "yyyy/MM/dd") : <span>تاریخ را انتخاب کنید</span>}
+                                </Button>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-auto p-0">
+                                <JalaliCalendar
+                                  selected={field.value ? new Date(field.value) : undefined}
+                                  onSelect={(date) => field.onChange(date ? date.toISOString() : "")}
+                                  showToggle={false} // Hide calendar type toggle
+                                />
+                              </PopoverContent>
+                            </Popover>
+                          )}
+                          {template.type === 'list' && template.options && (
+                            <Select
+                              onValueChange={field.onChange}
+                              value={field.value || ''}
+                            >
+                              <FormControl>
+                                <SelectTrigger className="w-full bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100">
+                                  <SelectValue placeholder={`انتخاب ${template.name}`} />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent className="backdrop-blur-md bg-white/80 dark:bg-gray-800/80 border border-white/30 dark:border-gray-600/30">
+                                {template.options.map((option) => (
+                                  <SelectItem key={option} value={option}>
+                                    {option}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          )}
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                );
+              })
+            )}
           </div>
 
           <div className="flex justify-end gap-2">

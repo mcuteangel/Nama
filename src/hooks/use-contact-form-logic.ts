@@ -4,12 +4,12 @@ import { UseFormReturn } from "react-hook-form";
 import { Session } from "@supabase/supabase-js";
 import { NavigateFunction } from "react-router-dom";
 import * as z from "zod";
+import { CustomFieldTemplate } from "@/domain/schemas/custom-field-template";
 
-// Define CustomField interface
-interface CustomField {
-  id?: string; // Optional for new fields
-  field_name: string;
-  field_value: string;
+// Define CustomField interface for form data
+interface CustomFieldFormData {
+  template_id: string;
+  value: string;
 }
 
 const formSchema = z.object({
@@ -24,9 +24,8 @@ const formSchema = z.object({
   notes: z.string().optional(),
   groupId: z.string().optional(),
   customFields: z.array(z.object({
-    id: z.string().optional(), // For existing custom fields
-    field_name: z.string().min(1, { message: "نام فیلد سفارشی نمی‌تواند خالی باشد." }),
-    field_value: z.string().min(1, { message: "مقدار فیلد سفارشی نمی‌تواند خالی باشد." }),
+    template_id: z.string().min(1, { message: "شناسه قالب فیلد سفارشی الزامی است." }),
+    value: z.string().min(1, { message: "مقدار فیلد سفارشی نمی‌تواند خالی باشد." }),
   })).optional(),
 });
 
@@ -36,7 +35,8 @@ export const useContactFormLogic = (
   contactId: string | undefined,
   navigate: NavigateFunction,
   session: Session | null,
-  form: UseFormReturn<ContactFormValues>
+  form: UseFormReturn<ContactFormValues>,
+  availableTemplates: CustomFieldTemplate[] // Pass available templates to logic
 ) => {
   const onSubmit = async (values: ContactFormValues) => {
     const toastId = showLoading(contactId ? "در حال به‌روزرسانی مخاطب..." : "در حال ذخیره مخاطب...");
@@ -187,15 +187,15 @@ export const useContactFormLogic = (
         // Handle custom fields update/insert/delete
         const existingCustomFields = (await supabase
           .from("custom_fields")
-          .select("id, field_name, field_value")
+          .select("id, template_id, field_value") // Select template_id
           .eq("contact_id", contactId)
           .eq("user_id", user.id)).data || [];
 
         const newCustomFields = values.customFields || [];
 
-        // Fields to delete
+        // Fields to delete (those in DB but not in form)
         const fieldsToDelete = existingCustomFields.filter(
-          (existingField) => !newCustomFields.some((newField) => newField.id === existingField.id)
+          (existingField) => !newCustomFields.some((newField) => newField.template_id === existingField.template_id)
         );
         if (fieldsToDelete.length > 0) {
           const { error: deleteError } = await supabase
@@ -205,16 +205,19 @@ export const useContactFormLogic = (
           if (deleteError) throw deleteError;
         }
 
-        // Fields to update and insert
+        // Fields to update or insert
         for (const field of newCustomFields) {
-          if (field.id) {
-            // Update existing field
-            const { error: updateError } = await supabase
-              .from("custom_fields")
-              .update({ field_name: field.field_name, field_value: field.field_value })
-              .eq("id", field.id)
-              .eq("user_id", user.id);
-            if (updateError) throw updateError;
+          const existingField = existingCustomFields.find(f => f.template_id === field.template_id);
+          if (existingField) {
+            // Update existing field if value changed
+            if (existingField.field_value !== field.value) {
+              const { error: updateError } = await supabase
+                .from("custom_fields")
+                .update({ field_value: field.value })
+                .eq("id", existingField.id)
+                .eq("user_id", user.id);
+              if (updateError) throw updateError;
+            }
           } else {
             // Insert new field
             const { error: insertError } = await supabase
@@ -222,8 +225,8 @@ export const useContactFormLogic = (
               .insert({
                 user_id: user.id,
                 contact_id: contactId,
-                field_name: field.field_name,
-                field_value: field.field_value,
+                template_id: field.template_id,
+                field_value: field.value,
               });
             if (insertError) throw insertError;
           }
@@ -292,8 +295,8 @@ export const useContactFormLogic = (
           const customFieldsToInsert = values.customFields.map(field => ({
             user_id: user.id,
             contact_id: currentContactId,
-            field_name: field.field_name,
-            field_value: field.field_value,
+            template_id: field.template_id,
+            field_value: field.value,
           }));
           const { error: customFieldsError } = await supabase
             .from("custom_fields")

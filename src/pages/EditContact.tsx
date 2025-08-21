@@ -25,8 +25,13 @@ interface ContactGroup {
 
 interface CustomField {
   id: string;
-  field_name: string;
+  template_id: string;
   field_value: string;
+  custom_field_templates: { // Nested template object to get name and type
+    name: string;
+    type: string;
+    options?: string[];
+  };
 }
 
 interface ContactDetailType {
@@ -38,10 +43,13 @@ interface ContactDetailType {
   company?: string;
   address?: string;
   notes?: string;
+  phoneNumber?: string; // Flattened for form
+  emailAddress?: string; // Flattened for form
+  groupId?: string; // Flattened for form
   phone_numbers: PhoneNumber[];
   email_addresses: EmailAddress[];
-  contact_groups: ContactGroup[]; // Added for group information
-  custom_fields: CustomField[]; // Added for custom fields
+  contact_groups: ContactGroup[];
+  custom_fields: CustomField[]; // Updated type for custom_fields
   created_at: string;
   updated_at: string;
 }
@@ -66,7 +74,7 @@ const EditContact = () => {
       try {
         const { data, error } = await supabase
           .from("contacts")
-          .select("*, phone_numbers(id, phone_type, phone_number), email_addresses(id, email_type, email_address), contact_groups(group_id), custom_fields(id, field_name, field_value)") // Include custom_fields
+          .select("*, phone_numbers(id, phone_type, phone_number), email_addresses(id, email_type, email_address), contact_groups(group_id), custom_fields(id, template_id, field_value, custom_field_templates(name, type, options))") // Select custom_field_templates
           .eq("id", id)
           .single();
 
@@ -78,8 +86,8 @@ const EditContact = () => {
             ...data,
             phoneNumber: data.phone_numbers[0]?.phone_number || "",
             emailAddress: data.email_addresses[0]?.email_address || "",
-            groupId: data.contact_groups[0]?.group_id || "", // Extract group_id
-            custom_fields: data.custom_fields || [], // Extract custom_fields
+            groupId: data.contact_groups[0]?.group_id || "",
+            custom_fields: data.custom_fields || [], // Pass full custom_fields array
           } as ContactDetailType;
 
           setInitialContactData(formattedData);
