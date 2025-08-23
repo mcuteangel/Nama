@@ -13,7 +13,7 @@ import { useSession } from "@/integrations/supabase/auth";
 import FormDialogWrapper from "./FormDialogWrapper"; // Import the new wrapper
 import LoadingMessage from "./LoadingMessage"; // Import LoadingMessage
 import CancelButton from "./CancelButton"; // Import CancelButton
-import { fetchWithCache } from "@/utils/cache-helpers"; // Import fetchWithCache
+import { fetchWithCache, invalidateCache } from "@/utils/cache-helpers"; // Import fetchWithCache
 
 interface UserProfile {
   id: string;
@@ -27,11 +27,13 @@ interface UserProfile {
 const UserItem = ({ user, onUserUpdated, onUserDeleted }: { user: UserProfile; onUserUpdated: () => void; onUserDeleted: () => void }) => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const { t } = useTranslation();
+  const { session } = useSession(); // Get session to invalidate cache
 
   const onSuccessDelete = useCallback(() => {
     ErrorManager.notifyUser(t('user_management.user_deleted_success'), 'success');
+    invalidateCache(`user_list_${session?.user?.id}`); // Invalidate cache after successful delete
     onUserDeleted();
-  }, [t, onUserDeleted]);
+  }, [t, onUserDeleted, session]);
 
   const onErrorDelete = useCallback((err) => {
     ErrorManager.logError(err, { component: 'UserList', action: 'deleteUser', userId: user.id });
@@ -127,8 +129,10 @@ const UserList: React.FC = () => {
   const { t } = useTranslation();
 
   const onSuccessDeleteList = useCallback(() => {
-    ErrorManager.notifyUser(t('user_management.user_deleted_success'), 'success');
-  }, [t]);
+    // This callback is for the individual item's delete, the cache invalidation is handled there.
+    // We just need to refetch the list here.
+    fetchUsers();
+  }, []);
 
   const onErrorDeleteList = useCallback((err) => {
     ErrorManager.logError(err, { component: 'UserList', action: 'deleteUser' });
@@ -161,7 +165,7 @@ const UserList: React.FC = () => {
   const {
     isLoading: loadingUsers,
     executeAsync: executeFetchUsers,
-  } = useErrorHandler<{ data: UserProfile[] | null; error: string | null; fromCache: boolean }>(null, {
+  } = useErrorHandler<{ data: UserProfile[] | null; error: string | null; fromCache: boolean }>(null, { // Explicitly define TResult here
     maxRetries: 3,
     retryDelay: 1000,
     showToast: false, // IMPORTANT: Set to false to control toast manually
