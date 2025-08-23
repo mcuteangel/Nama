@@ -12,6 +12,10 @@ import { CustomFieldTemplate } from "@/domain/schemas/custom-field-template";
 import { ContactFormValues, contactFormSchema } from "../types/contact.ts"; // Import contactFormSchema
 import { fetchWithCache } from "@/utils/cache-helpers";
 import { Button } from "./ui/button.tsx"; // Import Button for retry
+import { Textarea } from "./ui/textarea.tsx"; // Import Textarea
+import { Sparkles } from "lucide-react"; // Import Sparkles icon
+import { useContactExtractor } from "@/hooks/use-contact-extractor"; // Import the new hook
+import { useTranslation } from "react-i18next"; // Import useTranslation
 
 // Import new modular components
 import ContactBasicInfo from "./contact-form/ContactBasicInfo.tsx";
@@ -24,6 +28,7 @@ import ContactCustomFields from "./contact-form/ContactCustomFields.tsx";
 import ContactFormActions from "./contact-form/ContactFormActions.tsx";
 import ContactAvatarUpload from "./ContactAvatarUpload.tsx";
 import { ErrorManager } from "@/lib/error-manager.ts"; // Import ErrorManager for error display
+import LoadingMessage from "./LoadingMessage.tsx"; // Import LoadingMessage
 
 interface ContactFormProps {
   initialData?: {
@@ -65,6 +70,9 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
   const { session } = useSession();
   const [availableTemplates, setAvailableTemplates] = useState<CustomFieldTemplate[]>([]);
   const [loadingTemplates, setLoadingTemplates] = useState(true);
+  const [rawTextInput, setRawTextInput] = useState('');
+  const { extractContactInfo, isLoading: isExtractorLoading, error: extractorError } = useContactExtractor();
+  const { t } = useTranslation();
 
   const formSchema = useMemo(() => {
     return contactFormSchema.superRefine((data, ctx) => {
@@ -178,6 +186,51 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
     navigate(-1);
   };
 
+  const handleExtractInfo = async () => {
+    if (!rawTextInput.trim()) {
+      ErrorManager.notifyUser(t('contact_form.empty_text_for_extraction'), 'warning');
+      return;
+    }
+    const extracted = await extractContactInfo(rawTextInput);
+    if (extracted) {
+      form.setValue('firstName', extracted.firstName, { shouldDirty: true });
+      form.setValue('lastName', extracted.lastName, { shouldDirty: true });
+      form.setValue('company', extracted.company, { shouldDirty: true });
+      form.setValue('position', extracted.position, { shouldDirty: true });
+      form.setValue('notes', extracted.notes, { shouldDirty: true });
+
+      // Append new phone numbers, avoiding duplicates
+      const currentPhoneNumbers = form.getValues('phoneNumbers') || [];
+      const newPhoneNumbers = extracted.phoneNumbers.filter(
+        (newPhone) => !currentPhoneNumbers.some((existingPhone) => existingPhone.phone_number === newPhone.phone_number)
+      );
+      form.setValue('phoneNumbers', [...currentPhoneNumbers, ...newPhoneNumbers], { shouldDirty: true });
+
+      // Append new email addresses, avoiding duplicates
+      const currentEmailAddresses = form.getValues('emailAddresses') || [];
+      const newEmailAddresses = extracted.emailAddresses.filter(
+        (newEmail) => !currentEmailAddresses.some((existingEmail) => existingEmail.email_address === newEmail.email_address)
+      );
+      form.setValue('emailAddresses', [...currentEmailAddresses, ...newEmailAddresses], { shouldDirty: true });
+
+      // Clear the raw text input after extraction
+      setRawTextInput('');
+    }
+  };
+
+  if (isExtractorLoading) {
+    return <LoadingMessage message={t('contact_form.loading_extractor_model')} />;
+  }
+
+  if (extractorError) {
+    return (
+      <div className="text-center text-red-500 dark:text-red-400 p-4">
+        <p>{t('contact_form.extractor_error')}: {extractorError}</p>
+        <Button onClick={() => window.location.reload()} className="mt-4">{t('common.reload_page')}</Button>
+      </div>
+    );
+  }
+
   return (
     <CardContent className="space-y-4">
       {error && (
@@ -191,13 +244,35 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
               disabled={isSubmitting}
               className="text-destructive hover:bg-destructive/10"
             >
-              تلاش مجدد ({retryCount} از ۳)
+              {t('common.retry')} ({retryCount} {t('common.of')} ۳)
             </Button>
           )}
         </div>
       )}
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          {/* Smart Extraction Section */}
+          <div className="space-y-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 flex items-center gap-2">
+              <Sparkles size={20} className="text-blue-500" /> {t('contact_form.smart_extraction_title')}
+            </h3>
+            <Textarea
+              placeholder={t('contact_form.paste_text_placeholder')}
+              value={rawTextInput}
+              onChange={(e) => setRawTextInput(e.target.value)}
+              className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 min-h-[100px]"
+              disabled={isSubmitting}
+            />
+            <Button
+              type="button"
+              onClick={handleExtractInfo}
+              disabled={isSubmitting || isExtractorLoading || !rawTextInput.trim()}
+              className="w-full flex items-center gap-2 px-6 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-semibold shadow-md transition-all duration-300 transform hover:scale-105"
+            >
+              <Sparkles size={16} className="me-2" /> {t('contact_form.extract_info_button')}
+            </Button>
+          </div>
+
           <ContactAvatarUpload
             initialAvatarUrl={form.watch('avatarUrl')}
             onAvatarChange={(url) => form.setValue('avatarUrl', url)}
