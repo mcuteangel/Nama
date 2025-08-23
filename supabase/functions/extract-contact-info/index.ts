@@ -1,30 +1,22 @@
 // @ts-nocheck
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { pipeline, env } from 'https://esm.sh/@xenova/transformers@2.17.2';
+import { pipeline } from 'https://esm.sh/@xenova/transformers@2.17.2'; // Removed 'env'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.55.0';
-
-declare namespace Deno {
-  namespace env {
-    function get(key: string): string | undefined;
-  }
-}
-
-// Set environment variables for Transformers.js within Deno
-env.allowLocalModels = false;
-env.useWebWorkers = false; // Web Workers are not applicable in Deno Edge Functions
-env.backends.onnx.wasm.numThreads = 1; // Limit threads for broader compatibility
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, GET, OPTIONS', // Added for completeness
 };
 
-// Cache the model globally in the Edge Function to avoid re-loading on every invocation
-let extractor: any = null;
+let extractor = null;
 
 serve(async (req) => {
+  console.log("Edge Function received request:", req.method, req.url);
+
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    console.log("Handling OPTIONS request.");
+    return new Response(null, { headers: corsHeaders, status: 200 });
   }
 
   try {
@@ -33,7 +25,6 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_ANON_KEY') ?? ''
     );
 
-    // Authenticate the request
     const authHeader = req.headers.get('Authorization');
     const token = authHeader?.split(' ')[1];
 
@@ -53,9 +44,9 @@ serve(async (req) => {
       });
     }
 
-    // Load model if not already loaded
     if (!extractor) {
       console.log("Loading AI model in Edge Function...");
+      // Removed env configuration entirely
       extractor = await pipeline('token-classification', 'Xenova/distilbert-base-multilingual-cased-ner-hrl');
       console.log("AI model loaded in Edge Function.");
     }
@@ -77,7 +68,7 @@ serve(async (req) => {
       phoneNumbers: [],
       emailAddresses: [],
       socialLinks: [],
-      notes: text, // Default notes to full text
+      notes: text,
     };
 
     // 1. Use NER for named entities (Person, Organization)
