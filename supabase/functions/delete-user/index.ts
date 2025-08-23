@@ -10,7 +10,7 @@ declare namespace Deno {
 }
 
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.55.0'; // Changed version to 2.55.0
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.55.0';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -18,6 +18,8 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
+  console.log("Edge Function delete-user received request."); // Added log at the very beginning
+
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -32,12 +34,11 @@ serve(async (req) => {
     const contentLength = req.headers.get('content-length');
     const contentType = req.headers.get('content-type');
 
-    // Log headers and content info for debugging
     console.log("Request Headers:", Object.fromEntries(req.headers.entries()));
-    console.log("Content-Length:", contentLength);
-    console.log("Content-Type:", contentType);
+    console.log("Content-Length before JSON parse:", contentLength); // Added log
+    console.log("Content-Type before JSON parse:", contentType); // Added log
 
-    // Validate content type and length before parsing JSON
+    // Validate content type
     if (!contentType || !contentType.includes('application/json')) {
       console.error("Invalid Content-Type. Expected application/json.");
       return new Response(JSON.stringify({ error: 'Invalid Content-Type. Expected application/json.' }), {
@@ -45,16 +46,11 @@ serve(async (req) => {
         status: 400,
       });
     }
-    if (contentLength === '0') {
-      console.error("Request body is empty.");
-      return new Response(JSON.stringify({ error: 'Request body is empty. User ID is required.' }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 400,
-      });
-    }
+    // Removed contentLength === '0' check, let req.json() handle it.
 
+    let requestBody;
     try {
-      const requestBody = await req.json();
+      requestBody = await req.json();
       userId = requestBody.userId;
       console.log("Parsed userId from body:", userId);
     } catch (jsonError: any) {
