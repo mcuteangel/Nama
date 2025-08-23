@@ -149,16 +149,31 @@ export const UserManagementService = {
   async deleteUser(userId: string): Promise<{ success: boolean; error: string | null }> {
     try {
       const requestBody = { userId };
-      console.log("UserManagementService: Deleting user with body:", requestBody); // Added client-side log
+      console.log("UserManagementService: Deleting user with body:", requestBody);
 
-      // Invoke Edge Function to delete user with service role key
-      const { data, error } = await supabase.functions.invoke('delete-user', {
-        body: JSON.stringify(requestBody), // Ensure userId is sent in the body
-        headers: { 'Content-Type': 'application/json' },
-      });
+      // Get the JWT token from the current session
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError || !session) {
+        throw new Error("No active session found. User must be logged in to delete users.");
+      }
 
-      if (error) {
-        throw new Error(error.message);
+      const response = await fetch(
+        `https://hhtaykuurboewbowzesa.supabase.co/functions/v1/delete-user`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`, // Use the access token for authorization
+            'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY, // Use the public anon key from environment variables
+          },
+          body: JSON.stringify(requestBody),
+        }
+      );
+
+      const responseData = await response.json();
+
+      if (!response.ok) {
+        throw new Error(responseData.error || `HTTP error! status: ${response.status}`);
       }
 
       return { success: true, error: null };
