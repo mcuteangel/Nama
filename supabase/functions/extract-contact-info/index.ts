@@ -44,10 +44,10 @@ serve(async (req) => {
       });
     }
 
-    // Fetch Gemini API key from user_settings table
+    // Fetch Gemini API key AND model from user_settings table
     const { data: userSettings, error: settingsError } = await supabaseClient
       .from('user_settings')
-      .select('gemini_api_key')
+      .select('gemini_api_key, gemini_model') // Select both fields
       .eq('user_id', user.id)
       .maybeSingle();
 
@@ -60,6 +60,7 @@ serve(async (req) => {
     }
 
     const geminiApiKey = userSettings?.gemini_api_key;
+    const geminiModel = userSettings?.gemini_model || 'gemini-pro'; // Default to 'gemini-pro' if not set
 
     if (!geminiApiKey) {
       console.error("Gemini API key not found for user:", user.id);
@@ -95,8 +96,9 @@ serve(async (req) => {
 
 Text: ${text}`;
 
+    // Use the selected geminiModel in the API call
     const geminiResponse = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${geminiApiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:generateContent?key=${geminiApiKey}`,
       {
         method: 'POST',
         headers: {
