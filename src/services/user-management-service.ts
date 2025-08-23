@@ -150,7 +150,7 @@ export const UserManagementService = {
     try {
       // Invoke Edge Function to delete user with service role key
       const { data, error } = await supabase.functions.invoke('delete-user', {
-        body: JSON.stringify({ userId }),
+        body: JSON.stringify({ userId }), // Ensure userId is sent in the body
         headers: { 'Content-Type': 'application/json' },
       });
 
