@@ -12,7 +12,7 @@ import { useTranslation } from 'react-i18next';
 import { useSession } from '@/integrations/supabase/auth';
 import { useErrorHandler } from '@/hooks/use-error-handler';
 import { ErrorManager } from '@/lib/error-manager';
-import { SettingsService } from '@/services/settings-service'; // Will create this service next
+import { SettingsService } from '@/services/settings-service';
 import { fetchWithCache, invalidateCache } from '@/utils/cache-helpers';
 
 const formSchema = z.object({
