@@ -148,9 +148,12 @@ export const UserManagementService = {
 
   async deleteUser(userId: string): Promise<{ success: boolean; error: string | null }> {
     try {
+      const requestBody = { userId };
+      console.log("UserManagementService: Deleting user with body:", requestBody); // Added client-side log
+
       // Invoke Edge Function to delete user with service role key
       const { data, error } = await supabase.functions.invoke('delete-user', {
-        body: JSON.stringify({ userId }), // Ensure userId is sent in the body
+        body: JSON.stringify(requestBody), // Ensure userId is sent in the body
         headers: { 'Content-Type': 'application/json' },
       });
 
