@@ -24,7 +24,7 @@ export function useContactExtractor() {
 
     try {
       const { data, error: invokeError } = await supabase.functions.invoke('extract-contact-info', {
-        body: JSON.stringify({ text }),
+        body: JSON.stringify({ text }), // Ensure body is stringified JSON
         headers: { 'Content-Type': 'application/json' },
       });
 
