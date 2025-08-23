@@ -1,7 +1,16 @@
 // @ts-nocheck
+/// <reference lib="deno.ns" />
+/// <reference types="https://deno.land/std@0.190.0/http/server.d.ts" />
+/// <reference types="https://esm.sh/@supabase/supabase-js@2.55.0/dist/main.d.ts" />
 
-import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.58.4';
+declare namespace Deno {
+  namespace env {
+    function get(key: string): string | undefined;
+  }
+}
+
+import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.55.0'; // Changed version to 2.55.0
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
