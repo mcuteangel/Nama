@@ -7,7 +7,8 @@ import { useTranslation } from 'react-i18next';
 import { ThemeToggle } from "@/components/ThemeToggle";
 import CalendarTypeSetting from "@/components/CalendarTypeSetting";
 import LanguageSetting from "@/components/LanguageSetting";
-import { Download, User, Settings as SettingsIcon } from "lucide-react";
+import GeminiApiKeySetting from "@/components/GeminiApiKeySetting"; // Import GeminiApiKeySetting
+import { Download, User, Settings as SettingsIcon, Sparkles } from "lucide-react"; // Import Sparkles icon
 import { exportContactsToCsv } from "@/utils/export-contacts";
 import { useSession } from "@/integrations/supabase/auth";
 import { Label } from "@/components/ui/label"; // Import Label
@@ -54,6 +55,16 @@ const Settings = () => {
               <div className="flex items-center justify-between p-4 glass rounded-lg shadow-sm">
                 <LanguageSetting />
               </div>
+            </div>
+          </div>
+
+          {/* AI Settings */}
+          <div className="space-y-4">
+            <h3 className="text-2xl font-semibold text-gray-800 dark:text-gray-100 border-b pb-2 mb-4 flex items-center gap-2">
+              <Sparkles size={20} /> {t('settings.ai_settings')}
+            </h3>
+            <div className="p-4 glass rounded-lg shadow-sm">
+              <GeminiApiKeySetting />
             </div>
           </div>
 

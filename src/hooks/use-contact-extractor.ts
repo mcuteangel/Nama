@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { ContactFormValues, PhoneNumberFormData, EmailAddressFormData, SocialLinkFormData } from '@/types/contact';
 import { ErrorManager } from '@/lib/error-manager';
-import { supabase } from '@/integrations/supabase/client'; // Import supabase client
+import { supabase } from '@/integrations/supabase/client';
 
 interface ExtractedContactInfo {
   firstName: string;
@@ -14,23 +14,9 @@ interface ExtractedContactInfo {
   notes: string;
 }
 
-const initialExtractedInfo: ExtractedContactInfo = {
-  firstName: '',
-  lastName: '',
-  company: '',
-  position: '',
-  phoneNumbers: [],
-  emailAddresses: [],
-  socialLinks: [],
-  notes: '',
-};
-
 export function useContactExtractor() {
-  const [isLoading, setIsLoading] = useState(false); // No longer loading client-side model
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  // Model is now loaded on the Edge Function, so no client-side useEffect for model loading
-  // We can assume the Edge Function is ready or will load on first call.
 
   const extractContactInfo = useCallback(async (text: string): Promise<ExtractedContactInfo | undefined> => {
     setIsLoading(true);

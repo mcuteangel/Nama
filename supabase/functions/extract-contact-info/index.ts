@@ -1,6 +1,5 @@
 // @ts-nocheck
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-// import { pipeline } from 'https://esm.sh/@xenova/transformers@2.17.2'; // Temporarily commented out
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.55.0';
 
 const corsHeaders = {
@@ -8,8 +7,6 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
 };
-
-// let extractor = null; // Temporarily commented out
 
 serve(async (req) => {
   console.log("Edge Function received request:", req.method, req.url);
@@ -47,19 +44,37 @@ serve(async (req) => {
       });
     }
 
-    // Temporarily skip AI model loading and extraction
-    // if (!extractor) {
-    //   console.log("Loading AI model in Edge Function...");
-    //   extractor = await pipeline('token-classification', 'Xenova/distilbert-base-multilingual-cased-ner-hrl');
-    //   console.log("AI model loaded in Edge Function.");
-    // }
+    // Fetch Gemini API key from user_settings table
+    const { data: userSettings, error: settingsError } = await supabaseClient
+      .from('user_settings')
+      .select('gemini_api_key')
+      .eq('user_id', user.id)
+      .maybeSingle();
+
+    if (settingsError) {
+      console.error("Error fetching user settings:", settingsError.message);
+      return new Response(JSON.stringify({ error: `Error fetching user settings: ${settingsError.message}` }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 500,
+      });
+    }
+
+    const geminiApiKey = userSettings?.gemini_api_key;
+
+    if (!geminiApiKey) {
+      console.error("Gemini API key not found for user:", user.id);
+      return new Response(JSON.stringify({ error: 'Gemini API key is not set. Please set it in your profile settings.' }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 400,
+      });
+    }
 
     let text: string;
     try {
       const requestBody = await req.json();
       text = requestBody.text;
       console.log("Parsed request body:", requestBody);
-      console.log("Extracted text:", text);
+      console.log("Text for extraction:", text);
     } catch (jsonError: any) {
       console.error("Error parsing request body as JSON:", jsonError.message);
       return new Response(JSON.stringify({ error: `Invalid JSON in request body: ${jsonError.message}. Ensure 'text' field is present.` }), {
@@ -76,19 +91,94 @@ serve(async (req) => {
       });
     }
 
-    // Return a dummy response for now
-    const dummyExtractedInfo = {
-      firstName: 'DummyFirstName',
-      lastName: 'DummyLastName',
-      company: 'DummyCompany',
-      position: 'DummyPosition',
-      phoneNumbers: [{ phone_type: 'mobile', phone_number: '09123456789', extension: null }],
-      emailAddresses: [{ email_type: 'personal', email_address: 'dummy@example.com' }],
+    const prompt = `Extract contact information (first name, last name, company, position, phone numbers, email addresses, social media links, and any other relevant notes) from the following text. Provide the output in a JSON format with keys: firstName, lastName, company, position, phoneNumbers (array of {phone_type: string, phone_number: string, extension: string | null}), emailAddresses (array of {email_type: string, email_address: string}), socialLinks (array of {type: string, url: string}), notes: string. If a field is not found, use an empty string or empty array. For phone_type and email_type, use 'mobile', 'home', 'work', 'personal', 'other'. For social link type, use 'linkedin', 'twitter', 'instagram', 'telegram', 'website', 'other'. Ensure the output is a valid JSON string only, without any markdown or extra text.
+
+Text: ${text}`;
+
+    const geminiResponse = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${geminiApiKey}`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+        }),
+      }
+    );
+
+    if (!geminiResponse.ok) {
+      const errorBody = await geminiResponse.json();
+      console.error("Gemini API error:", geminiResponse.status, errorBody);
+      throw new Error(`Gemini API error: ${errorBody.error?.message || 'Unknown error'}`);
+    }
+
+    const geminiData = await geminiResponse.json();
+    console.log("Raw Gemini response:", JSON.stringify(geminiData, null, 2));
+
+    let extractedInfo: any = {
+      firstName: '',
+      lastName: '',
+      company: '',
+      position: '',
+      phoneNumbers: [],
+      emailAddresses: [],
       socialLinks: [],
-      notes: `Original text: ${text}`,
+      notes: text, // Default to original text, will be refined
     };
 
-    return new Response(JSON.stringify({ extractedInfo: dummyExtractedInfo }), {
+    try {
+      const geminiOutputText = geminiData.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (!geminiOutputText) {
+        throw new Error("Gemini did not return valid content.");
+      }
+
+      // Attempt to parse the JSON string from Gemini's response
+      // Sometimes Gemini might wrap JSON in markdown, so try to clean it
+      let jsonString = geminiOutputText.trim();
+      if (jsonString.startsWith('```json')) {
+        jsonString = jsonString.substring(7, jsonString.lastIndexOf('```')).trim();
+      } else if (jsonString.startsWith('```')) {
+        jsonString = jsonString.substring(3, jsonString.lastIndexOf('```')).trim();
+      }
+      
+      const parsedGeminiOutput = JSON.parse(jsonString);
+      console.log("Parsed Gemini output:", parsedGeminiOutput);
+
+      extractedInfo = {
+        firstName: parsedGeminiOutput.firstName || '',
+        lastName: parsedGeminiOutput.lastName || '',
+        company: parsedGeminiOutput.company || '',
+        position: parsedGeminiOutput.position || '',
+        phoneNumbers: parsedGeminiOutput.phoneNumbers || [],
+        emailAddresses: parsedGeminiOutput.emailAddresses || [],
+        socialLinks: parsedGeminiOutput.socialLinks || [],
+        notes: parsedGeminiOutput.notes || text, // Use Gemini's notes or fallback to original text
+      };
+
+    } catch (parseError: any) {
+      console.error("Error parsing Gemini's JSON output:", parseError.message);
+      // Fallback to a simpler extraction if Gemini's JSON is malformed
+      extractedInfo.notes = `Could not parse AI response. Original text: ${text}`;
+      // Attempt basic regex extraction as a fallback
+      const phoneRegex = /(09\d{9})/g;
+      let match;
+      const phoneNumbers: any[] = [];
+      while ((match = phoneRegex.exec(text)) !== null) {
+        phoneNumbers.push({ phone_type: 'mobile', phone_number: match[0], extension: null });
+      }
+      extractedInfo.phoneNumbers = phoneNumbers;
+
+      const emailRegex = /([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/g;
+      const emailAddresses: any[] = [];
+      while ((match = emailRegex.exec(text)) !== null) {
+        emailAddresses.push({ email_type: 'personal', email_address: match[0] });
+      }
+      extractedInfo.emailAddresses = emailAddresses;
+    }
+
+    return new Response(JSON.stringify({ extractedInfo }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 200,
     });
