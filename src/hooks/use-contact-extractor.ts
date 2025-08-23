@@ -4,9 +4,9 @@ import { ContactFormValues, PhoneNumberFormData, EmailAddressFormData, SocialLin
 import { ErrorManager } from '@/lib/error-manager';
 
 // Set environment variables for Transformers.js
-env.allowLocalModels = false; // Prefer remote models for initial download
-env.use  = true; // Use Web Workers for better performance
-env.backends.onnx.wasm.numThreads = 1; // Limit threads for broader compatibility
+(env as any).allowLocalModels = false; // Prefer remote models for initial download
+(env as any).useWebWorkers = true; // Use Web Workers for better performance
+(env as any).backends.onnx.wasm.numThreads = 1; // Limit threads for broader compatibility
 
 interface ExtractedContactInfo {
   firstName: string;
@@ -42,8 +42,8 @@ export function useContactExtractor() {
       setError(null);
       try {
         // Load the NER pipeline
-        // Using a multilingual model that might perform better for Persian
-        extractorRef.current = await pipeline('token-classification', 'Xenova/bert-base-multilingual-cased-ner-hrl');
+        // Using a smaller, more efficient DistilBERT model
+        extractorRef.current = await pipeline('token-classification', 'Xenova/distilbert-base-multilingual-cased-ner-hrl');
         setExtractor(extractorRef.current);
         ErrorManager.notifyUser('مدل استخراج اطلاعات با موفقیت بارگذاری شد.', 'success');
       } catch (err: any) {
