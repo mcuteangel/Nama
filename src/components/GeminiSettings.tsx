@@ -110,7 +110,23 @@ const GeminiSettings: React.FC = () => {
     ErrorManager.notifyUser(t('settings.gemini_settings_saved_success'), 'success');
     invalidateCache(`user_settings_${session?.user?.id}`);
     // After saving, re-fetch models to ensure the new API key is used
-    executeFetchModels(async () => {}); // Pass an empty async function
+    executeFetchModels(async () => {
+      const cacheKey = `available_gemini_models_${session?.user?.id}`;
+      const { data, error, fromCache } = await fetchWithCache<GeminiModel[]>(
+        cacheKey,
+        async () => {
+          const res = await SettingsService.listGeminiModels();
+          if (res.error) {
+            throw new Error(res.error);
+          }
+          return { data: res.data, error: null };
+        }
+      );
+      if (error) {
+        throw new Error(error);
+      }
+      return { data, error: null, fromCache };
+    });
   }, [session, t, executeFetchModels]);
 
   // Update the useErrorHandler for submit to use the correctly defined onSuccessSubmit
