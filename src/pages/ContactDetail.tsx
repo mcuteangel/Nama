@@ -43,7 +43,7 @@ interface GroupData {
 
 interface ContactGroup {
   group_id: string;
-  groups: GroupData | null; // Changed back to single GroupData object, as Supabase's `single()` on a foreign table usually returns the object directly if it exists.
+  groups: GroupData[] | null; // Corrected: groups should be an array of GroupData
 }
 
 interface CustomField {
@@ -201,7 +201,7 @@ const ContactDetail = () => {
   }
 
   // Access the group directly from the first contact_group entry
-  const assignedGroup = contact.contact_groups?.[0]?.groups || null;
+  const assignedGroup = contact.contact_groups?.[0]?.groups?.[0] || null;
 
   return (
     <div className="flex flex-col items-center justify-center p-4 h-full w-full">
