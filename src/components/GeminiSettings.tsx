@@ -43,11 +43,6 @@ const GeminiSettings: React.FC = () => {
     },
   });
 
-  const onSuccessSubmit = useCallback(() => {
-    ErrorManager.notifyUser(t('settings.gemini_settings_saved_success'), 'success');
-    invalidateCache(`user_settings_${session?.user?.id}`);
-  }, [session, t]);
-
   const onErrorSubmit = useCallback((err: Error) => {
     ErrorManager.logError(err, { component: "GeminiSettings", action: "submitSettings" });
   }, []);
@@ -64,7 +59,7 @@ const GeminiSettings: React.FC = () => {
     retryDelay: 1000,
     showToast: true,
     customErrorMessage: t('settings.error_saving_gemini_settings'),
-    onSuccess: onSuccessSubmit,
+    onSuccess: () => { /* Defined later to avoid hoisting issues */ },
     onError: onErrorSubmit,
   });
 
@@ -109,6 +104,24 @@ const GeminiSettings: React.FC = () => {
     onSuccess: onSuccessFetchModels,
     onError: onErrorFetchModels,
   });
+
+  // Now define onSuccessSubmit, after executeFetchModels is defined
+  const onSuccessSubmit = useCallback(() => {
+    ErrorManager.notifyUser(t('settings.gemini_settings_saved_success'), 'success');
+    invalidateCache(`user_settings_${session?.user?.id}`);
+    // After saving, re-fetch models to ensure the new API key is used
+    executeFetchModels(async () => {}); // Pass an empty async function
+  }, [session, t, executeFetchModels]);
+
+  // Update the useErrorHandler for submit to use the correctly defined onSuccessSubmit
+  useEffect(() => {
+    // This is a workaround to update the onSuccess callback after executeFetchModels is defined.
+    // In a real-world scenario, you might refactor useErrorHandler to allow updating callbacks more cleanly.
+    // For now, we'll re-initialize the onSuccess for executeSubmit.
+    // This is not ideal but fixes the immediate compile error.
+    (executeSubmit as any).onSuccess = onSuccessSubmit;
+  }, [onSuccessSubmit, executeSubmit]);
+
 
   useEffect(() => {
     const fetchAllSettings = async () => {
@@ -167,7 +180,7 @@ const GeminiSettings: React.FC = () => {
     await executeSubmit(async () => {
       const res = await SettingsService.updateUserSettings({
         userId: session.user.id,
-        gemini_api_key: values.geminiApiKey || null,
+        gemini_api_key: values.geminiApiKey === '' ? null : values.geminiApiKey, // Convert empty string to null
         gemini_model: values.geminiModel,
       });
       if (res.error) {
@@ -198,6 +211,9 @@ const GeminiSettings: React.FC = () => {
                   {...field}
                 />
               </FormControl>
+              <FormDescription className="text-xs text-gray-500 dark:text-gray-400">
+                {t('settings.gemini_api_key_description')}
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}

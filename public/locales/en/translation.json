@@ -59,6 +59,7 @@
     "ai_settings": "AI Settings",
     "gemini_api_key": "Gemini API Key",
     "enter_gemini_api_key": "Enter your Gemini API Key",
+    "gemini_api_key_description": "Your Gemini API key is stored securely and used to access AI features. Get one from Google AI Studio.",
     "gemini_api_key_saved_success": "Gemini API Key saved successfully!",
     "error_saving_gemini_api_key": "Error saving Gemini API Key",
     "loading_api_key": "Loading API Key...",

@@ -59,6 +59,7 @@
     "ai_settings": "تنظیمات هوش مصنوعی",
     "gemini_api_key": "کلید API جیمینی",
     "enter_gemini_api_key": "کلید API جیمینی خود را وارد کنید",
+    "gemini_api_key_description": "کلید API جیمینی شما به صورت امن ذخیره می‌شود و برای دسترسی به قابلیت‌های هوش مصنوعی استفاده می‌گردد. آن را از Google AI Studio دریافت کنید.",
     "gemini_api_key_saved_success": "کلید API جیمینی با موفقیت ذخیره شد!",
     "error_saving_gemini_api_key": "خطا در ذخیره کلید API جیمینی",
     "loading_api_key": "در حال بارگذاری کلید API...",
