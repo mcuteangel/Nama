@@ -102,7 +102,7 @@ serve(async (req) => {
 
 Text: ${text}`;
 
-    // Use the selected geminiModel in the API call
+    console.log("Calling Gemini API with model:", geminiModel);
     const geminiResponse = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:generateContent?key=${geminiApiKey}`,
       {
@@ -116,6 +116,8 @@ Text: ${text}`;
       }
     );
 
+    console.log("Received response from Gemini API. Status:", geminiResponse.status);
+
     if (!geminiResponse.ok) {
       const errorBody = await geminiResponse.json();
       console.error("Gemini API error:", geminiResponse.status, errorBody);
@@ -123,7 +125,7 @@ Text: ${text}`;
     }
 
     const geminiData = await geminiResponse.json();
-    console.log("Raw Gemini response:", JSON.stringify(geminiData, null, 2));
+    console.log("Raw Gemini response data:", JSON.stringify(geminiData, null, 2));
 
     let extractedInfo: any = {
       firstName: '',
@@ -133,18 +135,21 @@ Text: ${text}`;
       phoneNumbers: [],
       emailAddresses: [],
       socialLinks: [],
-      notes: text, // Default to original text, will be refined
+      notes: text,
     };
 
     try {
       const geminiOutputText = geminiData.candidates?.[0]?.content?.parts?.[0]?.text;
+      console.log("Gemini output text:", geminiOutputText);
+
       if (!geminiOutputText) {
-        throw new Error("Gemini did not return valid content.");
+        console.warn("Gemini did not return valid content. Falling back to basic extraction.");
+        throw new Error("Gemini did not return valid content."); // Force fallback
       }
 
-      // Attempt to parse the JSON string from Gemini's response
-      // Sometimes Gemini might wrap JSON in markdown, so try to clean it
       let jsonString = geminiOutputText.trim();
+      console.log("Cleaned Gemini JSON string before parsing:", jsonString);
+
       if (jsonString.startsWith('```json')) {
         jsonString = jsonString.substring(7, jsonString.lastIndexOf('```')).trim();
       } else if (jsonString.startsWith('```')) {
@@ -152,24 +157,25 @@ Text: ${text}`;
       }
       
       const parsedGeminiOutput = JSON.parse(jsonString);
-      console.log("Parsed Gemini output:", parsedGeminiOutput);
+      console.log("Parsed Gemini output object:", parsedGeminiOutput);
 
       extractedInfo = {
         firstName: parsedGeminiOutput.firstName || '',
         lastName: parsedGeminiOutput.lastName || '',
         company: parsedGeminiOutput.company || '',
         position: parsedGeminiOutput.position || '',
-        phoneNumbers: parsedGeminiOutput.phoneNumbers || [],
-        emailAddresses: parsedGeminiOutput.emailAddresses || [],
-        socialLinks: parsedGeminiOutput.socialLinks || [],
-        notes: parsedGeminiOutput.notes || text, // Use Gemini's notes or fallback to original text
+        phoneNumbers: Array.isArray(parsedGeminiOutput.phoneNumbers) ? parsedGeminiOutput.phoneNumbers : [],
+        emailAddresses: Array.isArray(parsedGeminiOutput.emailAddresses) ? parsedGeminiOutput.emailAddresses : [],
+        socialLinks: Array.isArray(parsedGeminiOutput.socialLinks) ? parsedGeminiOutput.socialLinks : [],
+        notes: parsedGeminiOutput.notes || text,
       };
 
     } catch (parseError: any) {
-      console.error("Error parsing Gemini's JSON output:", parseError.message);
+      console.error("Error parsing Gemini's JSON output or invalid content:", parseError.message);
+      console.warn("Falling back to basic regex extraction.");
       // Fallback to a simpler extraction if Gemini's JSON is malformed
       extractedInfo.notes = `Could not parse AI response. Original text: ${text}`;
-      // Attempt basic regex extraction as a fallback
+      
       const phoneRegex = /(09\d{9})/g;
       let match;
       const phoneNumbers: any[] = [];
@@ -184,8 +190,14 @@ Text: ${text}`;
         emailAddresses.push({ email_type: 'personal', email_address: match[0] });
       }
       extractedInfo.emailAddresses = emailAddresses;
+
+      // Ensure socialLinks is an array even in fallback
+      if (!Array.isArray(extractedInfo.socialLinks)) {
+        extractedInfo.socialLinks = [];
+      }
     }
 
+    console.log("Final extractedInfo before sending to client:", JSON.stringify(extractedInfo, null, 2));
     return new Response(JSON.stringify({ extractedInfo }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 200,
