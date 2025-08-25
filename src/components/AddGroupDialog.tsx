@@ -12,7 +12,7 @@ import LoadingMessage from './LoadingMessage';
 import { colors } from './ColorPicker'; // Import colors array
 
 interface AddGroupDialogProps {
-  onGroupAdded: () => void;
+  onGroupAdded: (newGroupId?: string) => void; // Modified to accept new group ID
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
@@ -78,9 +78,9 @@ const AddGroupDialog: React.FC<AddGroupDialogProps> = ({ onGroupAdded, open, onO
     }
   }, [session, isSessionLoading, open, executeFetchColors]);
 
-  const handleSuccess = () => {
+  const handleSuccess = (newGroupId?: string) => { // Receive new group ID
     onOpenChange(false); // Close dialog on success
-    onGroupAdded();
+    onGroupAdded(newGroupId); // Pass the new group's ID
   };
 
   const handleCancel = () => {

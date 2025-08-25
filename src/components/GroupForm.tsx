@@ -27,7 +27,7 @@ interface GroupFormProps {
     name: string;
     color?: string;
   };
-  onSuccess?: () => void;
+  onSuccess?: (newGroupId?: string) => void; // Modified to accept new group ID
   onCancel?: () => void;
 }
 
@@ -52,9 +52,9 @@ const GroupForm: React.FC<GroupFormProps> = ({ initialData, onSuccess, onCancel 
 
   const selectedColor = watch('color');
 
-  const onSuccessCallback = useCallback(() => {
+  const onSuccessCallback = useCallback((result: { id: string } | undefined) => { // result will be the data from executeSave
     ErrorManager.notifyUser(initialData?.id ? 'گروه با موفقیت ویرایش شد.' : 'گروه با موفقیت اضافه شد.', 'success');
-    onSuccess?.();
+    onSuccess?.(result?.id); // Pass the new group's ID
   }, [initialData?.id, onSuccess]);
 
   const onErrorCallback = useCallback((err) => {
@@ -100,16 +100,21 @@ const GroupForm: React.FC<GroupFormProps> = ({ initialData, onSuccess, onCancel 
         res = await supabase
           .from('groups')
           .update({ name: values.name, color: values.color, user_id: userId })
-          .eq('id', initialData.id);
+          .eq('id', initialData.id)
+          .select('id') // Select the ID to return it
+          .single();
       } else {
         res = await supabase
           .from('groups')
-          .insert({ name: values.name, color: values.color, user_id: userId });
+          .insert({ name: values.name, color: values.color, user_id: userId })
+          .select('id') // Select the ID to return it
+          .single();
       }
 
       if (res.error) {
         throw new Error(res.error.message);
       }
+      return res.data; // Return the data (which includes the ID)
     });
   };
 

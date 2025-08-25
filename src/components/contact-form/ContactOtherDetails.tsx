@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -14,6 +14,13 @@ const ContactOtherDetails: React.FC = () => {
   const form = useFormContext<ContactFormValues>();
   const { groups, fetchGroups } = useGroups();
   const [isAddGroupDialogOpen, setIsAddGroupDialogOpen] = useState(false);
+
+  const handleGroupAdded = useCallback(async (newGroupId?: string) => {
+    await fetchGroups(); // Refetch all groups
+    if (newGroupId) {
+      form.setValue('groupId', newGroupId, { shouldDirty: true, shouldValidate: true }); // Set the newly added group as selected
+    }
+  }, [fetchGroups, form]);
 
   return (
     <>
@@ -63,7 +70,7 @@ const ContactOtherDetails: React.FC = () => {
           <AddGroupDialog
             open={isAddGroupDialogOpen}
             onOpenChange={setIsAddGroupDialogOpen}
-            onGroupAdded={fetchGroups}
+            onGroupAdded={handleGroupAdded} // Use the new handler
           />
         </div>
         <FormField
