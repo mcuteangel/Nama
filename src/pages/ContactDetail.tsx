@@ -43,7 +43,7 @@ interface GroupData {
 
 interface ContactGroup {
   group_id: string;
-  groups: GroupData[] | null; // Reverted to array as Supabase returns it
+  groups: GroupData | null; // Changed to single GroupData object
 }
 
 interface CustomField {
@@ -187,8 +187,8 @@ const ContactDetail = () => {
     fetchDetails();
   }, [id, navigate, executeFetchContact]);
 
-  // Access the group from the first contact_group entry, and then the first group object within its 'groups' array
-  const assignedGroup = contact?.contact_groups?.[0]?.groups?.[0] || null;
+  // Access the group from the first contact_group entry, and then the group object within it
+  const assignedGroup = contact?.contact_groups?.[0]?.groups || null;
   console.log("DEBUG: Assigned group after processing:", assignedGroup); // Debug log
 
   if (loading) {
