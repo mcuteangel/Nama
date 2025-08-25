@@ -4,18 +4,18 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Form } from "@/components/ui/form";
 import { useNavigate } from "react-router-dom";
-import React, { useEffect, useState, useCallback, useMemo } from "react";
+import React, { useEffect, useState, useCallback, useMemo, useRef } from "react"; // Import useRef
 import { useSession } from "@/integrations/supabase/auth";
 import { useContactFormLogic } from "@/hooks/use-contact-form-logic";
 import { ContactService } from "@/services/contact-service";
 import { CustomFieldTemplate } from "@/domain/schemas/custom-field-template";
-import { ContactFormValues, contactFormSchema } from "../types/contact.ts"; // Import contactFormSchema
+import { ContactFormValues, contactFormSchema } from "../types/contact.ts";
 import { fetchWithCache } from "@/utils/cache-helpers";
-import { Button } from "./ui/button.tsx"; // Import Button for retry
-import { Textarea } from "./ui/textarea.tsx"; // Import Textarea
-import { Sparkles } from "lucide-react"; // Import Sparkles icon
-import { useContactExtractor } from "@/hooks/use-contact-extractor"; // Import the new hook
-import { useTranslation } from "react-i18next"; // Import useTranslation
+import { Button } from "./ui/button.tsx";
+import { Textarea } from "./ui/textarea.tsx";
+import { Sparkles } from "lucide-react";
+import { useContactExtractor } from "@/hooks/use-contact-extractor";
+import { useTranslation } from "react-i18next";
 
 // Import new modular components
 import ContactBasicInfo from "./contact-form/ContactBasicInfo.tsx";
@@ -27,8 +27,8 @@ import ContactImportantDates from "./contact-form/ContactImportantDates.tsx";
 import ContactCustomFields from "./contact-form/ContactCustomFields.tsx";
 import ContactFormActions from "./contact-form/ContactFormActions.tsx";
 import ContactAvatarUpload from "./ContactAvatarUpload.tsx";
-import { ErrorManager } from "@/lib/error-manager.ts"; // Import ErrorManager for error display
-import LoadingMessage from "./LoadingMessage.tsx"; // Import LoadingMessage
+import { ErrorManager } from "@/lib/error-manager.ts";
+import LoadingMessage from "./LoadingMessage.tsx";
 
 interface ContactFormProps {
   initialData?: ContactFormValues;
@@ -61,34 +61,38 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
 
   const form = useForm<ContactFormValues>({
     resolver: zodResolver(formSchema),
+    // Initialize with empty defaults, initialData will be handled by useEffect
     defaultValues: {
-      firstName: initialData?.firstName || "",
-      lastName: initialData?.lastName || "",
-      gender: initialData?.gender || "not_specified",
-      position: initialData?.position || "",
-      company: initialData?.company || "",
-      street: initialData?.street ?? null,
-      city: initialData?.city ?? null,
-      state: initialData?.state ?? null,
-      zipCode: initialData?.zipCode ?? null,
-      country: initialData?.country ?? null,
-      notes: initialData?.notes ?? null,
-      groupId: initialData?.groupId ?? null,
-      birthday: initialData?.birthday ?? null,
-      avatarUrl: initialData?.avatarUrl ?? null,
-      preferredContactMethod: initialData?.preferredContactMethod ?? null,
-      phoneNumbers: initialData?.phoneNumbers || [],
-      emailAddresses: initialData?.emailAddresses || [],
-      socialLinks: initialData?.socialLinks || [],
-      customFields: initialData?.customFields || [],
+      firstName: "",
+      lastName: "",
+      gender: "not_specified",
+      position: "",
+      company: "",
+      street: null,
+      city: null,
+      state: null,
+      zipCode: null,
+      country: null,
+      notes: null,
+      groupId: null,
+      birthday: null,
+      avatarUrl: null,
+      preferredContactMethod: null,
+      phoneNumbers: [],
+      emailAddresses: [],
+      socialLinks: [],
+      customFields: [],
     },
     context: { availableTemplates },
   });
 
-  // Add this useEffect to reset the form when initialData changes
+  const lastInitialDataRef = useRef<ContactFormValues | undefined>(undefined);
+
+  // Add this useEffect to reset the form when initialData changes, but only if content is different
   useEffect(() => {
-    if (initialData) {
+    if (initialData && JSON.stringify(initialData) !== JSON.stringify(lastInitialDataRef.current)) {
       form.reset(initialData);
+      lastInitialDataRef.current = initialData;
     }
   }, [initialData, form]);
 
