@@ -160,8 +160,8 @@ const EditContact = () => {
           position: extracted.position || mappedData.position,
           notes: extracted.notes || mappedData.notes,
           phoneNumbers: [...(mappedData.phoneNumbers || []), ...extracted.phoneNumbers.filter(p => !(mappedData.phoneNumbers || []).some(ep => ep.phone_number === p.phone_number))],
-          emailAddresses: [...(mappedData.emailAddresses || []), ...extracted.emailAddresses.filter(e => !(mappedData.emailAddresses || []).some(ee => ee.email_address === e.email_address))],
-          socialLinks: [...(mappedData.socialLinks || []), ...extracted.socialLinks.filter(s => !(mappedData.socialLinks || []).some(es => es.url === s.url))],
+          emailAddresses: [...(mappedData.emailAddresses || []), ...extracted.emailAddresses.filter(e => !(mappedData.emailAddresses || []).some(ee => ee.email_address === e.email_address))].filter(Boolean), // Filter out any null/undefined
+          socialLinks: [...(mappedData.socialLinks || []), ...extracted.socialLinks.filter(s => !(mappedData.socialLinks || []).some(es => es.url === s.url))].filter(Boolean), // Filter out any null/undefined
           // Other fields can be merged similarly or overwritten if preferred
         };
         
