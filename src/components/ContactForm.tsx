@@ -91,8 +91,19 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
   // Add this useEffect to reset the form when initialData changes, but only if content is different
   useEffect(() => {
     if (initialData && JSON.stringify(initialData) !== JSON.stringify(lastInitialDataRef.current)) {
+      console.log("ContactForm: initialData changed, resetting form.");
       form.reset(initialData);
       lastInitialDataRef.current = initialData;
+    } else if (!initialData && lastInitialDataRef.current) {
+      // If initialData becomes undefined (e.g., navigating from edit to add), reset to default
+      console.log("ContactForm: initialData became undefined, resetting form to defaults.");
+      form.reset({
+        firstName: "", lastName: "", gender: "not_specified", position: "", company: "",
+        street: null, city: null, state: null, zipCode: null, country: null, notes: null,
+        groupId: null, birthday: null, avatarUrl: null, preferredContactMethod: null,
+        phoneNumbers: [], emailAddresses: [], socialLinks: [], customFields: [],
+      });
+      lastInitialDataRef.current = undefined;
     }
   }, [initialData, form]);
 
@@ -139,21 +150,27 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
       });
     });
 
-    newCustomFieldsFormState.sort((a, b) => {
-      const templateA = availableTemplates.find(t => t.id === a.template_id)?.name || '';
-      const templateB = availableTemplates.find(t => t.id === b.template_id)?.name || '';
-      return templateA.localeCompare(templateB);
-    });
+    // Sort both arrays for stable comparison
+    const sortFn = (a: { template_id: string; value: string }, b: { template_id: string; value: string }) => {
+      if (a.template_id < b.template_id) return -1;
+      if (a.template_id > b.template_id) return 1;
+      if (a.value < b.value) return -1;
+      if (a.value > b.value) return 1;
+      return 0;
+    };
 
-    const currentFormValues = form.getValues("customFields");
-    const isDifferent = currentFormValues.length !== newCustomFieldsFormState.length ||
-                        currentFormValues.some((field, index) =>
-                          field.template_id !== newCustomFieldsFormState[index].template_id ||
-                          field.value !== newCustomFieldsFormState[index].value
-                        );
+    const sortedNewCustomFields = [...newCustomFieldsFormState].sort(sortFn);
+    const currentFormValues = form.getValues("customFields") || [];
+    const sortedCurrentFormValues = [...currentFormValues].sort(sortFn);
+
+    // Perform a deep comparison of the sorted arrays
+    const isDifferent = JSON.stringify(sortedCurrentFormValues) !== JSON.stringify(sortedNewCustomFields);
 
     if (isDifferent) {
-      form.setValue("customFields", newCustomFieldsFormState, { shouldValidate: true, shouldDirty: true });
+      console.log("ContactForm: Custom fields are different, updating form values.");
+      form.setValue("customFields", sortedNewCustomFields, { shouldValidate: true, shouldDirty: true });
+    } else {
+      console.log("ContactForm: Custom fields are the same, no update needed.");
     }
 
   }, [availableTemplates, initialData, loadingTemplates, form]);
