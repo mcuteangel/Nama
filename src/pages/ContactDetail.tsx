@@ -185,6 +185,18 @@ const ContactDetail = () => {
     fetchDetails();
   }, [id, navigate, executeFetchContact]);
 
+  // Access the group from the first contact_group entry, and then the first group within that array
+  const assignedGroup = contact?.contact_groups?.[0]?.groups?.[0] || null;
+
+  // --- DEBUGGING LOGS ---
+  useEffect(() => {
+    if (contact) {
+      console.log("Contact data:", contact);
+      console.log("Assigned Group:", assignedGroup);
+    }
+  }, [contact, assignedGroup]);
+  // --- END DEBUGGING LOGS ---
+
   if (loading) {
     return (
       <LoadingMessage message="در حال بارگذاری جزئیات مخاطب..." />
@@ -199,9 +211,6 @@ const ContactDetail = () => {
       </div>
     );
   }
-
-  // Access the group from the first contact_group entry, and then the first group within that array
-  const assignedGroup = contact.contact_groups?.[0]?.groups?.[0] || null;
 
   return (
     <div className="flex flex-col items-center justify-center p-4 h-full w-full">
