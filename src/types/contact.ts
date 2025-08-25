@@ -7,8 +7,10 @@ export const contactFormSchema = z.object({
   phoneNumbers: z.array(z.object({
     id: z.string().optional(),
     phone_type: z.string().min(1, { message: "نوع شماره الزامی است." }),
-    // Updated regex to be more flexible for various phone number formats, including fixed lines
-    phone_number: z.string().regex(/^(0|\+98)?\d{10}$|^\d{7,11}$/, { message: "شماره تلفن معتبر نیست (مثال: 09123456789 یا 02188888888)." }),
+    // Preprocess phone_number to remove non-digit characters before validation
+    phone_number: z.string()
+      .transform((val) => val.replace(/[-\s./]/g, '')) // Remove hyphens, spaces, dots, slashes
+      .refine((val) => /^(0|\+98)?\d{10}$|^\d{7,11}$/.test(val), { message: "شماره تلفن معتبر نیست (مثال: 09123456789 یا 02188888888)." }),
     extension: z.string().optional().nullable(),
   })).optional(),
   emailAddresses: z.array(z.object({
