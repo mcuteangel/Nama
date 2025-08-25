@@ -36,12 +36,14 @@ interface SocialLink {
   url: string;
 }
 
+interface GroupData {
+  name: string;
+  color?: string;
+}
+
 interface ContactGroup {
   group_id: string;
-  groups: Array<{
-    name: string;
-    color?: string;
-  }> | null;
+  groups: GroupData[] | null; // Changed to array of GroupData
 }
 
 interface CustomField {
@@ -199,7 +201,7 @@ const ContactDetail = () => {
   }
 
   // Find the assigned group. Since we enforce single group assignment, we can just take the first one.
-  const assignedGroup = contact.contact_groups?.[0]?.groups?.[0] || null;
+  const assignedGroup = contact.contact_groups?.[0]?.groups?.[0] || null; // Access the first element of the groups array
 
   return (
     <div className="flex flex-col items-center justify-center p-4 h-full w-full">
