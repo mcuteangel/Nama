@@ -1,6 +1,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { ErrorManager } from '@/lib/error-manager';
 import { ExtractedContactInfo } from '@/hooks/use-contact-extractor'; // Re-use the type from the hook
+import { invalidateCache } from '@/utils/cache-helpers'; // Import invalidateCache
 
 export interface AISuggestion {
   id: string;
@@ -48,6 +49,8 @@ export const AISuggestionsService = {
       if (error) {
         throw new Error(error.message);
       }
+      // Invalidate the cache for pending suggestions after status update
+      invalidateCache(`ai_pending_suggestions_${user.id}`);
       return { success: true, error: null };
     } catch (err: any) {
       ErrorManager.logError(err, { context: 'AISuggestionsService.updateSuggestionStatus', suggestionId, status });
@@ -71,6 +74,8 @@ export const AISuggestionsService = {
       if (error) {
         throw new Error(error.message);
       }
+      // Invalidate the cache for pending suggestions after deletion
+      invalidateCache(`ai_pending_suggestions_${user.id}`);
       return { success: true, error: null };
     } catch (err: any) {
       ErrorManager.logError(err, { context: 'AISuggestionsService.deleteSuggestion', suggestionId });
