@@ -10,9 +10,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import ColorPicker, { colors } from './ColorPicker';
 import { useSession } from '@/integrations/supabase/auth';
-import { useErrorHandler } from '@/hooks/use-error-handler'; // Import useErrorHandler
-import { ErrorManager } from '@/lib/error-manager'; // Import ErrorManager
-import CancelButton from './CancelButton'; // Import CancelButton
+import { useErrorHandler } from '@/hooks/use-error-handler';
+import { ErrorManager } from '@/lib/error-manager';
+import CancelButton from './CancelButton';
 
 const formSchema = z.object({
   name: z.string().min(1, { message: 'نام گروه نمی‌تواند خالی باشد.' }),
@@ -23,7 +23,7 @@ type GroupFormValues = z.infer<typeof formSchema>;
 
 interface GroupFormProps {
   initialData?: {
-    id: string;
+    id?: string; // Make id optional for new groups
     name: string;
     color?: string;
   };
@@ -33,39 +33,33 @@ interface GroupFormProps {
 
 const GroupForm: React.FC<GroupFormProps> = ({ initialData, onSuccess, onCancel }) => {
   const navigate = useNavigate();
-  const { session, isLoading: isSessionLoading } = useSession();
-  const [existingGroupColors, setExistingGroupColors] = useState<string[]>([]);
+  const { session } = useSession();
 
+  // Assign the result of useForm to a variable named 'form'
+  const form = useForm<GroupFormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: initialData || { name: '', color: '#60A5FA' },
+  });
+
+  // Destructure properties from the 'form' variable
   const {
     register,
     handleSubmit,
     setValue,
     watch,
     formState: { errors, isSubmitting },
-  } = useForm<GroupFormValues>({
-    resolver: zodResolver(formSchema),
-    defaultValues: initialData || { name: '', color: '#60A5FA' },
-  });
+  } = form;
 
   const selectedColor = watch('color');
 
-  const findUniqueColor = useCallback((usedColors: string[]): string => {
-    for (const color of colors) {
-      if (!usedColors.includes(color)) {
-        return color;
-      }
-    }
-    return '#60A5FA';
-  }, []);
-
   const onSuccessCallback = useCallback(() => {
-    ErrorManager.notifyUser(initialData ? 'گروه با موفقیت ویرایش شد.' : 'گروه با موفقیت اضافه شد.', 'success');
+    ErrorManager.notifyUser(initialData?.id ? 'گروه با موفقیت ویرایش شد.' : 'گروه با موفقیت اضافه شد.', 'success');
     onSuccess?.();
-  }, [initialData, onSuccess]);
+  }, [initialData?.id, onSuccess]);
 
   const onErrorCallback = useCallback((err) => {
-    ErrorManager.logError(err, { component: "GroupForm", action: initialData ? "updateGroup" : "addGroup" });
-  }, [initialData]);
+    ErrorManager.logError(err, { component: "GroupForm", action: initialData?.id ? "updateGroup" : "addGroup" });
+  }, [initialData?.id]);
 
   const {
     isLoading: isSaving,
@@ -78,61 +72,19 @@ const GroupForm: React.FC<GroupFormProps> = ({ initialData, onSuccess, onCancel 
     maxRetries: 3,
     retryDelay: 1000,
     showToast: true,
-    customErrorMessage: initialData ? "خطایی در ویرایش گروه رخ داد" : "خطایی در افزودن گروه رخ داد",
+    customErrorMessage: initialData?.id ? "خطایی در ویرایش گروه رخ داد" : "خطایی در افزودن گروه رخ داد",
     onSuccess: onSuccessCallback,
     onError: onErrorCallback,
   });
 
-  const {
-    isLoading: isFetchingColors,
-    executeAsync: executeFetchColors,
-  } = useErrorHandler(null, {
-    showToast: false, // Don't show toast for this fetch
-    onError: (err) => {
-      console.error("Error fetching existing group colors:", err);
-      // Fallback to default color if fetch fails
-      if (!initialData) {
-        setValue('color', '#60A5FA');
-      }
-    }
-  });
-
   useEffect(() => {
-    const fetchColors = async () => {
-      if (isSessionLoading) {
-        return;
-      }
-
-      if (!session?.user) {
-        setExistingGroupColors([]);
-        if (!initialData) {
-          setValue('color', '#60A5FA');
-        }
-        return;
-      }
-
-      await executeFetchColors(async () => {
-        const { data, error } = await supabase
-          .from('groups')
-          .select('color')
-          .eq('user_id', session.user.id);
-
-        if (error) throw error;
-
-        const currentColors = data.map(g => g.color).filter(Boolean) as string[];
-        setExistingGroupColors(currentColors);
-
-        if (!initialData) {
-          const uniqueColor = findUniqueColor(currentColors);
-          setValue('color', uniqueColor);
-        } else {
-          setValue('color', initialData.color || findUniqueColor(currentColors));
-        }
+    if (initialData) {
+      form.reset({
+        name: initialData.name,
+        color: initialData.color || '#60A5FA',
       });
-    };
-
-    fetchColors();
-  }, [session, isSessionLoading, initialData, setValue, findUniqueColor, executeFetchColors]);
+    }
+  }, [initialData, form]);
 
   const onSubmit = async (values: GroupFormValues) => {
     if (!session?.user) {
@@ -144,7 +96,7 @@ const GroupForm: React.FC<GroupFormProps> = ({ initialData, onSuccess, onCancel 
 
     await executeSave(async () => {
       let res;
-      if (initialData) {
+      if (initialData?.id) {
         res = await supabase
           .from('groups')
           .update({ name: values.name, color: values.color, user_id: userId })
@@ -161,26 +113,11 @@ const GroupForm: React.FC<GroupFormProps> = ({ initialData, onSuccess, onCancel 
     });
   };
 
-  if (isFetchingColors && !initialData) {
-    return (
-      <Card className="w-full max-w-md glass rounded-xl p-6 bg-white/90 dark:bg-gray-900/90">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold text-gray-800 dark:text-gray-100">
-            در حال بارگذاری...
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-center text-gray-500 dark:text-gray-400">در حال آماده‌سازی فرم گروه...</p>
-        </CardContent>
-      </Card>
-    );
-  }
-
   return (
     <Card className="w-full max-w-md glass rounded-xl p-6 bg-white/90 dark:bg-gray-900/90">
       <CardHeader className="text-center">
         <CardTitle className="text-2xl font-bold text-gray-800 dark:text-gray-100">
-          {initialData ? "ویرایش گروه" : "افزودن گروه جدید"}
+          {initialData?.id ? "ویرایش گروه" : "افزودن گروه جدید"}
         </CardTitle>
         {error && (
           <div className="text-sm text-destructive flex items-center justify-center gap-2 mt-2">
@@ -219,13 +156,13 @@ const GroupForm: React.FC<GroupFormProps> = ({ initialData, onSuccess, onCancel 
           </div>
 
           <CardFooter className="flex justify-end gap-4 p-0 pt-4">
-            <CancelButton onClick={onCancel} disabled={isSaving} /> {/* Use CancelButton */}
+            <CancelButton onClick={onCancel} disabled={isSaving} />
             <Button
               type="submit"
               className="px-6 py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white transition-colors"
               disabled={isSaving}
             >
-              {isSaving ? (initialData ? "در حال ویرایش..." : "در حال افزودن...") : (initialData ? "ویرایش" : "افزودن")}
+              {isSaving ? (initialData?.id ? "در حال ویرایش..." : "در حال افزودن...") : (initialData?.id ? "ویرایش" : "افزودن")}
             </Button>
           </CardFooter>
         </form>
