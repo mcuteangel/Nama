@@ -10,6 +10,8 @@ export const ContactCrudService = {
     }
 
     try {
+      console.log("ContactCrudService.addContact: Received values:", JSON.stringify(values, null, 2)); // Log received values
+
       const { data: contactData, error: contactError } = await supabase
         .from("contacts")
         .insert({
@@ -44,6 +46,7 @@ export const ContactCrudService = {
           phone_number: phone.phone_number,
           extension: phone.extension || null,
         }));
+        console.log("ContactCrudService.addContact: Phones to insert:", JSON.stringify(phonesToInsert, null, 2)); // Log phones to insert
         const { error: phoneError } = await supabase
           .from("phone_numbers")
           .insert(phonesToInsert);
@@ -118,7 +121,7 @@ export const ContactCrudService = {
     }
 
     console.log(`ContactCrudService.updateContact: Starting update for contactId: ${contactId}, userId: ${user.id}`);
-    console.log("ContactCrudService.updateContact: Values received:", values);
+    console.log("ContactCrudService.updateContact: Received values:", JSON.stringify(values, null, 2)); // Log received values
 
     try {
       // 1. Update main contacts table
@@ -157,9 +160,10 @@ export const ContactCrudService = {
         .select("id, phone_type, phone_number, extension")
         .eq("contact_id", contactId)
         .eq("user_id", user.id)).data || [];
-      console.log("ContactCrudService.updateContact: Existing phone numbers:", existingPhoneNumbers);
+      console.log("ContactCrudService.updateContact: Existing phone numbers from DB:", JSON.stringify(existingPhoneNumbers, null, 2));
 
       const newPhoneNumbers = values.phoneNumbers || [];
+      console.log("ContactCrudService.updateContact: New phone numbers from form:", JSON.stringify(newPhoneNumbers, null, 2));
 
       const phonesToDelete = existingPhoneNumbers.filter(
         (existingPhone) => !newPhoneNumbers.some((newPhone) => newPhone.id === existingPhone.id)
@@ -179,7 +183,7 @@ export const ContactCrudService = {
 
       for (const phone of newPhoneNumbers) {
         if (phone.id) {
-          console.log("ContactCrudService.updateContact: Updating phone:", phone.id);
+          console.log("ContactCrudService.updateContact: Updating phone:", phone.id, "with data:", JSON.stringify(phone, null, 2));
           const { error: updateError } = await supabase
             .from("phone_numbers")
             .update({
@@ -194,7 +198,7 @@ export const ContactCrudService = {
             throw updateError;
           }
         } else {
-          console.log("ContactCrudService.updateContact: Inserting new phone:", phone.phone_number);
+          console.log("ContactCrudService.updateContact: Inserting new phone with data:", JSON.stringify(phone, null, 2));
           const { error: insertError } = await supabase
             .from("phone_numbers")
             .insert({
@@ -219,9 +223,10 @@ export const ContactCrudService = {
         .select("id, email_type, email_address")
         .eq("contact_id", contactId)
         .eq("user_id", user.id)).data || [];
-      console.log("ContactCrudService.updateContact: Existing email addresses:", existingEmailAddresses);
+      console.log("ContactCrudService.updateContact: Existing email addresses:", JSON.stringify(existingEmailAddresses, null, 2));
 
       const newEmailAddresses = values.emailAddresses || [];
+      console.log("ContactCrudService.updateContact: New email addresses from form:", JSON.stringify(newEmailAddresses, null, 2));
 
       const emailsToDelete = existingEmailAddresses.filter(
         (existingEmail) => !newEmailAddresses.some((newEmail) => newEmail.id === existingEmail.id)
@@ -241,7 +246,7 @@ export const ContactCrudService = {
 
       for (const email of newEmailAddresses) {
         if (email.id) {
-          console.log("ContactCrudService.updateContact: Updating email:", email.id);
+          console.log("ContactCrudService.updateContact: Updating email:", email.id, "with data:", JSON.stringify(email, null, 2));
           const { error: updateError } = await supabase
             .from("email_addresses")
             .update({
@@ -255,7 +260,7 @@ export const ContactCrudService = {
             throw updateError;
           }
         } else {
-          console.log("ContactCrudService.updateContact: Inserting new email:", email.email_address);
+          console.log("ContactCrudService.updateContact: Inserting new email with data:", JSON.stringify(email, null, 2));
           const { error: insertError } = await supabase
             .from("email_addresses")
             .insert({
@@ -279,9 +284,10 @@ export const ContactCrudService = {
         .select("id, type, url")
         .eq("contact_id", contactId)
         .eq("user_id", user.id)).data || [];
-      console.log("ContactCrudService.updateContact: Existing social links:", existingSocialLinks);
+      console.log("ContactCrudService.updateContact: Existing social links:", JSON.stringify(existingSocialLinks, null, 2));
 
       const newSocialLinks = values.socialLinks || [];
+      console.log("ContactCrudService.updateContact: New social links from form:", JSON.stringify(newSocialLinks, null, 2));
 
       const linksToDelete = existingSocialLinks.filter(
         (existingLink) => !newSocialLinks.some((newLink) => newLink.id === existingLink.id)
@@ -301,7 +307,7 @@ export const ContactCrudService = {
 
       for (const link of newSocialLinks) {
         if (link.id) {
-          console.log("ContactCrudService.updateContact: Updating social link:", link.id);
+          console.log("ContactCrudService.updateContact: Updating social link:", link.id, "with data:", JSON.stringify(link, null, 2));
           const { error: updateError } = await supabase
             .from("social_links")
             .update({
@@ -315,7 +321,7 @@ export const ContactCrudService = {
             throw updateError;
           }
         } else {
-          console.log("ContactCrudService.updateContact: Inserting new social link:", link.url);
+          console.log("ContactCrudService.updateContact: Inserting new social link with data:", JSON.stringify(link, null, 2));
           const { error: insertError } = await supabase
             .from("social_links")
             .insert({
@@ -371,9 +377,10 @@ export const ContactCrudService = {
         .select("id, template_id, field_value")
         .eq("contact_id", contactId)
         .eq("user_id", user.id)).data || [];
-      console.log("ContactCrudService.updateContact: Existing custom fields:", existingCustomFields);
+      console.log("ContactCrudService.updateContact: Existing custom fields:", JSON.stringify(existingCustomFields, null, 2));
 
       const newCustomFields = values.customFields || [];
+      console.log("ContactCrudService.updateContact: New custom fields from form:", JSON.stringify(newCustomFields, null, 2));
 
       const fieldsToDelete = existingCustomFields.filter(
         (existingField) => !newCustomFields.some((newField) => newField.template_id === existingField.template_id)
@@ -395,7 +402,7 @@ export const ContactCrudService = {
         const existingField = existingCustomFields.find(f => f.template_id === field.template_id);
         if (existingField) {
           if (existingField.field_value !== field.value) {
-            console.log("ContactCrudService.updateContact: Updating custom field:", existingField.id);
+            console.log("ContactCrudService.updateContact: Updating custom field:", existingField.id, "with value:", field.value);
             const { error: updateError } = await supabase
               .from("custom_fields")
               .update({ field_value: field.value })
@@ -408,7 +415,7 @@ export const ContactCrudService = {
           }
         } else {
           if (field.value && field.value.trim() !== '') {
-            console.log("ContactCrudService.updateContact: Inserting new custom field for template:", field.template_id);
+            console.log("ContactCrudService.updateContact: Inserting new custom field for template:", field.template_id, "with value:", field.value);
             const { error: insertError } = await supabase
               .from("custom_fields")
               .insert({
