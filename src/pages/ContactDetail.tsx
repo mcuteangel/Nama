@@ -268,12 +268,15 @@ const ContactDetail = () => {
                 <Input value={contact.country} readOnly className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
               </div>
             )}
-            {assignedGroup && (
-              <div>
-                <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><Users size={16} /> گروه</Label>
+            {/* Display Group Information */}
+            <div>
+              <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><Users size={16} /> گروه</Label>
+              {assignedGroup ? (
                 <Input value={assignedGroup.name} readOnly className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" style={{ backgroundColor: assignedGroup.color || 'transparent' }} />
-              </div>
-            )}
+              ) : (
+                <Input value="بدون گروه" readOnly className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
+              )}
+            </div>
             {contact.birthday && (
               <div>
                 <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><Gift size={16} /> تاریخ تولد</Label>
