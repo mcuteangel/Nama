@@ -9,7 +9,7 @@ import { ErrorManager } from "@/lib/error-manager";
 import LoadingMessage from "./LoadingMessage";
 import { supabase } from '@/integrations/supabase/client';
 import { invalidateCache } from '@/utils/cache-helpers';
-import { AISuggestionsService } from '@/services/ai-suggestions-service';
+// AISuggestionsService is no longer used for gender suggestions directly
 
 interface ContactForGenderSuggestion {
   id: string;
@@ -24,6 +24,22 @@ interface GenderSuggestionDisplay {
   currentGender: 'male' | 'female' | 'not_specified';
   suggestedGender: 'male' | 'female' | 'not_specified';
 }
+
+// --- Client-side gender suggestion logic (very basic) ---
+const suggestGenderFromName = (firstName: string): 'male' | 'female' | 'not_specified' => {
+  const lowerFirstName = firstName.toLowerCase();
+  // A very basic, limited set of rules for common Persian names
+  // This is NOT comprehensive and will be inaccurate for many names.
+  // For a more robust solution without AI, a large local database of names would be needed.
+  if (['علی', 'محمد', 'رضا', 'حسین', 'امیر', 'حسن', 'مهدی', 'جواد', 'سعید', 'محمود', 'احمد', 'مصطفی', 'مجید', 'ناصر', 'بهنام', 'فرهاد', 'کاوه', 'کوروش', 'داریوش', 'آرش', 'بابک', 'پویا', 'کیوان', 'مانی', 'نادر', 'هومن', 'یوسف'].includes(lowerFirstName)) {
+    return 'male';
+  }
+  if (['فاطمه', 'زهرا', 'مریم', 'سارا', 'نازنین', 'زینب', 'آزاده', 'پریسا', 'ژاله', 'شیرین', 'لیلا', 'مهسا', 'نسترن', 'هدیه', 'یاسمن', 'آرزو', 'بهار', 'پگاه', 'ترانه', 'ثمین', 'خاطره', 'دلارام', 'رعنا', 'رویا', 'سحر', 'شبنم', 'غزل', 'فرناز', 'کیمیا', 'گلناز', 'لاله', 'مرجان', 'نوشین', 'ویدا'].includes(lowerFirstName)) {
+    return 'female';
+  }
+  return 'not_specified';
+};
+// --- End client-side gender suggestion logic ---
 
 const GenderSuggestionManagement: React.FC = () => {
   const { t } = useTranslation();
@@ -87,40 +103,30 @@ const GenderSuggestionManagement: React.FC = () => {
     }
 
     setIsGenerating(true);
-    const toastId = ErrorManager.notifyUser(t('ai_suggestions.generating_gender_suggestions'), 'info');
+    const toastId = ErrorManager.notifyUser(t('ai_suggestions.generating_gender_suggestions_local'), 'info'); // Updated message
 
     try {
-      const contactsForAI = ungenderedContacts.map(c => ({
-        id: c.id,
-        firstName: c.first_name,
-        lastName: c.last_name,
-      }));
-
-      const { data: suggestions, error } = await AISuggestionsService.getGenderSuggestions(contactsForAI);
-
-      if (error) throw new Error(error);
-
-      const formattedSuggestions: GenderSuggestionDisplay[] = (suggestions || [])
-        .filter(s => s.suggestedGender !== 'not_specified') // Only show actionable suggestions
-        .map(s => {
-          const contact = ungenderedContacts.find(c => c.id === s.contactId);
+      const newSuggestions: GenderSuggestionDisplay[] = ungenderedContacts
+        .map(contact => {
+          const suggestedGender = suggestGenderFromName(contact.first_name);
           return {
-            contactId: s.contactId,
-            contactName: `${contact?.first_name || ''} ${contact?.last_name || ''}`,
-            currentGender: contact?.gender || 'not_specified',
-            suggestedGender: s.suggestedGender,
+            contactId: contact.id,
+            contactName: `${contact.first_name} ${contact.last_name}`,
+            currentGender: contact.gender,
+            suggestedGender: suggestedGender,
           };
-        });
+        })
+        .filter(s => s.suggestedGender !== 'not_specified'); // Only show actionable suggestions
 
-      setGenderSuggestions(formattedSuggestions);
-      if (formattedSuggestions.length === 0) {
-        ErrorManager.notifyUser(t('ai_suggestions.no_gender_suggestions_found'), 'info');
+      setGenderSuggestions(newSuggestions);
+      if (newSuggestions.length === 0) {
+        ErrorManager.notifyUser(t('ai_suggestions.no_gender_suggestions_found_local'), 'info'); // Updated message
       } else {
-        ErrorManager.notifyUser(t('ai_suggestions.gender_suggestions_generated'), 'success');
+        ErrorManager.notifyUser(t('ai_suggestions.gender_suggestions_generated_local'), 'success'); // Updated message
       }
     } catch (err: any) {
-      ErrorManager.logError(err, { component: 'GenderSuggestionManagement', action: 'generateGenderSuggestions' });
-      ErrorManager.notifyUser(`${t('ai_suggestions.error_generating_gender_suggestions')}: ${ErrorManager.getErrorMessage(err)}`, 'error');
+      ErrorManager.logError(err, { component: 'GenderSuggestionManagement', action: 'generateGenderSuggestionsLocal' });
+      ErrorManager.notifyUser(`${t('ai_suggestions.error_generating_gender_suggestions_local')}: ${ErrorManager.getErrorMessage(err)}`, 'error'); // Updated message
     } finally {
       setIsGenerating(false);
       // dismissToast(toastId); // Assuming notifyUser returns a toastId if needed
@@ -174,7 +180,7 @@ const GenderSuggestionManagement: React.FC = () => {
             <User size={20} className="text-pink-500" /> {t('ai_suggestions.gender_suggestion_title')}
           </CardTitle>
           <CardDescription className="text-gray-600 dark:text-gray-300">
-            {t('ai_suggestions.gender_suggestion_description')}
+            {t('ai_suggestions.gender_suggestion_description_local')} {/* Updated description */}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">

@@ -178,13 +178,13 @@
     "loading_smart_management_data": "Loading smart management data...",
     "loading_duplicate_management_data": "Loading duplicate management data...",
     "gender_suggestion_title": "Gender Suggestion",
-    "gender_suggestion_description": "Suggest gender for contacts with unspecified gender based on name.",
+    "gender_suggestion_description_local": "Suggest gender for contacts with unspecified gender based on a simple, internal (non-AI) logic.",
     "generate_gender_suggestions": "Generate Gender Suggestions",
     "no_ungendered_contacts": "No contacts with unspecified gender found.",
     "all_contacts_gendered": "All contacts have specified gender.",
-    "generating_gender_suggestions": "Generating gender suggestions...",
-    "gender_suggestions_generated": "Gender suggestions generated successfully.",
-    "error_generating_gender_suggestions": "Error generating gender suggestions.",
+    "generating_gender_suggestions_local": "Generating gender suggestions (local)...",
+    "gender_suggestions_generated_local": "Gender suggestions generated successfully.",
+    "error_generating_gender_suggestions_local": "Error generating gender suggestions (local).",
     "pending_gender_suggestions": "Pending Gender Suggestions",
     "suggested_gender": "Suggested Gender",
     "applying_gender_suggestion": "Applying gender suggestion...",
@@ -206,17 +206,17 @@
     "fax": "Fax",
     "other": "Other"
   },
-  "email_type": {
-    "personal": "Personal",
-    "work": "Work",
-    "other": "Other"
-  },
   "social_type": {
     "linkedin": "LinkedIn",
     "twitter": "Twitter",
     "instagram": "Instagram",
     "telegram": "Telegram",
     "website": "Website",
+    "other": "Other"
+  },
+  "email_type": {
+    "personal": "Personal",
+    "work": "Work",
     "other": "Other"
   },
   "contact_method": {

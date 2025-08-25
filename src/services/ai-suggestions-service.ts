@@ -13,16 +13,8 @@ export interface AISuggestion {
   ai_processing_queue_id: string | null;
 }
 
-interface ContactNameForGenderSuggestion {
-  id: string;
-  firstName: string;
-  lastName: string;
-}
-
-interface GenderSuggestionResult {
-  contactId: string;
-  suggestedGender: 'male' | 'female' | 'not_specified';
-}
+// Removed ContactNameForGenderSuggestion and GenderSuggestionResult interfaces
+// as they are no longer needed in the service layer.
 
 export const AISuggestionsService = {
   async getPendingSuggestions(userId: string): Promise<{ data: AISuggestion[] | null; error: string | null }> {
@@ -94,43 +86,6 @@ export const AISuggestionsService = {
     }
   },
 
-  async getGenderSuggestions(contacts: ContactNameForGenderSuggestion[]): Promise<{ data: GenderSuggestionResult[] | null; error: string | null }> {
-    try {
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-      if (sessionError || !session) {
-        throw new Error('No active session found. User must be logged in to get gender suggestions.');
-      }
-
-      const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-      const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
-      const edgeFunctionUrl = `${SUPABASE_URL}/functions/v1/suggest-gender`;
-
-      const response = await fetch(edgeFunctionUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`,
-          'apikey': SUPABASE_ANON_KEY,
-        },
-        body: JSON.stringify({ contacts }),
-      });
-
-      if (!response.ok) {
-        let errorBody = null;
-        try {
-          errorBody = await response.json();
-        } catch (jsonParseError) {
-          throw new Error(`HTTP error! Status: ${response.status}, StatusText: ${response.statusText}`);
-        }
-        throw new Error(errorBody.error || `HTTP error! Status: ${response.status}, StatusText: ${response.statusText}`);
-      }
-
-      const responseData = await response.json();
-
-      return { data: responseData.suggestions as GenderSuggestionResult[], error: null };
-    } catch (err: any) {
-      ErrorManager.logError(err, { context: 'AISuggestionsService.getGenderSuggestions', contacts });
-      return { data: null, error: ErrorManager.getErrorMessage(err) };
-    }
-  },
+  // Removed getGenderSuggestions as it's no longer using an Edge Function.
+  // The logic will be moved to the client-side component.
 };
