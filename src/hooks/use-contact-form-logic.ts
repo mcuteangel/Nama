@@ -71,15 +71,15 @@ export const useContactFormLogic = (
             gender: values.gender,
             position: values.position || null,
             company: values.company || null,
-            street: values.street || null,
-            city: values.city || null,
-            state: values.state || null,
-            zip_code: values.zipCode || null,
-            country: values.country || null,
-            notes: values.notes || null,
-            birthday: values.birthday || null,
-            avatar_url: values.avatarUrl || null,
-            preferred_contact_method: values.preferredContactMethod || null,
+            street: values.street ?? null,
+            city: values.city ?? null,
+            state: values.state ?? null,
+            zip_code: values.zipCode ?? null,
+            country: values.country ?? null,
+            notes: values.notes ?? null,
+            birthday: values.birthday ?? null,
+            avatar_url: values.avatarUrl ?? null,
+            preferred_contact_method: values.preferredContactMethod ?? null,
           })
           .eq("id", contactId)
           .eq("user_id", user.id);
@@ -220,43 +220,26 @@ export const useContactFormLogic = (
           }
         }
 
-        // Handle group assignment
+        // --- Handle group assignment ---
+        // First, delete all existing group assignments for this contact to ensure single assignment
+        const { error: deleteExistingGroupsError } = await supabase
+          .from("contact_groups")
+          .delete()
+          .eq("contact_id", currentContactId) // Use currentContactId which is set for both new and existing contacts
+          .eq("user_id", user.id);
+
+        if (deleteExistingGroupsError) throw deleteExistingGroupsError;
+
+        // If a group is selected in the form, insert the new assignment
         if (values.groupId) {
-          const { data: existingContactGroup, error: fetchGroupError } = await supabase
+          const { error: insertGroupError } = await supabase
             .from("contact_groups")
-            .select("contact_id, group_id")
-            .eq("contact_id", contactId)
-            .eq("user_id", user.id)
-            .maybeSingle();
-
-          if (fetchGroupError && fetchGroupError.code !== 'PGRST116') {
-            throw fetchGroupError;
-          }
-
-          if (existingContactGroup) {
-            const { error: updateGroupError } = await supabase
-              .from("contact_groups")
-              .update({ group_id: values.groupId })
-              .eq("contact_id", contactId)
-              .eq("user_id", user.id);
-            if (updateGroupError) throw updateGroupError;
-          } else {
-            const { error: insertGroupError } = await supabase
-              .from("contact_groups")
-              .insert({
-                user_id: user.id,
-                contact_id: contactId,
-                group_id: values.groupId,
-              });
-            if (insertGroupError) throw insertGroupError;
-          }
-        } else {
-          const { error: deleteGroupError } = await supabase
-            .from("contact_groups")
-            .delete()
-            .eq("contact_id", contactId)
-            .eq("user_id", user.id);
-          if (deleteGroupError) throw deleteGroupError;
+            .insert({
+              user_id: user.id,
+              contact_id: currentContactId,
+              group_id: values.groupId,
+            });
+          if (insertGroupError) throw insertGroupError;
         }
 
         // Handle custom fields update/insert/delete
@@ -315,15 +298,15 @@ export const useContactFormLogic = (
             gender: values.gender,
             position: values.position || null,
             company: values.company || null,
-            street: values.street || null,
-            city: values.city || null,
-            state: values.state || null,
-            zip_code: values.zipCode || null,
-            country: values.country || null,
-            notes: values.notes || null,
-            birthday: values.birthday || null,
-            avatar_url: values.avatarUrl || null,
-            preferred_contact_method: values.preferredContactMethod || null,
+            street: values.street ?? null,
+            city: values.city ?? null,
+            state: values.state ?? null,
+            zip_code: values.zipCode ?? null,
+            country: values.country ?? null,
+            notes: values.notes ?? null,
+            birthday: values.birthday ?? null,
+            avatar_url: values.avatarUrl ?? null,
+            preferred_contact_method: values.preferredContactMethod ?? null,
           })
           .select('id')
           .single();
@@ -372,6 +355,7 @@ export const useContactFormLogic = (
           if (socialLinkError) throw socialLinkError;
         }
 
+        // --- Handle group assignment for new contact ---
         if (values.groupId) {
           const { error: groupAssignmentError } = await supabase
             .from("contact_groups")
