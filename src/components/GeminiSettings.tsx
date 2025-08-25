@@ -1,13 +1,13 @@
 "use client";
 
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from '@/components/ui/form'; // Added FormDescription
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from '@/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useTranslation } from 'react-i18next';
 import { useSession } from '@/integrations/supabase/auth';
@@ -16,9 +16,16 @@ import { ErrorManager } from '@/lib/error-manager';
 import { SettingsService } from '@/services/settings-service';
 import { fetchWithCache, invalidateCache } from '@/utils/cache-helpers';
 
+// Define a type for the Gemini model data
+interface GeminiModel {
+  name: string;
+  displayName: string;
+  description: string;
+}
+
 const formSchema = z.object({
   geminiApiKey: z.string().optional(),
-  geminiModel: z.enum(['gemini-pro', 'gemini-1.5-flash', 'gemini-1.5-pro']).default('gemini-pro'),
+  geminiModel: z.string().default('gemini-pro'), // Changed to z.string() for dynamic models
 });
 
 type GeminiSettingsFormValues = z.infer<typeof formSchema>;
@@ -26,6 +33,7 @@ type GeminiSettingsFormValues = z.infer<typeof formSchema>;
 const GeminiSettings: React.FC = () => {
   const { t } = useTranslation();
   const { session, isLoading: isSessionLoading } = useSession();
+  const [availableGeminiModels, setAvailableGeminiModels] = useState<GeminiModel[]>([]);
 
   const form = useForm<GeminiSettingsFormValues>({
     resolver: zodResolver(formSchema),
@@ -60,35 +68,56 @@ const GeminiSettings: React.FC = () => {
     onError: onErrorSubmit,
   });
 
-  const onSuccessFetch = useCallback((result: { data: { gemini_api_key: string | null; gemini_model: string | null } | null; error: string | null; fromCache: boolean }) => {
+  const onSuccessFetchSettings = useCallback((result: { data: { gemini_api_key: string | null; gemini_model: string | null } | null; error: string | null; fromCache: boolean }) => {
     if (result.data) {
       form.reset({
         geminiApiKey: result.data.gemini_api_key ?? '',
-        geminiModel: (result.data.gemini_model as GeminiSettingsFormValues['geminiModel']) ?? 'gemini-pro',
+        geminiModel: result.data.gemini_model ?? 'gemini-pro',
       });
     }
   }, [form]);
 
-  const onErrorFetch = useCallback((err: Error) => {
+  const onErrorFetchSettings = useCallback((err: Error) => {
     ErrorManager.logError(err, { component: "GeminiSettings", action: "fetchSettings" });
   }, []);
 
   const {
     isLoading: loadingSettings,
-    executeAsync: executeFetch,
+    executeAsync: executeFetchSettings,
   } = useErrorHandler<{ data: { gemini_api_key: string | null; gemini_model: string | null } | null; error: string | null; fromCache: boolean }>(null, {
     showToast: false,
-    onSuccess: onSuccessFetch,
-    onError: onErrorFetch,
+    onSuccess: onSuccessFetchSettings,
+    onError: onErrorFetchSettings,
+  });
+
+  const onSuccessFetchModels = useCallback((result: { data: GeminiModel[] | null; error: string | null; fromCache: boolean }) => {
+    if (result.data) {
+      setAvailableGeminiModels(result.data);
+    }
+  }, []);
+
+  const onErrorFetchModels = useCallback((err: Error) => {
+    ErrorManager.logError(err, { component: "GeminiSettings", action: "fetchModels" });
+    ErrorManager.notifyUser(t('settings.error_loading_gemini_models'), 'error');
+  }, [t]);
+
+  const {
+    isLoading: loadingModels,
+    executeAsync: executeFetchModels,
+  } = useErrorHandler<{ data: GeminiModel[] | null; error: string | null; fromCache: boolean }>(null, {
+    showToast: false,
+    onSuccess: onSuccessFetchModels,
+    onError: onErrorFetchModels,
   });
 
   useEffect(() => {
-    const fetchSettings = async () => {
+    const fetchAllSettings = async () => {
       if (isSessionLoading || !session?.user) {
         return;
       }
 
-      await executeFetch(async () => {
+      // Fetch user settings (API key and selected model)
+      await executeFetchSettings(async () => {
         const cacheKey = `user_settings_${session.user.id}`;
         const { data, error, fromCache } = await fetchWithCache<{ gemini_api_key: string | null; gemini_model: string | null }>(
           cacheKey,
@@ -105,10 +134,29 @@ const GeminiSettings: React.FC = () => {
         }
         return { data, error: null, fromCache };
       });
+
+      // Fetch available Gemini models
+      await executeFetchModels(async () => {
+        const cacheKey = `available_gemini_models_${session.user.id}`;
+        const { data, error, fromCache } = await fetchWithCache<GeminiModel[]>(
+          cacheKey,
+          async () => {
+            const res = await SettingsService.listGeminiModels();
+            if (res.error) {
+              throw new Error(res.error);
+            }
+            return { data: res.data, error: null };
+          }
+        );
+        if (error) {
+          throw new Error(error);
+        }
+        return { data, error: null, fromCache };
+      });
     };
 
-    fetchSettings();
-  }, [session, isSessionLoading, executeFetch]);
+    fetchAllSettings();
+  }, [session, isSessionLoading, executeFetchSettings, executeFetchModels]);
 
   const onSubmit = useCallback(async (values: GeminiSettingsFormValues) => {
     if (!session?.user) {
@@ -128,7 +176,7 @@ const GeminiSettings: React.FC = () => {
     });
   }, [session, t, executeSubmit]);
 
-  if (loadingSettings) {
+  if (loadingSettings || loadingModels) {
     return <p className="text-center text-gray-500 dark:text-gray-400">{t('settings.loading_gemini_settings')}</p>;
   }
 
@@ -161,16 +209,24 @@ const GeminiSettings: React.FC = () => {
           render={({ field }) => (
             <FormItem>
               <FormLabel className="text-gray-700 dark:text-gray-200">{t('settings.gemini_model')}</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isSubmitting}>
+              <Select onValueChange={field.onChange} value={field.value} disabled={isSubmitting || loadingModels}>
                 <FormControl>
                   <SelectTrigger className="w-full bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100">
                     <SelectValue placeholder={t('settings.select_gemini_model')} />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent className="backdrop-blur-md bg-white/80 dark:bg-gray-800/80 border border-white/30 dark:border-gray-600/30">
-                  <SelectItem value="gemini-pro">{t('settings.gemini_pro')}</SelectItem>
-                  <SelectItem value="gemini-1.5-flash">{t('settings.gemini_1_5_flash')}</SelectItem>
-                  <SelectItem value="gemini-1.5-pro">{t('settings.gemini_1_5_pro')}</SelectItem>
+                  {loadingModels ? (
+                    <SelectItem value="loading" disabled>{t('settings.loading_gemini_models')}</SelectItem>
+                  ) : availableGeminiModels.length > 0 ? (
+                    availableGeminiModels.map((model) => (
+                      <SelectItem key={model.name} value={model.name}>
+                        {model.displayName}
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <SelectItem value="no-models" disabled>{t('settings.no_gemini_models_found')}</SelectItem>
+                  )}
                 </SelectContent>
               </Select>
               <FormDescription className="text-xs text-gray-500 dark:text-gray-400">

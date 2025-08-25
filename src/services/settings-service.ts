@@ -15,6 +15,12 @@ interface UpdateUserSettingsInput {
   gemini_model?: string | null; // Added gemini_model to update input
 }
 
+interface GeminiModel {
+  name: string;
+  displayName: string;
+  description: string;
+}
+
 export const SettingsService = {
   async getUserSettings(userId: string): Promise<{ data: { gemini_api_key: string | null; gemini_model: string | null } | null; error: string | null }> {
     try {
@@ -60,6 +66,40 @@ export const SettingsService = {
     } catch (err: any) {
       ErrorManager.logError(err, { context: 'SettingsService.updateUserSettings', input });
       return { success: false, error: ErrorManager.getErrorMessage(err) };
+    }
+  },
+
+  async listGeminiModels(): Promise<{ data: GeminiModel[] | null; error: string | null }> {
+    try {
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError || !session) {
+        throw new Error("No active session found. User must be logged in to list Gemini models.");
+      }
+
+      const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+      const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
+      const edgeFunctionUrl = `${SUPABASE_URL}/functions/v1/list-gemini-models`;
+
+      const response = await fetch(edgeFunctionUrl, {
+        method: 'POST', // Use POST for invoking Edge Functions
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+          'apikey': SUPABASE_ANON_KEY,
+        },
+        body: JSON.stringify({}), // Empty body for GET-like request
+      });
+
+      const responseData = await response.json();
+
+      if (!response.ok) {
+        throw new Error(responseData.error || `HTTP error! status: ${response.status}`);
+      }
+
+      return { data: responseData.models as GeminiModel[], error: null };
+    } catch (err: any) {
+      ErrorManager.logError(err, { context: 'SettingsService.listGeminiModels' });
+      return { data: null, error: ErrorManager.getErrorMessage(err) };
     }
   },
 };
