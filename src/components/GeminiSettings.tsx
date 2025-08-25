@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from '@/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useTranslation } from 'react-i18next';
@@ -42,7 +43,7 @@ const GeminiSettings: React.FC = () => {
     },
   });
 
-  const onErrorSubmit = useCallback((err: any) => { // Explicitly type err
+  const onErrorSubmit = useCallback((err: Error) => {
     ErrorManager.logError(err, { component: "GeminiSettings", action: "submitSettings" });
   }, []);
 
@@ -71,7 +72,7 @@ const GeminiSettings: React.FC = () => {
     }
   }, [form]);
 
-  const onErrorFetchSettings = useCallback((err: any) => { // Explicitly type err
+  const onErrorFetchSettings = useCallback((err: Error) => {
     ErrorManager.logError(err, { component: "GeminiSettings", action: "fetchSettings" });
   }, []);
 
@@ -90,7 +91,7 @@ const GeminiSettings: React.FC = () => {
     }
   }, []);
 
-  const onErrorFetchModels = useCallback((err: any) => { // Explicitly type err
+  const onErrorFetchModels = useCallback((err: Error) => {
     ErrorManager.logError(err, { component: "GeminiSettings", action: "fetchModels" });
     ErrorManager.notifyUser(t('settings.error_loading_gemini_models'), 'error');
   }, [t]);

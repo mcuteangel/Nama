@@ -1,10 +1,11 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { showError, showSuccess } from "@/utils/toast"; // Removed showLoading, dismissToast
+import { showError, showLoading, showSuccess, dismissToast } from "@/utils/toast";
 import ContactForm from "@/components/ContactForm";
 import { MadeWithDyad } from "@/components/made-with-dyad";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { fetchWithCache } from "@/utils/cache-helpers";
 import LoadingMessage from "@/components/LoadingMessage";
 import CancelButton from "@/components/CancelButton";
@@ -14,6 +15,8 @@ import { ExtractedContactInfo } from "@/hooks/use-contact-extractor";
 import { AISuggestionsService } from "@/services/ai-suggestions-service";
 import { useSession } from "@/integrations/supabase/auth";
 import { ContactFormValues } from "@/types/contact";
+import { ContactListService } from "@/services/contact-list-service";
+import { ContactCrudService } from "@/services/contact-crud-service";
 
 interface PhoneNumber {
   id: string;
@@ -117,7 +120,7 @@ const mapContactDetailToFormValues = (contact: ContactDetailType): ContactFormVa
 const EditContact = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { session } = useSession(); // Removed isSessionLoading
+  const { session, isLoading: isSessionLoading } = useSession();
   const [initialContactData, setInitialContactData] = useState<ContactFormValues | undefined>(undefined);
   const lastFetchedContactDataRef = useRef<ContactFormValues | undefined>(undefined);
 
@@ -195,7 +198,7 @@ const EditContact = () => {
     }
   }, []); // Empty dependency array for onSuccessFetchContact
 
-  const onErrorFetchContact = useCallback((err: any) => { // Explicitly type err
+  const onErrorFetchContact = useCallback((err: Error) => {
     const currentNavigate = navigateRef.current;
     console.error("Error fetching contact details for edit:", err);
     showError(`خطا در بارگذاری اطلاعات مخاطب: ${ErrorManager.getErrorMessage(err) || "خطای ناشناخته"}`);
@@ -247,7 +250,7 @@ const EditContact = () => {
     };
 
     fetchDetails();
-  }, [id, executeFetchContact]);
+  }, [id, executeFetchContact]); // Removed navigate from here, as it's accessed via ref in callbacks
 
   if (loading) {
     return (

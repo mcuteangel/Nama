@@ -1,14 +1,14 @@
-import { useEffect, useState } from "react"; // Removed React
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { MadeWithDyad } from "@/components/made-with-dyad";
-import { JalaliCalendar } from "@/components/JalaliCalendar";
-import { format } from "date-fns-jalali";
+import { JalaliCalendar } from "@/components/JalaliCalendar"; // Changed to named import
+import { format } from "date-fns-jalali"; // Import format from date-fns-jalali
 
 const Home = () => {
   const navigate = useNavigate();
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date()); // State for selected date
 
   useEffect(() => {
     const hasSeenWelcome = localStorage.getItem('hasSeenWelcome');

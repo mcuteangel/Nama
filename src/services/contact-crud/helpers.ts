@@ -31,9 +31,9 @@ export async function syncPhoneNumbers(
       // Existing phone, check for updates
       const oldPhone = existingMap.get(newPhone.id);
       if (
-        oldPhone?.phone_type !== newPhone.phone_type || // Added null check
-        oldPhone?.phone_number !== newPhone.phone_number || // Added null check
-        oldPhone?.extension !== (newPhone.extension || null) // Added null check
+        oldPhone.phone_type !== newPhone.phone_type ||
+        oldPhone.phone_number !== newPhone.phone_number ||
+        oldPhone.extension !== (newPhone.extension || null)
       ) {
         phonesToUpdate.push({ ...newPhone, id: newPhone.id });
       }
@@ -105,8 +105,8 @@ export async function syncEmailAddresses(
       // Existing email, check for updates
       const oldEmail = existingMap.get(newEmail.id);
       if (
-        oldEmail?.email_type !== newEmail.email_type || // Added null check
-        oldEmail?.email_address !== newEmail.email_address // Added null check
+        oldEmail.email_type !== newEmail.email_type ||
+        oldEmail.email_address !== newEmail.email_address
       ) {
         emailsToUpdate.push({ ...newEmail, id: newEmail.id });
       }
@@ -176,8 +176,8 @@ export async function syncSocialLinks(
       // Existing link, check for updates
       const oldLink = existingMap.get(newLink.id);
       if (
-        oldLink?.type !== newLink.type || // Added null check
-        oldLink?.url !== newLink.url // Added null check
+        oldLink.type !== newLink.type ||
+        oldLink.url !== newLink.url
       ) {
         linksToUpdate.push({ ...newLink, id: newLink.id });
       }

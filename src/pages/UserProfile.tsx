@@ -1,6 +1,7 @@
+import React from "react";
 import { MadeWithDyad } from "@/components/made-with-dyad";
 import UserProfileForm from "@/components/UserProfileForm";
-import React from "react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 
 const UserProfile = () => {
   return (

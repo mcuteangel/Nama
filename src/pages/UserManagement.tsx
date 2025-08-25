@@ -2,7 +2,8 @@ import { MadeWithDyad } from "@/components/made-with-dyad";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import UserList from "@/components/UserList";
 import { useTranslation } from "react-i18next";
-import React from "react";
+import EmptyState from '@/components/EmptyState';
+import { Users } from 'lucide-react';
 
 const UserManagement = () => {
   const { t } = useTranslation();

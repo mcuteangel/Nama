@@ -12,7 +12,7 @@ interface UserProfile {
 
 interface CreateUserInput {
   email: string;
-  password?: string;
+  password?: string; // Password is optional for admin.createUser, but required for sign up
   first_name?: string;
   last_name?: string;
   role: 'user' | 'admin';
@@ -88,7 +88,7 @@ export const UserManagementService = {
       const { userId, role } = input;
 
       // Invoke Edge Function to update user role with service role key
-      const { error } = await supabase.functions.invoke('update-user-role', { // Removed 'data'
+      const { data, error } = await supabase.functions.invoke('update-user-role', {
         body: JSON.stringify({ userId, role }),
         headers: { 'Content-Type': 'application/json' },
       });
@@ -109,7 +109,7 @@ export const UserManagementService = {
       const { userId, first_name, last_name } = input;
 
       // Invoke Edge Function to update user profile with service role key
-      const { error } = await supabase.functions.invoke('update-user-profile', { // Removed 'data'
+      const { data, error } = await supabase.functions.invoke('update-user-profile', {
         body: JSON.stringify({ userId, first_name, last_name }),
         headers: { 'Content-Type': 'application/json' },
       });
@@ -130,7 +130,7 @@ export const UserManagementService = {
       const { userId, newPassword } = input;
 
       // Invoke Edge Function to update user password with service role key
-      const { error } = await supabase.functions.invoke('update-user-password', { // Removed 'data'
+      const { data, error } = await supabase.functions.invoke('update-user-password', {
         body: JSON.stringify({ userId, newPassword }),
         headers: { 'Content-Type': 'application/json' },
       });
@@ -163,8 +163,8 @@ export const UserManagementService = {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${session.access_token}`,
-            'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${session.access_token}`, // Use the access token for authorization
+            'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY, // Use the public anon key from environment variables
           },
           body: JSON.stringify(requestBody),
         }

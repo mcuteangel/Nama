@@ -4,9 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Edit, Trash2, Users, PlusCircle, Tag } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/integrations/supabase/auth";
-import { showSuccess, showError, showLoading } from "@/utils/toast"; // Removed dismissToast
-import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"; // Removed DialogHeader, DialogTitle
+import { showSuccess, showError, showLoading, dismissToast } from "@/utils/toast";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import GroupForm from "./GroupForm";
 import { invalidateCache, fetchWithCache } from "@/utils/cache-helpers";
 import LoadingMessage from "./LoadingMessage";
@@ -49,7 +49,7 @@ const GroupItem = ({ group, onGroupUpdated, onGroupDeleted }: { group: Group; on
       console.error("Error deleting group:", error);
       showError(`خطا در حذف گروه: ${error.message || "خطای ناشناخته"}`);
     } finally {
-      // dismissToast(toastId); // Commented out as per previous instruction
+      dismissToast(toastId);
       setIsDeleting(false);
     }
   };
@@ -166,7 +166,7 @@ const GroupList = () => {
       showError(`خطا در بارگذاری گروه‌ها: ${ErrorManager.getErrorMessage(error) || "خطای ناشناخته"}`);
       setGroups([]);
     } finally {
-      // dismissToast(toastId); // Commented out as per previous instruction
+      dismissToast(toastId);
       setLoadingGroups(false);
     }
   }, [session, isSessionLoading]);

@@ -3,8 +3,9 @@
 import React, { useState, useRef, useCallback } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label'; // Removed Input
-import { UploadCloud, FileText, XCircle } from 'lucide-react'; // Removed Loader2
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { UploadCloud, FileText, XCircle, Loader2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useErrorHandler } from '@/hooks/use-error-handler';
 import { ErrorManager } from '@/lib/error-manager';
@@ -35,7 +36,7 @@ const ImportContactsDialog: React.FC<ImportContactsDialogProps> = ({ onImportSuc
     }
   }, [onImportSuccess, t]);
 
-  const onErrorImport = useCallback((err: any) => { // Explicitly type err
+  const onErrorImport = useCallback((err: Error) => {
     ErrorManager.logError(err, { component: 'ImportContactsDialog', action: 'importCsv' });
   }, []);
 

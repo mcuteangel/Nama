@@ -19,6 +19,7 @@ interface AddGroupDialogProps {
 
 const AddGroupDialog: React.FC<AddGroupDialogProps> = ({ onGroupAdded, open, onOpenChange }) => {
   const { session, isLoading: isSessionLoading } = useSession();
+  const [existingGroupColors, setExistingGroupColors] = useState<string[]>([]);
   const [initialColor, setInitialColor] = useState<string>('#60A5FA'); // Default color
 
   const findUniqueColor = useCallback((usedColors: string[]): string => {
@@ -32,10 +33,11 @@ const AddGroupDialog: React.FC<AddGroupDialogProps> = ({ onGroupAdded, open, onO
 
   const onSuccessFetchColors = useCallback((result: any) => {
     const currentColors = result.data.map((g: { color: string }) => g.color).filter(Boolean) as string[];
+    setExistingGroupColors(currentColors);
     setInitialColor(findUniqueColor(currentColors));
   }, [findUniqueColor]);
 
-  const onErrorFetchColors = useCallback((err: any) => { // Explicitly type err
+  const onErrorFetchColors = useCallback((err: Error) => {
     console.error("Error fetching existing group colors in AddGroupDialog:", err);
     ErrorManager.notifyUser("خطا در بارگذاری رنگ‌های گروه‌های موجود.", 'error');
     setInitialColor('#60A5FA'); // Fallback to default color on error
@@ -54,6 +56,7 @@ const AddGroupDialog: React.FC<AddGroupDialogProps> = ({ onGroupAdded, open, onO
   useEffect(() => {
     const fetchColors = async () => {
       if (isSessionLoading || !session?.user) {
+        setExistingGroupColors([]);
         setInitialColor('#60A5FA');
         return;
       }

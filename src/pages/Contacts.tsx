@@ -2,7 +2,7 @@ import { MadeWithDyad } from "@/components/made-with-dyad";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, Search, Download, Users } from "lucide-react"; // Removed Users
+import { PlusCircle, Search, Download, Users } from "lucide-react";
 import ContactList from "@/components/ContactList";
 import { useNavigate } from "react-router-dom";
 import React, { useState, useEffect } from "react";
@@ -15,13 +15,13 @@ import LoadingSpinner from '@/components/LoadingSpinner';
 
 const Contacts = () => {
   const navigate = useNavigate();
-  const { groups, fetchGroups } = useGroups(); // Removed loadingGroups
+  const { groups, loadingGroups, fetchGroups } = useGroups();
   const { session } = useSession();
 
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedGroup, setSelectedGroup] = useState<string>("");
   const [companyFilter, setCompanyFilter] = useState<string>("");
-  const [sortOption, setSortOption] = useState<string>("last_name_asc");
+  const [sortOption, setSortOption] = useState<string>("last_name_asc"); // Changed default sort option here
   const [isExporting, setIsExporting] = useState(false);
 
   useEffect(() => {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Sparkles, User, CheckCircle, XCircle, LightbulbOff, Brain } from "lucide-react"; // Removed Loader2
+import { Sparkles, Loader2, User, CheckCircle, XCircle, LightbulbOff, Brain } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useSession } from "@/integrations/supabase/auth";
 import { useErrorHandler } from "@/hooks/use-error-handler";
@@ -10,7 +10,7 @@ import LoadingMessage from "./LoadingMessage";
 import { supabase } from '@/integrations/supabase/client';
 import { invalidateCache } from '@/utils/cache-helpers';
 import { suggestGenderFromName, updateLearnedGenderPreference, clearLearnedGenderPreferences, getLearnedGenderPreferences } from '@/utils/gender-learning';
-import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import CancelButton from './CancelButton';
 import EmptyState from './EmptyState';
 import LoadingSpinner from './LoadingSpinner';
@@ -49,7 +49,7 @@ const GenderSuggestionManagement: React.FC = () => {
     }
   }, []);
 
-  const onErrorFetchContacts = useCallback((err: any) => { // Explicitly type err
+  const onErrorFetchContacts = useCallback((err: Error) => {
     ErrorManager.logError(err, { component: 'GenderSuggestionManagement', action: 'fetchUngenderedContacts' });
     ErrorManager.notifyUser(t('ai_suggestions.error_fetching_ungendered_contacts'), 'error');
   }, [t]);
@@ -98,7 +98,7 @@ const GenderSuggestionManagement: React.FC = () => {
     }
 
     setIsGenerating(true);
-    ErrorManager.notifyUser(t('ai_suggestions.generating_gender_suggestions_local'), 'info'); // Removed toastId
+    const toastId = ErrorManager.notifyUser(t('ai_suggestions.generating_gender_suggestions_local'), 'info');
 
     try {
       const newSuggestions: GenderSuggestionDisplay[] = ungenderedContacts
@@ -119,11 +119,12 @@ const GenderSuggestionManagement: React.FC = () => {
       } else {
         ErrorManager.notifyUser(t('ai_suggestions.gender_suggestions_generated_local'), 'success');
       }
-    } catch (err: any) { // Explicitly type err
+    } catch (err: any) {
       ErrorManager.logError(err, { component: 'GenderSuggestionManagement', action: 'generateGenderSuggestionsLocal' });
       ErrorManager.notifyUser(`${t('ai_suggestions.error_generating_gender_suggestions_local')}: ${ErrorManager.getErrorMessage(err)}`, 'error');
     } finally {
       setIsGenerating(false);
+      // dismissToast(toastId);
     }
   }, [session, ungenderedContacts, t]);
 
@@ -133,7 +134,7 @@ const GenderSuggestionManagement: React.FC = () => {
       return;
     }
 
-    ErrorManager.notifyUser(t('ai_suggestions.applying_gender_suggestion'), 'info'); // Removed toastId
+    const toastId = ErrorManager.notifyUser(t('ai_suggestions.applying_gender_suggestion'), 'info');
     try {
       const { error } = await supabase
         .from('contacts')
@@ -153,11 +154,11 @@ const GenderSuggestionManagement: React.FC = () => {
       setGenderSuggestions(prev => prev.filter(s => s.contactId !== suggestion.contactId));
       invalidateCache(`contacts_list_${session.user.id}_`);
       fetchUngenderedContacts();
-    } catch (err: any) { // Explicitly type err
+    } catch (err: any) {
       ErrorManager.logError(err, { component: 'GenderSuggestionManagement', action: 'acceptGenderSuggestion', suggestion });
       ErrorManager.notifyUser(`${t('ai_suggestions.error_applying_gender_suggestion')}: ${ErrorManager.getErrorMessage(err)}`, 'error');
     } finally {
-      // dismissToast(toastId); // Commented out as per previous instruction
+      // dismissToast(toastId);
     }
   }, [session, t, fetchUngenderedContacts, ungenderedContacts, updateLearnedNamesCount]);
 

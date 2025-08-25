@@ -3,15 +3,15 @@ import { MadeWithDyad } from "@/components/made-with-dyad";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Sparkles, UserCheck, Mic, StopCircle } from "lucide-react"; // Removed Loader2, PlusCircle
+import { Sparkles, Loader2, PlusCircle, UserCheck, Mic, StopCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useContactExtractor, ExtractedContactInfo } from "@/hooks/use-contact-extractor";
 import { ErrorManager } from "@/lib/error-manager";
 import LoadingMessage from "@/components/LoadingMessage";
 import AISuggestionCard, { AISuggestion as AISuggestionCardProps } from "@/components/AISuggestionCard";
-import { ContactFormValues } from "@/types/contact"; // Removed PhoneNumberFormData, EmailAddressFormData, SocialLinkFormData
-import { ContactCrudService } from "@/services/contact-crud-service";
-import { ContactListService } from "@/services/contact-list-service";
+import { ContactFormValues, PhoneNumberFormData, EmailAddressFormData, SocialLinkFormData } from "@/types/contact";
+import { ContactCrudService } from "@/services/contact-crud-service"; // Updated import
+import { ContactListService } from "@/services/contact-list-service"; // Updated import
 import { useSession } from "@/integrations/supabase/auth";
 import { useErrorHandler } from "@/hooks/use-error-handler";
 import { invalidateCache, fetchWithCache } from "@/utils/cache-helpers";
@@ -75,7 +75,7 @@ const AISuggestions: React.FC = () => {
     }
   }, []);
 
-  const onErrorFetchSuggestions = useCallback((err: any) => { // Explicitly type err
+  const onErrorFetchSuggestions = useCallback((err: Error) => {
     ErrorManager.logError(err, { component: 'AISuggestions', action: 'fetchPendingSuggestions' });
     ErrorManager.notifyUser(t('ai_suggestions.error_fetching_suggestions'), 'error');
   }, [t]);
@@ -117,7 +117,7 @@ const AISuggestions: React.FC = () => {
       // Now, for each fetched suggestion, check if it's an update or new
       const formattedSuggestions: AISuggestionDisplay[] = [];
       if (data) {
-        const { data: allContacts, error: fetchContactsError } = await ContactListService.getFilteredContacts(
+        const { data: allContacts, error: fetchContactsError } = await ContactListService.getFilteredContacts( // Updated service call
           userId, "", "", "", "first_name_asc" // Fetch all contacts for comparison
         );
 
@@ -170,7 +170,7 @@ const AISuggestions: React.FC = () => {
     fetchPendingSuggestions(); // Refresh the list of suggestions
   }, [session, t, fetchPendingSuggestions]);
 
-  const onErrorProcessContact = useCallback((err: any) => { // Explicitly type err
+  const onErrorProcessContact = useCallback((err: Error) => {
     ErrorManager.logError(err, { component: 'AISuggestions', action: 'saveOrUpdateContact' });
   }, []);
 
@@ -195,7 +195,7 @@ const AISuggestions: React.FC = () => {
     }
 
     setIsProcessingSuggestions(true);
-    const { success, error } = await enqueueContactExtraction(rawTextInput); // Removed suggestionId
+    const { success, error, suggestionId } = await enqueueContactExtraction(rawTextInput);
 
     if (success) {
       // Invalidate cache for pending suggestions to force a refetch
@@ -228,10 +228,10 @@ const AISuggestions: React.FC = () => {
 
     await executeSaveOrUpdate(async () => {
       if (suggestion.type === 'new') {
-        const { error } = await ContactCrudService.addContact(contactValues);
+        const { error } = await ContactCrudService.addContact(contactValues); // Updated service call
         if (error) throw new Error(error);
       } else if (suggestion.type === 'update' && suggestion.existingContact) {
-        const { error } = await ContactCrudService.updateContact(suggestion.existingContact.id, contactValues);
+        const { error } = await ContactCrudService.updateContact(suggestion.existingContact.id, contactValues); // Updated service call
         if (error) throw new Error(error);
       }
       // Update suggestion status in DB

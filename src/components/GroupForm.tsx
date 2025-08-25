@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react'; // Removed useState
+import React, { useState, useEffect, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
-import ColorPicker from './ColorPicker'; // Removed colors import as it's not directly used here
+import ColorPicker, { colors } from './ColorPicker';
 import { useSession } from '@/integrations/supabase/auth';
 import { useErrorHandler } from '@/hooks/use-error-handler';
 import { ErrorManager } from '@/lib/error-manager';
@@ -36,11 +36,13 @@ const GroupForm: React.FC<GroupFormProps> = ({ initialData, onSuccess, onCancel 
   const navigate = useNavigate();
   const { session } = useSession();
 
+  // Assign the result of useForm to a variable named 'form'
   const form = useForm<GroupFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: initialData || { name: '', color: '#60A5FA' },
   });
 
+  // Destructure properties from the 'form' variable
   const {
     register,
     handleSubmit,
@@ -51,12 +53,12 @@ const GroupForm: React.FC<GroupFormProps> = ({ initialData, onSuccess, onCancel 
 
   const selectedColor = watch('color');
 
-  const onSuccessCallback = useCallback((result: { id: string } | undefined) => {
+  const onSuccessCallback = useCallback((result: { id: string } | undefined) => { // result will be the data from executeSave
     ErrorManager.notifyUser(initialData?.id ? 'گروه با موفقیت ویرایش شد.' : 'گروه با موفقیت اضافه شد.', 'success');
-    onSuccess?.(result?.id);
+    onSuccess?.(result?.id); // Pass the new group's ID
   }, [initialData?.id, onSuccess]);
 
-  const onErrorCallback = useCallback((err: any) => { // Explicitly type err
+  const onErrorCallback = useCallback((err) => {
     ErrorManager.logError(err, { component: "GroupForm", action: initialData?.id ? "updateGroup" : "addGroup" });
   }, [initialData?.id]);
 
@@ -100,20 +102,20 @@ const GroupForm: React.FC<GroupFormProps> = ({ initialData, onSuccess, onCancel 
           .from('groups')
           .update({ name: values.name, color: values.color, user_id: userId })
           .eq('id', initialData.id)
-          .select('id')
+          .select('id') // Select the ID to return it
           .single();
       } else {
         res = await supabase
           .from('groups')
           .insert({ name: values.name, color: values.color, user_id: userId })
-          .select('id')
+          .select('id') // Select the ID to return it
           .single();
       }
 
       if (res.error) {
         throw new Error(res.error.message);
       }
-      return res.data;
+      return res.data; // Return the data (which includes the ID)
     });
   };
 

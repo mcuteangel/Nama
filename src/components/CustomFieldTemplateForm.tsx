@@ -7,8 +7,8 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
-import { Plus, X } from 'lucide-react';
-import { CustomFieldTemplateService } from '@/services/custom-field-template-service';
+import { Plus, Save, X } from 'lucide-react';
+import { CustomFieldTemplateService } from '@/services/custom-field-template-service'; // Updated import
 import { useErrorHandler } from '@/hooks/use-error-handler';
 import { ErrorManager } from '@/lib/error-manager';
 import {
@@ -39,7 +39,7 @@ const CustomFieldTemplateForm: React.FC<CustomFieldTemplateFormProps> = ({ initi
     onSuccess?.();
   }, [initialData, onSuccess]);
 
-  const onErrorCallback = useCallback((err: any) => { // Explicitly type err
+  const onErrorCallback = useCallback((err) => {
     console.error("CustomFieldTemplateForm: useErrorHandler onError triggered.", err);
     ErrorManager.logError(err, {
       component: "CustomFieldTemplateForm",
@@ -101,7 +101,7 @@ const CustomFieldTemplateForm: React.FC<CustomFieldTemplateFormProps> = ({ initi
       console.log("CustomFieldTemplateForm: Executing async Supabase operation.");
       let res;
       if (initialData) {
-        res = await CustomFieldTemplateService.updateCustomFieldTemplate(initialData.id, {
+        res = await CustomFieldTemplateService.updateCustomFieldTemplate(initialData.id, { // Updated service call
           name: data.name.trim(),
           type: data.type,
           options: data.type === 'list' ? (data.options || []).filter(Boolean) : undefined,
@@ -109,7 +109,7 @@ const CustomFieldTemplateForm: React.FC<CustomFieldTemplateFormProps> = ({ initi
           required: !!data.required,
         });
       } else {
-        res = await CustomFieldTemplateService.addCustomFieldTemplate({
+        res = await CustomFieldTemplateService.addCustomFieldTemplate({ // Updated service call
           name: data.name.trim(),
           type: data.type,
           options: data.type === 'list' ? (data.options || []).filter(Boolean) : undefined,

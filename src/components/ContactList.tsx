@@ -1,15 +1,15 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { Card } from "@/components/ui/card"; // Removed CardContent
+import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Edit, Trash2, Phone, Mail, Users } from "lucide-react"; // Added Users
-import { supabase } from "@/integrations/supabase/client"; // Removed supabase as it's not directly used here
-import { showSuccess, showError, showLoading } from "@/utils/toast"; // Removed dismissToast
+import { Edit, Trash2, Phone, Mail, Users } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { showSuccess, showError, showLoading, dismissToast } from "@/utils/toast";
 import { useNavigate } from "react-router-dom";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"; // Added AlertDialogCancel
-import { ContactCrudService } => from "@/services/contact-crud-service";
-import { ContactListService } from "@/services/contact-list-service";
-import { fetchWithCache, invalidateCache } from "@/utils/cache-helpers"; // Added invalidateCache
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { ContactCrudService } from "@/services/contact-crud-service"; // Updated import
+import { ContactListService } from "@/services/contact-list-service"; // Updated import
+import { fetchWithCache, invalidateCache } from "@/utils/cache-helpers";
 import { useSession } from "@/integrations/supabase/auth";
 import LoadingMessage from "./LoadingMessage";
 import { useErrorHandler } from "@/hooks/use-error-handler";
@@ -18,14 +18,14 @@ import EmptyState from './EmptyState';
 import LoadingSpinner from './LoadingSpinner';
 
 interface PhoneNumber {
-  id: string;
+  id: string; // Added id
   phone_number: string;
   phone_type: string;
   extension?: string | null;
 }
 
 interface EmailAddress {
-  id: string;
+  id: string; // Added id
   email_address: string;
   email_type: string;
 }
@@ -65,7 +65,7 @@ const ContactItem = ({ contact, onContactDeleted, onContactEdited }: { contact: 
     onContactDeleted(contact.id);
   }, [contact.id, onContactDeleted]);
 
-  const onErrorDelete = useCallback((err: any) => { // Explicitly type err
+  const onErrorDelete = useCallback((err: Error) => {
     ErrorManager.logError(err, { component: 'ContactItem', action: 'deleteContact', contactId: contact.id });
   }, [contact.id]);
 
@@ -88,7 +88,7 @@ const ContactItem = ({ contact, onContactDeleted, onContactEdited }: { contact: 
   const handleDelete = async (e: React.MouseEvent) => {
     e.stopPropagation();
     await executeDelete(async () => {
-      const { error } = await ContactCrudService.deleteContact(contact.id);
+      const { error } = await ContactCrudService.deleteContact(contact.id); // Updated service call
 
       if (error) throw error;
     });
@@ -167,7 +167,7 @@ const ContactList = ({ searchTerm, selectedGroup, companyFilter, sortOption }: C
     }
   }, []);
 
-  const onErrorFetch = useCallback((err: any) => { // Explicitly type err
+  const onErrorFetch = useCallback((err: Error) => {
     ErrorManager.logError(err, { component: 'ContactList', action: 'fetchContacts' });
     console.error("Error fetching contacts in ContactList:", err);
   }, []);
@@ -197,7 +197,7 @@ const ContactList = ({ searchTerm, selectedGroup, companyFilter, sortOption }: C
       const { data, error, fromCache } = await fetchWithCache<Contact[]>(
         cacheKey,
         async () => {
-          const result = await ContactListService.getFilteredContacts(
+          const result = await ContactListService.getFilteredContacts( // Updated service call
             userId,
             searchTerm,
             selectedGroup,

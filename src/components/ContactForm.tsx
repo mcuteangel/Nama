@@ -4,15 +4,18 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Form } from "@/components/ui/form";
 import { useNavigate } from "react-router-dom";
-import React, { useEffect, useState, useCallback, useMemo, useRef } from "react";
+import React, { useEffect, useState, useCallback, useMemo, useRef } from "react"; // Import useRef
 import { useSession } from "@/integrations/supabase/auth";
 import { useContactFormLogic } from "@/hooks/use-contact-form-logic";
-import { CustomFieldTemplateService } from "@/services/custom-field-template-service";
+import { CustomFieldTemplateService } from "@/services/custom-field-template-service"; // Updated import
 import { CustomFieldTemplate } from "@/domain/schemas/custom-field-template";
 import { ContactFormValues, contactFormSchema, CustomFieldFormData } from "../types/contact.ts";
 import { fetchWithCache } from "@/utils/cache-helpers";
+import { Button } from "./ui/button.tsx";
+import { Textarea } from "./ui/textarea.tsx";
+import { Sparkles } from "lucide-react";
+import { useContactExtractor } from "@/hooks/use-contact-extractor";
 import { useTranslation } from "react-i18next";
-import { Button } from "@/components/ui/button"; // Added Button
 
 // Import new modular components
 import ContactBasicInfo from "./contact-form/ContactBasicInfo.tsx";
@@ -24,6 +27,7 @@ import ContactImportantDates from "./contact-form/ContactImportantDates.tsx";
 import ContactCustomFields from "./contact-form/ContactCustomFields.tsx";
 import ContactFormActions from "./contact-form/ContactFormActions.tsx";
 import ContactAvatarUpload from "./ContactAvatarUpload.tsx";
+import { ErrorManager } from "@/lib/error-manager.ts";
 import LoadingMessage from "./LoadingMessage.tsx";
 
 interface ContactFormProps {
@@ -111,7 +115,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
     const { data, error } = await fetchWithCache<CustomFieldTemplate[]>(
       cacheKey,
       async () => {
-        const result = await CustomFieldTemplateService.getAllCustomFieldTemplates();
+        const result = await CustomFieldTemplateService.getAllCustomFieldTemplates(); // Updated service call
         return { data: result.data, error: result.error };
       }
     );

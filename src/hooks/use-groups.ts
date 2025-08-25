@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/integrations/supabase/auth";
-import { fetchWithCache } from "@/utils/cache-helpers"; // Removed invalidateCache
+import { fetchWithCache, invalidateCache } from "@/utils/cache-helpers";
 import { useErrorHandler } from "./use-error-handler";
 import { ErrorManager } from "@/lib/error-manager";
 
@@ -21,17 +21,17 @@ export const useGroups = () => {
     }
   }, []);
 
-  const onErrorGroups = useCallback((err: any) => { // Explicitly type err
+  const onErrorGroups = useCallback((err) => {
     ErrorManager.logError(err, { component: 'useGroups', action: 'fetchGroups' });
   }, []);
 
   const {
     isLoading: loadingGroups,
     executeAsync,
-  } = useErrorHandler<{ data: Group[] | null; error: string | null; fromCache: boolean }>(null, {
+  } = useErrorHandler<{ data: Group[] | null; error: string | null; fromCache: boolean }>(null, { // Explicitly define TResult here
     maxRetries: 3,
     retryDelay: 1000,
-    showToast: false,
+    showToast: false, // Changed to false to manually control success toast
     customErrorMessage: "خطا در بارگذاری گروه‌ها",
     onSuccess: onSuccessGroups,
     onError: onErrorGroups,
@@ -63,7 +63,7 @@ export const useGroups = () => {
         throw new Error(error);
       }
       setGroups(data || []);
-      return { data, error: null, fromCache };
+      return { data, error: null, fromCache }; // Added error: null
     });
   }, [session, isSessionLoading, executeAsync]);
 

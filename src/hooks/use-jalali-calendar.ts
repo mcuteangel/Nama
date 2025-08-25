@@ -1,15 +1,15 @@
 "use client";
 
 import { useState, useCallback, useEffect } from 'react';
-import moment, { Moment } from 'moment-jalaali'; // Import Moment type
+import moment from 'moment-jalaali';
 import { enUS } from 'date-fns/locale';
-import { format as formatFns } from 'date-fns';
+import { format as formatFns } from 'date-fns'; // Renamed to avoid conflict with local format function
 
 export type CalendarType = 'gregorian' | 'jalali';
 
 export interface CalendarOptions {
   type?: CalendarType;
-  defaultDate?: Date; // Removed unused defaultDate
+  defaultDate?: Date;
   format?: string;
 }
 
@@ -20,8 +20,8 @@ export interface CalendarHookReturn {
   formatDate: (date: Date | undefined, formatString?: string) => string;
   formatDateWithDay: (date: Date | undefined) => string;
   getCalendarLabel: () => string;
-  convertToJalali: (date: Date) => Moment; // Use Moment type
-  convertToGregorian: (date: Moment) => Date; // Use Moment type
+  convertToJalali: (date: Date) => moment.Moment;
+  convertToGregorian: (date: moment.Moment) => Date;
 }
 
 const CALENDAR_TYPE_STORAGE_KEY = 'calendarType';
@@ -29,8 +29,9 @@ const CALENDAR_TYPE_STORAGE_KEY = 'calendarType';
 export function useJalaliCalendar(options: CalendarOptions = {}): CalendarHookReturn {
   const { 
     type = 'jalali', 
+    defaultDate, 
     format: formatString = 'jYYYY/jMM/jDD' 
-  } = options; // Removed defaultDate
+  } = options;
 
   const [calendarType, setCalendarTypeState] = useState<CalendarType>(() => {
     if (typeof window !== 'undefined') {
@@ -83,7 +84,7 @@ export function useJalaliCalendar(options: CalendarOptions = {}): CalendarHookRe
     return moment(date);
   }, []);
 
-  const convertToGregorian = useCallback((date: Moment) => { // Use Moment type
+  const convertToGregorian = useCallback((date: moment.Moment) => {
     return date.toDate();
   }, []);
 

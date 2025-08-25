@@ -44,7 +44,7 @@ const ContactsByGenderChart: React.FC<ContactsByGenderChartProps> = ({ data }) =
                 fill="#8884d8"
                 dataKey="value"
               >
-                {formattedData.map((_, index) => ( /* Removed 'entry' */
+                {formattedData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>

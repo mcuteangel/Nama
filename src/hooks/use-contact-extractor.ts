@@ -1,7 +1,8 @@
-import { useState, useCallback } from 'react'; // Removed useEffect
-import { PhoneNumberFormData, EmailAddressFormData, SocialLinkFormData } from '@/types/contact'; // Removed ContactFormValues
+import { useState, useEffect, useCallback } from 'react';
+import { ContactFormValues, PhoneNumberFormData, EmailAddressFormData, SocialLinkFormData } from '@/types/contact';
 import { ErrorManager } from '@/lib/error-manager';
-import { useSession } from '@/integrations/supabase/auth';
+import { supabase } from '@/integrations/supabase/client';
+import { useSession } from '@/integrations/supabase/auth'; // Import useSession to get the access token
 
 // Define ExtractedContactInfo here as it's the core output of the AI
 export interface ExtractedContactInfo {
@@ -18,7 +19,7 @@ export interface ExtractedContactInfo {
 export function useContactExtractor() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { session } = useSession();
+  const { session } = useSession(); // Get the current session
 
   const enqueueContactExtraction = useCallback(async (text: string): Promise<{ success: boolean; error: string | null; suggestionId?: string }> => {
     setIsLoading(true);
@@ -39,10 +40,10 @@ export function useContactExtractor() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`,
-          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${session.access_token}`, // Use the session's access token
+          'apikey': SUPABASE_ANON_KEY, // Use the anon key
         },
-        body: JSON.stringify({ text }),
+        body: JSON.stringify({ text }), // Ensure body is stringified JSON
       });
 
       if (!response.ok) {

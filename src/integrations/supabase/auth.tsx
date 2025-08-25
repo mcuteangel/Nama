@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { Session, SupabaseClient } from '@supabase/supabase-js';
 
 interface SessionContextType {
@@ -32,7 +32,7 @@ export const SessionContextProvider = ({ children, supabaseClient }: SessionCont
     });
 
     return () => subscription.unsubscribe();
-  }, [supabaseClient]);
+  }, [supabaseClient]); // Depend on supabaseClient
 
   return (
     <SessionContext.Provider value={{ session, isLoading }}>

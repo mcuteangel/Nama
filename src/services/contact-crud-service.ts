@@ -1,5 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
-import { ContactFormValues, PhoneNumberFormData, EmailAddressFormData, SocialLinkFormData, CustomFieldFormData } from '@/types/contact'; // Import specific FormData types
+import { ContactFormValues } from '@/types/contact';
 import { invalidateCache } from '@/utils/cache-helpers';
 import {
   syncPhoneNumbers,
@@ -46,19 +46,19 @@ export const ContactCrudService = {
 
       // 2. Insert related data using helper functions (no diffing needed for new contacts)
       if (values.phoneNumbers && values.phoneNumbers.length > 0) {
-        await syncPhoneNumbers(supabase, user.id, currentContactId, values.phoneNumbers as PhoneNumberFormData[]);
+        await syncPhoneNumbers(supabase, user.id, currentContactId, values.phoneNumbers);
       }
       if (values.emailAddresses && values.emailAddresses.length > 0) {
-        await syncEmailAddresses(supabase, user.id, currentContactId, values.emailAddresses as EmailAddressFormData[]);
+        await syncEmailAddresses(supabase, user.id, currentContactId, values.emailAddresses);
       }
       if (values.socialLinks && values.socialLinks.length > 0) {
-        await syncSocialLinks(supabase, user.id, currentContactId, values.socialLinks as SocialLinkFormData[]);
+        await syncSocialLinks(supabase, user.id, currentContactId, values.socialLinks);
       }
       if (values.groupId) {
         await syncGroupAssignment(supabase, user.id, currentContactId, values.groupId);
       }
       if (values.customFields && values.customFields.length > 0) {
-        await syncCustomFields(supabase, user.id, currentContactId, values.customFields as CustomFieldFormData[]);
+        await syncCustomFields(supabase, user.id, currentContactId, values.customFields);
       }
 
       return { data: { id: currentContactId }, error: null };
@@ -100,11 +100,11 @@ export const ContactCrudService = {
       if (contactError) throw contactError;
 
       // 2. Synchronize related data using helper functions
-      await syncPhoneNumbers(supabase, user.id, contactId, (values.phoneNumbers || []) as PhoneNumberFormData[]);
-      await syncEmailAddresses(supabase, user.id, contactId, (values.emailAddresses || []) as EmailAddressFormData[]);
-      await syncSocialLinks(supabase, user.id, contactId, (values.socialLinks || []) as SocialLinkFormData[]);
+      await syncPhoneNumbers(supabase, user.id, contactId, values.phoneNumbers || []);
+      await syncEmailAddresses(supabase, user.id, contactId, values.emailAddresses || []);
+      await syncSocialLinks(supabase, user.id, contactId, values.socialLinks || []);
       await syncGroupAssignment(supabase, user.id, contactId, values.groupId || null);
-      await syncCustomFields(supabase, user.id, contactId, (values.customFields || []) as CustomFieldFormData[]);
+      await syncCustomFields(supabase, user.id, contactId, values.customFields || []);
 
       return { success: true, error: null };
     } catch (error: any) {
