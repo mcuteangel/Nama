@@ -9,7 +9,7 @@ import { useSession } from "@/integrations/supabase/auth";
 import { useContactFormLogic } from "@/hooks/use-contact-form-logic";
 import { ContactService } from "@/services/contact-service";
 import { CustomFieldTemplate } from "@/domain/schemas/custom-field-template";
-import { ContactFormValues, contactFormSchema } from "../types/contact.ts";
+import { ContactFormValues, contactFormSchema, CustomFieldFormData } from "../types/contact.ts";
 import { fetchWithCache } from "@/utils/cache-helpers";
 import { Button } from "./ui/button.tsx";
 import { Textarea } from "./ui/textarea.tsx";
@@ -132,26 +132,26 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
     fetchTemplates();
   }, [fetchTemplates]);
 
+  // Ref to store the last customFields value that was successfully set to the form
+  const lastSetCustomFieldsRef = useRef<CustomFieldFormData[]>([]);
+
   useEffect(() => {
-    if (loadingTemplates) return;
+    console.log("ContactForm: Custom fields useEffect triggered.");
+    if (loadingTemplates || !session?.user) {
+      console.log("ContactForm: Custom fields useEffect skipped due to loadingTemplates or no session user.");
+      return;
+    }
 
-    const newCustomFieldsFormState: { template_id: string; value: string }[] = [];
-    const initialCustomFieldValuesMap = new Map<string, string>();
-
-    initialData?.customFields?.forEach(cf => {
-      initialCustomFieldValuesMap.set(cf.template_id, cf.value);
-    });
-
-    availableTemplates.forEach(template => {
-      const existingValue = initialCustomFieldValuesMap.get(template.id!);
-      newCustomFieldsFormState.push({
+    const desiredCustomFields: CustomFieldFormData[] = availableTemplates.map(template => {
+      const initialValue = initialData?.customFields?.find(cf => cf.template_id === template.id)?.value;
+      return {
         template_id: template.id!,
-        value: existingValue !== undefined ? existingValue : "",
-      });
+        value: initialValue !== undefined ? initialValue : "",
+      };
     });
 
-    // Sort both arrays for stable comparison
-    const sortFn = (a: { template_id: string; value: string }, b: { template_id: string; value: string }) => {
+    // Sort for stable comparison
+    const sortFn = (a: CustomFieldFormData, b: CustomFieldFormData) => {
       if (a.template_id < b.template_id) return -1;
       if (a.template_id > b.template_id) return 1;
       if (a.value < b.value) return -1;
@@ -159,21 +159,30 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
       return 0;
     };
 
-    const sortedNewCustomFields = [...newCustomFieldsFormState].sort(sortFn);
-    const currentFormValues = form.getValues("customFields") || [];
-    const sortedCurrentFormValues = [...currentFormValues].sort(sortFn);
+    const sortedDesired = [...desiredCustomFields].sort(sortFn);
+    const sortedLastSet = [...lastSetCustomFieldsRef.current].sort(sortFn);
 
-    // Perform a deep comparison of the sorted arrays
-    const isDifferent = JSON.stringify(sortedCurrentFormValues) !== JSON.stringify(sortedNewCustomFields);
+    // Deep comparison function
+    const areCustomFieldsEqual = (arr1: CustomFieldFormData[], arr2: CustomFieldFormData[]) => {
+      if (arr1.length !== arr2.length) return false;
+      for (let i = 0; i < arr1.length; i++) {
+        if (arr1[i].template_id !== arr2[i].template_id || arr1[i].value !== arr2[i].value) {
+          return false;
+        }
+      }
+      return true;
+    };
 
-    if (isDifferent) {
-      console.log("ContactForm: Custom fields are different, updating form values.");
-      form.setValue("customFields", sortedNewCustomFields, { shouldValidate: true, shouldDirty: true });
+    console.log("ContactForm: Comparing desired vs last set custom fields.");
+    if (!areCustomFieldsEqual(sortedDesired, sortedLastSet)) {
+      console.log("ContactForm: Custom fields are different, updating form values and ref.");
+      form.setValue("customFields", sortedDesired, { shouldValidate: true, shouldDirty: true });
+      lastSetCustomFieldsRef.current = desiredCustomFields; // Update the ref with the new desired state
     } else {
-      console.log("ContactForm: Custom fields are the same, no update needed.");
+      console.log("ContactForm: Custom fields are the same as last set, no update needed.");
     }
 
-  }, [availableTemplates, initialData, loadingTemplates, form]);
+  }, [availableTemplates, initialData, loadingTemplates, form, session?.user?.id]); // Dependencies
 
   const handleCancel = () => {
     navigate(-1);
