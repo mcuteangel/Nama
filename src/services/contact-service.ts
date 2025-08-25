@@ -105,7 +105,7 @@ export const ContactService = {
 
     let sortByColumn: string;
     let ascendingOrder: boolean;
-    let collation: string | undefined; // New variable for collation
+    let collation: string | undefined;
 
     switch (sortOption) {
       case "first_name_asc":
@@ -148,6 +148,7 @@ export const ContactService = {
       sortByColumn = `${sortByColumn} COLLATE "${collation}"`;
     }
     
+    // Pass only 'ascending' in the options object, as 'collate' is now part of sortByColumn
     query = query.order(sortByColumn, { ascending: ascendingOrder });
 
     const { data, error } = await query;
