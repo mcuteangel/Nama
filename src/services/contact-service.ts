@@ -137,7 +137,7 @@ export const ContactService = {
         ascendingOrder = true;
         break;
       default:
-        sortByColumn = "first_name";
+        sortByColumn = "last_name"; // Changed default sort to last_name
         ascendingOrder = true;
         collation = "fa_IR"; // Default to Persian collation for name sorts
         break;
@@ -150,9 +150,7 @@ export const ContactService = {
     
     query = query.order(sortByColumn, orderOptions);
 
-    console.log("ContactService: Supabase query before execution:", query); // New log
     const { data, error } = await query;
-    console.log("ContactService: Supabase query result - data:", data, "error:", error); // New log
 
     if (error) {
       return { data: null, error: error.message };
