@@ -97,26 +97,33 @@ serve(async (req: Request) => {
     const model: GenerativeModel = genAI.getGenerativeModel({ model: geminiModelName });
 
     const prompt = `
-      Extract contact information from the following text.
-      The output should be a JSON object with the following structure.
+      Extract contact information from the following text, which is in Persian (Farsi).
+      The output should be a JSON object with the specified structure.
+      The JSON keys (e.g., "firstName", "lastName", "company", "phoneNumbers", "emailAddresses", "socialLinks", "notes") must be in English.
+      The *values* for "firstName", "lastName", "company", "position", and "notes" should be extracted directly from the Persian input text.
+      For "phone_type", "email_type", and "socialLinks.type", map the Persian descriptions to their corresponding English enum values.
+      For example:
+      - 'موبایل' should map to 'mobile'
+      - 'منزل' should map to 'home'
+      - 'کار' should map to 'work'
+      - 'شخصی' should map to 'personal'
+      - 'لینکدین' should map to 'linkedin'
+      - 'وب‌سایت' should map to 'website'
       If a field is not found, use an empty string or an empty array as appropriate.
-      For phone numbers, try to identify the type (mobile, home, work, other) and extension if present.
-      For email addresses, try to identify the type (personal, work, other).
-      For social links, identify the type (linkedin, twitter, instagram, telegram, website, other) and the full URL.
       The output should be ONLY the JSON object, no other text or markdown.
 
-      Example Input:
-      "John Doe, Software Engineer at Example Corp. Mobile: +1-555-123-4567, Work Email: john.doe@example.com. LinkedIn: linkedin.com/in/johndoe"
+      Example Input (Persian):
+      "علی احمدی، مهندس نرم‌افزار در شرکت فناوری نوین. موبایل: 09123456789، ایمیل کاری: ali.ahmadi@novintech.com. لینکدین: linkedin.com/in/aliahmadi"
 
       Example Output:
       {
-        "firstName": "John",
-        "lastName": "Doe",
-        "company": "Example Corp",
-        "position": "Software Engineer",
-        "phoneNumbers": [{"phone_type": "mobile", "phone_number": "+1-555-123-4567", "extension": null}],
-        "emailAddresses": [{"email_type": "work", "email_address": "john.doe@example.com"}],
-        "socialLinks": [{"type": "linkedin", "url": "https://linkedin.com/in/johndoe"}],
+        "firstName": "علی",
+        "lastName": "احمدی",
+        "company": "شرکت فناوری نوین",
+        "position": "مهندس نرم‌افزار",
+        "phoneNumbers": [{"phone_type": "mobile", "phone_number": "09123456789", "extension": null}],
+        "emailAddresses": [{"email_type": "work", "email_address": "ali.ahmadi@novintech.com"}],
+        "socialLinks": [{"type": "linkedin", "url": "https://linkedin.com/in/aliahmadi"}],
         "notes": ""
       }
 
