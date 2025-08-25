@@ -16,6 +16,9 @@ import { useErrorHandler } from "@/hooks/use-error-handler";
 import { invalidateCache, fetchWithCache } from "@/utils/cache-helpers";
 import { useNavigate } from "react-router-dom";
 import { AISuggestionsService, AISuggestion as AISuggestionServiceType } from "@/services/ai-suggestions-service"; // Import new service
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"; // Import Tabs components
+import SmartGroupManagement from "@/components/SmartGroupManagement"; // New component for smart group management
+import DuplicateContactManagement from "@/components/DuplicateContactManagement"; // New component for duplicate contact management
 
 interface ExistingContactSummary {
   id: string;
@@ -40,28 +43,7 @@ const AISuggestions: React.FC = () => {
 
   const { enqueueContactExtraction, isLoading: isExtractorLoading, error: extractorError } = useContactExtractor();
 
-  const onSuccessProcessContact = useCallback(() => {
-    ErrorManager.notifyUser(t('ai_suggestions.contact_processed_success'), 'success');
-    invalidateCache(`contacts_list_${session?.user?.id}_`);
-    invalidateCache(`statistics_dashboard_${session?.user?.id}`);
-    setRawTextInput(''); // Clear input text
-    fetchPendingSuggestions(); // Refresh the list of suggestions
-  }, [session, t]);
-
-  const onErrorProcessContact = useCallback((err: Error) => {
-    ErrorManager.logError(err, { component: 'AISuggestions', action: 'saveOrUpdateContact' });
-  }, []);
-
-  const {
-    isLoading: isSavingOrUpdating,
-    executeAsync: executeSaveOrUpdate,
-  } = useErrorHandler(null, {
-    showToast: true,
-    customErrorMessage: t('ai_suggestions.error_processing_contact'),
-    onSuccess: onSuccessProcessContact,
-    onError: onErrorProcessContact,
-  });
-
+  // Define fetchPendingSuggestions first, as it's a dependency for other callbacks
   const onSuccessFetchSuggestions = useCallback((result: { data: AISuggestionServiceType[] | null; error: string | null; fromCache: boolean }) => {
     if (result.data) {
       const formattedSuggestions: AISuggestionDisplay[] = result.data.map(s => ({
@@ -158,6 +140,29 @@ const AISuggestions: React.FC = () => {
       return { data, error: null, fromCache };
     });
   }, [session, isSessionLoading, executeFetchSuggestions, t]);
+
+
+  const onSuccessProcessContact = useCallback(() => {
+    ErrorManager.notifyUser(t('ai_suggestions.contact_processed_success'), 'success');
+    invalidateCache(`contacts_list_${session?.user?.id}_`);
+    invalidateCache(`statistics_dashboard_${session?.user?.id}`);
+    setRawTextInput(''); // Clear input text
+    fetchPendingSuggestions(); // Refresh the list of suggestions
+  }, [session, t, fetchPendingSuggestions]); // fetchPendingSuggestions is now defined
+
+  const onErrorProcessContact = useCallback((err: Error) => {
+    ErrorManager.logError(err, { component: 'AISuggestions', action: 'saveOrUpdateContact' });
+  }, []);
+
+  const {
+    isLoading: isSavingOrUpdating,
+    executeAsync: executeSaveOrUpdate,
+  } = useErrorHandler(null, {
+    showToast: true,
+    customErrorMessage: t('ai_suggestions.error_processing_contact'),
+    onSuccess: onSuccessProcessContact,
+    onError: onErrorProcessContact,
+  });
 
   useEffect(() => {
     fetchPendingSuggestions();
@@ -260,57 +265,69 @@ const AISuggestions: React.FC = () => {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          <div className="space-y-3">
-            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 flex items-center gap-2">
-              <Sparkles size={20} className="text-blue-500" /> {t('ai_suggestions.input_section_title')}
-            </h3>
-            <Textarea
-              placeholder={t('ai_suggestions.paste_text_placeholder')}
-              value={rawTextInput}
-              onChange={(e) => setRawTextInput(e.target.value)}
-              className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 min-h-[150px]"
-              disabled={isExtractorLoading || isProcessingSuggestions || isSavingOrUpdating}
-            />
-            <Button
-              type="button"
-              onClick={handleExtractAndEnqueue}
-              disabled={!rawTextInput.trim() || isExtractorLoading || isProcessingSuggestions || isSavingOrUpdating}
-              className="w-full flex items-center gap-2 px-6 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-semibold shadow-md transition-all duration-300 transform hover:scale-105"
-            >
-              {isExtractorLoading || isProcessingSuggestions ? (
-                <Loader2 size={16} className="me-2 animate-spin" />
-              ) : (
-                <Sparkles size={16} className="me-2" />
-              )}
-              {isExtractorLoading || isProcessingSuggestions ? t('ai_suggestions.processing_text') : t('ai_suggestions.extract_and_suggest_button')}
-            </Button>
-          </div>
-
-          {(isLoadingSuggestions || isSavingOrUpdating) && (
-            <LoadingMessage message={t('ai_suggestions.loading_suggestions')} />
-          )}
-
-          {pendingSuggestions.length > 0 && (
-            <div className="space-y-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-              <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 flex items-center gap-2">
-                <UserCheck size={20} className="text-green-500" /> {t('ai_suggestions.suggestions_section_title')}
-              </h3>
-              {pendingSuggestions.map((suggestion) => (
-                <AISuggestionCard
-                  key={suggestion.id}
-                  suggestion={suggestion}
-                  onProcess={handleProcessSuggestion}
-                  onDiscard={handleDiscardSuggestion}
-                  onEdit={handleEditSuggestion}
-                  isProcessing={isSavingOrUpdating}
+          <Tabs defaultValue="extract-info" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="extract-info">{t('ai_suggestions.tab_extract_info')}</TabsTrigger>
+              <TabsTrigger value="smart-management">{t('ai_suggestions.tab_smart_management')}</TabsTrigger>
+            </TabsList>
+            <TabsContent value="extract-info" className="space-y-6 pt-4">
+              <div className="space-y-3">
+                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 flex items-center gap-2">
+                  <Sparkles size={20} className="text-blue-500" /> {t('ai_suggestions.input_section_title')}
+                </h3>
+                <Textarea
+                  placeholder={t('ai_suggestions.paste_text_placeholder')}
+                  value={rawTextInput}
+                  onChange={(e) => setRawTextInput(e.target.value)}
+                  className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-400 min-h-[150px]"
+                  disabled={isExtractorLoading || isProcessingSuggestions || isSavingOrUpdating}
                 />
-              ))}
-            </div>
-          )}
+                <Button
+                  type="button"
+                  onClick={handleExtractAndEnqueue}
+                  disabled={!rawTextInput.trim() || isExtractorLoading || isProcessingSuggestions || isSavingOrUpdating}
+                  className="w-full flex items-center gap-2 px-6 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-semibold shadow-md transition-all duration-300 transform hover:scale-105"
+                >
+                  {isExtractorLoading || isProcessingSuggestions ? (
+                    <Loader2 size={16} className="me-2 animate-spin" />
+                  ) : (
+                    <Sparkles size={16} className="me-2" />
+                  )}
+                  {isExtractorLoading || isProcessingSuggestions ? t('ai_suggestions.processing_text') : t('ai_suggestions.extract_and_suggest_button')}
+                </Button>
+              </div>
 
-          {pendingSuggestions.length === 0 && !isLoadingSuggestions && !isProcessingSuggestions && !isSavingOrUpdating && (
-            <p className="text-center text-gray-500 dark:text-gray-400">{t('ai_suggestions.no_suggestions_found')}</p>
-          )}
+              {(isLoadingSuggestions || isSavingOrUpdating) && (
+                <LoadingMessage message={t('ai_suggestions.loading_suggestions')} />
+              )}
+
+              {pendingSuggestions.length > 0 && (
+                <div className="space-y-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                  <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 flex items-center gap-2">
+                    <UserCheck size={20} className="text-green-500" /> {t('ai_suggestions.suggestions_section_title')}
+                  </h3>
+                  {pendingSuggestions.map((suggestion) => (
+                    <AISuggestionCard
+                      key={suggestion.id}
+                      suggestion={suggestion}
+                      onProcess={handleProcessSuggestion}
+                      onDiscard={handleDiscardSuggestion}
+                      onEdit={handleEditSuggestion}
+                      isProcessing={isSavingOrUpdating}
+                    />
+                  ))}
+                </div>
+              )}
+
+              {pendingSuggestions.length === 0 && !isLoadingSuggestions && !isProcessingSuggestions && !isSavingOrUpdating && (
+                <p className="text-center text-gray-500 dark:text-gray-400">{t('ai_suggestions.no_suggestions_found')}</p>
+              )}
+            </TabsContent>
+            <TabsContent value="smart-management" className="space-y-6 pt-4">
+              <SmartGroupManagement />
+              <DuplicateContactManagement />
+            </TabsContent>
+          </Tabs>
         </CardContent>
       </Card>
       <MadeWithDyad />
