@@ -18,6 +18,7 @@ export const useContactFormLogic = (
   availableTemplates: CustomFieldTemplate[]
 ) => {
   const onSuccessCallback = useCallback(() => {
+    console.log("useContactFormLogic: onSuccessCallback triggered.");
     ErrorManager.notifyUser(contactId ? "مخاطب با موفقیت به‌روزرسانی شد!" : "مخاطب با موفقیت ذخیره شد!", 'success');
     if (!contactId) { // Only reset form for new contacts
       form.reset();
@@ -34,10 +35,12 @@ export const useContactFormLogic = (
       updateLearnedGenderPreference(firstName, gender);
     }
 
+    console.log("useContactFormLogic: Navigating to /");
     navigate("/"); // Navigate back to contacts list after success
   }, [contactId, form, session, navigate]);
 
   const onErrorCallback = useCallback((err: Error) => {
+    console.error("useContactFormLogic: onErrorCallback triggered.", err);
     ErrorManager.logError(err, { component: "useContactFormLogic", action: contactId ? "updateContact" : "createContact" });
   }, [contactId]);
 
@@ -58,6 +61,7 @@ export const useContactFormLogic = (
   });
 
   const onSubmit = async (values: ContactFormValues) => {
+    console.log("useContactFormLogic: onSubmit started. isSubmitting:", isSubmitting);
     const user = session?.user;
 
     if (!user) {
@@ -67,16 +71,29 @@ export const useContactFormLogic = (
     }
 
     await executeSave(async () => {
+      console.log("useContactFormLogic: executeSave async function started.");
       let res;
       if (contactId) {
+        console.log("useContactFormLogic: Calling ContactService.updateContact...");
         res = await ContactService.updateContact(contactId, values);
-        if (res.error) throw new Error(res.error);
+        if (res.error) {
+          console.error("useContactFormLogic: ContactService.updateContact returned error:", res.error);
+          throw new Error(res.error);
+        }
+        console.log("useContactFormLogic: ContactService.updateContact successful.");
       } else {
+        console.log("useContactFormLogic: Calling ContactService.addContact...");
         res = await ContactService.addContact(values);
-        if (res.error) throw new Error(res.error);
+        if (res.error) {
+          console.error("useContactFormLogic: ContactService.addContact returned error:", res.error);
+          throw new Error(res.error);
+        }
+        console.log("useContactFormLogic: ContactService.addContact successful.");
       }
+      console.log("useContactFormLogic: executeSave async function finished successfully.");
       return res.data; // Return data for onSuccess callback if needed
     });
+    console.log("useContactFormLogic: onSubmit finished.");
   };
 
   return { onSubmit, isSubmitting, error, errorMessage, retrySave, retryCount };

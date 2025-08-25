@@ -12,6 +12,7 @@ interface ContactFormActionsProps {
 
 const ContactFormActions: React.FC<ContactFormActionsProps> = ({ isSubmitting, onCancel, contactId }) => {
   const { t } = useTranslation();
+  console.log("ContactFormActions: isSubmitting prop:", isSubmitting); // Added log
   return (
     <div className="flex justify-end gap-2">
       <CancelButton onClick={onCancel} disabled={isSubmitting} text={t('common.cancel')} />
