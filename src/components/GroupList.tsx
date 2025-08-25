@@ -1,17 +1,19 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Edit, Trash2, Users, PlusCircle } from "lucide-react";
+import { Edit, Trash2, Users, PlusCircle, Tag } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/integrations/supabase/auth";
 import { showSuccess, showError, showLoading, dismissToast } from "@/utils/toast";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import GroupForm from "./GroupForm";
-import { invalidateCache, fetchWithCache } from "@/utils/cache-helpers"; // Import fetchWithCache
-import LoadingMessage from "./LoadingMessage"; // Import LoadingMessage
-import CancelButton from "./CancelButton"; // Import CancelButton
-import { ErrorManager } from "@/lib/error-manager"; // Import ErrorManager
+import { invalidateCache, fetchWithCache } from "@/utils/cache-helpers";
+import LoadingMessage from "./LoadingMessage";
+import CancelButton from "./CancelButton";
+import { ErrorManager } from "@/lib/error-manager";
+import EmptyState from './EmptyState';
+import LoadingSpinner from './LoadingSpinner';
 
 interface Group {
   id: string;
@@ -23,12 +25,14 @@ interface Group {
 const GroupItem = ({ group, onGroupUpdated, onGroupDeleted }: { group: Group; onGroupUpdated: () => void; onGroupDeleted: () => void }) => {
   const { session } = useSession();
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = async () => {
     if (!session?.user) {
       showError("برای حذف گروه باید وارد شوید.");
       return;
     }
+    setIsDeleting(true);
     const toastId = showLoading("در حال حذف گروه...");
     try {
       const { error } = await supabase
@@ -46,6 +50,7 @@ const GroupItem = ({ group, onGroupUpdated, onGroupDeleted }: { group: Group; on
       showError(`خطا در حذف گروه: ${error.message || "خطای ناشناخته"}`);
     } finally {
       dismissToast(toastId);
+      setIsDeleting(false);
     }
   };
 
@@ -88,8 +93,8 @@ const GroupItem = ({ group, onGroupUpdated, onGroupDeleted }: { group: Group; on
 
         <AlertDialog>
           <AlertDialogTrigger asChild>
-            <Button variant="ghost" size="icon" className="text-red-600 hover:bg-red-100 dark:text-red-400 dark:hover:bg-gray-600/50 transition-all duration-200">
-              <Trash2 size={20} />
+            <Button variant="ghost" size="icon" className="text-red-600 hover:bg-red-100 dark:text-red-400 dark:hover:bg-gray-600/50 transition-all duration-200" disabled={isDeleting}>
+              {isDeleting ? <LoadingSpinner size={20} /> : <Trash2 size={20} />}
             </Button>
           </AlertDialogTrigger>
           <AlertDialogContent className="glass rounded-xl p-6">
@@ -100,8 +105,11 @@ const GroupItem = ({ group, onGroupUpdated, onGroupDeleted }: { group: Group; on
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <CancelButton onClick={() => {}} text="لغو" /> {/* Use CancelButton */}
-              <AlertDialogAction onClick={handleDelete} className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold">حذف</AlertDialogAction>
+              <CancelButton onClick={() => {}} text="لغو" />
+              <AlertDialogAction onClick={handleDelete} className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold" disabled={isDeleting}>
+                {isDeleting && <LoadingSpinner size={16} className="me-2" />}
+                حذف
+              </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
@@ -150,7 +158,7 @@ const GroupList = () => {
       }
 
       setGroups(data as Group[]);
-      if (!fromCache) { // Only show success toast if not from cache
+      if (!fromCache) {
         showSuccess("گروه‌ها با موفقیت بارگذاری شدند.");
       }
     } catch (error: any) {
@@ -197,7 +205,11 @@ const GroupList = () => {
       </Dialog>
 
       {groups.length === 0 ? (
-        <p className="text-center text-gray-500 dark:text-gray-400">هیچ گروهی یافت نشد.</p>
+        <EmptyState
+          icon={Tag}
+          title="هیچ گروهی یافت نشد."
+          description="برای سازماندهی مخاطبین خود، یک گروه جدید اضافه کنید."
+        />
       ) : (
         groups.map((group) => (
           <GroupItem

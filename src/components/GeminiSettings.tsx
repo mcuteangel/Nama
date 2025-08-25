@@ -15,8 +15,8 @@ import { useErrorHandler } from '@/hooks/use-error-handler';
 import { ErrorManager } from '@/lib/error-manager';
 import { SettingsService } from '@/services/settings-service';
 import { fetchWithCache, invalidateCache } from '@/utils/cache-helpers';
+import LoadingSpinner from './LoadingSpinner';
 
-// Define a type for the Gemini model data
 interface GeminiModel {
   name: string;
   displayName: string;
@@ -25,7 +25,7 @@ interface GeminiModel {
 
 const formSchema = z.object({
   geminiApiKey: z.string().optional(),
-  geminiModel: z.string().default('gemini-pro'), // Changed to z.string() for dynamic models
+  geminiModel: z.string().default('gemini-pro'),
 });
 
 type GeminiSettingsFormValues = z.infer<typeof formSchema>;
@@ -105,11 +105,9 @@ const GeminiSettings: React.FC = () => {
     onError: onErrorFetchModels,
   });
 
-  // Now define onSuccessSubmit, after executeFetchModels is defined
   const onSuccessSubmit = useCallback(() => {
     ErrorManager.notifyUser(t('settings.gemini_settings_saved_success'), 'success');
     invalidateCache(`user_settings_${session?.user?.id}`);
-    // After saving, re-fetch models to ensure the new API key is used
     executeFetchModels(async () => {
       const cacheKey = `available_gemini_models_${session?.user?.id}`;
       const { data, error, fromCache } = await fetchWithCache<GeminiModel[]>(
@@ -129,12 +127,7 @@ const GeminiSettings: React.FC = () => {
     });
   }, [session, t, executeFetchModels]);
 
-  // Update the useErrorHandler for submit to use the correctly defined onSuccessSubmit
   useEffect(() => {
-    // This is a workaround to update the onSuccess callback after executeFetchModels is defined.
-    // In a real-world scenario, you might refactor useErrorHandler to allow updating callbacks more cleanly.
-    // For now, we'll re-initialize the onSuccess for executeSubmit.
-    // This is not ideal but fixes the immediate compile error.
     (executeSubmit as any).onSuccess = onSuccessSubmit;
   }, [onSuccessSubmit, executeSubmit]);
 
@@ -145,7 +138,6 @@ const GeminiSettings: React.FC = () => {
         return;
       }
 
-      // Fetch user settings (API key and selected model)
       await executeFetchSettings(async () => {
         const cacheKey = `user_settings_${session.user.id}`;
         const { data, error, fromCache } = await fetchWithCache<{ gemini_api_key: string | null; gemini_model: string | null }>(
@@ -164,7 +156,6 @@ const GeminiSettings: React.FC = () => {
         return { data, error: null, fromCache };
       });
 
-      // Fetch available Gemini models
       await executeFetchModels(async () => {
         const cacheKey = `available_gemini_models_${session.user.id}`;
         const { data, error, fromCache } = await fetchWithCache<GeminiModel[]>(
@@ -196,7 +187,7 @@ const GeminiSettings: React.FC = () => {
     await executeSubmit(async () => {
       const res = await SettingsService.updateUserSettings({
         userId: session.user.id,
-        gemini_api_key: values.geminiApiKey === '' ? null : values.geminiApiKey, // Convert empty string to null
+        gemini_api_key: values.geminiApiKey === '' ? null : values.geminiApiKey,
         gemini_model: values.geminiModel,
       });
       if (res.error) {
@@ -290,6 +281,7 @@ const GeminiSettings: React.FC = () => {
           className="w-full px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-md transition-all duration-300 transform hover:scale-105"
           disabled={isSubmitting}
         >
+          {isSubmitting && <LoadingSpinner size={16} className="me-2" />}
           {isSubmitting ? t('common.saving') : t('common.save')}
         </Button>
       </form>

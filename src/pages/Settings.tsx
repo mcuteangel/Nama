@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { MadeWithDyad } from "@/components/made-with-dyad";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,24 +7,36 @@ import { useTranslation } from 'react-i18next';
 import { ThemeToggle } from "@/components/ThemeToggle";
 import CalendarTypeSetting from "@/components/CalendarTypeSetting";
 import LanguageSetting from "@/components/LanguageSetting";
-import GeminiSettings from "@/components/GeminiSettings"; // Updated import to GeminiSettings
-import { Download, User, Settings as SettingsIcon, Sparkles } from "lucide-react";
+import GeminiSettings from "@/components/GeminiSettings";
+import { Download, User, Settings as SettingsIcon, Sparkles, UploadCloud } from "lucide-react";
 import { exportContactsToCsv } from "@/utils/export-contacts";
 import { useSession } from "@/integrations/supabase/auth";
 import { Label } from "@/components/ui/label";
+import ImportContactsDialog from "@/components/ImportContactsDialog";
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 const Settings = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { session } = useSession();
+  const [isExporting, setIsExporting] = useState(false);
 
-  const handleExport = () => {
-    exportContactsToCsv(session, {
+  const handleExport = async () => {
+    setIsExporting(true);
+    await exportContactsToCsv(session, {
       searchTerm: "",
       selectedGroup: "",
       companyFilter: "",
       sortOption: "first_name_asc",
     });
+    setIsExporting(false);
+  };
+
+  const handleImportSuccess = () => {
+    // Optionally refresh contact list or show a global success message
+    console.log("Contacts imported successfully, refreshing data...");
+    // Invalidate relevant caches if needed, e.g., contacts_list
+    // For now, the DataImportService already invalidates caches.
   };
 
   return (
@@ -64,7 +76,7 @@ const Settings = () => {
               <Sparkles size={20} /> {t('settings.ai_settings')}
             </h3>
             <div className="p-4 glass rounded-lg shadow-sm">
-              <GeminiSettings /> {/* Use the new GeminiSettings component */}
+              <GeminiSettings />
             </div>
           </div>
 
@@ -76,19 +88,14 @@ const Settings = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Button
                 onClick={handleExport}
+                disabled={isExporting}
                 className="flex items-center gap-2 px-6 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white font-semibold shadow-md transition-all duration-300 transform hover:scale-105"
               >
+                {isExporting && <LoadingSpinner size={16} className="me-2" />}
                 <Download size={20} />
                 {t('settings.export_contacts')}
               </Button>
-              <Button
-                variant="outline"
-                disabled
-                className="flex items-center gap-2 px-6 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold shadow-md transition-all duration-300 transform hover:scale-105 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-100 dark:border-gray-600"
-              >
-                <Download size={20} />
-                {t('settings.import_contacts')}
-              </Button>
+              <ImportContactsDialog onImportSuccess={handleImportSuccess} />
             </div>
           </div>
 

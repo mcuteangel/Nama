@@ -19,8 +19,10 @@ import { AISuggestionsService, AISuggestion as AISuggestionServiceType } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import SmartGroupManagement from "@/components/SmartGroupManagement";
 import DuplicateContactManagement from "@/components/DuplicateContactManagement";
-import GenderSuggestionManagement from "@/components/GenderSuggestionManagement"; // New import
+import GenderSuggestionManagement from "@/components/GenderSuggestionManagement";
 import { useSpeechToText } from "@/hooks/use-speech-to-text";
+import EmptyState from '@/components/EmptyState';
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 interface ExistingContactSummary {
   id: string;
@@ -320,12 +322,8 @@ const AISuggestions: React.FC = () => {
                   disabled={!rawTextInput.trim() || isExtractorLoading || isProcessingSuggestions || isSavingOrUpdating}
                   className="w-full flex items-center gap-2 px-6 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-semibold shadow-md transition-all duration-300 transform hover:scale-105"
                 >
-                  {isExtractorLoading || isProcessingSuggestions ? (
-                    <Loader2 size={16} className="me-2 animate-spin" />
-                  ) : (
-                    <Sparkles size={16} className="me-2" />
-                  )}
-                  {isExtractorLoading || isProcessingSuggestions ? t('ai_suggestions.processing_text') : t('ai_suggestions.extract_and_suggest_button')}
+                  {(isExtractorLoading || isProcessingSuggestions || isSavingOrUpdating) && <LoadingSpinner size={16} className="me-2" />}
+                  {isExtractorLoading || isProcessingSuggestions || isSavingOrUpdating ? t('ai_suggestions.processing_text') : t('ai_suggestions.extract_and_suggest_button')}
                 </Button>
               </div>
 
@@ -352,7 +350,11 @@ const AISuggestions: React.FC = () => {
               )}
 
               {pendingSuggestions.length === 0 && !isLoadingSuggestions && !isProcessingSuggestions && !isSavingOrUpdating && (
-                <p className="text-center text-gray-500 dark:text-gray-400">{t('ai_suggestions.no_suggestions_found')}</p>
+                <EmptyState
+                  icon={Sparkles}
+                  title={t('ai_suggestions.no_suggestions_found')}
+                  description={t('ai_suggestions.no_suggestions_description')}
+                />
               )}
             </TabsContent>
             <TabsContent value="smart-management" className="space-y-6 pt-4">

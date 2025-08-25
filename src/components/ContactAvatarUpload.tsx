@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useSession } from '@/integrations/supabase/auth';
 import { showError, showSuccess, showLoading, dismissToast } from '@/utils/toast';
 import { cn } from '@/lib/utils';
+import LoadingSpinner from './LoadingSpinner';
 
 interface ContactAvatarUploadProps {
   initialAvatarUrl?: string | null;
@@ -39,7 +40,7 @@ const ContactAvatarUpload: React.FC<ContactAvatarUploadProps> = ({ initialAvatar
       return;
     }
 
-    if (file.size > 5 * 1024 * 1024) { // 5MB limit
+    if (file.size > 5 * 1024 * 1024) {
       showError("حجم فایل نباید بیشتر از 5 مگابایت باشد.");
       return;
     }
@@ -49,13 +50,13 @@ const ContactAvatarUpload: React.FC<ContactAvatarUploadProps> = ({ initialAvatar
 
     try {
       const fileExt = file.name.split('.').pop();
-      const fileName = `${session.user.id}/${Date.now()}.${fileExt}`; // Unique path for each user's avatar
+      const fileName = `${session.user.id}/${Date.now()}.${fileExt}`;
 
       const { data, error } = await supabase.storage
         .from('avatars')
         .upload(fileName, file, {
           cacheControl: '3600',
-          upsert: false, // Do not upsert, create new file
+          upsert: false,
         });
 
       if (error) {
@@ -76,12 +77,12 @@ const ContactAvatarUpload: React.FC<ContactAvatarUploadProps> = ({ initialAvatar
     } catch (error: any) {
       console.error("Error uploading avatar:", error);
       showError(`خطا در آپلود تصویر: ${error.message || "خطای ناشناخته"}`);
-      setAvatarUrl(initialAvatarUrl || null); // Revert to initial on error
+      setAvatarUrl(initialAvatarUrl || null);
     } finally {
       dismissToast(toastId);
       setIsUploading(false);
       if (fileInputRef.current) {
-        fileInputRef.current.value = ''; // Clear the input
+        fileInputRef.current.value = '';
       }
     }
   };
@@ -93,7 +94,6 @@ const ContactAvatarUpload: React.FC<ContactAvatarUploadProps> = ({ initialAvatar
     const toastId = showLoading("در حال حذف تصویر...");
 
     try {
-      // Extract file path from public URL
       const urlParts = avatarUrl.split('/');
       const fileName = urlParts.slice(urlParts.indexOf('avatars') + 1).join('/');
 
@@ -137,11 +137,11 @@ const ContactAvatarUpload: React.FC<ContactAvatarUploadProps> = ({ initialAvatar
         />
         <Button
           type="button"
-          variant="outline"
           onClick={() => fileInputRef.current?.click()}
           disabled={disabled || isUploading}
           className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold shadow-sm transition-all duration-300 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-200 dark:border-gray-600"
         >
+          {isUploading && <LoadingSpinner size={16} className="me-2" />}
           <UploadCloud size={16} />
           {isUploading ? "در حال آپلود..." : "آپلود تصویر"}
         </Button>
@@ -153,6 +153,7 @@ const ContactAvatarUpload: React.FC<ContactAvatarUploadProps> = ({ initialAvatar
             disabled={disabled || isUploading}
             className="flex items-center gap-2 px-4 py-2 rounded-lg shadow-sm transition-all duration-300"
           >
+            {isUploading && <LoadingSpinner size={16} className="me-2" />}
             <XCircle size={16} />
             حذف تصویر
           </Button>

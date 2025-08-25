@@ -4,9 +4,10 @@ import { Button } from "@/components/ui/button";
 import { PlusCircle, UserCheck, Loader2, Phone, Mail, Building, Briefcase, Link as LinkIcon, XCircle, Edit } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { PhoneNumberFormData, EmailAddressFormData, SocialLinkFormData } from "@/types/contact";
-import { ExtractedContactInfo } from '@/hooks/use-contact-extractor'; // Import ExtractedContactInfo
+import { ExtractedContactInfo } from '@/hooks/use-contact-extractor';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import CancelButton from './CancelButton';
+import LoadingSpinner from './LoadingSpinner';
 
 interface ExistingContactSummary {
   id: string;
@@ -17,7 +18,7 @@ interface ExistingContactSummary {
 }
 
 export interface AISuggestion {
-  id: string; // Add ID for the suggestion itself
+  id: string;
   type: 'new' | 'update';
   extractedData: ExtractedContactInfo;
   existingContact?: ExistingContactSummary;
@@ -131,7 +132,7 @@ const AISuggestionCard: React.FC<AISuggestionCardProps> = ({ suggestion, onProce
             disabled={isProcessing}
             className="flex-grow flex items-center gap-2 px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-md transition-all duration-300 transform hover:scale-105"
           >
-            {isProcessing ? <Loader2 size={16} className="me-2 animate-spin" /> : null}
+            {isProcessing && <LoadingSpinner size={16} className="me-2" />}
             {getActionLabel()}
           </Button>
           <Button

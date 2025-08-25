@@ -9,7 +9,9 @@ import { ErrorManager } from "@/lib/error-manager";
 import LoadingMessage from "./LoadingMessage";
 import { supabase } from '@/integrations/supabase/client';
 import { invalidateCache } from '@/utils/cache-helpers';
-import { ContactService } from '@/services/contact-service'; // Import ContactService for merging
+import { ContactService } from '@/services/contact-service';
+import EmptyState from './EmptyState';
+import LoadingSpinner from './LoadingSpinner';
 
 interface DuplicateContact {
   id: string;
@@ -21,7 +23,6 @@ interface DuplicateContact {
   position?: string;
   notes?: string;
   avatar_url?: string;
-  // Add other relevant fields for comparison and merging
 }
 
 interface DuplicatePair {
@@ -84,7 +85,7 @@ const DuplicateContactManagement: React.FC = () => {
 
       return { data: contacts as DuplicateContact[], error: null, fromCache: false };
     });
-    setIsScanning(true); // Keep scanning true until findDuplicates finishes
+    setIsScanning(true);
   }, [session, isSessionLoading, executeFetchContacts]);
 
   const findDuplicates = useCallback((contacts: DuplicateContact[]) => {
@@ -101,7 +102,6 @@ const DuplicateContactManagement: React.FC = () => {
         const contact2 = contacts[j];
         let reason = '';
 
-        // Simple duplicate detection logic
         const namesMatch = contact1.first_name === contact2.first_name && contact1.last_name === contact2.last_name;
         const emailsOverlap = contact1.email_addresses.some(e1 => contact2.email_addresses.some(e2 => e1.email_address === e2.email_address));
         const phonesOverlap = contact1.phone_numbers.some(p1 => contact2.phone_numbers.some(p2 => p1.phone_number === p2.phone_number));
@@ -135,7 +135,6 @@ const DuplicateContactManagement: React.FC = () => {
   }, [t]);
 
   useEffect(() => {
-    // Initial scan when component mounts
     fetchAllContactsForDuplicates();
   }, [fetchAllContactsForDuplicates]);
 
@@ -147,7 +146,6 @@ const DuplicateContactManagement: React.FC = () => {
 
     const toastId = ErrorManager.notifyUser(t('ai_suggestions.merging_contacts'), 'info');
     try {
-      // Fetch full details of both contacts
       const { data: mainContactFull, error: mainError } = await supabase
         .from('contacts')
         .select(`
@@ -178,10 +176,8 @@ const DuplicateContactManagement: React.FC = () => {
         throw new Error(mainError?.message || duplicateError?.message || 'Failed to fetch full contact details for merging.');
       }
 
-      // Merge logic: prioritize mainContact's non-empty fields, add unique fields from duplicate
       const mergedData: any = { ...mainContactFull };
 
-      // Merge simple fields (e.g., company, position, notes, avatar_url)
       if (!mergedData.company && duplicateContactFull.company) mergedData.company = duplicateContactFull.company;
       if (!mergedData.position && duplicateContactFull.position) mergedData.position = duplicateContactFull.position;
       if (!mergedData.notes && duplicateContactFull.notes) mergedData.notes = duplicateContactFull.notes;
@@ -195,47 +191,41 @@ const DuplicateContactManagement: React.FC = () => {
       if (!mergedData.country && duplicateContactFull.country) mergedData.country = duplicateContactFull.country;
 
 
-      // Merge phone numbers
       const mergedPhoneNumbers = [...mainContactFull.phone_numbers];
       duplicateContactFull.phone_numbers.forEach((dp: any) => {
         if (!mergedPhoneNumbers.some((mp: any) => mp.phone_number === dp.phone_number)) {
-          mergedPhoneNumbers.push({ ...dp, contact_id: mainContact.id }); // Reassign to main contact
+          mergedPhoneNumbers.push({ ...dp, contact_id: mainContact.id });
         }
       });
 
-      // Merge email addresses
       const mergedEmailAddresses = [...mainContactFull.email_addresses];
       duplicateContactFull.email_addresses.forEach((de: any) => {
         if (!mergedEmailAddresses.some((me: any) => me.email_address === de.email_address)) {
-          mergedEmailAddresses.push({ ...de, contact_id: mainContact.id }); // Reassign to main contact
+          mergedEmailAddresses.push({ ...de, contact_id: mainContact.id });
         }
       });
 
-      // Merge social links
       const mergedSocialLinks = [...mainContactFull.social_links];
       duplicateContactFull.social_links.forEach((ds: any) => {
         if (!mergedSocialLinks.some((ms: any) => ms.url === ds.url)) {
-          mergedSocialLinks.push({ ...ds, contact_id: mainContact.id }); // Reassign to main contact
+          mergedSocialLinks.push({ ...ds, contact_id: mainContact.id });
         }
       });
 
-      // Merge groups (if any)
       const mergedContactGroups = [...mainContactFull.contact_groups];
       duplicateContactFull.contact_groups.forEach((dg: any) => {
         if (!mergedContactGroups.some((mg: any) => mg.group_id === dg.group_id)) {
-          mergedContactGroups.push({ ...dg, contact_id: mainContact.id }); // Reassign to main contact
+          mergedContactGroups.push({ ...dg, contact_id: mainContact.id });
         }
       });
 
-      // Merge custom fields
       const mergedCustomFields = [...mainContactFull.custom_fields];
       duplicateContactFull.custom_fields.forEach((dcf: any) => {
         if (!mergedCustomFields.some((mcf: any) => mcf.template_id === dcf.template_id)) {
-          mergedCustomFields.push({ ...dcf, contact_id: mainContact.id }); // Reassign to main contact
+          mergedCustomFields.push({ ...dcf, contact_id: mainContact.id });
         }
       });
 
-      // 1. Update main contact with merged data
       const { error: updateMainError } = await supabase
         .from('contacts')
         .update({
@@ -256,8 +246,6 @@ const DuplicateContactManagement: React.FC = () => {
 
       if (updateMainError) throw new Error(updateMainError.message);
 
-      // 2. Update related tables to point to the main contact
-      // Delete all existing related entries for main contact first to avoid conflicts
       await Promise.all([
         supabase.from('phone_numbers').delete().eq('contact_id', mainContact.id).eq('user_id', session.user.id),
         supabase.from('email_addresses').delete().eq('contact_id', mainContact.id).eq('user_id', session.user.id),
@@ -266,7 +254,6 @@ const DuplicateContactManagement: React.FC = () => {
         supabase.from('custom_fields').delete().eq('contact_id', mainContact.id).eq('user_id', session.user.id),
       ]);
 
-      // Insert merged related data
       await Promise.all([
         mergedPhoneNumbers.length > 0 ? supabase.from('phone_numbers').insert(mergedPhoneNumbers.map(p => ({ ...p, id: undefined }))) : Promise.resolve(),
         mergedEmailAddresses.length > 0 ? supabase.from('email_addresses').insert(mergedEmailAddresses.map(e => ({ ...e, id: undefined }))) : Promise.resolve(),
@@ -275,7 +262,6 @@ const DuplicateContactManagement: React.FC = () => {
         mergedCustomFields.length > 0 ? supabase.from('custom_fields').insert(mergedCustomFields.map(cf => ({ ...cf, id: undefined }))) : Promise.resolve(),
       ]);
 
-      // 3. Delete the duplicate contact and its associated data
       const { error: deleteDuplicateError } = await supabase
         .from('contacts')
         .delete()
@@ -285,16 +271,14 @@ const DuplicateContactManagement: React.FC = () => {
       if (deleteDuplicateError) throw new Error(deleteDuplicateError.message);
 
       ErrorManager.notifyUser(t('ai_suggestions.contacts_merged_success'), 'success');
-      // Invalidate caches for contacts list and statistics
       invalidateCache(`contacts_list_${session.user.id}_`);
       invalidateCache(`statistics_dashboard_${session.user.id}`);
-      // Re-scan for duplicates after merge
       fetchAllContactsForDuplicates();
     } catch (err: any) {
       ErrorManager.logError(err, { component: 'DuplicateContactManagement', action: 'mergeContacts', mainContact, duplicateContact });
       ErrorManager.notifyUser(`${t('ai_suggestions.error_merging_contacts')}: ${ErrorManager.getErrorMessage(err)}`, 'error');
     } finally {
-      // dismissToast(toastId); // Assuming notifyUser returns a toastId if needed
+      // dismissToast(toastId);
     }
   }, [session, t, fetchAllContactsForDuplicates]);
 
@@ -324,16 +308,17 @@ const DuplicateContactManagement: React.FC = () => {
             disabled={isScanning}
             className="w-full flex items-center gap-2 px-6 py-2 rounded-lg bg-yellow-600 hover:bg-yellow-700 text-white font-semibold shadow-md transition-all duration-300 transform hover:scale-105"
           >
-            {isScanning ? (
-              <Loader2 size={16} className="me-2 animate-spin" />
-            ) : (
-              <Merge size={16} className="me-2" />
-            )}
+            {isScanning && <LoadingSpinner size={16} className="me-2" />}
+            <Merge size={16} className="me-2" />
             {t('ai_suggestions.scan_for_duplicates')}
           </Button>
 
           {duplicatePairs.length === 0 && !isScanning && (
-            <p className="text-center text-gray-500 dark:text-gray-400">{t('ai_suggestions.no_duplicates_found')}</p>
+            <EmptyState
+              icon={Copy}
+              title={t('ai_suggestions.no_duplicates_found')}
+              description={t('ai_suggestions.no_duplicates_found_description')}
+            />
           )}
 
           {duplicatePairs.length > 0 && (

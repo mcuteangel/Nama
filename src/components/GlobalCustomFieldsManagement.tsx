@@ -4,7 +4,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Trash2, Edit } from "lucide-react";
+import { Trash2, Edit, ClipboardList } from "lucide-react";
 import { ContactService } from "@/services/contact-service";
 import { useErrorHandler } from "@/hooks/use-error-handler";
 import { ErrorManager } from "@/lib/error-manager";
@@ -14,10 +14,12 @@ import { useSession } from "@/integrations/supabase/auth";
 import CustomFieldTemplateForm from "./CustomFieldTemplateForm";
 import AddCustomFieldTemplateDialog from "./AddCustomFieldTemplateDialog";
 import { fetchWithCache, invalidateCache } from "@/utils/cache-helpers";
-import FormDialogWrapper from "./FormDialogWrapper"; // Import the new wrapper
-import LoadingMessage from "./LoadingMessage"; // Import LoadingMessage
-import CancelButton from "./CancelButton"; // Import CancelButton
-import { showLoading, dismissToast, showError, showSuccess } from "@/utils/toast"; // Import toast functions
+import FormDialogWrapper from "./FormDialogWrapper";
+import LoadingMessage from "./LoadingMessage";
+import CancelButton from "./CancelButton";
+import { showLoading, dismissToast, showError, showSuccess } from "@/utils/toast";
+import EmptyState from './EmptyState';
+import LoadingSpinner from './LoadingSpinner';
 
 type TemplateType = 'text' | 'number' | 'date' | 'list';
 
@@ -60,7 +62,7 @@ export function GlobalCustomFieldsManagement() {
     isLoading: loadingTemplates,
     executeAsync: executeLoadTemplates,
   } = useErrorHandler<{ data: CustomFieldTemplate[] | null; error: string | null; fromCache: boolean }>(null, {
-    showToast: false, // Control toasts manually
+    showToast: false,
     onSuccess: onSuccessFetchTemplates,
     onError: onErrorFetchTemplates,
   });
@@ -108,9 +110,8 @@ export function GlobalCustomFieldsManagement() {
     });
   }, []);
 
-  // This useErrorHandler is for DELETE and EDIT operations, not for initial load
   const {
-    isLoading: isOperationLoading, // Renamed to avoid conflict with loadTemplates's loading
+    isLoading: isOperationLoading,
     error: operationError,
     errorMessage: operationErrorMessage,
     retryCount: operationRetryCount,
@@ -130,7 +131,7 @@ export function GlobalCustomFieldsManagement() {
   }, [loadTemplates]);
 
   const handleDeleteField = async (id: string) => {
-    await executeOperation(async () => { // Use executeOperation
+    await executeOperation(async () => {
       const res = await ContactService.deleteCustomFieldTemplate(id);
       if (res.error) {
         throw new Error(res.error || "خطا در حذف قالب فیلد سفارشی");
@@ -170,10 +171,11 @@ export function GlobalCustomFieldsManagement() {
         {loadingTemplates && customFields.length === 0 ? (
           <LoadingMessage message="در حال بارگذاری فیلدهای سفارشی..." />
         ) : customFields.length === 0 ? (
-          <div className="glass p-8 rounded-lg text-center">
-            <p className="text-muted-foreground mb-4">هنوز فیلد سفارشی تعریف نشده است.</p>
-            <p className="text-sm text-muted-foreground">با افزودن فیلدهای سفارشی، می‌توانید قالب‌های استاندارد برای اطلاعات مخاطبین خود ایجاد کنید.</p>
-          </div>
+          <EmptyState
+            icon={ClipboardList}
+            title="هنوز فیلد سفارشی تعریف نشده است."
+            description="با افزودن فیلدهای سفارشی، می‌توانید قالب‌های استاندارد برای اطلاعات مخاطبین خود ایجاد کنید."
+          />
         ) : (
           <div className="grid gap-4">
             {customFields.map((field) => (
@@ -214,8 +216,8 @@ export function GlobalCustomFieldsManagement() {
 
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
-                        <Button variant="ghost" size="icon" className="text-red-600 hover:bg-red-100 dark:text-red-400 dark:hover:bg-gray-600/50 transition-all duration-200">
-                          <Trash2 size={16} />
+                        <Button variant="ghost" size="icon" className="text-red-600 hover:bg-red-100 dark:text-red-400 dark:hover:bg-gray-600/50 transition-all duration-200" disabled={isOperationLoading}>
+                          {isOperationLoading ? <LoadingSpinner size={16} /> : <Trash2 size={16} />}
                         </Button>
                       </AlertDialogTrigger>
                       <AlertDialogContent className="glass rounded-xl p-6">
@@ -227,7 +229,10 @@ export function GlobalCustomFieldsManagement() {
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                           <CancelButton onClick={() => {}} text="لغو" />
-                          <AlertDialogAction onClick={() => handleDeleteField(field.id)} className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold">حذف</AlertDialogAction>
+                          <AlertDialogAction onClick={() => handleDeleteField(field.id)} className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold" disabled={isOperationLoading}>
+                            {isOperationLoading && <LoadingSpinner size={16} className="me-2" />}
+                            حذف
+                          </AlertDialogAction>
                         </AlertDialogFooter>
                       </AlertDialogContent>
                     </AlertDialog>

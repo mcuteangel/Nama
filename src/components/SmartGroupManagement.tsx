@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Users, Tag, Loader2, CheckCircle, XCircle, Sparkles } from "lucide-react"; // Add Sparkles here
+import { Users, Tag, Loader2, CheckCircle, XCircle, Sparkles } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useSession } from "@/integrations/supabase/auth";
 import { useErrorHandler } from "@/hooks/use-error-handler";
@@ -9,7 +9,9 @@ import { ErrorManager } from "@/lib/error-manager";
 import LoadingMessage from "./LoadingMessage";
 import { supabase } from '@/integrations/supabase/client';
 import { invalidateCache } from '@/utils/cache-helpers';
-import { useGroups } from '@/hooks/use-groups'; // Import useGroups hook
+import { useGroups } from '@/hooks/use-groups';
+import EmptyState from './EmptyState';
+import LoadingSpinner from './LoadingSpinner';
 
 interface ContactWithoutGroup {
   id: string;
@@ -32,7 +34,7 @@ interface GroupSuggestion {
 const SmartGroupManagement: React.FC = () => {
   const { t } = useTranslation();
   const { session, isLoading: isSessionLoading } = useSession();
-  const { groups, fetchGroups } = useGroups(); // Use the useGroups hook
+  const { groups, fetchGroups } = useGroups();
 
   const [contactsWithoutGroup, setContactsWithoutGroup] = useState<ContactWithoutGroup[]>([]);
   const [groupSuggestions, setGroupSuggestions] = useState<GroupSuggestion[]>([]);
@@ -90,7 +92,7 @@ const SmartGroupManagement: React.FC = () => {
 
   useEffect(() => {
     fetchContactsWithoutGroup();
-    fetchGroups(); // Fetch groups to display in suggestions
+    fetchGroups();
   }, [fetchContactsWithoutGroup, fetchGroups]);
 
   const generateGroupSuggestions = useCallback(() => {
@@ -151,7 +153,7 @@ const SmartGroupManagement: React.FC = () => {
       ErrorManager.logError(err, { component: 'SmartGroupManagement', action: 'applyGroupSuggestion', suggestion });
       ErrorManager.notifyUser(`${t('ai_suggestions.error_applying_group_suggestion')}: ${ErrorManager.getErrorMessage(err)}`, 'error');
     } finally {
-      // dismissToast(toastId); // Assuming notifyUser returns a toastId if needed
+      // dismissToast(toastId);
     }
   }, [session, t, fetchContactsWithoutGroup]);
 
@@ -181,16 +183,17 @@ const SmartGroupManagement: React.FC = () => {
             disabled={isGeneratingSuggestions || contactsWithoutGroup.length === 0}
             className="w-full flex items-center gap-2 px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-md transition-all duration-300 transform hover:scale-105"
           >
-            {isGeneratingSuggestions ? (
-              <Loader2 size={16} className="me-2 animate-spin" />
-            ) : (
-              <Sparkles size={16} className="me-2" />
-            )}
+            {isGeneratingSuggestions && <LoadingSpinner size={16} className="me-2" />}
+            <Sparkles size={16} className="me-2" />
             {t('ai_suggestions.generate_group_suggestions')}
           </Button>
 
           {contactsWithoutGroup.length === 0 && !isGeneratingSuggestions && (
-            <p className="text-center text-gray-500 dark:text-gray-400">{t('ai_suggestions.all_contacts_grouped')}</p>
+            <EmptyState
+              icon={Users}
+              title={t('ai_suggestions.all_contacts_grouped')}
+              description={t('ai_suggestions.all_contacts_grouped_description')}
+            />
           )}
 
           {groupSuggestions.length > 0 && (

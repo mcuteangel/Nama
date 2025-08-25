@@ -293,7 +293,9 @@ const ContactDetail = () => {
             <div className="space-y-2 pt-4 border-t border-gray-200 dark:border-gray-700">
               <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><Phone size={16} /> شماره تلفن‌ها</Label>
               {contact.phone_numbers.map((phone) => (
-                <Input key={phone.id} value={`${phone.phone_number} (${phone.phone_type})${phone.extension ? ` - داخلی: ${phone.extension}` : ''}`} readOnly className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
+                <a key={phone.id} href={`tel:${phone.phone_number}`} className="block">
+                  <Input value={`${phone.phone_number} (${phone.phone_type})${phone.extension ? ` - داخلی: ${phone.extension}` : ''}`} readOnly className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-blue-600 dark:text-blue-400 hover:underline cursor-pointer" />
+                </a>
               ))}
             </div>
           )}
@@ -302,7 +304,9 @@ const ContactDetail = () => {
             <div className="space-y-2 pt-4 border-t border-gray-200 dark:border-gray-700">
               <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><Mail size={16} /> آدرس‌های ایمیل</Label>
               {contact.email_addresses.map((email) => (
-                <Input key={email.id} value={`${email.email_address} (${email.email_type})`} readOnly className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
+                <a key={email.id} href={`mailto:${email.email_address}`} className="block">
+                  <Input value={`${email.email_address} (${email.email_type})`} readOnly className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-blue-600 dark:text-blue-400 hover:underline cursor-pointer" />
+                </a>
               ))}
             </div>
           )}

@@ -11,7 +11,8 @@ import { useErrorHandler } from "@/hooks/use-error-handler";
 import { ErrorManager } from "@/lib/error-manager";
 import { useTranslation } from "react-i18next";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import CancelButton from "./CancelButton"; // Import CancelButton
+import CancelButton from "./CancelButton";
+import LoadingSpinner from './LoadingSpinner';
 
 const formSchema = z.object({
   email: z.string().email({ message: "ایمیل نامعتبر است." }),
@@ -220,12 +221,13 @@ const UserForm: React.FC<UserFormProps> = ({ initialData, onSuccess, onCancel })
               )}
             />
             <div className="flex justify-end gap-2 mt-6">
-              <CancelButton onClick={onCancel} disabled={isLoading} /> {/* Use CancelButton */}
+              <CancelButton onClick={onCancel} disabled={isLoading} />
               <Button
                 type="submit"
                 className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold"
                 disabled={isLoading}
               >
+                {isLoading && <LoadingSpinner size={16} className="me-2" />}
                 {isLoading ? (initialData ? t('common.saving') : t('common.creating')) : (initialData ? t('common.save') : t('common.create'))}
               </Button>
             </div>

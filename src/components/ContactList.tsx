@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Edit, Trash2, Phone, Mail } from "lucide-react";
+import { Edit, Trash2, Phone, Mail, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { showSuccess, showError, showLoading, dismissToast } from "@/utils/toast";
 import { useNavigate } from "react-router-dom";
@@ -11,8 +11,10 @@ import { ContactService } from "@/services/contact-service";
 import { fetchWithCache, invalidateCache } from "@/utils/cache-helpers";
 import { useSession } from "@/integrations/supabase/auth";
 import LoadingMessage from "./LoadingMessage";
-import { useErrorHandler } from "@/hooks/use-error-handler"; // Import useErrorHandler
-import { ErrorManager } from "@/lib/error-manager"; // Import ErrorManager
+import { useErrorHandler } from "@/hooks/use-error-handler";
+import { ErrorManager } from "@/lib/error-manager";
+import EmptyState from './EmptyState';
+import LoadingSpinner from './LoadingSpinner';
 
 interface PhoneNumber {
   phone_number: string;
@@ -131,7 +133,7 @@ const ContactItem = ({ contact, onContactDeleted, onContactEdited }: { contact: 
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <Button variant="ghost" size="icon" className="text-red-600 hover:bg-red-100 dark:text-red-400 dark:hover:bg-gray-600/50 transition-all duration-200" onClick={(e) => e.stopPropagation()} disabled={isDeleting}>
-              <Trash2 size={20} />
+              {isDeleting ? <LoadingSpinner size={20} /> : <Trash2 size={20} />}
             </Button>
           </AlertDialogTrigger>
           <AlertDialogContent className="glass rounded-xl p-6">
@@ -143,7 +145,10 @@ const ContactItem = ({ contact, onContactDeleted, onContactEdited }: { contact: 
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-100">لغو</AlertDialogCancel>
-              <AlertDialogAction onClick={handleDelete} className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold" disabled={isDeleting}>حذف</AlertDialogAction>
+              <AlertDialogAction onClick={handleDelete} className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold" disabled={isDeleting}>
+                {isDeleting && <LoadingSpinner size={16} className="me-2" />}
+                حذف
+              </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
@@ -172,7 +177,7 @@ const ContactList = ({ searchTerm, selectedGroup, companyFilter, sortOption }: C
   } = useErrorHandler<{ data: Contact[] | null; error: string | null; fromCache: boolean }>(null, {
     maxRetries: 3,
     retryDelay: 1000,
-    showToast: false, // Changed to false to manually control success toast
+    showToast: false,
     customErrorMessage: "خطا در بارگذاری مخاطبین",
     onSuccess: onSuccessFetch,
     onError: onErrorFetch,
@@ -205,7 +210,7 @@ const ContactList = ({ searchTerm, selectedGroup, companyFilter, sortOption }: C
         throw new Error(error);
       }
       setContacts(data || []);
-      return { data, error: null, fromCache }; // Ensure error: null is returned
+      return { data, error: null, fromCache };
     });
   }, [session, isSessionLoading, searchTerm, selectedGroup, companyFilter, sortOption, executeAsync]);
 
@@ -232,7 +237,11 @@ const ContactList = ({ searchTerm, selectedGroup, companyFilter, sortOption }: C
   return (
     <div className="space-y-4">
       {contacts.length === 0 ? (
-        <p className="text-center text-gray-500 dark:text-gray-400">هیچ مخاطبی یافت نشد.</p>
+        <EmptyState
+          icon={Users}
+          title="هیچ مخاطبی یافت نشد."
+          description="برای شروع، یک مخاطب جدید اضافه کنید."
+        />
       ) : (
         contacts.map((contact) => (
           <ContactItem

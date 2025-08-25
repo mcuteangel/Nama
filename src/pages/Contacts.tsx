@@ -2,24 +2,27 @@ import { MadeWithDyad } from "@/components/made-with-dyad";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, Search, Download } from "lucide-react"; // Import Download icon
+import { PlusCircle, Search, Download, Users } from "lucide-react";
 import ContactList from "@/components/ContactList";
 import { useNavigate } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useGroups } from "@/hooks/use-groups";
-import { exportContactsToCsv } from "@/utils/export-contacts"; // Import export utility
-import { useSession } from "@/integrations/supabase/auth"; // Import useSession
+import { exportContactsToCsv } from "@/utils/export-contacts";
+import { useSession } from "@/integrations/supabase/auth";
+import EmptyState from '@/components/EmptyState';
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 const Contacts = () => {
   const navigate = useNavigate();
   const { groups, loadingGroups, fetchGroups } = useGroups();
-  const { session } = useSession(); // Get session for export function
+  const { session } = useSession();
 
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedGroup, setSelectedGroup] = useState<string>("");
   const [companyFilter, setCompanyFilter] = useState<string>("");
   const [sortOption, setSortOption] = useState<string>("first_name_asc");
+  const [isExporting, setIsExporting] = useState(false);
 
   useEffect(() => {
     fetchGroups();
@@ -45,13 +48,15 @@ const Contacts = () => {
     setSortOption(value);
   };
 
-  const handleExportClick = () => {
-    exportContactsToCsv(session, {
+  const handleExportClick = async () => {
+    setIsExporting(true);
+    await exportContactsToCsv(session, {
       searchTerm,
       selectedGroup,
       companyFilter,
       sortOption,
     });
+    setIsExporting(false);
   };
 
   return (
@@ -88,15 +93,16 @@ const Contacts = () => {
               <Button
                 onClick={handleExportClick}
                 variant="outline"
+                disabled={isExporting}
                 className="flex items-center gap-2 px-6 py-2 rounded-lg text-gray-700 font-semibold shadow-md transition-all duration-300 transform hover:scale-105 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-100 dark:border-gray-600 flex-grow sm:flex-grow-0"
               >
+                {isExporting && <LoadingSpinner size={16} className="me-2" />}
                 <Download size={20} />
                 خروجی
               </Button>
             </div>
           </div>
 
-          {/* Filter and Sort Controls */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label htmlFor="group-filter" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">فیلتر بر اساس گروه:</label>

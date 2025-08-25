@@ -13,6 +13,7 @@ import { useSession } from '@/integrations/supabase/auth';
 import { useErrorHandler } from '@/hooks/use-error-handler';
 import { ErrorManager } from '@/lib/error-manager';
 import CancelButton from './CancelButton';
+import LoadingSpinner from './LoadingSpinner';
 
 const formSchema = z.object({
   name: z.string().min(1, { message: 'نام گروه نمی‌تواند خالی باشد.' }),
@@ -167,6 +168,7 @@ const GroupForm: React.FC<GroupFormProps> = ({ initialData, onSuccess, onCancel 
               className="px-6 py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white transition-colors"
               disabled={isSaving}
             >
+              {isSaving && <LoadingSpinner size={16} className="me-2" />}
               {isSaving ? (initialData?.id ? "در حال ویرایش..." : "در حال افزودن...") : (initialData?.id ? "ویرایش" : "افزودن")}
             </Button>
           </CardFooter>

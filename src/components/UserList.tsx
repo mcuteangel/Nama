@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Edit, Trash2, User as UserIcon, PlusCircle } from "lucide-react";
+import { Edit, Trash2, User as UserIcon, PlusCircle, Users } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { UserManagementService } from "@/services/user-management-service";
@@ -10,10 +10,12 @@ import { ErrorManager } from "@/lib/error-manager";
 import UserForm from "./UserForm";
 import { useTranslation } from "react-i18next";
 import { useSession } from "@/integrations/supabase/auth";
-import FormDialogWrapper from "./FormDialogWrapper"; // Import the new wrapper
-import LoadingMessage from "./LoadingMessage"; // Import LoadingMessage
-import CancelButton from "./CancelButton"; // Import CancelButton
-import { fetchWithCache, invalidateCache } from "@/utils/cache-helpers"; // Import fetchWithCache
+import FormDialogWrapper from "./FormDialogWrapper";
+import LoadingMessage from "./LoadingMessage";
+import CancelButton from "./CancelButton";
+import { fetchWithCache, invalidateCache } from "@/utils/cache-helpers";
+import EmptyState from './EmptyState';
+import LoadingSpinner from './LoadingSpinner';
 
 interface UserProfile {
   id: string;
@@ -27,11 +29,11 @@ interface UserProfile {
 const UserItem = ({ user, onUserUpdated, onUserDeleted }: { user: UserProfile; onUserUpdated: () => void; onUserDeleted: () => void }) => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const { t } = useTranslation();
-  const { session } = useSession(); // Get session to invalidate cache
+  const { session } = useSession();
 
   const onSuccessDelete = useCallback(() => {
     ErrorManager.notifyUser(t('user_management.user_deleted_success'), 'success');
-    invalidateCache(`user_list_${session?.user?.id}`); // Invalidate cache after successful delete
+    invalidateCache(`user_list_${session?.user?.id}`);
     onUserDeleted();
   }, [t, onUserDeleted, session]);
 
@@ -86,7 +88,7 @@ const UserItem = ({ user, onUserUpdated, onUserDeleted }: { user: UserProfile; o
               <Edit size={20} />
             </Button>
           </DialogTrigger>
-          <FormDialogWrapper> {/* Use the new wrapper */}
+          <FormDialogWrapper>
             <UserForm
               initialData={user}
               onSuccess={() => {
@@ -101,7 +103,7 @@ const UserItem = ({ user, onUserUpdated, onUserDeleted }: { user: UserProfile; o
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <Button variant="ghost" size="icon" className="text-red-600 hover:bg-red-100 dark:text-red-400 dark:hover:bg-gray-600/50 transition-all duration-200" disabled={isDeleting}>
-              <Trash2 size={20} />
+              {isDeleting ? <LoadingSpinner size={20} /> : <Trash2 size={20} />}
             </Button>
           </AlertDialogTrigger>
           <AlertDialogContent className="rounded-xl p-6 bg-white dark:bg-gray-800">
@@ -112,8 +114,11 @@ const UserItem = ({ user, onUserUpdated, onUserDeleted }: { user: UserProfile; o
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <CancelButton onClick={() => {}} text={t('common.cancel')} /> {/* Use CancelButton */}
-              <AlertDialogAction onClick={handleDelete} className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold" disabled={isDeleting}>{t('common.delete')}</AlertDialogAction>
+              <CancelButton onClick={() => {}} text={t('common.cancel')} />
+              <AlertDialogAction onClick={handleDelete} className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold" disabled={isDeleting}>
+                {isDeleting && <LoadingSpinner size={16} className="me-2" />}
+                {t('common.delete')}
+              </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
@@ -129,8 +134,6 @@ const UserList: React.FC = () => {
   const { t } = useTranslation();
 
   const onSuccessDeleteList = useCallback(() => {
-    // This callback is for the individual item's delete, the cache invalidation is handled there.
-    // We just need to refetch the list here.
     fetchUsers();
   }, []);
 
@@ -138,7 +141,6 @@ const UserList: React.FC = () => {
     ErrorManager.logError(err, { component: 'UserList', action: 'deleteUser' });
   }, []);
 
-  // This useErrorHandler is for the DELETE operation
   const {
     isLoading: isDeleting,
     executeAsync: executeDelete,
@@ -161,14 +163,13 @@ const UserList: React.FC = () => {
     ErrorManager.logError(err, { component: 'UserList', action: 'fetchUsers' });
   }, []);
 
-  // New useErrorHandler for FETCHING users
   const {
     isLoading: loadingUsers,
     executeAsync: executeFetchUsers,
-  } = useErrorHandler<{ data: UserProfile[] | null; error: string | null; fromCache: boolean }>(null, { // Explicitly define TResult here
+  } = useErrorHandler<{ data: UserProfile[] | null; error: string | null; fromCache: boolean }>(null, {
     maxRetries: 3,
     retryDelay: 1000,
-    showToast: false, // IMPORTANT: Set to false to control toast manually
+    showToast: false,
     customErrorMessage: t('user_management.error_loading_users'),
     onSuccess: onSuccessFetchUsers,
     onError: onErrorFetchUsers,
@@ -191,7 +192,7 @@ const UserList: React.FC = () => {
       return;
     }
 
-    const cacheKey = `user_list_${session.user.id}`; // Add cache key for user list
+    const cacheKey = `user_list_${session.user.id}`;
     await executeFetchUsers(async () => {
       const { data, error, fromCache } = await fetchWithCache<UserProfile[]>(
         cacheKey,
@@ -202,7 +203,7 @@ const UserList: React.FC = () => {
       );
       if (error) throw new Error(error);
       setUsers(data || []);
-      return { data, error: null, fromCache }; // Ensure error: null is returned
+      return { data, error: null, fromCache };
     });
   }, [session, isSessionLoading, executeFetchUsers, t]);
 
@@ -235,7 +236,7 @@ const UserList: React.FC = () => {
             </span>
           </Button>
         </DialogTrigger>
-        <FormDialogWrapper> {/* Use the new wrapper */}
+        <FormDialogWrapper>
             <UserForm
               onSuccess={() => {
                 setIsAddUserDialogOpen(false);
@@ -247,7 +248,11 @@ const UserList: React.FC = () => {
       </Dialog>
 
       {users.length === 0 ? (
-        <p className="text-center text-gray-500 dark:text-gray-400">{t('user_management.no_users_found')}</p>
+        <EmptyState
+          icon={Users}
+          title={t('user_management.no_users_found')}
+          description={t('user_management.no_users_found_description')}
+        />
       ) : (
         users.map((user) => (
           <UserItem

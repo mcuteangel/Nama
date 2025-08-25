@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Loader2, User, CheckCircle, XCircle, LightbulbOff, Brain } from "lucide-react"; // Added Brain icon
+import { Sparkles, Loader2, User, CheckCircle, XCircle, LightbulbOff, Brain } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useSession } from "@/integrations/supabase/auth";
 import { useErrorHandler } from "@/hooks/use-error-handler";
@@ -9,9 +9,11 @@ import { ErrorManager } from "@/lib/error-manager";
 import LoadingMessage from "./LoadingMessage";
 import { supabase } from '@/integrations/supabase/client';
 import { invalidateCache } from '@/utils/cache-helpers';
-import { suggestGenderFromName, updateLearnedGenderPreference, clearLearnedGenderPreferences, getLearnedGenderPreferences } from '@/utils/gender-learning'; // Import new utility functions
+import { suggestGenderFromName, updateLearnedGenderPreference, clearLearnedGenderPreferences, getLearnedGenderPreferences } from '@/utils/gender-learning';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import CancelButton from './CancelButton';
+import EmptyState from './EmptyState';
+import LoadingSpinner from './LoadingSpinner';
 
 interface ContactForGenderSuggestion {
   id: string;
@@ -34,7 +36,7 @@ const GenderSuggestionManagement: React.FC = () => {
   const [ungenderedContacts, setUngenderedContacts] = useState<ContactForGenderSuggestion[]>([]);
   const [genderSuggestions, setGenderSuggestions] = useState<GenderSuggestionDisplay[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [learnedNamesCount, setLearnedNamesCount] = useState(0); // New state for learned names count
+  const [learnedNamesCount, setLearnedNamesCount] = useState(0);
 
   const updateLearnedNamesCount = useCallback(() => {
     const preferences = getLearnedGenderPreferences();
@@ -82,7 +84,7 @@ const GenderSuggestionManagement: React.FC = () => {
 
   useEffect(() => {
     fetchUngenderedContacts();
-    updateLearnedNamesCount(); // Update count on mount
+    updateLearnedNamesCount();
   }, [fetchUngenderedContacts, updateLearnedNamesCount]);
 
   const handleGenerateSuggestions = useCallback(async () => {
@@ -101,7 +103,7 @@ const GenderSuggestionManagement: React.FC = () => {
     try {
       const newSuggestions: GenderSuggestionDisplay[] = ungenderedContacts
         .map(contact => {
-          const suggestedGender = suggestGenderFromName(contact.first_name); // Use the centralized utility function
+          const suggestedGender = suggestGenderFromName(contact.first_name);
           return {
             contactId: contact.id,
             contactName: `${contact.first_name} ${contact.last_name}`,
@@ -109,7 +111,7 @@ const GenderSuggestionManagement: React.FC = () => {
             suggestedGender: suggestedGender,
           };
         })
-        .filter(s => s.suggestedGender !== 'not_specified'); // Only show actionable suggestions
+        .filter(s => s.suggestedGender !== 'not_specified');
 
       setGenderSuggestions(newSuggestions);
       if (newSuggestions.length === 0) {
@@ -122,7 +124,7 @@ const GenderSuggestionManagement: React.FC = () => {
       ErrorManager.notifyUser(`${t('ai_suggestions.error_generating_gender_suggestions_local')}: ${ErrorManager.getErrorMessage(err)}`, 'error');
     } finally {
       setIsGenerating(false);
-      // dismissToast(toastId); // Assuming notifyUser returns a toastId if needed
+      // dismissToast(toastId);
     }
   }, [session, ungenderedContacts, t]);
 
@@ -142,24 +144,21 @@ const GenderSuggestionManagement: React.FC = () => {
 
       if (error) throw new Error(error.message);
 
-      // Update learned preferences in localStorage
       updateLearnedGenderPreference(
         ungenderedContacts.find(c => c.id === suggestion.contactId)?.first_name || '',
         suggestion.suggestedGender
       );
-      updateLearnedNamesCount(); // Update count after learning
+      updateLearnedNamesCount();
 
       ErrorManager.notifyUser(t('ai_suggestions.gender_suggestion_applied_success'), 'success');
-      // Remove the applied suggestion from the list
       setGenderSuggestions(prev => prev.filter(s => s.contactId !== suggestion.contactId));
-      // Invalidate cache for contacts list and re-fetch ungendered contacts
       invalidateCache(`contacts_list_${session.user.id}_`);
       fetchUngenderedContacts();
     } catch (err: any) {
       ErrorManager.logError(err, { component: 'GenderSuggestionManagement', action: 'acceptGenderSuggestion', suggestion });
       ErrorManager.notifyUser(`${t('ai_suggestions.error_applying_gender_suggestion')}: ${ErrorManager.getErrorMessage(err)}`, 'error');
     } finally {
-      // dismissToast(toastId); // Assuming notifyUser returns a toastId if needed
+      // dismissToast(toastId);
     }
   }, [session, t, fetchUngenderedContacts, ungenderedContacts, updateLearnedNamesCount]);
 
@@ -171,8 +170,7 @@ const GenderSuggestionManagement: React.FC = () => {
   const handleClearLearnedPreferences = useCallback(() => {
     clearLearnedGenderPreferences();
     ErrorManager.notifyUser(t('ai_suggestions.learned_preferences_cleared'), 'success');
-    updateLearnedNamesCount(); // Update count after clearing
-    // Re-generate suggestions to reflect cleared learning
+    updateLearnedNamesCount();
     handleGenerateSuggestions();
   }, [t, handleGenerateSuggestions, updateLearnedNamesCount]);
 
@@ -207,11 +205,8 @@ const GenderSuggestionManagement: React.FC = () => {
             disabled={isGenerating || ungenderedContacts.length === 0}
             className="w-full flex items-center gap-2 px-6 py-2 rounded-lg bg-pink-600 hover:bg-pink-700 text-white font-semibold shadow-md transition-all duration-300 transform hover:scale-105"
           >
-            {isGenerating ? (
-              <Loader2 size={16} className="me-2 animate-spin" />
-            ) : (
-              <Sparkles size={16} className="me-2" />
-            )}
+            {isGenerating && <LoadingSpinner size={16} className="me-2" />}
+            <Sparkles size={16} className="me-2" />
             {t('ai_suggestions.generate_gender_suggestions')}
           </Button>
 
@@ -243,7 +238,11 @@ const GenderSuggestionManagement: React.FC = () => {
           </AlertDialog>
 
           {ungenderedContacts.length === 0 && !isGenerating && (
-            <p className="text-center text-gray-500 dark:text-gray-400">{t('ai_suggestions.all_contacts_gendered')}</p>
+            <EmptyState
+              icon={User}
+              title={t('ai_suggestions.all_contacts_gendered')}
+              description={t('ai_suggestions.all_contacts_gendered_description')}
+            />
           )}
 
           {genderSuggestions.length > 0 && (

@@ -18,7 +18,8 @@ import {
 } from '@/domain/schemas/custom-field-template';
 import { useSession } from '@/integrations/supabase/auth';
 import { useNavigate } from 'react-router-dom';
-import CancelButton from './CancelButton'; // Import CancelButton
+import CancelButton from './CancelButton';
+import LoadingSpinner from './LoadingSpinner';
 
 type TemplateType = 'text' | 'number' | 'date' | 'list';
 
@@ -269,14 +270,14 @@ const CustomFieldTemplateForm: React.FC<CustomFieldTemplateFormProps> = ({ initi
           </div>
 
           <CardFooter className="flex justify-end gap-4 p-0 pt-4">
-            <CancelButton onClick={onCancel} disabled={isSubmitting} /> {/* Use CancelButton */}
+            <CancelButton onClick={onCancel} disabled={isSubmitting} />
             <Button
               type="submit"
               className="px-6 py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white transition-colors"
               disabled={isSubmitting}
             >
+              {isSubmitting && <LoadingSpinner size={16} className="me-2" />}
               {isSubmitting ? (initialData ? "در حال ویرایش..." : "در حال افزودن...") : (initialData ? "ویرایش" : "افزودن")}
-              <Save size={16} className="me-2" />
             </Button>
           </CardFooter>
         </form>

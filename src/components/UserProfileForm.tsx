@@ -15,7 +15,8 @@ import { ErrorManager } from '@/lib/error-manager';
 import { User } from 'lucide-react';
 import { fetchWithCache, invalidateCache } from "@/utils/cache-helpers";
 import LoadingMessage from './LoadingMessage';
-import { showLoading, dismissToast, showSuccess, showError } from '@/utils/toast'; // Import toast functions
+import { showLoading, dismissToast, showSuccess, showError } from '@/utils/toast';
+import LoadingSpinner from './LoadingSpinner';
 
 const profileSchema = z.object({
   first_name: z.string().optional(),
@@ -38,15 +39,15 @@ const UserProfileForm: React.FC = () => {
 
   const {
     isLoading: isSubmitting,
-    error: submitError, // Renamed to avoid conflict
-    errorMessage: submitErrorMessage, // Renamed
-    retry: retrySubmit, // Renamed
-    executeAsync: executeSubmit, // Renamed
-    retryCount: submitRetryCount, // Renamed
+    error: submitError,
+    errorMessage: submitErrorMessage,
+    retry: retrySubmit,
+    executeAsync: executeSubmit,
+    retryCount: submitRetryCount,
   } = useErrorHandler(null, {
     maxRetries: 3,
     retryDelay: 1000,
-    showToast: true, // We want toast for submit success/error
+    showToast: true,
     customErrorMessage: "خطایی در به‌روزرسانی پروفایل رخ داد",
     onSuccess: onSuccessSubmit,
     onError: onErrorSubmit,
@@ -82,7 +83,7 @@ const UserProfileForm: React.FC = () => {
     isLoading: loadingProfile,
     executeAsync: executeFetchProfile,
   } = useErrorHandler<{ data: { first_name: string | null; last_name: string | null } | null; error: string | null; fromCache: boolean }>(null, {
-    showToast: false, // Control toasts manually
+    showToast: false,
     onSuccess: onSuccessFetchProfile,
     onError: onErrorFetchProfile,
   });
@@ -127,7 +128,7 @@ const UserProfileForm: React.FC = () => {
       return;
     }
 
-    await executeSubmit(async () => { // Use executeSubmit here
+    await executeSubmit(async () => {
       const { error } = await supabase
         .from('profiles')
         .upsert(
@@ -143,9 +144,9 @@ const UserProfileForm: React.FC = () => {
         throw new Error(error.message || "خطا در ذخیره پروفایل");
       }
     });
-  }, [session, executeSubmit]); // Add dependencies for useCallback
+  }, [session, executeSubmit]);
 
-  if (loadingProfile) { // Use new loading state
+  if (loadingProfile) {
     return <LoadingMessage message="در حال بارگذاری پروفایل..." />;
   }
 
@@ -155,7 +156,7 @@ const UserProfileForm: React.FC = () => {
         <CardTitle className="text-2xl font-bold text-gray-800 dark:text-gray-100">
           پروفایل کاربری
         </CardTitle>
-        {submitError && ( // Use submitError
+        {submitError && (
           <div className="text-sm text-destructive flex items-center justify-center gap-2 mt-2">
             <span>{submitErrorMessage}</span>
             {submitRetryCount > 0 && (
@@ -214,6 +215,7 @@ const UserProfileForm: React.FC = () => {
               className="px-6 py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white transition-colors"
               disabled={isSubmitting}
             >
+              {isSubmitting && <LoadingSpinner size={16} className="me-2" />}
               {isSubmitting ? "در حال ذخیره..." : "ذخیره تغییرات"}
             </Button>
           </CardFooter>

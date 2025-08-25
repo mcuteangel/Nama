@@ -1,13 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { LogOut, PlusCircle, Users, Home, Menu, Settings, User, BarChart2, ClipboardList, ShieldCheck, Sparkles } from "lucide-react"; // Import Sparkles
+import { LogOut, PlusCircle, Users, Home, Menu, Settings, User, BarChart2, ClipboardList, ShieldCheck, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { showError, showSuccess, showLoading, dismissToast } from "@/utils/toast";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { ThemeToggle } from "./ThemeToggle";
 import { useTranslation } from 'react-i18next';
+import LoadingSpinner from './LoadingSpinner';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -18,6 +19,7 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isAdmin }) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const navItems = [
     { name: t('common.home'), icon: Home, path: "/" },
@@ -27,7 +29,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isAdmin }) => {
     { name: t('common.profile'), icon: User, path: "/profile" },
     { name: t('common.statistics'), icon: BarChart2, path: "/statistics" },
     { name: t('common.settings'), icon: Settings, path: "/settings" },
-    { name: t('ai_suggestions.title'), icon: Sparkles, path: "/ai-suggestions" }, // New AI Suggestions link
+    { name: t('ai_suggestions.title'), icon: Sparkles, path: "/ai-suggestions" },
   ];
 
   if (isAdmin) {
@@ -35,6 +37,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isAdmin }) => {
   }
 
   const handleLogout = async () => {
+    setIsLoggingOut(true);
     const toastId = showLoading(t('common.logout_loading'));
     try {
       const { error } = await supabase.auth.signOut();
@@ -46,6 +49,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isAdmin }) => {
       showError(`${t('common.logout_error')}: ${error.message || t('common.unknown_error')}`);
     } finally {
       dismissToast(toastId);
+      setIsLoggingOut(false);
     }
   };
 
@@ -104,13 +108,14 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isAdmin }) => {
               <Button
                 variant="ghost"
                 onClick={handleLogout}
+                disabled={isLoggingOut}
                 className={cn(
                   "w-full text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
                   isOpen ? "justify-start" : "justify-center"
                 )}
               >
                 <div className="flex items-center">
-                  <LogOut size={20} className={cn(isOpen ? "me-2" : "mx-auto")} />
+                  {isLoggingOut ? <LoadingSpinner size={20} className="me-2" /> : <LogOut size={20} className="me-2" />}
                   {isOpen && <span className="whitespace-nowrap overflow-hidden">{t('common.logout')}</span>}
                 </div>
               </Button>
@@ -125,9 +130,10 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isAdmin }) => {
                 variant="ghost"
                 size="icon"
                 onClick={handleLogout}
+                disabled={isLoggingOut}
                 className="text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground mx-auto"
               >
-                <LogOut size={20} />
+                {isLoggingOut ? <LoadingSpinner size={20} /> : <LogOut size={20} />}
               </Button>
             </TooltipTrigger>
             <TooltipContent side="left">{t('common.logout')}</TooltipContent>

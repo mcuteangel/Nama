@@ -1,11 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { LogOut, PlusCircle, Users, Home, User, BarChart2, ClipboardList, ShieldCheck, Sparkles, Settings } from "lucide-react"; // Import Sparkles and Settings
+import { LogOut, PlusCircle, Users, Home, User, BarChart2, ClipboardList, ShieldCheck, Sparkles, Settings } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { showError, showSuccess, showLoading, dismissToast } from "@/utils/toast";
 import { cn } from "@/lib/utils";
 import { useTranslation } from 'react-i18next';
+import LoadingSpinner from './LoadingSpinner';
 
 interface BottomNavigationBarProps {
   isAdmin: boolean;
@@ -15,21 +16,22 @@ const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({ isAdmin }) =>
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useTranslation();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const navItems = [
     { name: t('common.home'), icon: Home, path: "/" },
     { name: t('common.add_contact'), icon: PlusCircle, path: "/add-contact" },
     { name: t('common.groups'), icon: Users, path: "/groups" },
-    { name: t('ai_suggestions.title'), icon: Sparkles, path: "/ai-suggestions" }, // New AI Suggestions link
-    { name: t('common.settings'), icon: Settings, path: "/settings" }, // Moved settings here for mobile
+    { name: t('ai_suggestions.title'), icon: Sparkles, path: "/ai-suggestions" },
+    { name: t('common.settings'), icon: Settings, path: "/settings" },
   ];
 
-  // Add User Management only if isAdmin is true
   if (isAdmin) {
     navItems.push({ name: t('user_management.title'), icon: ShieldCheck, path: "/user-management" });
   }
 
   const handleLogout = async () => {
+    setIsLoggingOut(true);
     const toastId = showLoading(t('common.logout_loading'));
     try {
       const { error } = await supabase.auth.signOut();
@@ -41,6 +43,7 @@ const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({ isAdmin }) =>
       showError(`${t('common.logout_error')}: ${error.message || t('common.unknown_error')}`);
     } finally {
       dismissToast(toastId);
+      setIsLoggingOut(false);
     }
   };
 
@@ -71,10 +74,11 @@ const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({ isAdmin }) =>
       <Button
         variant="ghost"
         onClick={handleLogout}
+        disabled={isLoggingOut}
         className="flex flex-col items-center justify-center text-xs p-1 h-auto min-w-[60px] hover:bg-white/20"
       >
         <div className="flex flex-col items-center justify-center">
-          <LogOut size={20} className="mb-1" />
+          {isLoggingOut ? <LoadingSpinner size={20} className="mb-1" /> : <LogOut size={20} className="mb-1" />}
           {t('common.logout')}
         </div>
       </Button>
