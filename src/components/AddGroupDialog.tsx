@@ -33,13 +33,15 @@ const AddGroupDialog: React.FC<AddGroupDialogProps> = ({ onGroupAdded, open, onO
 
   const {
     isLoading: isFetchingColors,
+    error: fetchColorsError, // Get error state
+    errorMessage: fetchColorsErrorMessage, // Get error message
     executeAsync: executeFetchColors,
   } = useErrorHandler(null, {
-    showToast: false,
+    showToast: true, // Keep toast for errors
+    customErrorMessage: "خطا در بارگذاری رنگ‌های گروه‌های موجود.",
     onError: (err) => {
       console.error("Error fetching existing group colors in AddGroupDialog:", err);
-      ErrorManager.notifyUser("خطا در بارگذاری رنگ‌های گروه‌های موجود.", 'error');
-      setInitialColor('#60A5FA'); // Fallback to default color
+      setInitialColor('#60A5FA'); // Fallback to default color on error
     }
   });
 
@@ -98,6 +100,11 @@ const AddGroupDialog: React.FC<AddGroupDialogProps> = ({ onGroupAdded, open, onO
         {isFetchingColors ? (
           <div className="w-full max-w-md glass rounded-xl p-6 bg-white/90 dark:bg-gray-900/90">
             <LoadingMessage message="در حال آماده‌سازی فرم گروه..." />
+          </div>
+        ) : fetchColorsError ? ( // Display error message if fetching colors failed
+          <div className="w-full max-w-md glass rounded-xl p-6 bg-white/90 dark:bg-gray-900/90 text-center text-red-500 dark:text-red-400">
+            <p>{fetchColorsErrorMessage}</p>
+            <Button onClick={() => onOpenChange(false)} className="mt-4">بستن</Button>
           </div>
         ) : (
           <GroupForm
