@@ -188,15 +188,6 @@ const ContactDetail = () => {
   // Access the group from the first contact_group entry, and then the first group within that array
   const assignedGroup = contact?.contact_groups?.[0]?.groups?.[0] || null;
 
-  // --- DEBUGGING LOGS ---
-  useEffect(() => {
-    if (contact) {
-      console.log("Contact data:", contact);
-      console.log("Assigned Group:", assignedGroup);
-    }
-  }, [contact, assignedGroup]);
-  // --- END DEBUGGING LOGS ---
-
   if (loading) {
     return (
       <LoadingMessage message="در حال بارگذاری جزئیات مخاطب..." />
