@@ -7,7 +7,8 @@ import { invalidateCache } from "@/utils/cache-helpers";
 import { useErrorHandler } from "./use-error-handler";
 import { ErrorManager } from "@/lib/error-manager";
 import { useCallback } from "react";
-import { ContactService } from "@/services/contact-service"; // Import ContactService
+import { ContactService } from "@/services/contact-service";
+import { updateLearnedGenderPreference } from "@/utils/gender-learning"; // New import
 
 export const useContactFormLogic = (
   contactId: string | undefined,
@@ -26,6 +27,13 @@ export const useContactFormLogic = (
     if (contactId) {
       invalidateCache(`contact_detail_${contactId}`); // Invalidate single contact cache
     }
+
+    // New: Update learned gender preferences based on form submission
+    const { firstName, gender } = form.getValues();
+    if (firstName && gender && gender !== 'not_specified') {
+      updateLearnedGenderPreference(firstName, gender);
+    }
+
     navigate("/"); // Navigate back to contacts list after success
   }, [contactId, form, session, navigate]);
 
