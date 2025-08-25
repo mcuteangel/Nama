@@ -60,6 +60,8 @@ export const useContactFormLogic = (
 
     await executeSave(async () => {
       let currentContactId = contactId;
+      console.log("useContactFormLogic: Starting onSubmit. contactId:", contactId, "values.groupId:", values.groupId);
+
 
       if (contactId) {
         // Update existing contact
@@ -221,6 +223,7 @@ export const useContactFormLogic = (
         }
 
         // --- Handle group assignment ---
+        console.log("useContactFormLogic: Handling group assignment for existing contact. currentContactId:", currentContactId, "values.groupId:", values.groupId);
         // First, delete all existing group assignments for this contact to ensure single assignment
         const { error: deleteExistingGroupsError } = await supabase
           .from("contact_groups")
@@ -228,7 +231,11 @@ export const useContactFormLogic = (
           .eq("contact_id", currentContactId) // Use currentContactId which is set for both new and existing contacts
           .eq("user_id", user.id);
 
-        if (deleteExistingGroupsError) throw deleteExistingGroupsError;
+        if (deleteExistingGroupsError) {
+          console.error("useContactFormLogic: Error deleting existing groups:", deleteExistingGroupsError);
+          throw deleteExistingGroupsError;
+        }
+        console.log("useContactFormLogic: Existing groups deleted successfully (if any).");
 
         // If a group is selected in the form, insert the new assignment
         if (values.groupId) {
@@ -239,7 +246,13 @@ export const useContactFormLogic = (
               contact_id: currentContactId,
               group_id: values.groupId,
             });
-          if (insertGroupError) throw insertGroupError;
+          if (insertGroupError) {
+            console.error("useContactFormLogic: Error inserting new group:", insertGroupError);
+            throw insertGroupError;
+          }
+          console.log("useContactFormLogic: New group inserted successfully:", values.groupId);
+        } else {
+          console.log("useContactFormLogic: No group selected, skipping insert.");
         }
 
         // Handle custom fields update/insert/delete
@@ -356,6 +369,7 @@ export const useContactFormLogic = (
         }
 
         // --- Handle group assignment for new contact ---
+        console.log("useContactFormLogic: Handling group assignment for new contact. currentContactId:", currentContactId, "values.groupId:", values.groupId);
         if (values.groupId) {
           const { error: groupAssignmentError } = await supabase
             .from("contact_groups")
@@ -364,7 +378,13 @@ export const useContactFormLogic = (
               contact_id: currentContactId,
               group_id: values.groupId,
             });
-          if (groupAssignmentError) throw groupAssignmentError;
+          if (groupAssignmentError) {
+            console.error("useContactFormLogic: Error inserting group for new contact:", groupAssignmentError);
+            throw groupAssignmentError;
+          }
+          console.log("useContactFormLogic: Group inserted for new contact successfully:", values.groupId);
+        } else {
+          console.log("useContactFormLogic: No group selected for new contact, skipping insert.");
         }
 
         if (values.customFields && values.customFields.length > 0) {

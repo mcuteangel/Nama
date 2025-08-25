@@ -1,0 +1,1 @@
+DROP POLICY IF EXISTS "contact_groups_insert_policy" ON public.contact_groups;
