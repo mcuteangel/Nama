@@ -47,10 +47,15 @@ export const ContactCrudService = {
           extension: phone.extension || null,
         }));
         console.log("ContactCrudService.addContact: Phones to insert:", JSON.stringify(phonesToInsert, null, 2)); // Log phones to insert
-        const { error: phoneError } = await supabase
+        const { data: insertedPhones, error: phoneError } = await supabase
           .from("phone_numbers")
-          .insert(phonesToInsert);
-        if (phoneError) throw phoneError;
+          .insert(phonesToInsert)
+          .select('id'); // Select ID to confirm insertion
+        if (phoneError) {
+          console.error("ContactCrudService.addContact: Error inserting phones:", phoneError.message);
+          throw phoneError;
+        }
+        console.log("ContactCrudService.addContact: Phones inserted successfully. IDs:", insertedPhones?.map(p => p.id));
       }
 
       if (values.emailAddresses && values.emailAddresses.length > 0) {
@@ -60,10 +65,15 @@ export const ContactCrudService = {
           email_type: email.email_type,
           email_address: email.email_address,
         }));
-        const { error: emailError } = await supabase
+        const { data: insertedEmails, error: emailError } = await supabase
           .from("email_addresses")
-          .insert(emailsToInsert);
-        if (emailError) throw emailError;
+          .insert(emailsToInsert)
+          .select('id');
+        if (emailError) {
+          console.error("ContactCrudService.addContact: Error inserting emails:", emailError.message);
+          throw emailError;
+        }
+        console.log("ContactCrudService.addContact: Emails inserted successfully. IDs:", insertedEmails?.map(e => e.id));
       }
 
       if (values.socialLinks && values.socialLinks.length > 0) {
@@ -73,21 +83,31 @@ export const ContactCrudService = {
           type: link.type,
           url: link.url,
         }));
-        const { error: socialLinkError } = await supabase
+        const { data: insertedLinks, error: socialLinkError } = await supabase
           .from("social_links")
-          .insert(linksToInsert);
-        if (socialLinkError) throw socialLinkError;
+          .insert(linksToInsert)
+          .select('id');
+        if (socialLinkError) {
+          console.error("ContactCrudService.addContact: Error inserting social links:", socialLinkError.message);
+          throw socialLinkError;
+        }
+        console.log("ContactCrudService.addContact: Social links inserted successfully. IDs:", insertedLinks?.map(l => l.id));
       }
 
       if (values.groupId) {
-        const { error: groupAssignmentError } = await supabase
+        const { data: insertedGroup, error: groupAssignmentError } = await supabase
           .from("contact_groups")
           .insert({
             user_id: user.id,
             contact_id: currentContactId,
             group_id: values.groupId,
-          });
-        if (groupAssignmentError) throw groupAssignmentError;
+          })
+          .select('group_id');
+        if (groupAssignmentError) {
+          console.error("ContactCrudService.addContact: Error inserting group assignment:", groupAssignmentError.message);
+          throw groupAssignmentError;
+        }
+        console.log("ContactCrudService.addContact: Group assignment inserted. Group ID:", insertedGroup?.[0]?.group_id);
       }
 
       if (values.customFields && values.customFields.length > 0) {
@@ -100,10 +120,15 @@ export const ContactCrudService = {
             field_value: field.value,
           }));
         if (customFieldsToInsert.length > 0) {
-          const { error: customFieldsError } = await supabase
+          const { data: insertedCustomFields, error: customFieldsError } = await supabase
             .from("custom_fields")
-            .insert(customFieldsToInsert);
-          if (customFieldsError) throw customFieldsError;
+            .insert(customFieldsToInsert)
+            .select('id');
+          if (customFieldsError) {
+            console.error("ContactCrudService.addContact: Error inserting custom fields:", customFieldsError.message);
+            throw customFieldsError;
+          }
+          console.log("ContactCrudService.addContact: Custom fields inserted successfully. IDs:", insertedCustomFields?.map(cf => cf.id));
         }
       }
       return { data: { id: currentContactId }, error: null };
@@ -184,7 +209,7 @@ export const ContactCrudService = {
       for (const phone of newPhoneNumbers) {
         if (phone.id) {
           console.log("ContactCrudService.updateContact: Updating phone:", phone.id, "with data:", JSON.stringify(phone, null, 2));
-          const { error: updateError } = await supabase
+          const { data: updatedPhone, error: updateError } = await supabase
             .from("phone_numbers")
             .update({
               phone_type: phone.phone_type,
@@ -192,14 +217,16 @@ export const ContactCrudService = {
               extension: phone.extension || null,
             })
             .eq("id", phone.id)
-            .eq("user_id", user.id);
+            .eq("user_id", user.id)
+            .select('id');
           if (updateError) {
             console.error("ContactCrudService.updateContact: Error updating phone:", updateError.message);
             throw updateError;
           }
+          console.log("ContactCrudService.updateContact: Phone updated successfully. ID:", updatedPhone?.[0]?.id);
         } else {
           console.log("ContactCrudService.updateContact: Inserting new phone with data:", JSON.stringify(phone, null, 2));
-          const { error: insertError } = await supabase
+          const { data: insertedPhone, error: insertError } = await supabase
             .from("phone_numbers")
             .insert({
               user_id: user.id,
@@ -207,11 +234,13 @@ export const ContactCrudService = {
               phone_type: phone.phone_type,
               phone_number: phone.phone_number,
               extension: phone.extension || null,
-            });
+            })
+            .select('id');
           if (insertError) {
             console.error("ContactCrudService.updateContact: Error inserting phone:", insertError.message);
             throw insertError;
           }
+          console.log("ContactCrudService.updateContact: Phone inserted successfully. ID:", insertedPhone?.[0]?.id);
         }
       }
       console.log("ContactCrudService.updateContact: Phone numbers handled.");
@@ -247,32 +276,36 @@ export const ContactCrudService = {
       for (const email of newEmailAddresses) {
         if (email.id) {
           console.log("ContactCrudService.updateContact: Updating email:", email.id, "with data:", JSON.stringify(email, null, 2));
-          const { error: updateError } = await supabase
+          const { data: updatedEmail, error: updateError } = await supabase
             .from("email_addresses")
             .update({
               email_type: email.email_type,
               email_address: email.email_address,
             })
             .eq("id", email.id)
-            .eq("user_id", user.id);
+            .eq("user_id", user.id)
+            .select('id');
           if (updateError) {
             console.error("ContactCrudService.updateContact: Error updating email:", updateError.message);
             throw updateError;
           }
+          console.log("ContactCrudService.updateContact: Email updated successfully. ID:", updatedEmail?.[0]?.id);
         } else {
           console.log("ContactCrudService.updateContact: Inserting new email with data:", JSON.stringify(email, null, 2));
-          const { error: insertError } = await supabase
+          const { data: insertedEmail, error: insertError } = await supabase
             .from("email_addresses")
             .insert({
               user_id: user.id,
               contact_id: contactId,
               email_type: email.email_type,
               email_address: email.email_address,
-            });
+            })
+            .select('id');
           if (insertError) {
             console.error("ContactCrudService.updateContact: Error inserting email:", insertError.message);
             throw insertError;
           }
+          console.log("ContactCrudService.updateContact: Email inserted successfully. ID:", insertedEmail?.[0]?.id);
         }
       }
       console.log("ContactCrudService.updateContact: Email addresses handled.");
@@ -308,32 +341,36 @@ export const ContactCrudService = {
       for (const link of newSocialLinks) {
         if (link.id) {
           console.log("ContactCrudService.updateContact: Updating social link:", link.id, "with data:", JSON.stringify(link, null, 2));
-          const { error: updateError } = await supabase
+          const { data: updatedLink, error: updateError } = await supabase
             .from("social_links")
             .update({
               type: link.type,
               url: link.url,
             })
             .eq("id", link.id)
-            .eq("user_id", user.id);
+            .eq("user_id", user.id)
+            .select('id');
           if (updateError) {
             console.error("ContactCrudService.updateContact: Error updating social link:", updateError.message);
             throw updateError;
           }
+          console.log("ContactCrudService.updateContact: Social link updated successfully. ID:", updatedLink?.[0]?.id);
         } else {
           console.log("ContactCrudService.updateContact: Inserting new social link with data:", JSON.stringify(link, null, 2));
-          const { error: insertError } = await supabase
+          const { data: insertedLink, error: insertError } = await supabase
             .from("social_links")
             .insert({
               user_id: user.id,
               contact_id: contactId,
               type: link.type,
               url: link.url,
-            });
+            })
+            .select('id');
           if (insertError) {
             console.error("ContactCrudService.updateContact: Error inserting social link:", insertError.message);
             throw insertError;
           }
+          console.log("ContactCrudService.updateContact: Social link inserted successfully. ID:", insertedLink?.[0]?.id);
         }
       }
       console.log("ContactCrudService.updateContact: Social links handled.");
@@ -354,18 +391,19 @@ export const ContactCrudService = {
 
       if (values.groupId) {
         console.log("ContactCrudService.updateContact: Inserting new group assignment:", values.groupId);
-        const { error: insertGroupError } = await supabase
+        const { data: insertedGroup, error: insertGroupError } = await supabase
           .from("contact_groups")
           .insert({
             user_id: user.id,
             contact_id: contactId,
             group_id: values.groupId,
-          });
+          })
+          .select('group_id');
         if (insertGroupError) {
           console.error("ContactCrudService.updateContact: Error inserting group assignment:", insertGroupError.message);
           throw insertGroupError;
         }
-        console.log("ContactCrudService.updateContact: Group assignment inserted.");
+        console.log("ContactCrudService.updateContact: Group assignment inserted. Group ID:", insertedGroup?.[0]?.group_id);
       } else {
         console.log("ContactCrudService.updateContact: No group assigned.");
       }
@@ -403,31 +441,35 @@ export const ContactCrudService = {
         if (existingField) {
           if (existingField.field_value !== field.value) {
             console.log("ContactCrudService.updateContact: Updating custom field:", existingField.id, "with value:", field.value);
-            const { error: updateError } = await supabase
+            const { data: updatedCustomField, error: updateError } = await supabase
               .from("custom_fields")
               .update({ field_value: field.value })
               .eq("id", existingField.id)
-              .eq("user_id", user.id);
+              .eq("user_id", user.id)
+              .select('id');
             if (updateError) {
               console.error("ContactCrudService.updateContact: Error updating custom field:", updateError.message);
               throw updateError;
             }
+            console.log("ContactCrudService.updateContact: Custom field updated successfully. ID:", updatedCustomField?.[0]?.id);
           }
         } else {
           if (field.value && field.value.trim() !== '') {
             console.log("ContactCrudService.updateContact: Inserting new custom field for template:", field.template_id, "with value:", field.value);
-            const { error: insertError } = await supabase
+            const { data: insertedCustomField, error: insertError } = await supabase
               .from("custom_fields")
               .insert({
                 user_id: user.id,
                 contact_id: contactId,
                 template_id: field.template_id,
                 field_value: field.value,
-              });
+              })
+              .select('id');
             if (insertError) {
               console.error("ContactCrudService.updateContact: Error inserting custom field:", insertError.message);
               throw insertError;
             }
+            console.log("ContactCrudService.updateContact: Custom field inserted successfully. ID:", insertedCustomField?.[0]?.id);
           }
         }
       }
