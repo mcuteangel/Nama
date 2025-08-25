@@ -14,7 +14,8 @@ import ContactsByCreationTimeChart from "@/components/statistics/ContactsByCreat
 import TopCompaniesList from "@/components/statistics/TopCompaniesList";
 import TopPositionsList from "@/components/statistics/TopPositionsList";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ContactService } from "@/services/contact-service";
+import { ContactStatisticsService } from "@/services/contact-statistics-service"; // Updated import
+import { ContactListService } from "@/services/contact-list-service"; // Added import for getFilteredContacts
 import { useTranslation } from "react-i18next";
 import { fetchWithCache } from "@/utils/cache-helpers";
 
@@ -142,14 +143,14 @@ const ContactStatisticsDashboard: React.FC = () => {
             { data: companiesStats, error: companiesError },
             { data: positionsStats, error: errorPositions },
           ] = await Promise.all([
-            ContactService.getTotalContacts(userId),
-            ContactService.getContactsByGender(userId),
-            ContactService.getContactsByGroup(userId),
-            ContactService.getContactsByPreferredMethod(userId),
-            ContactService.getUpcomingBirthdays(userId),
-            ContactService.getContactsByCreationMonth(userId),
-            ContactService.getTopCompanies(userId),
-            ContactService.getTopPositions(userId),
+            ContactStatisticsService.getTotalContacts(userId), // Updated service call
+            ContactStatisticsService.getContactsByGender(userId), // Updated service call
+            ContactStatisticsService.getContactsByGroup(userId), // Updated service call
+            ContactStatisticsService.getContactsByPreferredMethod(userId), // Updated service call
+            ContactStatisticsService.getUpcomingBirthdays(userId), // Updated service call
+            ContactStatisticsService.getContactsByCreationMonth(userId), // Updated service call
+            ContactStatisticsService.getTopCompanies(userId), // Updated service call
+            ContactStatisticsService.getTopPositions(userId), // Updated service call
           ]);
 
           if (totalError) throw new Error(totalError);

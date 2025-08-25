@@ -7,7 +7,7 @@ import { invalidateCache } from "@/utils/cache-helpers";
 import { useErrorHandler } from "./use-error-handler";
 import { ErrorManager } from "@/lib/error-manager";
 import { useCallback } from "react";
-import { ContactService } from "@/services/contact-service";
+import { ContactCrudService } from "@/services/contact-crud-service"; // Updated import
 import { updateLearnedGenderPreference } from "@/utils/gender-learning"; // New import
 
 export const useContactFormLogic = (
@@ -74,21 +74,21 @@ export const useContactFormLogic = (
       console.log("useContactFormLogic: executeSave async function started.");
       let res;
       if (contactId) {
-        console.log("useContactFormLogic: Calling ContactService.updateContact...");
-        res = await ContactService.updateContact(contactId, values);
+        console.log("useContactFormLogic: Calling ContactCrudService.updateContact...");
+        res = await ContactCrudService.updateContact(contactId, values); // Updated service call
         if (res.error) {
-          console.error("useContactFormLogic: ContactService.updateContact returned error:", res.error);
+          console.error("useContactFormLogic: ContactCrudService.updateContact returned error:", res.error);
           throw new Error(res.error);
         }
-        console.log("useContactFormLogic: ContactService.updateContact successful.");
+        console.log("useContactFormLogic: ContactCrudService.updateContact successful.");
       } else {
-        console.log("useContactFormLogic: Calling ContactService.addContact...");
-        res = await ContactService.addContact(values);
+        console.log("useContactFormLogic: Calling ContactCrudService.addContact...");
+        res = await ContactCrudService.addContact(values); // Updated service call
         if (res.error) {
-          console.error("useContactFormLogic: ContactService.addContact returned error:", res.error);
+          console.error("useContactFormLogic: ContactCrudService.addContact returned error:", res.error);
           throw new Error(res.error);
         }
-        console.log("useContactFormLogic: ContactService.addContact successful.");
+        console.log("useContactFormLogic: ContactCrudService.addContact successful.");
       }
       console.log("useContactFormLogic: executeSave async function finished successfully.");
       return res.data; // Return data for onSuccess callback if needed

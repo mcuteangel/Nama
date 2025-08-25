@@ -10,7 +10,8 @@ import { ErrorManager } from "@/lib/error-manager";
 import LoadingMessage from "@/components/LoadingMessage";
 import AISuggestionCard, { AISuggestion as AISuggestionCardProps } from "@/components/AISuggestionCard";
 import { ContactFormValues, PhoneNumberFormData, EmailAddressFormData, SocialLinkFormData } from "@/types/contact";
-import { ContactService } from "@/services/contact-service";
+import { ContactCrudService } from "@/services/contact-crud-service"; // Updated import
+import { ContactListService } from "@/services/contact-list-service"; // Updated import
 import { useSession } from "@/integrations/supabase/auth";
 import { useErrorHandler } from "@/hooks/use-error-handler";
 import { invalidateCache, fetchWithCache } from "@/utils/cache-helpers";
@@ -116,7 +117,7 @@ const AISuggestions: React.FC = () => {
       // Now, for each fetched suggestion, check if it's an update or new
       const formattedSuggestions: AISuggestionDisplay[] = [];
       if (data) {
-        const { data: allContacts, error: fetchContactsError } = await ContactService.getFilteredContacts(
+        const { data: allContacts, error: fetchContactsError } = await ContactListService.getFilteredContacts( // Updated service call
           userId, "", "", "", "first_name_asc" // Fetch all contacts for comparison
         );
 
@@ -227,10 +228,10 @@ const AISuggestions: React.FC = () => {
 
     await executeSaveOrUpdate(async () => {
       if (suggestion.type === 'new') {
-        const { error } = await ContactService.addContact(contactValues);
+        const { error } = await ContactCrudService.addContact(contactValues); // Updated service call
         if (error) throw new Error(error);
       } else if (suggestion.type === 'update' && suggestion.existingContact) {
-        const { error } = await ContactService.updateContact(suggestion.existingContact.id, contactValues);
+        const { error } = await ContactCrudService.updateContact(suggestion.existingContact.id, contactValues); // Updated service call
         if (error) throw new Error(error);
       }
       // Update suggestion status in DB

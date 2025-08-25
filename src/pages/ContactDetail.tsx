@@ -16,6 +16,7 @@ import LoadingMessage from "@/components/LoadingMessage";
 import CancelButton from "@/components/CancelButton";
 import { ErrorManager } from "@/lib/error-manager";
 import { useErrorHandler } from "@/hooks/use-error-handler";
+import { ContactListService } from "@/services/contact-list-service"; // Updated import
 
 interface PhoneNumber {
   id: string;

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Trash2, Edit, ClipboardList } from "lucide-react";
-import { ContactService } from "@/services/contact-service";
+import { CustomFieldTemplateService } from "@/services/custom-field-template-service"; // Updated import
 import { useErrorHandler } from "@/hooks/use-error-handler";
 import { ErrorManager } from "@/lib/error-manager";
 import { type CustomFieldTemplate } from "@/domain/schemas/custom-field-template";
@@ -77,7 +77,7 @@ export function GlobalCustomFieldsManagement() {
       const { data, error, fromCache } = await fetchWithCache<CustomFieldTemplate[]>(
         cacheKey,
         async () => {
-          const res = await ContactService.getAllCustomFieldTemplates();
+          const res = await CustomFieldTemplateService.getAllCustomFieldTemplates(); // Updated service call
           if (res.error) {
             throw new Error(res.error || "خطا در دریافت لیست قالب‌های فیلدهای سفارشی");
           }
@@ -126,13 +126,9 @@ export function GlobalCustomFieldsManagement() {
     onError: onErrorOperation,
   });
 
-  useEffect(() => {
-    loadTemplates();
-  }, [loadTemplates]);
-
   const handleDeleteField = async (id: string) => {
     await executeOperation(async () => {
-      const res = await ContactService.deleteCustomFieldTemplate(id);
+      const res = await CustomFieldTemplateService.deleteCustomFieldTemplate(id); // Updated service call
       if (res.error) {
         throw new Error(res.error || "خطا در حذف قالب فیلد سفارشی");
       }

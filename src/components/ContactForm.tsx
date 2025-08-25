@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import React, { useEffect, useState, useCallback, useMemo, useRef } from "react"; // Import useRef
 import { useSession } from "@/integrations/supabase/auth";
 import { useContactFormLogic } from "@/hooks/use-contact-form-logic";
-import { ContactService } from "@/services/contact-service";
+import { CustomFieldTemplateService } from "@/services/custom-field-template-service"; // Updated import
 import { CustomFieldTemplate } from "@/domain/schemas/custom-field-template";
 import { ContactFormValues, contactFormSchema, CustomFieldFormData } from "../types/contact.ts";
 import { fetchWithCache } from "@/utils/cache-helpers";
@@ -115,7 +115,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
     const { data, error } = await fetchWithCache<CustomFieldTemplate[]>(
       cacheKey,
       async () => {
-        const result = await ContactService.getAllCustomFieldTemplates();
+        const result = await CustomFieldTemplateService.getAllCustomFieldTemplates(); // Updated service call
         return { data: result.data, error: result.error };
       }
     );

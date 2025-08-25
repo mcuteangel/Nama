@@ -1,4 +1,4 @@
-import { ContactService } from "@/services/contact-service";
+import { ContactListService } from "@/services/contact-list-service"; // Updated import
 import { showError, showSuccess, showLoading, dismissToast } from "@/utils/toast";
 import { Session } from "@supabase/supabase-js";
 
@@ -18,7 +18,7 @@ export const exportContactsToCsv = async (session: Session | null, options: Expo
   const toastId = showLoading("در حال آماده‌سازی فایل خروجی...");
 
   try {
-    const { data: contacts, error } = await ContactService.getFilteredContacts(
+    const { data: contacts, error } = await ContactListService.getFilteredContacts( // Updated service call
       session.user.id,
       options.searchTerm,
       options.selectedGroup,

@@ -15,6 +15,8 @@ import { ExtractedContactInfo } from "@/hooks/use-contact-extractor";
 import { AISuggestionsService } from "@/services/ai-suggestions-service";
 import { useSession } from "@/integrations/supabase/auth";
 import { ContactFormValues } from "@/types/contact"; // Import ContactFormValues
+import { ContactListService } from "@/services/contact-list-service"; // Updated import
+import { ContactCrudService } from "@/services/contact-crud-service"; // Updated import
 
 interface PhoneNumber {
   id: string;

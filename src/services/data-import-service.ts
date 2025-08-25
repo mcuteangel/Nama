@@ -1,6 +1,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { ErrorManager } from '@/lib/error-manager';
-import { ContactService } from './contact-service';
+import { ContactCrudService } from './contact-crud-service'; // Updated import
+import { CustomFieldTemplateService } from './custom-field-template-service'; // Updated import
 import { ContactFormValues } from '@/types/contact';
 import { invalidateCache } from '@/utils/cache-helpers';
 
@@ -38,7 +39,7 @@ export const DataImportService = {
       const rows = lines.slice(1);
 
       const contactsToImport: ParsedContactRow[] = [];
-      const customFieldTemplates = (await ContactService.getAllCustomFieldTemplates()).data || [];
+      const customFieldTemplates = (await CustomFieldTemplateService.getAllCustomFieldTemplates()).data || []; // Updated service call
       const existingGroups = (await supabase.from('groups').select('id, name').eq('user_id', userId)).data || [];
 
       for (const row of rows) {
@@ -172,7 +173,7 @@ export const DataImportService = {
           customFields: contact.customFields,
         };
 
-        const { data, error } = await ContactService.addContact(contactFormValues);
+        const { data, error } = await ContactCrudService.addContact(contactFormValues); // Updated service call
         if (error) {
           console.error(`Error importing contact ${contact.firstName} ${contact.lastName}:`, error);
           // Continue with other contacts even if one fails

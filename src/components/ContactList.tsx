@@ -7,7 +7,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { showSuccess, showError, showLoading, dismissToast } from "@/utils/toast";
 import { useNavigate } from "react-router-dom";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { ContactService } from "@/services/contact-service";
+import { ContactCrudService } from "@/services/contact-crud-service"; // Updated import
+import { ContactListService } from "@/services/contact-list-service"; // Updated import
 import { fetchWithCache, invalidateCache } from "@/utils/cache-helpers";
 import { useSession } from "@/integrations/supabase/auth";
 import LoadingMessage from "./LoadingMessage";
@@ -87,10 +88,7 @@ const ContactItem = ({ contact, onContactDeleted, onContactEdited }: { contact: 
   const handleDelete = async (e: React.MouseEvent) => {
     e.stopPropagation();
     await executeDelete(async () => {
-      const { error } = await supabase
-        .from("contacts")
-        .delete()
-        .eq("id", contact.id);
+      const { error } = await ContactCrudService.deleteContact(contact.id); // Updated service call
 
       if (error) throw error;
     });
@@ -199,7 +197,7 @@ const ContactList = ({ searchTerm, selectedGroup, companyFilter, sortOption }: C
       const { data, error, fromCache } = await fetchWithCache<Contact[]>(
         cacheKey,
         async () => {
-          const result = await ContactService.getFilteredContacts(
+          const result = await ContactListService.getFilteredContacts( // Updated service call
             userId,
             searchTerm,
             selectedGroup,

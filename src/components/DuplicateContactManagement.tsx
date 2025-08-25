@@ -9,7 +9,8 @@ import { ErrorManager } from "@/lib/error-manager";
 import LoadingMessage from "./LoadingMessage";
 import { supabase } from '@/integrations/supabase/client';
 import { invalidateCache } from '@/utils/cache-helpers';
-import { ContactService } from '@/services/contact-service';
+import { ContactCrudService } from '@/services/contact-crud-service'; // Updated import
+import { ContactListService } from '@/services/contact-list-service'; // Updated import
 import EmptyState from './EmptyState';
 import LoadingSpinner from './LoadingSpinner';
 
@@ -262,13 +263,9 @@ const DuplicateContactManagement: React.FC = () => {
         mergedCustomFields.length > 0 ? supabase.from('custom_fields').insert(mergedCustomFields.map(cf => ({ ...cf, id: undefined }))) : Promise.resolve(),
       ]);
 
-      const { error: deleteDuplicateError } = await supabase
-        .from('contacts')
-        .delete()
-        .eq('id', duplicateContact.id)
-        .eq('user_id', session.user.id);
+      const { error: deleteDuplicateError } = await ContactCrudService.deleteContact(duplicateContact.id); // Updated service call
 
-      if (deleteDuplicateError) throw new Error(deleteDuplicateError.message);
+      if (deleteDuplicateError) throw new Error(deleteDuplicateError);
 
       ErrorManager.notifyUser(t('ai_suggestions.contacts_merged_success'), 'success');
       invalidateCache(`contacts_list_${session.user.id}_`);
