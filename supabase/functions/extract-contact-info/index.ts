@@ -18,9 +18,10 @@ serve(async (req) => {
   }
 
   try {
-    const supabaseClient = createClient(
+    // Use the service role key for admin access to fetch user settings
+    const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
     const authHeader = req.headers.get('Authorization');
@@ -34,6 +35,11 @@ serve(async (req) => {
       });
     }
 
+    // Authenticate the user with the provided token using the anon key client
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+    );
     const { data: { user }, error: authError } = await supabaseClient.auth.getUser(token);
 
     if (authError || !user) {
@@ -44,8 +50,8 @@ serve(async (req) => {
       });
     }
 
-    // Fetch Gemini API key AND model from user_settings table
-    const { data: userSettings, error: settingsError } = await supabaseClient
+    // Fetch Gemini API key AND model from user_settings table using supabaseAdmin
+    const { data: userSettings, error: settingsError } = await supabaseAdmin
       .from('user_settings')
       .select('gemini_api_key, gemini_model') // Select both fields
       .eq('user_id', user.id)
