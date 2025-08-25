@@ -17,12 +17,14 @@ import EmptyState from './EmptyState';
 import LoadingSpinner from './LoadingSpinner';
 
 interface PhoneNumber {
+  id: string; // Added id
   phone_number: string;
   phone_type: string;
   extension?: string | null;
 }
 
 interface EmailAddress {
+  id: string; // Added id
   email_address: string;
   email_type: string;
 }
