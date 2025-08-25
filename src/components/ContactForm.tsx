@@ -132,8 +132,8 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
     fetchTemplates();
   }, [fetchTemplates]);
 
-  // Ref to store the last customFields value that was successfully set to the form
-  const lastSetCustomFieldsRef = useRef<CustomFieldFormData[]>([]);
+  // Ref to store the JSON string of the last customFields value that was successfully set to the form by this effect
+  const lastSetCustomFieldsRef = useRef<string>(''); 
 
   useEffect(() => {
     console.log("ContactForm: Custom fields useEffect triggered.");
@@ -142,6 +142,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
       return;
     }
 
+    // 1. Calculate the desired state for customFields based on templates and initialData
     const desiredCustomFields: CustomFieldFormData[] = availableTemplates.map(template => {
       const initialValue = initialData?.customFields?.find(cf => cf.template_id === template.id)?.value;
       return {
@@ -160,24 +161,30 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
     };
 
     const sortedDesired = [...desiredCustomFields].sort(sortFn);
-    const sortedLastSet = [...lastSetCustomFieldsRef.current].sort(sortFn);
+    const desiredJson = JSON.stringify(sortedDesired);
 
-    // Deep comparison function
-    const areCustomFieldsEqual = (arr1: CustomFieldFormData[], arr2: CustomFieldFormData[]) => {
-      if (arr1.length !== arr2.length) return false;
-      for (let i = 0; i < arr1.length; i++) {
-        if (arr1[i].template_id !== arr2[i].template_id || arr1[i].value !== arr2[i].value) {
-          return false;
-        }
-      }
-      return true;
-    };
+    // 2. Get the current state of customFields from the form
+    const currentFormCustomFields = form.getValues("customFields") || [];
+    const sortedCurrentFormCustomFields = [...currentFormCustomFields].sort(sortFn);
+    const currentFormJson = JSON.stringify(sortedCurrentFormCustomFields);
 
-    console.log("ContactForm: Comparing desired vs last set custom fields.");
-    if (!areCustomFieldsEqual(sortedDesired, sortedLastSet)) {
-      console.log("ContactForm: Custom fields are different, updating form values and ref.");
+    console.log("ContactForm: Desired custom fields JSON:", desiredJson);
+    console.log("ContactForm: Current form custom fields JSON:", currentFormJson);
+    console.log("ContactForm: Last set custom fields JSON (ref):", lastSetCustomFieldsRef.current);
+
+    // 3. Compare desired state with the current form state AND with what was last set by this effect
+    // Only update if the desired state is different from the current form state
+    // AND if the desired state is different from what this effect last set (to prevent redundant setValue calls if form state is already correct)
+    if (desiredJson !== currentFormJson) {
+      console.log("ContactForm: Current form custom fields are different from desired. Updating form values.");
       form.setValue("customFields", sortedDesired, { shouldValidate: true, shouldDirty: true });
-      lastSetCustomFieldsRef.current = desiredCustomFields; // Update the ref with the new desired state
+      lastSetCustomFieldsRef.current = desiredJson; // Update ref to reflect what was just set
+    } else if (desiredJson !== lastSetCustomFieldsRef.current) {
+      // This case handles when the form's state *already matches* the desired state,
+      // but our ref hasn't been updated yet (e.g., if initialData directly set it).
+      // We still update the ref to prevent future redundant checks.
+      console.log("ContactForm: Current form custom fields already match desired. Updating ref only.");
+      lastSetCustomFieldsRef.current = desiredJson;
     } else {
       console.log("ContactForm: Custom fields are the same as last set, no update needed.");
     }
