@@ -1,7 +1,23 @@
-// @ts-nocheck
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.55.0';
-import { GoogleGenerativeAI } from "npm:@google/generative-ai";
+import { createClient, SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2.55.0';
+import { GoogleGenerativeAI, GenerativeModel } from "npm:@google/generative-ai";
+
+// Define types for better type safety
+interface ExtractedContactInfo {
+  firstName: string;
+  lastName: string;
+  company: string;
+  position: string;
+  phoneNumbers: Array<{ phone_type: string; phone_number: string; extension: string | null }>;
+  emailAddresses: Array<{ email_type: string; email_address: string }>;
+  socialLinks: Array<{ type: string; url: string }>;
+  notes: string;
+}
+
+interface UserSettings {
+  gemini_api_key: string | null;
+  gemini_model: string | null;
+}
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -9,13 +25,13 @@ const corsHeaders = {
   'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
 };
 
-serve(async (req) => {
+serve(async (req: Request) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders, status: 200 });
   }
 
   try {
-    const supabaseAdmin = createClient(
+    const supabaseAdmin: SupabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
@@ -30,7 +46,7 @@ serve(async (req) => {
       });
     }
 
-    const supabaseClient = createClient(
+    const supabaseClient: SupabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? ''
     );
@@ -48,7 +64,7 @@ serve(async (req) => {
       .from('user_settings')
       .select('gemini_api_key, gemini_model')
       .eq('user_id', user.id)
-      .maybeSingle();
+      .maybeSingle<UserSettings>(); // Explicitly type the result
 
     if (settingsError) {
       return new Response(JSON.stringify({ error: `Error fetching user settings: ${settingsError.message}` }), {
@@ -67,7 +83,7 @@ serve(async (req) => {
       });
     }
 
-    const requestBody = await req.json();
+    const requestBody: { text: string } = await req.json();
     const text = requestBody.text;
 
     if (!text) {
@@ -78,7 +94,7 @@ serve(async (req) => {
     }
 
     const genAI = new GoogleGenerativeAI(geminiApiKey);
-    const model = genAI.getGenerativeModel({ model: geminiModelName });
+    const model: GenerativeModel = genAI.getGenerativeModel({ model: geminiModelName });
 
     const prompt = `
       Extract contact information from the following text.
@@ -118,10 +134,10 @@ serve(async (req) => {
     }
 
     // Attempt to parse the JSON response
-    let extractedInfo;
+    let extractedInfo: ExtractedContactInfo;
     try {
       extractedInfo = JSON.parse(rawText);
-    } catch (jsonParseError) {
+    } catch (jsonParseError: any) {
       console.error("Error parsing Gemini response as JSON:", jsonParseError);
       console.error("Raw Gemini response (after stripping):", rawText);
       return new Response(JSON.stringify({ error: `Failed to parse AI response: ${jsonParseError.message}. Raw response: ${rawText.substring(0, 200)}...` }), {
