@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
-import { Plus, X, Link as LinkIcon } from 'lucide-react'; // Renamed Link to LinkIcon to avoid conflict
+import { Plus, X } from 'lucide-react'; // Removed Link as LinkIcon
 import { ContactFormValues } from '@/types/contact';
 
 const socialLinkTypeOptions = [

@@ -1,11 +1,11 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useState, useCallback } from "react"; // Removed useEffect
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Trash2, Edit, ClipboardList } from "lucide-react";
-import { CustomFieldTemplateService } from "@/services/custom-field-template-service"; // Updated import
+import { CustomFieldTemplateService } from "@/services/custom-field-template-service";
 import { useErrorHandler } from "@/hooks/use-error-handler";
 import { ErrorManager } from "@/lib/error-manager";
 import { type CustomFieldTemplate } from "@/domain/schemas/custom-field-template";
@@ -17,7 +17,7 @@ import { fetchWithCache, invalidateCache } from "@/utils/cache-helpers";
 import FormDialogWrapper from "./FormDialogWrapper";
 import LoadingMessage from "./LoadingMessage";
 import CancelButton from "./CancelButton";
-import { showLoading, dismissToast, showError, showSuccess } from "@/utils/toast";
+import { showError, showSuccess } from "@/utils/toast"; // Removed showLoading, dismissToast
 import EmptyState from './EmptyState';
 import LoadingSpinner from './LoadingSpinner';
 
@@ -52,7 +52,7 @@ export function GlobalCustomFieldsManagement() {
     }
   }, []);
 
-  const onErrorFetchTemplates = useCallback((err: Error) => {
+  const onErrorFetchTemplates = useCallback((err: any) => { // Explicitly type err
     console.error("Error loading custom field templates:", err);
     showError(`خطا در دریافت لیست قالب‌های فیلدهای سفارشی: ${ErrorManager.getErrorMessage(err) || "خطای ناشناخته"}`);
     setCustomFields([]);
@@ -77,7 +77,7 @@ export function GlobalCustomFieldsManagement() {
       const { data, error, fromCache } = await fetchWithCache<CustomFieldTemplate[]>(
         cacheKey,
         async () => {
-          const res = await CustomFieldTemplateService.getAllCustomFieldTemplates(); // Updated service call
+          const res = await CustomFieldTemplateService.getAllCustomFieldTemplates();
           if (res.error) {
             throw new Error(res.error || "خطا در دریافت لیست قالب‌های فیلدهای سفارشی");
           }
@@ -97,7 +97,7 @@ export function GlobalCustomFieldsManagement() {
     loadTemplates();
   }, [session, loadTemplates]);
 
-  const onErrorOperation = useCallback((error) => {
+  const onErrorOperation = useCallback((error: any) => { // Explicitly type error
     ErrorManager.logError(error, {
       component: 'GlobalCustomFieldsManagement',
       action: 'customFieldsOperation',
@@ -112,10 +112,6 @@ export function GlobalCustomFieldsManagement() {
 
   const {
     isLoading: isOperationLoading,
-    error: operationError,
-    errorMessage: operationErrorMessage,
-    retryCount: operationRetryCount,
-    retry: retryOperation,
     executeAsync: executeOperation,
   } = useErrorHandler(null, {
     maxRetries: 3,
@@ -128,7 +124,7 @@ export function GlobalCustomFieldsManagement() {
 
   const handleDeleteField = async (id: string) => {
     await executeOperation(async () => {
-      const res = await CustomFieldTemplateService.deleteCustomFieldTemplate(id); // Updated service call
+      const res = await CustomFieldTemplateService.deleteCustomFieldTemplate(id);
       if (res.error) {
         throw new Error(res.error || "خطا در حذف قالب فیلد سفارشی");
       }
@@ -213,7 +209,8 @@ export function GlobalCustomFieldsManagement() {
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
                         <Button variant="ghost" size="icon" className="text-red-600 hover:bg-red-100 dark:text-red-400 dark:hover:bg-gray-600/50 transition-all duration-200" disabled={isOperationLoading}>
-                          {isOperationLoading ? <LoadingSpinner size={16} /> : <Trash2 size={16} />}
+                          {isOperationLoading && <LoadingSpinner size={16} />}
+                          <Trash2 size={16} />
                         </Button>
                       </AlertDialogTrigger>
                       <AlertDialogContent className="glass rounded-xl p-6">

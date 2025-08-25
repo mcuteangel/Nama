@@ -1,7 +1,7 @@
 import ContactForm from "@/components/ContactForm";
 import { MadeWithDyad } from "@/components/made-with-dyad";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react"; // Removed React
 import { ExtractedContactInfo } from "@/hooks/use-contact-extractor";
 import { ContactFormValues } from "@/types/contact";
 import { AISuggestionsService } from "@/services/ai-suggestions-service";
@@ -39,7 +39,7 @@ const AddContact = () => {
         groupId: null, // Default value
         birthday: null, // Default value
         avatarUrl: null, // Default value
-        preferredContactMethod: null, // Default value
+        preferredContactMethod: null, // Default address fields
         street: null, city: null, state: null, zipCode: null, country: null, // Default address fields
         customFields: [], // Default empty
       };

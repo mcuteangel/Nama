@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Users, Tag, Loader2, CheckCircle, XCircle, Sparkles } from "lucide-react";
+import { Users, Sparkles, CheckCircle, XCircle } from "lucide-react"; // Removed Tag, Loader2
 import { useTranslation } from "react-i18next";
 import { useSession } from "@/integrations/supabase/auth";
 import { useErrorHandler } from "@/hooks/use-error-handler";
@@ -46,7 +46,7 @@ const SmartGroupManagement: React.FC = () => {
     }
   }, []);
 
-  const onErrorFetchContacts = useCallback((err: Error) => {
+  const onErrorFetchContacts = useCallback((err: any) => { // Explicitly type err
     ErrorManager.logError(err, { component: 'SmartGroupManagement', action: 'fetchContactsWithoutGroup' });
     ErrorManager.notifyUser(t('ai_suggestions.error_fetching_ungrouped_contacts'), 'error');
   }, [t]);
@@ -131,7 +131,7 @@ const SmartGroupManagement: React.FC = () => {
       return;
     }
 
-    const toastId = ErrorManager.notifyUser(t('ai_suggestions.applying_group_suggestion'), 'info');
+    ErrorManager.notifyUser(t('ai_suggestions.applying_group_suggestion'), 'info');
     try {
       const { error } = await supabase
         .from('contact_groups')
@@ -149,7 +149,7 @@ const SmartGroupManagement: React.FC = () => {
       // Invalidate cache for contacts list and re-fetch ungrouped contacts
       invalidateCache(`contacts_list_${session.user.id}_`);
       fetchContactsWithoutGroup();
-    } catch (err: any) {
+    } catch (err: any) { // Explicitly type err
       ErrorManager.logError(err, { component: 'SmartGroupManagement', action: 'applyGroupSuggestion', suggestion });
       ErrorManager.notifyUser(`${t('ai_suggestions.error_applying_group_suggestion')}: ${ErrorManager.getErrorMessage(err)}`, 'error');
     } finally {

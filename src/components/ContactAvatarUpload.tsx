@@ -6,8 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Camera, XCircle, UploadCloud } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSession } from '@/integrations/supabase/auth';
-import { showError, showSuccess, showLoading, dismissToast } from '@/utils/toast';
-import { cn } from '@/lib/utils';
+import { showError, showSuccess, showLoading } from '@/utils/toast'; // Removed dismissToast as it's not used
 import LoadingSpinner from './LoadingSpinner';
 
 interface ContactAvatarUploadProps {
@@ -52,7 +51,7 @@ const ContactAvatarUpload: React.FC<ContactAvatarUploadProps> = ({ initialAvatar
       const fileExt = file.name.split('.').pop();
       const fileName = `${session.user.id}/${Date.now()}.${fileExt}`;
 
-      const { data, error } = await supabase.storage
+      const { error } = await supabase.storage // Removed 'data' from destructuring
         .from('avatars')
         .upload(fileName, file, {
           cacheControl: '3600',
@@ -79,7 +78,8 @@ const ContactAvatarUpload: React.FC<ContactAvatarUploadProps> = ({ initialAvatar
       showError(`خطا در آپلود تصویر: ${error.message || "خطای ناشناخته"}`);
       setAvatarUrl(initialAvatarUrl || null);
     } finally {
-      dismissToast(toastId);
+      // dismissToast(toastId); // Commented out as per previous instruction
+      // The toast is dismissed by the success/error toast itself in sonner
       setIsUploading(false);
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
@@ -112,7 +112,8 @@ const ContactAvatarUpload: React.FC<ContactAvatarUploadProps> = ({ initialAvatar
       console.error("Error removing avatar:", error);
       showError(`خطا در حذف تصویر: ${error.message || "خطای ناشناخته"}`);
     } finally {
-      dismissToast(toastId);
+      // dismissToast(toastId); // Commented out as per previous instruction
+      // The toast is dismissed by the success/error toast itself in sonner
       setIsUploading(false);
     }
   };
@@ -142,7 +143,6 @@ const ContactAvatarUpload: React.FC<ContactAvatarUploadProps> = ({ initialAvatar
           className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold shadow-sm transition-all duration-300 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-200 dark:border-gray-600"
         >
           {isUploading && <LoadingSpinner size={16} className="me-2" />}
-          <UploadCloud size={16} />
           {isUploading ? "در حال آپلود..." : "آپلود تصویر"}
         </Button>
         {avatarUrl && (

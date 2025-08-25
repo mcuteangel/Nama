@@ -10,7 +10,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import moment from 'moment-jalaali';
-import { useJalaliCalendar } from '@/hooks/use-jalali-calendar';
+// Removed useJalaliCalendar as it's not directly used here
 
 interface JalaliCalendarProps {
   selected?: Date | undefined;
@@ -144,7 +144,7 @@ export function JalaliCalendar({
   }, [currentMoment, selectedMoment, isJalali]);
 
   const goToPreviousMonth = () => {
-    setCurrentDate(prev => {
+    setCurrentDate((prev: any) => { // Explicitly type prev
       const date = moment(prev);
       return isJalali 
         ? date.subtract(1, 'jMonth').valueOf()
@@ -153,7 +153,7 @@ export function JalaliCalendar({
   };
 
   const goToNextMonth = () => {
-    setCurrentDate(prev => {
+    setCurrentDate((prev: any) => { // Explicitly type prev
       const date = moment(prev);
       return isJalali 
         ? date.add(1, 'jMonth').valueOf()
@@ -213,10 +213,10 @@ export function JalaliCalendar({
     }
   };
 
-  const { month, year, monthName, yearNumber } = getMonthYear();
+  const { month, yearNumber, monthName } = getMonthYear(); // Removed unused 'year'
 
   const changeMonth = (monthIndex: number) => {
-    setCurrentDate(prev => {
+    setCurrentDate((prev: any) => { // Explicitly type prev
       const newDate = moment(prev);
       if (isJalali) {
         newDate.jMonth(monthIndex);
@@ -229,7 +229,7 @@ export function JalaliCalendar({
   };
 
   const changeYear = (year: number) => {
-    setCurrentDate(prev => {
+    setCurrentDate((prev: any) => { // Explicitly type prev
       const newDate = moment(prev);
       if (isJalali) {
         newDate.jYear(year);

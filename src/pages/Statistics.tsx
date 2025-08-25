@@ -1,8 +1,8 @@
-import React from "react";
 import { MadeWithDyad } from "@/components/made-with-dyad";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import ContactStatisticsDashboard from "@/components/ContactStatisticsDashboard";
 import { useTranslation } from "react-i18next";
+import React from "react";
 
 const Statistics = () => {
   const { t } = useTranslation();

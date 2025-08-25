@@ -3,13 +3,13 @@
 import { useState, useCallback, useEffect } from 'react';
 import moment from 'moment-jalaali';
 import { enUS } from 'date-fns/locale';
-import { format as formatFns } from 'date-fns'; // Renamed to avoid conflict with local format function
+import { format as formatFns } from 'date-fns';
 
 export type CalendarType = 'gregorian' | 'jalali';
 
 export interface CalendarOptions {
   type?: CalendarType;
-  defaultDate?: Date;
+  defaultDate?: Date; // Removed unused defaultDate
   format?: string;
 }
 
@@ -29,9 +29,8 @@ const CALENDAR_TYPE_STORAGE_KEY = 'calendarType';
 export function useJalaliCalendar(options: CalendarOptions = {}): CalendarHookReturn {
   const { 
     type = 'jalali', 
-    defaultDate, 
     format: formatString = 'jYYYY/jMM/jDD' 
-  } = options;
+  } = options; // Removed defaultDate
 
   const [calendarType, setCalendarTypeState] = useState<CalendarType>(() => {
     if (typeof window !== 'undefined') {

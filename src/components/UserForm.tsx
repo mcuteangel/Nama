@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react"; // Removed useState
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -77,7 +77,7 @@ const UserForm: React.FC<UserFormProps> = ({ initialData, onSuccess, onCancel })
       ErrorManager.notifyUser(initialData ? t('user_management.user_updated_success') : t('user_management.user_created_success'), 'success');
       onSuccess();
     },
-    onError: (err) => {
+    onError: (err) => { // Explicitly type err
       ErrorManager.logError(err, { component: 'UserForm', action: initialData ? 'updateUser' : 'createUser', initialData });
     },
   });

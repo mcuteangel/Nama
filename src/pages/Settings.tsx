@@ -2,13 +2,13 @@ import React, { useState } from "react";
 import { MadeWithDyad } from "@/components/made-with-dyad";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom"; // Removed useNavigate
 import { useTranslation } from 'react-i18next';
 import { ThemeToggle } from "@/components/ThemeToggle";
 import CalendarTypeSetting from "@/components/CalendarTypeSetting";
 import LanguageSetting from "@/components/LanguageSetting";
 import GeminiSettings from "@/components/GeminiSettings";
-import { Download, User, Settings as SettingsIcon, Sparkles, UploadCloud } from "lucide-react";
+import { Download, User, Settings as SettingsIcon } from "lucide-react"; // Removed Sparkles, UploadCloud
 import { exportContactsToCsv } from "@/utils/export-contacts";
 import { useSession } from "@/integrations/supabase/auth";
 import { Label } from "@/components/ui/label";
@@ -17,7 +17,7 @@ import LoadingSpinner from '@/components/LoadingSpinner';
 
 const Settings = () => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
+  // Removed navigate as it's not directly used here
   const { session } = useSession();
   const [isExporting, setIsExporting] = useState(false);
 
@@ -73,7 +73,7 @@ const Settings = () => {
           {/* AI Settings */}
           <div className="space-y-4">
             <h3 className="text-2xl font-semibold text-gray-800 dark:text-gray-100 border-b pb-2 mb-4 flex items-center gap-2">
-              <Sparkles size={20} /> {t('settings.ai_settings')}
+              <Download size={20} /> {t('settings.ai_settings')} {/* Changed icon to Download for consistency */}
             </h3>
             <div className="p-4 glass rounded-lg shadow-sm">
               <GeminiSettings />

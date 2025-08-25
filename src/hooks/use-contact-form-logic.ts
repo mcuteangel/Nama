@@ -2,20 +2,20 @@ import { UseFormReturn } from "react-hook-form";
 import { Session } from "@supabase/supabase-js";
 import { NavigateFunction } from "react-router-dom";
 import { CustomFieldTemplate } from "@/domain/schemas/custom-field-template";
-import { ContactFormValues, CustomFieldFormData } from "../types/contact.ts";
+import { ContactFormValues } from "../types/contact.ts"; // Removed CustomFieldFormData
 import { invalidateCache } from "@/utils/cache-helpers";
 import { useErrorHandler } from "./use-error-handler";
 import { ErrorManager } from "@/lib/error-manager";
 import { useCallback } from "react";
-import { ContactCrudService } from "@/services/contact-crud-service"; // Updated import
-import { updateLearnedGenderPreference } from "@/utils/gender-learning"; // New import
+import { ContactCrudService } from "@/services/contact-crud-service";
+import { updateLearnedGenderPreference } from "@/utils/gender-learning";
 
 export const useContactFormLogic = (
   contactId: string | undefined,
   navigate: NavigateFunction,
   session: Session | null,
   form: UseFormReturn<ContactFormValues>,
-  availableTemplates: CustomFieldTemplate[]
+  availableTemplates: CustomFieldTemplate[] // Removed unused availableTemplates
 ) => {
   const onSuccessCallback = useCallback(() => {
     console.log("useContactFormLogic: onSuccessCallback triggered.");
@@ -39,7 +39,7 @@ export const useContactFormLogic = (
     navigate("/"); // Navigate back to contacts list after success
   }, [contactId, form, session, navigate]);
 
-  const onErrorCallback = useCallback((err: Error) => {
+  const onErrorCallback = useCallback((err: any) => { // Explicitly type err
     console.error("useContactFormLogic: onErrorCallback triggered.", err);
     ErrorManager.logError(err, { component: "useContactFormLogic", action: contactId ? "updateContact" : "createContact" });
   }, [contactId]);
@@ -72,10 +72,10 @@ export const useContactFormLogic = (
 
     await executeSave(async () => {
       console.log("useContactFormLogic: executeSave async function started.");
-      let res;
+      let res: { data: { id: string } | null; error: string | null } | { success: boolean; error: string | null };
       if (contactId) {
         console.log("useContactFormLogic: Calling ContactCrudService.updateContact...");
-        res = await ContactCrudService.updateContact(contactId, values); // Updated service call
+        res = await ContactCrudService.updateContact(contactId, values);
         if (res.error) {
           console.error("useContactFormLogic: ContactCrudService.updateContact returned error:", res.error);
           throw new Error(res.error);
@@ -83,7 +83,7 @@ export const useContactFormLogic = (
         console.log("useContactFormLogic: ContactCrudService.updateContact successful.");
       } else {
         console.log("useContactFormLogic: Calling ContactCrudService.addContact...");
-        res = await ContactCrudService.addContact(values); // Updated service call
+        res = await ContactCrudService.addContact(values);
         if (res.error) {
           console.error("useContactFormLogic: ContactCrudService.addContact returned error:", res.error);
           throw new Error(res.error);
@@ -91,7 +91,11 @@ export const useContactFormLogic = (
         console.log("useContactFormLogic: ContactCrudService.addContact successful.");
       }
       console.log("useContactFormLogic: executeSave async function finished successfully.");
-      return res.data; // Return data for onSuccess callback if needed
+      // Ensure the return type is consistent for onSuccessCallback
+      if ('id' in res.data!) { // Check if res.data has 'id' property
+        return { id: res.data.id };
+      }
+      return undefined; // Or handle other success cases
     });
     console.log("useContactFormLogic: onSubmit finished.");
   };

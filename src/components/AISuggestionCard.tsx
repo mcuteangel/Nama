@@ -1,11 +1,11 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, UserCheck, Loader2, Phone, Mail, Building, Briefcase, Link as LinkIcon, XCircle, Edit } from "lucide-react";
+import { PlusCircle, UserCheck, Phone, Mail, Building, Briefcase, Link as LinkIcon, XCircle, Edit } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { PhoneNumberFormData, EmailAddressFormData, SocialLinkFormData } from "@/types/contact";
 import { ExtractedContactInfo } from '@/hooks/use-contact-extractor';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import CancelButton from './CancelButton';
 import LoadingSpinner from './LoadingSpinner';
 

@@ -12,10 +12,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { useSession } from '@/integrations/supabase/auth';
 import { useErrorHandler } from '@/hooks/use-error-handler';
 import { ErrorManager } from '@/lib/error-manager';
-import { User } from 'lucide-react';
 import { fetchWithCache, invalidateCache } from "@/utils/cache-helpers";
 import LoadingMessage from './LoadingMessage';
-import { showLoading, dismissToast, showSuccess, showError } from '@/utils/toast';
+import { showSuccess, showError } from '@/utils/toast'; // Removed showLoading, dismissToast
 import LoadingSpinner from './LoadingSpinner';
 
 const profileSchema = z.object({
@@ -33,7 +32,7 @@ const UserProfileForm: React.FC = () => {
     invalidateCache(`user_profile_${session?.user?.id}`);
   }, [session]);
 
-  const onErrorSubmit = useCallback((err: Error) => {
+  const onErrorSubmit = useCallback((err: any) => { // Explicitly type err
     ErrorManager.logError(err, { component: "UserProfileForm", action: "submitProfile" });
   }, []);
 
@@ -73,7 +72,7 @@ const UserProfileForm: React.FC = () => {
     }
   }, [form]);
 
-  const onErrorFetchProfile = useCallback((err: Error) => {
+  const onErrorFetchProfile = useCallback((err: any) => { // Explicitly type err
     const msg = ErrorManager.getErrorMessage(err);
     showError(`خطا در بارگذاری پروفایل: ${msg}`);
     ErrorManager.logError(err, { component: "UserProfileForm", action: "fetchProfile" });

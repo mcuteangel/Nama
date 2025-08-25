@@ -1,10 +1,8 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/integrations/supabase/auth";
 import { useErrorHandler } from "@/hooks/use-error-handler";
 import { ErrorManager } from "@/lib/error-manager";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, PieChart, CalendarClock, Building, Mail, Phone } from "lucide-react";
+import { Card, CardContent, CardHeader } from "@/components/ui/card"; // Removed CardTitle
 import TotalContactsCard from "@/components/statistics/TotalContactsCard";
 import ContactsByGenderChart from "@/components/statistics/ContactsByGenderChart";
 import ContactsByGroupChart from "@/components/statistics/ContactsByGroupChart";
@@ -14,8 +12,7 @@ import ContactsByCreationTimeChart from "@/components/statistics/ContactsByCreat
 import TopCompaniesList from "@/components/statistics/TopCompaniesList";
 import TopPositionsList from "@/components/statistics/TopPositionsList";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ContactStatisticsService } from "@/services/contact-statistics-service"; // Updated import
-import { ContactListService } from "@/services/contact-list-service"; // Added import for getFilteredContacts
+import { ContactStatisticsService } from "@/services/contact-statistics-service";
 import { useTranslation } from "react-i18next";
 import { fetchWithCache } from "@/utils/cache-helpers";
 
@@ -90,17 +87,17 @@ const ContactStatisticsDashboard: React.FC = () => {
     }
   }, [t]);
 
-  const onErrorStats = useCallback((err) => {
+  const onErrorStats = useCallback((err: any) => { // Explicitly type err
     ErrorManager.logError(err, { component: 'ContactStatisticsDashboard', action: 'fetchStatistics' });
   }, []);
 
   const {
-    isLoading, // This isLoading is from useErrorHandler
+    isLoading,
     executeAsync,
-  } = useErrorHandler<{ data: StatisticsData | null; error: string | null; fromCache: boolean }>(null, { // Explicitly define TResult here
+  } = useErrorHandler<{ data: StatisticsData | null; error: string | null; fromCache: boolean }>(null, {
     maxRetries: 3,
     retryDelay: 1000,
-    showToast: false, // Changed to false to manually control success toast
+    showToast: false,
     customErrorMessage: t('statistics.error_loading_stats'),
     onSuccess: onSuccessStats,
     onError: onErrorStats,
@@ -143,14 +140,14 @@ const ContactStatisticsDashboard: React.FC = () => {
             { data: companiesStats, error: companiesError },
             { data: positionsStats, error: errorPositions },
           ] = await Promise.all([
-            ContactStatisticsService.getTotalContacts(userId), // Updated service call
-            ContactStatisticsService.getContactsByGender(userId), // Updated service call
-            ContactStatisticsService.getContactsByGroup(userId), // Updated service call
-            ContactStatisticsService.getContactsByPreferredMethod(userId), // Updated service call
-            ContactStatisticsService.getUpcomingBirthdays(userId), // Updated service call
-            ContactStatisticsService.getContactsByCreationMonth(userId), // Updated service call
-            ContactStatisticsService.getTopCompanies(userId), // Updated service call
-            ContactStatisticsService.getTopPositions(userId), // Updated service call
+            ContactStatisticsService.getTotalContacts(userId),
+            ContactStatisticsService.getContactsByGender(userId),
+            ContactStatisticsService.getContactsByGroup(userId),
+            ContactStatisticsService.getContactsByPreferredMethod(userId),
+            ContactStatisticsService.getUpcomingBirthdays(userId),
+            ContactStatisticsService.getContactsByCreationMonth(userId),
+            ContactStatisticsService.getTopCompanies(userId),
+            ContactStatisticsService.getTopPositions(userId),
           ]);
 
           if (totalError) throw new Error(totalError);
@@ -181,9 +178,9 @@ const ContactStatisticsDashboard: React.FC = () => {
       if (data) {
         setStatistics(data);
       }
-      return { data, error: null, fromCache }; // Added error: null
+      return { data, error: null, fromCache };
     });
-  }, [session, isSessionLoading, executeAsync, isLoading, t]); // Add isLoading to dependencies
+  }, [session, isSessionLoading, executeAsync, isLoading, t]);
 
   useEffect(() => {
     fetchStatistics();

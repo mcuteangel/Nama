@@ -4,8 +4,6 @@ import GroupList from "@/components/GroupList";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
-import EmptyState from '@/components/EmptyState';
-import { Tag } from 'lucide-react';
 
 const Groups = () => {
   const navigate = useNavigate();

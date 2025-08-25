@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Copy, Merge, Loader2, CheckCircle, XCircle, Info } from "lucide-react";
+import { Copy, Merge, Info } from "lucide-react"; // Removed Loader2, CheckCircle, XCircle
 import { useTranslation } from "react-i18next";
 import { useSession } from "@/integrations/supabase/auth";
 import { useErrorHandler } from "@/hooks/use-error-handler";
@@ -9,9 +9,7 @@ import { ErrorManager } from "@/lib/error-manager";
 import LoadingMessage from "./LoadingMessage";
 import { supabase } from '@/integrations/supabase/client';
 import { invalidateCache } from '@/utils/cache-helpers';
-import { ContactCrudService } from '@/services/contact-crud-service'; // Updated import
-import { ContactListService } from '@/services/contact-list-service'; // Updated import
-import EmptyState from './EmptyState';
+import { ContactCrudService } from '@/services/contact-crud-service';
 import LoadingSpinner from './LoadingSpinner';
 
 interface DuplicateContact {
@@ -45,7 +43,7 @@ const DuplicateContactManagement: React.FC = () => {
     }
   }, []);
 
-  const onErrorFetchContacts = useCallback((err: Error) => {
+  const onErrorFetchContacts = useCallback((err: any) => { // Explicitly type err
     ErrorManager.logError(err, { component: 'DuplicateContactManagement', action: 'fetchAllContactsForDuplicates' });
     ErrorManager.notifyUser(t('ai_suggestions.error_fetching_contacts_for_duplicates'), 'error');
   }, [t]);
@@ -145,7 +143,7 @@ const DuplicateContactManagement: React.FC = () => {
       return;
     }
 
-    const toastId = ErrorManager.notifyUser(t('ai_suggestions.merging_contacts'), 'info');
+    ErrorManager.notifyUser(t('ai_suggestions.merging_contacts'), 'info');
     try {
       const { data: mainContactFull, error: mainError } = await supabase
         .from('contacts')
@@ -263,7 +261,7 @@ const DuplicateContactManagement: React.FC = () => {
         mergedCustomFields.length > 0 ? supabase.from('custom_fields').insert(mergedCustomFields.map(cf => ({ ...cf, id: undefined }))) : Promise.resolve(),
       ]);
 
-      const { error: deleteDuplicateError } = await ContactCrudService.deleteContact(duplicateContact.id); // Updated service call
+      const { error: deleteDuplicateError } = await ContactCrudService.deleteContact(duplicateContact.id);
 
       if (deleteDuplicateError) throw new Error(deleteDuplicateError);
 
@@ -275,7 +273,7 @@ const DuplicateContactManagement: React.FC = () => {
       ErrorManager.logError(err, { component: 'DuplicateContactManagement', action: 'mergeContacts', mainContact, duplicateContact });
       ErrorManager.notifyUser(`${t('ai_suggestions.error_merging_contacts')}: ${ErrorManager.getErrorMessage(err)}`, 'error');
     } finally {
-      // dismissToast(toastId);
+      // dismissToast(toastId); // Commented out as per previous instruction
     }
   }, [session, t, fetchAllContactsForDuplicates]);
 

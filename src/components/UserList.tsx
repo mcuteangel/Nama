@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Edit, Trash2, User as UserIcon, PlusCircle, Users } from "lucide-react";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { UserManagementService } from "@/services/user-management-service";
 import { useErrorHandler } from "@/hooks/use-error-handler";
@@ -37,7 +37,7 @@ const UserItem = ({ user, onUserUpdated, onUserDeleted }: { user: UserProfile; o
     onUserDeleted();
   }, [t, onUserDeleted, session]);
 
-  const onErrorDelete = useCallback((err) => {
+  const onErrorDelete = useCallback((err: any) => { // Explicitly type err
     ErrorManager.logError(err, { component: 'UserList', action: 'deleteUser', userId: user.id });
   }, [user.id]);
 
@@ -137,7 +137,7 @@ const UserList: React.FC = () => {
     fetchUsers();
   }, []);
 
-  const onErrorDeleteList = useCallback((err) => {
+  const onErrorDeleteList = useCallback((err: any) => { // Explicitly type err
     ErrorManager.logError(err, { component: 'UserList', action: 'deleteUser' });
   }, []);
 
@@ -159,7 +159,7 @@ const UserList: React.FC = () => {
     }
   }, [t]);
 
-  const onErrorFetchUsers = useCallback((err) => {
+  const onErrorFetchUsers = useCallback((err: any) => { // Explicitly type err
     ErrorManager.logError(err, { component: 'UserList', action: 'fetchUsers' });
   }, []);
 

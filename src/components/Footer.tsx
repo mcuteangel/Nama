@@ -1,5 +1,5 @@
-import React from "react";
 import { MadeWithDyad } from "@/components/made-with-dyad";
+import React from "react";
 
 const Footer = () => {
   return (

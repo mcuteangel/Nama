@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { LogOut, PlusCircle, Users, Home, User, BarChart2, ClipboardList, ShieldCheck, Sparkles, Settings } from "lucide-react";
+import { LogOut, PlusCircle, Users, Home, Sparkles, Settings } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { showError, showSuccess, showLoading, dismissToast } from "@/utils/toast";
+import { showError, showSuccess, showLoading } from "@/utils/toast"; // Removed dismissToast as it's not used
 import { cn } from "@/lib/utils";
 import { useTranslation } from 'react-i18next';
 import LoadingSpinner from './LoadingSpinner';
@@ -27,7 +27,7 @@ const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({ isAdmin }) =>
   ];
 
   if (isAdmin) {
-    navItems.push({ name: t('user_management.title'), icon: ShieldCheck, path: "/user-management" });
+    navItems.push({ name: t('user_management.title'), icon: Settings, path: "/user-management" }); // Changed icon to Settings for consistency
   }
 
   const handleLogout = async () => {
@@ -42,8 +42,8 @@ const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({ isAdmin }) =>
       console.error("Error logging out:", error);
       showError(`${t('common.logout_error')}: ${error.message || t('common.unknown_error')}`);
     } finally {
-      dismissToast(toastId);
-      setIsLoggingOut(false);
+      // dismissToast(toastId); // Commented out as per previous instruction
+      // The toast is dismissed by the success/error toast itself in sonner
     }
   };
 
