@@ -85,7 +85,7 @@ export const ContactService = {
   ): Promise<{ data: any[] | null; error: string | null }> {
     let query = supabase
       .from("contacts")
-      .select("id, first_name, last_name, gender, position, company, street, city, state, zip_code, country, notes, created_at, updated_at, birthday, phone_numbers(phone_number, phone_type, extension), email_addresses(email_address, email_type), social_links(type, url), contact_groups(group_id, groups(name, color)), custom_fields(id, template_id, field_value, custom_field_templates(name, type, options))")
+      .select("id, first_name, last_name, gender, position, company, street, city, state, zip_code, country, notes, created_at, updated_at, birthday, phone_numbers(id, phone_number, phone_type, extension), email_addresses(id, email_address, email_type), social_links(type, url), contact_groups(group_id, groups(name, color)), custom_fields(id, template_id, field_value, custom_field_templates(name, type, options))")
       .eq("user_id", userId);
 
     if (selectedGroup) {
