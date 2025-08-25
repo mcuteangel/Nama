@@ -62,7 +62,8 @@ interface ContactDetailType {
   phone_numbers: PhoneNumber[];
   email_addresses: EmailAddress[];
   social_links: SocialLink[];
-  groupId?: string | null;
+  contact_groups: ContactGroup[]; // Ensure this is included
+  groupId?: string | null; // Add groupId for easier form initialization
   birthday?: string | null;
   avatar_url?: string | null;
   preferred_contact_method?: 'email' | 'phone' | 'sms' | 'any' | null;
@@ -77,14 +78,19 @@ const EditContact = () => {
   const [initialContactData, setInitialContactData] = useState<ContactDetailType | null>(null);
 
   const onSuccessFetchContact = useCallback((result: { data: ContactDetailType | null; error: string | null; fromCache: boolean }) => {
-    setInitialContactData(result.data || null);
-    if (!result.data) {
-      showError("مخاطب برای ویرایش یافت نشد.");
-      navigate("/");
-    } else {
+    if (result.data) {
+      // Extract groupId from contact_groups for form initialization
+      const formattedData: ContactDetailType = {
+        ...result.data,
+        groupId: result.data.contact_groups?.[0]?.group_id || null,
+      };
+      setInitialContactData(formattedData);
       if (!result.fromCache) {
         showSuccess("اطلاعات مخاطب با موفقیت بارگذاری شد.");
       }
+    } else {
+      showError("مخاطب برای ویرایش یافت نشد.");
+      navigate("/");
     }
   }, [navigate]);
 
@@ -125,15 +131,7 @@ const EditContact = () => {
             if (error) throw error;
 
             if (data) {
-              const formattedData: ContactDetailType = {
-                ...data,
-                phone_numbers: data.phone_numbers || [],
-                email_addresses: data.email_addresses || [],
-                social_links: data.social_links || [],
-                groupId: data.contact_groups[0]?.group_id || null,
-                custom_fields: data.custom_fields || [],
-              } as ContactDetailType;
-              return { data: formattedData, error: null };
+              return { data: data as ContactDetailType, error: null };
             }
             return { data: null, error: "مخاطب برای ویرایش یافت نشد." };
           }

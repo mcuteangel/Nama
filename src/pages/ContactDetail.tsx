@@ -198,9 +198,8 @@ const ContactDetail = () => {
     );
   }
 
-  const assignedGroup = contact.contact_groups.length > 0 && contact.contact_groups[0].groups && contact.contact_groups[0].groups.length > 0
-    ? contact.contact_groups[0].groups[0]
-    : null;
+  // Find the assigned group. Since we enforce single group assignment, we can just take the first one.
+  const assignedGroup = contact.contact_groups?.[0]?.groups?.[0] || null;
 
   return (
     <div className="flex flex-col items-center justify-center p-4 h-full w-full">
