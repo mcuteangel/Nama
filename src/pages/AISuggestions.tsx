@@ -3,23 +3,24 @@ import { MadeWithDyad } from "@/components/made-with-dyad";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Loader2, PlusCircle, UserCheck, Mic, StopCircle } from "lucide-react"; // Import Mic and StopCircle
+import { Sparkles, Loader2, PlusCircle, UserCheck, Mic, StopCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useContactExtractor, ExtractedContactInfo } from "@/hooks/use-contact-extractor";
 import { ErrorManager } from "@/lib/error-manager";
 import LoadingMessage from "@/components/LoadingMessage";
-import AISuggestionCard, { AISuggestion as AISuggestionCardProps } from "@/components/AISuggestionCard"; // Renamed import
+import AISuggestionCard, { AISuggestion as AISuggestionCardProps } from "@/components/AISuggestionCard";
 import { ContactFormValues, PhoneNumberFormData, EmailAddressFormData, SocialLinkFormData } from "@/types/contact";
 import { ContactService } from "@/services/contact-service";
 import { useSession } from "@/integrations/supabase/auth";
 import { useErrorHandler } from "@/hooks/use-error-handler";
 import { invalidateCache, fetchWithCache } from "@/utils/cache-helpers";
 import { useNavigate } from "react-router-dom";
-import { AISuggestionsService, AISuggestion as AISuggestionServiceType } from "@/services/ai-suggestions-service"; // Import new service
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"; // Import Tabs components
-import SmartGroupManagement from "@/components/SmartGroupManagement"; // New component for smart group management
-import DuplicateContactManagement from "@/components/DuplicateContactManagement"; // New component for duplicate contact management
-import { useSpeechToText } from "@/hooks/use-speech-to-text"; // Import useSpeechToText
+import { AISuggestionsService, AISuggestion as AISuggestionServiceType } from "@/services/ai-suggestions-service";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import SmartGroupManagement from "@/components/SmartGroupManagement";
+import DuplicateContactManagement from "@/components/DuplicateContactManagement";
+import GenderSuggestionManagement from "@/components/GenderSuggestionManagement"; // New import
+import { useSpeechToText } from "@/hooks/use-speech-to-text";
 
 interface ExistingContactSummary {
   id: string;
@@ -30,7 +31,7 @@ interface ExistingContactSummary {
 }
 
 interface AISuggestionDisplay extends AISuggestionCardProps {
-  id: string; // The ID of the suggestion in the ai_suggestions table
+  id: string;
 }
 
 const AISuggestions: React.FC = () => {
@@ -164,7 +165,7 @@ const AISuggestions: React.FC = () => {
     invalidateCache(`statistics_dashboard_${session?.user?.id}`);
     setRawTextInput(''); // Clear input text
     fetchPendingSuggestions(); // Refresh the list of suggestions
-  }, [session, t, fetchPendingSuggestions]); // fetchPendingSuggestions is now defined
+  }, [session, t, fetchPendingSuggestions]);
 
   const onErrorProcessContact = useCallback((err: Error) => {
     ErrorManager.logError(err, { component: 'AISuggestions', action: 'saveOrUpdateContact' });
@@ -282,9 +283,10 @@ const AISuggestions: React.FC = () => {
         </CardHeader>
         <CardContent className="space-y-6">
           <Tabs defaultValue="extract-info" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
+            <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="extract-info">{t('ai_suggestions.tab_extract_info')}</TabsTrigger>
               <TabsTrigger value="smart-management">{t('ai_suggestions.tab_smart_management')}</TabsTrigger>
+              <TabsTrigger value="gender-suggestions">{t('ai_suggestions.tab_gender_suggestions')}</TabsTrigger>
             </TabsList>
             <TabsContent value="extract-info" className="space-y-6 pt-4">
               <div className="space-y-3">
@@ -356,6 +358,9 @@ const AISuggestions: React.FC = () => {
             <TabsContent value="smart-management" className="space-y-6 pt-4">
               <SmartGroupManagement />
               <DuplicateContactManagement />
+            </TabsContent>
+            <TabsContent value="gender-suggestions" className="space-y-6 pt-4">
+              <GenderSuggestionManagement />
             </TabsContent>
           </Tabs>
         </CardContent>
