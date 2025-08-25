@@ -31,18 +31,26 @@ const AddGroupDialog: React.FC<AddGroupDialogProps> = ({ onGroupAdded, open, onO
     return '#60A5FA';
   }, []);
 
+  const onSuccessFetchColors = useCallback((result: any) => {
+    const currentColors = result.data.map((g: { color: string }) => g.color).filter(Boolean) as string[];
+    setExistingGroupColors(currentColors);
+    setInitialColor(findUniqueColor(currentColors));
+  }, [findUniqueColor]);
+
+  const onErrorFetchColors = useCallback((err: Error) => {
+    console.error("Error fetching existing group colors in AddGroupDialog:", err);
+    ErrorManager.notifyUser("خطا در بارگذاری رنگ‌های گروه‌های موجود.", 'error');
+    setInitialColor('#60A5FA'); // Fallback to default color on error
+  }, []);
+
   const {
     isLoading: isFetchingColors,
-    error: fetchColorsError, // Get error state
-    errorMessage: fetchColorsErrorMessage, // Get error message
+    error: fetchColorsError,
     executeAsync: executeFetchColors,
   } = useErrorHandler(null, {
-    showToast: true, // Keep toast for errors
-    customErrorMessage: "خطا در بارگذاری رنگ‌های گروه‌های موجود.",
-    onError: (err) => {
-      console.error("Error fetching existing group colors in AddGroupDialog:", err);
-      setInitialColor('#60A5FA'); // Fallback to default color on error
-    }
+    showToast: false, // Handled by onErrorFetchColors callback
+    onSuccess: onSuccessFetchColors,
+    onError: onErrorFetchColors,
   });
 
   useEffect(() => {
@@ -61,16 +69,14 @@ const AddGroupDialog: React.FC<AddGroupDialogProps> = ({ onGroupAdded, open, onO
 
         if (error) throw error;
 
-        const currentColors = data.map(g => g.color).filter(Boolean) as string[];
-        setExistingGroupColors(currentColors);
-        setInitialColor(findUniqueColor(currentColors));
+        return { data, error: null }; // Return data in expected format for onSuccess
       });
     };
 
     if (open) { // Only fetch colors when the dialog is opened
       fetchColors();
     }
-  }, [session, isSessionLoading, open, findUniqueColor, executeFetchColors]);
+  }, [session, isSessionLoading, open, executeFetchColors]);
 
   const handleSuccess = () => {
     onOpenChange(false); // Close dialog on success
@@ -101,9 +107,9 @@ const AddGroupDialog: React.FC<AddGroupDialogProps> = ({ onGroupAdded, open, onO
           <div className="w-full max-w-md glass rounded-xl p-6 bg-white/90 dark:bg-gray-900/90">
             <LoadingMessage message="در حال آماده‌سازی فرم گروه..." />
           </div>
-        ) : fetchColorsError ? ( // Display error message if fetching colors failed
+        ) : fetchColorsError ? (
           <div className="w-full max-w-md glass rounded-xl p-6 bg-white/90 dark:bg-gray-900/90 text-center text-red-500 dark:text-red-400">
-            <p>{fetchColorsErrorMessage}</p>
+            <p>{fetchColorsError.message}</p>
             <Button onClick={() => onOpenChange(false)} className="mt-4">بستن</Button>
           </div>
         ) : (
