@@ -261,6 +261,7 @@ export const ContactService = {
       }
       return { data: { id: currentContactId }, error: null };
     } catch (error: any) {
+      console.error("ContactService.addContact: Caught an error during add process:", error.message);
       return { data: null, error: error.message };
     }
   },
@@ -268,10 +269,16 @@ export const ContactService = {
   async updateContact(contactId: string, values: ContactFormValues): Promise<{ success: boolean; error: string | null }> {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
+      console.log("ContactService.updateContact: User not authenticated.");
       return { success: false, error: 'کاربر احراز هویت نشده است.' };
     }
 
+    console.log(`ContactService.updateContact: Starting update for contactId: ${contactId}, userId: ${user.id}`);
+    console.log("ContactService.updateContact: Values received:", values);
+
     try {
+      // 1. Update main contacts table
+      console.log("ContactService.updateContact: Updating main contact details...");
       const { error: contactError } = await supabase
         .from("contacts")
         .update({
@@ -293,14 +300,20 @@ export const ContactService = {
         .eq("id", contactId)
         .eq("user_id", user.id);
 
-      if (contactError) throw contactError;
+      if (contactError) {
+        console.error("ContactService.updateContact: Error updating main contact:", contactError.message);
+        throw contactError;
+      }
+      console.log("ContactService.updateContact: Main contact updated successfully.");
 
       // --- Handle Phone Numbers ---
+      console.log("ContactService.updateContact: Handling phone numbers...");
       const existingPhoneNumbers = (await supabase
         .from("phone_numbers")
         .select("id, phone_type, phone_number, extension")
         .eq("contact_id", contactId)
         .eq("user_id", user.id)).data || [];
+      console.log("ContactService.updateContact: Existing phone numbers:", existingPhoneNumbers);
 
       const newPhoneNumbers = values.phoneNumbers || [];
 
@@ -308,15 +321,21 @@ export const ContactService = {
         (existingPhone) => !newPhoneNumbers.some((newPhone) => newPhone.id === existingPhone.id)
       );
       if (phonesToDelete.length > 0) {
+        console.log("ContactService.updateContact: Deleting phones:", phonesToDelete.map(p => p.id));
         const { error: deleteError } = await supabase
           .from("phone_numbers")
           .delete()
           .in("id", phonesToDelete.map((p) => p.id));
-        if (deleteError) throw deleteError;
+        if (deleteError) {
+          console.error("ContactService.updateContact: Error deleting phones:", deleteError.message);
+          throw deleteError;
+        }
+        console.log("ContactService.updateContact: Phones deleted successfully.");
       }
 
       for (const phone of newPhoneNumbers) {
         if (phone.id) {
+          console.log("ContactService.updateContact: Updating phone:", phone.id);
           const { error: updateError } = await supabase
             .from("phone_numbers")
             .update({
@@ -326,8 +345,12 @@ export const ContactService = {
             })
             .eq("id", phone.id)
             .eq("user_id", user.id);
-          if (updateError) throw updateError;
+          if (updateError) {
+            console.error("ContactService.updateContact: Error updating phone:", updateError.message);
+            throw updateError;
+          }
         } else {
+          console.log("ContactService.updateContact: Inserting new phone:", phone.phone_number);
           const { error: insertError } = await supabase
             .from("phone_numbers")
             .insert({
@@ -337,16 +360,22 @@ export const ContactService = {
               phone_number: phone.phone_number,
               extension: phone.extension || null,
             });
-          if (insertError) throw insertError;
+          if (insertError) {
+            console.error("ContactService.updateContact: Error inserting phone:", insertError.message);
+            throw insertError;
+          }
         }
       }
+      console.log("ContactService.updateContact: Phone numbers handled.");
 
       // --- Handle Email Addresses ---
+      console.log("ContactService.updateContact: Handling email addresses...");
       const existingEmailAddresses = (await supabase
         .from("email_addresses")
         .select("id, email_type, email_address")
         .eq("contact_id", contactId)
         .eq("user_id", user.id)).data || [];
+      console.log("ContactService.updateContact: Existing email addresses:", existingEmailAddresses);
 
       const newEmailAddresses = values.emailAddresses || [];
 
@@ -354,15 +383,21 @@ export const ContactService = {
         (existingEmail) => !newEmailAddresses.some((newEmail) => newEmail.id === existingEmail.id)
       );
       if (emailsToDelete.length > 0) {
+        console.log("ContactService.updateContact: Deleting emails:", emailsToDelete.map(e => e.id));
         const { error: deleteError } = await supabase
           .from("email_addresses")
           .delete()
           .in("id", emailsToDelete.map((e) => e.id));
-        if (deleteError) throw deleteError;
+        if (deleteError) {
+          console.error("ContactService.updateContact: Error deleting emails:", deleteError.message);
+          throw deleteError;
+        }
+        console.log("ContactService.updateContact: Emails deleted successfully.");
       }
 
       for (const email of newEmailAddresses) {
         if (email.id) {
+          console.log("ContactService.updateContact: Updating email:", email.id);
           const { error: updateError } = await supabase
             .from("email_addresses")
             .update({
@@ -371,8 +406,12 @@ export const ContactService = {
             })
             .eq("id", email.id)
             .eq("user_id", user.id);
-          if (updateError) throw updateError;
+          if (updateError) {
+            console.error("ContactService.updateContact: Error updating email:", updateError.message);
+            throw updateError;
+          }
         } else {
+          console.log("ContactService.updateContact: Inserting new email:", email.email_address);
           const { error: insertError } = await supabase
             .from("email_addresses")
             .insert({
@@ -381,16 +420,22 @@ export const ContactService = {
               email_type: email.email_type,
               email_address: email.email_address,
             });
-          if (insertError) throw insertError;
+          if (insertError) {
+            console.error("ContactService.updateContact: Error inserting email:", insertError.message);
+            throw insertError;
+          }
         }
       }
+      console.log("ContactService.updateContact: Email addresses handled.");
 
       // --- Handle Social Links ---
+      console.log("ContactService.updateContact: Handling social links...");
       const existingSocialLinks = (await supabase
         .from("social_links")
         .select("id, type, url")
         .eq("contact_id", contactId)
         .eq("user_id", user.id)).data || [];
+      console.log("ContactService.updateContact: Existing social links:", existingSocialLinks);
 
       const newSocialLinks = values.socialLinks || [];
 
@@ -398,15 +443,21 @@ export const ContactService = {
         (existingLink) => !newSocialLinks.some((newLink) => newLink.id === existingLink.id)
       );
       if (linksToDelete.length > 0) {
+        console.log("ContactService.updateContact: Deleting social links:", linksToDelete.map(l => l.id));
         const { error: deleteError } = await supabase
           .from("social_links")
           .delete()
           .in("id", linksToDelete.map((l) => l.id));
-        if (deleteError) throw deleteError;
+        if (deleteError) {
+          console.error("ContactService.updateContact: Error deleting social links:", deleteError.message);
+          throw deleteError;
+        }
+        console.log("ContactService.updateContact: Social links deleted successfully.");
       }
 
       for (const link of newSocialLinks) {
         if (link.id) {
+          console.log("ContactService.updateContact: Updating social link:", link.id);
           const { error: updateError } = await supabase
             .from("social_links")
             .update({
@@ -415,8 +466,12 @@ export const ContactService = {
             })
             .eq("id", link.id)
             .eq("user_id", user.id);
-          if (updateError) throw updateError;
+          if (updateError) {
+            console.error("ContactService.updateContact: Error updating social link:", updateError.message);
+            throw updateError;
+          }
         } else {
+          console.log("ContactService.updateContact: Inserting new social link:", link.url);
           const { error: insertError } = await supabase
             .from("social_links")
             .insert({
@@ -425,20 +480,30 @@ export const ContactService = {
               type: link.type,
               url: link.url,
             });
-          if (insertError) throw insertError;
+          if (insertError) {
+            console.error("ContactService.updateContact: Error inserting social link:", insertError.message);
+            throw insertError;
+          }
         }
       }
+      console.log("ContactService.updateContact: Social links handled.");
 
       // --- Handle group assignment ---
+      console.log("ContactService.updateContact: Handling group assignment...");
       const { error: deleteExistingGroupsError } = await supabase
         .from("contact_groups")
         .delete()
         .eq("contact_id", contactId)
         .eq("user_id", user.id);
 
-      if (deleteExistingGroupsError) throw deleteExistingGroupsError;
+      if (deleteExistingGroupsError) {
+        console.error("ContactService.updateContact: Error deleting existing groups:", deleteExistingGroupsError.message);
+        throw deleteExistingGroupsError;
+      }
+      console.log("ContactService.updateContact: Existing groups deleted.");
 
       if (values.groupId) {
+        console.log("ContactService.updateContact: Inserting new group assignment:", values.groupId);
         const { error: insertGroupError } = await supabase
           .from("contact_groups")
           .insert({
@@ -446,15 +511,23 @@ export const ContactService = {
             contact_id: contactId,
             group_id: values.groupId,
           });
-        if (insertGroupError) throw insertGroupError;
+        if (insertGroupError) {
+          console.error("ContactService.updateContact: Error inserting group assignment:", insertGroupError.message);
+          throw insertGroupError;
+        }
+        console.log("ContactService.updateContact: Group assignment inserted.");
+      } else {
+        console.log("ContactService.updateContact: No group assigned.");
       }
 
       // Handle custom fields update/insert/delete
+      console.log("ContactService.updateContact: Handling custom fields...");
       const existingCustomFields = (await supabase
         .from("custom_fields")
         .select("id, template_id, field_value")
         .eq("contact_id", contactId)
         .eq("user_id", user.id)).data || [];
+      console.log("ContactService.updateContact: Existing custom fields:", existingCustomFields);
 
       const newCustomFields = values.customFields || [];
 
@@ -462,26 +535,36 @@ export const ContactService = {
         (existingField) => !newCustomFields.some((newField) => newField.template_id === existingField.template_id)
       );
       if (fieldsToDelete.length > 0) {
+        console.log("ContactService.updateContact: Deleting custom fields:", fieldsToDelete.map(f => f.id));
         const { error: deleteError } = await supabase
           .from("custom_fields")
           .delete()
           .in("id", fieldsToDelete.map((f) => f.id));
-        if (deleteError) throw deleteError;
+        if (deleteError) {
+          console.error("ContactService.updateContact: Error deleting custom fields:", deleteError.message);
+          throw deleteError;
+        }
+        console.log("ContactService.updateContact: Custom fields deleted successfully.");
       }
 
       for (const field of newCustomFields) {
         const existingField = existingCustomFields.find(f => f.template_id === field.template_id);
         if (existingField) {
           if (existingField.field_value !== field.value) {
+            console.log("ContactService.updateContact: Updating custom field:", existingField.id);
             const { error: updateError } = await supabase
               .from("custom_fields")
               .update({ field_value: field.value })
               .eq("id", existingField.id)
               .eq("user_id", user.id);
-            if (updateError) throw updateError;
+            if (updateError) {
+              console.error("ContactService.updateContact: Error updating custom field:", updateError.message);
+              throw updateError;
+            }
           }
         } else {
           if (field.value && field.value.trim() !== '') {
+            console.log("ContactService.updateContact: Inserting new custom field for template:", field.template_id);
             const { error: insertError } = await supabase
               .from("custom_fields")
               .insert({
@@ -490,12 +573,19 @@ export const ContactService = {
                 template_id: field.template_id,
                 field_value: field.value,
               });
-            if (insertError) throw insertError;
+            if (insertError) {
+              console.error("ContactService.updateContact: Error inserting custom field:", insertError.message);
+              throw insertError;
+            }
           }
         }
       }
+      console.log("ContactService.updateContact: Custom fields handled.");
+
+      console.log("ContactService.updateContact: All updates completed successfully.");
       return { success: true, error: null };
     } catch (error: any) {
+      console.error("ContactService.updateContact: Caught an error during update process:", error.message);
       return { success: false, error: error.message };
     }
   },
