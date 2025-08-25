@@ -169,7 +169,7 @@ const ContactDetail = () => {
             if (error) throw error;
 
             if (data) {
-              return { data: data as ContactDetailType, error: null };
+              return { data: data as unknown as ContactDetailType, error: null }; // Added 'as unknown'
             }
             return { data: null, error: "مخاطب یافت نشد." };
           }
@@ -200,7 +200,7 @@ const ContactDetail = () => {
     );
   }
 
-  // Access the group directly from the first contact_group entry
+  // Access the group from the first contact_group entry, and then the first group within that array
   const assignedGroup = contact.contact_groups?.[0]?.groups?.[0] || null;
 
   return (
