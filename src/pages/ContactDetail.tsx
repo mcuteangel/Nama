@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { showError, showLoading, showSuccess, dismissToast } from "@/utils/toast"; // Import toast functions
+import { showError, showLoading, showSuccess, dismissToast } from "@/utils/toast";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -12,10 +12,10 @@ import { Phone, Mail, Building, Briefcase, MapPin, Info, User, Users, Tag, Calen
 import { MadeWithDyad } from "@/components/made-with-dyad";
 import { useJalaliCalendar } from "@/hooks/use-jalali-calendar";
 import { fetchWithCache } from "@/utils/cache-helpers";
-import LoadingMessage from "@/components/LoadingMessage"; // Import LoadingMessage
-import CancelButton from "@/components/CancelButton"; // Import CancelButton
-import { ErrorManager } from "@/lib/error-manager"; // Import ErrorManager
-import { useErrorHandler } from "@/hooks/use-error-handler"; // Import useErrorHandler
+import LoadingMessage from "@/components/LoadingMessage";
+import CancelButton from "@/components/CancelButton";
+import { ErrorManager } from "@/lib/error-manager";
+import { useErrorHandler } from "@/hooks/use-error-handler";
 
 interface PhoneNumber {
   id: string;
@@ -43,7 +43,7 @@ interface GroupData {
 
 interface ContactGroup {
   group_id: string;
-  groups: GroupData[] | null; // Changed to array of GroupData
+  groups: GroupData | null; // Changed back to single GroupData object, as Supabase's `single()` on a foreign table usually returns the object directly if it exists.
 }
 
 interface CustomField {
@@ -129,11 +129,6 @@ const ContactDetail = () => {
       if (!result.fromCache) {
         showSuccess("جزئیات مخاطب با موفقیت بارگذاری شد.");
       }
-      // Debugging logs
-      console.log("ContactDetail Debug: Fetched contact data:", result.data);
-      console.log("ContactDetail Debug: contact_groups:", result.data.contact_groups);
-      const assignedGroup = result.data.contact_groups?.[0]?.groups?.[0] || null;
-      console.log("ContactDetail Debug: assignedGroup:", assignedGroup);
     }
   }, [navigate]);
 
@@ -147,7 +142,7 @@ const ContactDetail = () => {
     isLoading: loading,
     executeAsync: executeFetchContact,
   } = useErrorHandler<{ data: ContactDetailType | null; error: string | null; fromCache: boolean }>(null, {
-    showToast: false, // Control toasts manually
+    showToast: false,
     onSuccess: onSuccessFetchContact,
     onError: onErrorFetchContact,
   });
@@ -200,13 +195,13 @@ const ContactDetail = () => {
     return (
       <div className="flex flex-col items-center justify-center h-full w-full p-4">
         <p className="text-gray-700 dark:text-gray-300">مخاطب یافت نشد.</p>
-        <CancelButton text="بازگشت به لیست مخاطبین" /> {/* Use CancelButton */}
+        <CancelButton text="بازگشت به لیست مخاطبین" />
       </div>
     );
   }
 
-  // Find the assigned group. Since we enforce single group assignment, we can just take the first one.
-  const assignedGroup = contact.contact_groups?.[0]?.groups?.[0] || null; // Access the first element of the groups array
+  // Access the group directly from the first contact_group entry
+  const assignedGroup = contact.contact_groups?.[0]?.groups || null;
 
   return (
     <div className="flex flex-col items-center justify-center p-4 h-full w-full">
@@ -364,7 +359,7 @@ const ContactDetail = () => {
           </div>
 
           <div className="flex justify-end gap-2 mt-6">
-            <CancelButton /> {/* Use CancelButton */}
+            <CancelButton />
           </div>
         </CardContent>
       </Card>
