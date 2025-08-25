@@ -129,6 +129,11 @@ const ContactDetail = () => {
       if (!result.fromCache) {
         showSuccess("جزئیات مخاطب با موفقیت بارگذاری شد.");
       }
+      // Debugging logs
+      console.log("ContactDetail Debug: Fetched contact data:", result.data);
+      console.log("ContactDetail Debug: contact_groups:", result.data.contact_groups);
+      const assignedGroup = result.data.contact_groups?.[0]?.groups?.[0] || null;
+      console.log("ContactDetail Debug: assignedGroup:", assignedGroup);
     }
   }, [navigate]);
 
