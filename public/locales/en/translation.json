@@ -178,13 +178,13 @@
     "loading_smart_management_data": "Loading smart management data...",
     "loading_duplicate_management_data": "Loading duplicate management data...",
     "gender_suggestion_title": "Gender Suggestion",
-    "gender_suggestion_description_local": "Suggest gender for contacts with unspecified gender based on a simple, internal (non-AI) logic.",
+    "gender_suggestion_description_local": "Suggest gender for contacts with unspecified gender based on a simple, internal logic. This system learns from your choices.",
     "generate_gender_suggestions": "Generate Gender Suggestions",
     "no_ungendered_contacts": "No contacts with unspecified gender found.",
     "all_contacts_gendered": "All contacts have specified gender.",
-    "generating_gender_suggestions_local": "Generating gender suggestions (local)...",
+    "generating_gender_suggestions_local": "Generating gender suggestions...",
     "gender_suggestions_generated_local": "Gender suggestions generated successfully.",
-    "error_generating_gender_suggestions_local": "Error generating gender suggestions (local).",
+    "error_generating_gender_suggestions_local": "Error generating gender suggestions.",
     "pending_gender_suggestions": "Pending Gender Suggestions",
     "suggested_gender": "Suggested Gender",
     "applying_gender_suggestion": "Applying gender suggestion...",
@@ -192,7 +192,10 @@
     "error_applying_gender_suggestion": "Error applying gender suggestion.",
     "gender_suggestion_discarded": "Gender suggestion discarded.",
     "loading_gender_management_data": "Loading gender management data...",
-    "error_fetching_ungendered_contacts": "Error fetching contacts with unspecified gender."
+    "error_fetching_ungendered_contacts": "Error fetching contacts with unspecified gender.",
+    "clear_learned_preferences": "Clear Learned Preferences",
+    "confirm_clear_learning_title": "Are you sure you want to clear learned preferences?",
+    "confirm_clear_learning_description": "This action will remove all learned gender suggestion data from your browser's local storage. This might reduce the accuracy of future suggestions."
   },
   "gender": {
     "male": "Male",

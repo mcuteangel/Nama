@@ -179,13 +179,13 @@
     "loading_smart_management_data": "در حال بارگذاری داده‌های مدیریت هوشمند...",
     "loading_duplicate_management_data": "در حال بارگذاری داده‌های مدیریت تکراری...",
     "gender_suggestion_title": "پیشنهاد جنسیت",
-    "gender_suggestion_description_local": "پیشنهاد جنسیت برای مخاطبین بدون جنسیت مشخص بر اساس یک منطق ساده و داخلی (غیر هوش مصنوعی).",
+    "gender_suggestion_description_local": "پیشنهاد جنسیت برای مخاطبین بدون جنسیت مشخص بر اساس یک منطق ساده و داخلی. این سیستم از انتخاب‌های شما یاد می‌گیرد.",
     "generate_gender_suggestions": "ایجاد پیشنهادات جنسیت",
     "no_ungendered_contacts": "هیچ مخاطبی با جنسیت نامشخص یافت نشد.",
     "all_contacts_gendered": "همه مخاطبین دارای جنسیت مشخص هستند.",
-    "generating_gender_suggestions_local": "در حال ایجاد پیشنهادات جنسیت (داخلی)...",
+    "generating_gender_suggestions_local": "در حال ایجاد پیشنهادات جنسیت...",
     "gender_suggestions_generated_local": "پیشنهادات جنسیت با موفقیت ایجاد شد.",
-    "error_generating_gender_suggestions_local": "خطا در ایجاد پیشنهادات جنسیت (داخلی).",
+    "error_generating_gender_suggestions_local": "خطا در ایجاد پیشنهادات جنسیت.",
     "pending_gender_suggestions": "پیشنهادات جنسیت در انتظار",
     "suggested_gender": "جنسیت پیشنهادی",
     "applying_gender_suggestion": "در حال اعمال پیشنهاد جنسیت...",
@@ -193,7 +193,10 @@
     "error_applying_gender_suggestion": "خطا در اعمال پیشنهاد جنسیت.",
     "gender_suggestion_discarded": "پیشنهاد جنسیت رد شد.",
     "loading_gender_management_data": "در حال بارگذاری داده‌های مدیریت جنسیت...",
-    "error_fetching_ungendered_contacts": "خطا در دریافت مخاطبین بدون جنسیت مشخص."
+    "error_fetching_ungendered_contacts": "خطا در دریافت مخاطبین بدون جنسیت مشخص.",
+    "clear_learned_preferences": "پاک کردن ترجیحات یادگرفته شده",
+    "confirm_clear_learning_title": "آیا از پاک کردن ترجیحات یادگرفته شده مطمئن هستید؟",
+    "confirm_clear_learning_description": "این عمل تمام داده‌های یادگرفته شده برای پیشنهاد جنسیت را از حافظه محلی مرورگر شما حذف می‌کند. این کار ممکن است دقت پیشنهادات آینده را کاهش دهد."
   },
   "gender": {
     "male": "مرد",

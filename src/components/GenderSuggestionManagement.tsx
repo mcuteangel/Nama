@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Loader2, User, CheckCircle, XCircle } from "lucide-react";
+import { Sparkles, Loader2, User, CheckCircle, XCircle, LightbulbOff } from "lucide-react"; // Added LightbulbOff icon
 import { useTranslation } from "react-i18next";
 import { useSession } from "@/integrations/supabase/auth";
 import { useErrorHandler } from "@/hooks/use-error-handler";
@@ -9,7 +9,9 @@ import { ErrorManager } from "@/lib/error-manager";
 import LoadingMessage from "./LoadingMessage";
 import { supabase } from '@/integrations/supabase/client';
 import { invalidateCache } from '@/utils/cache-helpers';
-// AISuggestionsService is no longer used for gender suggestions directly
+import { suggestGenderFromName, updateLearnedGenderPreference, clearLearnedGenderPreferences } from '@/utils/gender-learning'; // Import new utility functions
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import CancelButton from './CancelButton';
 
 interface ContactForGenderSuggestion {
   id: string;
@@ -24,22 +26,6 @@ interface GenderSuggestionDisplay {
   currentGender: 'male' | 'female' | 'not_specified';
   suggestedGender: 'male' | 'female' | 'not_specified';
 }
-
-// --- Client-side gender suggestion logic (very basic) ---
-const suggestGenderFromName = (firstName: string): 'male' | 'female' | 'not_specified' => {
-  const lowerFirstName = firstName.toLowerCase();
-  // A very basic, limited set of rules for common Persian names
-  // This is NOT comprehensive and will be inaccurate for many names.
-  // For a more robust solution without AI, a large local database of names would be needed.
-  if (['علی', 'محمد', 'رضا', 'حسین', 'امیر', 'حسن', 'مهدی', 'جواد', 'سعید', 'محمود', 'احمد', 'مصطفی', 'مجید', 'ناصر', 'بهنام', 'فرهاد', 'کاوه', 'کوروش', 'داریوش', 'آرش', 'بابک', 'پویا', 'کیوان', 'مانی', 'نادر', 'هومن', 'یوسف'].includes(lowerFirstName)) {
-    return 'male';
-  }
-  if (['فاطمه', 'زهرا', 'مریم', 'سارا', 'نازنین', 'زینب', 'آزاده', 'پریسا', 'ژاله', 'شیرین', 'لیلا', 'مهسا', 'نسترن', 'هدیه', 'یاسمن', 'آرزو', 'بهار', 'پگاه', 'ترانه', 'ثمین', 'خاطره', 'دلارام', 'رعنا', 'رویا', 'سحر', 'شبنم', 'غزل', 'فرناز', 'کیمیا', 'گلناز', 'لاله', 'مرجان', 'نوشین', 'ویدا'].includes(lowerFirstName)) {
-    return 'female';
-  }
-  return 'not_specified';
-};
-// --- End client-side gender suggestion logic ---
 
 const GenderSuggestionManagement: React.FC = () => {
   const { t } = useTranslation();
@@ -103,12 +89,12 @@ const GenderSuggestionManagement: React.FC = () => {
     }
 
     setIsGenerating(true);
-    const toastId = ErrorManager.notifyUser(t('ai_suggestions.generating_gender_suggestions_local'), 'info'); // Updated message
+    const toastId = ErrorManager.notifyUser(t('ai_suggestions.generating_gender_suggestions_local'), 'info');
 
     try {
       const newSuggestions: GenderSuggestionDisplay[] = ungenderedContacts
         .map(contact => {
-          const suggestedGender = suggestGenderFromName(contact.first_name);
+          const suggestedGender = suggestGenderFromName(contact.first_name); // Use the updated utility function
           return {
             contactId: contact.id,
             contactName: `${contact.first_name} ${contact.last_name}`,
@@ -120,13 +106,13 @@ const GenderSuggestionManagement: React.FC = () => {
 
       setGenderSuggestions(newSuggestions);
       if (newSuggestions.length === 0) {
-        ErrorManager.notifyUser(t('ai_suggestions.no_gender_suggestions_found_local'), 'info'); // Updated message
+        ErrorManager.notifyUser(t('ai_suggestions.no_gender_suggestions_found_local'), 'info');
       } else {
-        ErrorManager.notifyUser(t('ai_suggestions.gender_suggestions_generated_local'), 'success'); // Updated message
+        ErrorManager.notifyUser(t('ai_suggestions.gender_suggestions_generated_local'), 'success');
       }
     } catch (err: any) {
       ErrorManager.logError(err, { component: 'GenderSuggestionManagement', action: 'generateGenderSuggestionsLocal' });
-      ErrorManager.notifyUser(`${t('ai_suggestions.error_generating_gender_suggestions_local')}: ${ErrorManager.getErrorMessage(err)}`, 'error'); // Updated message
+      ErrorManager.notifyUser(`${t('ai_suggestions.error_generating_gender_suggestions_local')}: ${ErrorManager.getErrorMessage(err)}`, 'error');
     } finally {
       setIsGenerating(false);
       // dismissToast(toastId); // Assuming notifyUser returns a toastId if needed
@@ -149,6 +135,12 @@ const GenderSuggestionManagement: React.FC = () => {
 
       if (error) throw new Error(error.message);
 
+      // Update learned preferences in localStorage
+      updateLearnedGenderPreference(
+        ungenderedContacts.find(c => c.id === suggestion.contactId)?.first_name || '',
+        suggestion.suggestedGender
+      );
+
       ErrorManager.notifyUser(t('ai_suggestions.gender_suggestion_applied_success'), 'success');
       // Remove the applied suggestion from the list
       setGenderSuggestions(prev => prev.filter(s => s.contactId !== suggestion.contactId));
@@ -161,12 +153,19 @@ const GenderSuggestionManagement: React.FC = () => {
     } finally {
       // dismissToast(toastId); // Assuming notifyUser returns a toastId if needed
     }
-  }, [session, t, fetchUngenderedContacts]);
+  }, [session, t, fetchUngenderedContacts, ungenderedContacts]);
 
   const handleDiscardSuggestion = useCallback((contactId: string) => {
     setGenderSuggestions(prev => prev.filter(s => s.contactId !== contactId));
     ErrorManager.notifyUser(t('ai_suggestions.gender_suggestion_discarded'), 'info');
   }, [t]);
+
+  const handleClearLearnedPreferences = useCallback(() => {
+    clearLearnedGenderPreferences();
+    ErrorManager.notifyUser(t('ai_suggestions.learned_preferences_cleared'), 'success');
+    // Re-generate suggestions to reflect cleared learning
+    handleGenerateSuggestions();
+  }, [t, handleGenerateSuggestions]);
 
   if (isSessionLoading || isLoadingContacts) {
     return <LoadingMessage message={t('ai_suggestions.loading_gender_management_data')} />;
@@ -180,7 +179,7 @@ const GenderSuggestionManagement: React.FC = () => {
             <User size={20} className="text-pink-500" /> {t('ai_suggestions.gender_suggestion_title')}
           </CardTitle>
           <CardDescription className="text-gray-600 dark:text-gray-300">
-            {t('ai_suggestions.gender_suggestion_description_local')} {/* Updated description */}
+            {t('ai_suggestions.gender_suggestion_description_local')}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -196,6 +195,33 @@ const GenderSuggestionManagement: React.FC = () => {
             )}
             {t('ai_suggestions.generate_gender_suggestions')}
           </Button>
+
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button
+                variant="outline"
+                disabled={isGenerating}
+                className="w-full flex items-center gap-2 px-6 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold shadow-sm transition-all duration-300 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-200 dark:border-gray-600"
+              >
+                <LightbulbOff size={16} />
+                {t('ai_suggestions.clear_learned_preferences')}
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent className="glass rounded-xl p-6">
+              <AlertDialogHeader>
+                <AlertDialogTitle className="text-gray-800 dark:text-gray-100">{t('ai_suggestions.confirm_clear_learning_title')}</AlertDialogTitle>
+                <AlertDialogDescription className="text-gray-600 dark:text-gray-300">
+                  {t('ai_suggestions.confirm_clear_learning_description')}
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <CancelButton text={t('common.cancel')} />
+                <AlertDialogAction onClick={handleClearLearnedPreferences} className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold">
+                  {t('ai_suggestions.clear_learning_button')}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
 
           {ungenderedContacts.length === 0 && !isGenerating && (
             <p className="text-center text-gray-500 dark:text-gray-400">{t('ai_suggestions.all_contacts_gendered')}</p>
