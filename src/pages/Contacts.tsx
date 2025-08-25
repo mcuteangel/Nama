@@ -21,7 +21,7 @@ const Contacts = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedGroup, setSelectedGroup] = useState<string>("");
   const [companyFilter, setCompanyFilter] = useState<string>("");
-  const [sortOption, setSortOption] = useState<string>("first_name_asc");
+  const [sortOption, setSortOption] = useState<string>("last_name_asc"); // Changed default sort option here
   const [isExporting, setIsExporting] = useState(false);
 
   useEffect(() => {

@@ -169,7 +169,7 @@ const ContactList = ({ searchTerm, selectedGroup, companyFilter, sortOption }: C
 
   const onErrorFetch = useCallback((err: Error) => {
     ErrorManager.logError(err, { component: 'ContactList', action: 'fetchContacts' });
-    console.error("Error fetching contacts in ContactList:", err); // Added log
+    console.error("Error fetching contacts in ContactList:", err);
   }, []);
 
   const {
