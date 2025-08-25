@@ -3,7 +3,7 @@ import { MadeWithDyad } from "@/components/made-with-dyad";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Loader2, PlusCircle, UserCheck } from "lucide-react";
+import { Sparkles, Loader2, PlusCircle, UserCheck, Mic, StopCircle } from "lucide-react"; // Import Mic and StopCircle
 import { useTranslation } from "react-i18next";
 import { useContactExtractor, ExtractedContactInfo } from "@/hooks/use-contact-extractor";
 import { ErrorManager } from "@/lib/error-manager";
@@ -19,6 +19,7 @@ import { AISuggestionsService, AISuggestion as AISuggestionServiceType } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"; // Import Tabs components
 import SmartGroupManagement from "@/components/SmartGroupManagement"; // New component for smart group management
 import DuplicateContactManagement from "@/components/DuplicateContactManagement"; // New component for duplicate contact management
+import { useSpeechToText } from "@/hooks/use-speech-to-text"; // Import useSpeechToText
 
 interface ExistingContactSummary {
   id: string;
@@ -42,6 +43,21 @@ const AISuggestions: React.FC = () => {
   const [isProcessingSuggestions, setIsProcessingSuggestions] = useState(false);
 
   const { enqueueContactExtraction, isLoading: isExtractorLoading, error: extractorError } = useContactExtractor();
+  const {
+    isListening,
+    transcript,
+    startListening,
+    stopListening,
+    browserSupportsSpeechRecognition,
+    error: speechError,
+  } = useSpeechToText();
+
+  // Update rawTextInput with transcript when listening
+  useEffect(() => {
+    if (isListening && transcript) {
+      setRawTextInput(transcript);
+    }
+  }, [isListening, transcript]);
 
   // Define fetchPendingSuggestions first, as it's a dependency for other callbacks
   const onSuccessFetchSuggestions = useCallback((result: { data: AISuggestionServiceType[] | null; error: string | null; fromCache: boolean }) => {
@@ -244,10 +260,10 @@ const AISuggestions: React.FC = () => {
     return <LoadingMessage message={t('common.loading')} />;
   }
 
-  if (extractorError) {
+  if (extractorError || speechError) {
     return (
       <div className="text-center text-red-500 dark:text-red-400 p-4">
-        <p>{t('ai_suggestions.extractor_error')}: {extractorError}</p>
+        <p>{t('ai_suggestions.extractor_error')}: {extractorError || speechError}</p>
         <Button onClick={() => window.location.reload()} className="mt-4">{t('common.reload_page')}</Button>
       </div>
     );
@@ -275,13 +291,27 @@ const AISuggestions: React.FC = () => {
                 <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 flex items-center gap-2">
                   <Sparkles size={20} className="text-blue-500" /> {t('ai_suggestions.input_section_title')}
                 </h3>
-                <Textarea
-                  placeholder={t('ai_suggestions.paste_text_placeholder')}
-                  value={rawTextInput}
-                  onChange={(e) => setRawTextInput(e.target.value)}
-                  className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-400 min-h-[150px]"
-                  disabled={isExtractorLoading || isProcessingSuggestions || isSavingOrUpdating}
-                />
+                <div className="relative">
+                  <Textarea
+                    placeholder={t('ai_suggestions.paste_text_placeholder')}
+                    value={rawTextInput}
+                    onChange={(e) => setRawTextInput(e.target.value)}
+                    className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-400 min-h-[150px] pr-12"
+                    disabled={isExtractorLoading || isProcessingSuggestions || isSavingOrUpdating}
+                  />
+                  {browserSupportsSpeechRecognition && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={isListening ? stopListening : startListening}
+                      className="absolute top-2 right-2 text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400"
+                      disabled={isExtractorLoading || isProcessingSuggestions || isSavingOrUpdating}
+                    >
+                      {isListening ? <StopCircle size={20} className="animate-pulse text-red-500" /> : <Mic size={20} />}
+                    </Button>
+                  )}
+                </div>
                 <Button
                   type="button"
                   onClick={handleExtractAndEnqueue}
