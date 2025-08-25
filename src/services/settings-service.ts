@@ -90,11 +90,19 @@ export const SettingsService = {
         body: JSON.stringify({}), // Empty body for GET-like request
       });
 
-      const responseData = await response.json();
-
+      // Check if response is OK first
       if (!response.ok) {
-        throw new Error(responseData.error || `HTTP error! status: ${response.status}`);
+        let errorBody = null;
+        try {
+          errorBody = await response.json();
+        } catch (jsonParseError) {
+          // If response is not JSON, just use status text
+          throw new Error(`HTTP error! Status: ${response.status}, StatusText: ${response.statusText}`);
+        }
+        throw new Error(errorBody.error || `HTTP error! Status: ${response.status}, StatusText: ${response.statusText}`);
       }
+
+      const responseData = await response.json();
 
       return { data: responseData.models as GeminiModel[], error: null };
     } catch (err: any) {
