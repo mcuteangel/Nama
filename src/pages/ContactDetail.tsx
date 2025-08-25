@@ -43,7 +43,7 @@ interface GroupData {
 
 interface ContactGroup {
   group_id: string;
-  groups: GroupData[] | null; // Corrected: groups should be an array of GroupData
+  groups: GroupData | null; // Corrected: groups should be a single GroupData object, not an array of GroupData
 }
 
 interface CustomField {
@@ -169,7 +169,16 @@ const ContactDetail = () => {
             if (error) throw error;
 
             if (data) {
-              return { data: data as unknown as ContactDetailType, error: null }; // Added 'as unknown'
+              // Supabase returns `groups` as an array of objects, even if it's a single relationship.
+              // We need to extract the first element if it exists.
+              const formattedData = {
+                ...data,
+                contact_groups: data.contact_groups.map(cg => ({
+                  ...cg,
+                  groups: Array.isArray(cg.groups) && cg.groups.length > 0 ? cg.groups[0] : null
+                }))
+              };
+              return { data: formattedData as ContactDetailType, error: null };
             }
             return { data: null, error: "مخاطب یافت نشد." };
           }
@@ -185,8 +194,8 @@ const ContactDetail = () => {
     fetchDetails();
   }, [id, navigate, executeFetchContact]);
 
-  // Access the group from the first contact_group entry, and then the first group within that array
-  const assignedGroup = contact?.contact_groups?.[0]?.groups?.[0] || null;
+  // Access the group from the first contact_group entry, and then the single group object
+  const assignedGroup = contact?.contact_groups?.[0]?.groups || null;
 
   if (loading) {
     return (
@@ -268,15 +277,18 @@ const ContactDetail = () => {
                 <Input value={contact.country} readOnly className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
               </div>
             )}
-            {/* Display Group Information */}
-            <div>
-              <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><Users size={16} /> گروه</Label>
-              {assignedGroup ? (
+            {assignedGroup && (
+              <div>
+                <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><Users size={16} /> گروه</Label>
                 <Input value={assignedGroup.name} readOnly className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" style={{ backgroundColor: assignedGroup.color || 'transparent' }} />
-              ) : (
+              </div>
+            )}
+            {!assignedGroup && (
+              <div>
+                <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><Users size={16} /> گروه</Label>
                 <Input value="بدون گروه" readOnly className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
-              )}
-            </div>
+              </div>
+            )}
             {contact.birthday && (
               <div>
                 <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><Gift size={16} /> تاریخ تولد</Label>
@@ -362,6 +374,12 @@ const ContactDetail = () => {
           </div>
 
           <div className="flex justify-end gap-2 mt-6">
+            <Button
+              onClick={() => navigate(`/contacts/edit/${id}`)}
+              className="px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-md transition-all duration-300 transform hover:scale-105"
+            >
+              ویرایش مخاطب
+            </Button>
             <CancelButton />
           </div>
         </CardContent>
