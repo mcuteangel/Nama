@@ -10,8 +10,9 @@ import Groups from './pages/Groups';
 import CustomFields from './pages/CustomFields';
 import UserProfile from './pages/UserProfile';
 import Settings from './pages/Settings';
-import Statistics from './pages/Statistics'; // Import Statistics page
-import UserManagement from './pages/UserManagement'; // Import UserManagement page
+import Statistics from './pages/Statistics';
+import UserManagement from './pages/UserManagement';
+import AISuggestions from './pages/AISuggestions'; // Import AISuggestions page
 import { SessionContextProvider } from './integrations/supabase/auth';
 import { supabase } from './integrations/supabase/client';
 import MobileHeader from './components/MobileHeader';
@@ -24,13 +25,13 @@ import ProtectedRoute from './components/ProtectedRoute';
 import { TooltipProvider } from './components/ui/tooltip';
 import { ThemeProvider } from 'next-themes';
 import { useTranslation } from 'react-i18next';
-import { useSession } from './integrations/supabase/auth'; // Import useSession to check user role
+import { useSession } from './integrations/supabase/auth';
 
 function AppLayout() {
   const location = useLocation();
   const mobileBreakpoint = 768; // Tailwind's 'md' breakpoint
-  const { i18n } = useTranslation(); // Get i18n instance
-  const { session } = useSession(); // Get session to check user role
+  const { i18n } = useTranslation();
+  const { session } = useSession();
 
   const [isMobile, setIsMobile] = useState(() => window.innerWidth < mobileBreakpoint);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -44,24 +45,20 @@ function AppLayout() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Set document direction based on language
   useEffect(() => {
     document.documentElement.dir = i18n.dir();
   }, [i18n.dir()]);
 
-  // Debugging: Log the user's role
   useEffect(() => {
     console.log("Current user role from session:", session?.user?.user_metadata?.role);
   }, [session]);
 
   const isAuthPage = location.pathname === '/login';
 
-  // Calculate padding for main content based on sidebar state
   const mainContentPaddingRight = !isAuthPage && !isMobile
-    ? (isSidebarOpen ? "pr-64" : "pr-20") // 256px for w-64, 80px for w-20
+    ? (isSidebarOpen ? "pr-64" : "pr-20")
     : "";
 
-  // Check if the current user is an admin
   const isAdmin = session?.user?.user_metadata?.role === 'admin';
 
   return (
@@ -74,7 +71,7 @@ function AppLayout() {
       )}
       <div className={cn(
         "flex-grow",
-        !isAuthPage && (isMobile ? "pt-[64px] pb-16" : mainContentPaddingRight) // Apply dynamic padding
+        !isAuthPage && (isMobile ? "pt-[64px] pb-16" : mainContentPaddingRight)
       )}>
         <main className="h-full w-full flex flex-col items-center justify-center p-4">
           <Routes>
@@ -90,7 +87,8 @@ function AppLayout() {
             <Route path="/profile" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
             <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
             <Route path="/statistics" element={<ProtectedRoute><Statistics /></ProtectedRoute>} />
-            {isAdmin && ( // Only render UserManagement route if user is admin
+            <Route path="/ai-suggestions" element={<ProtectedRoute><AISuggestions /></ProtectedRoute>} /> {/* New AI Suggestions route */}
+            {isAdmin && (
               <Route path="/user-management" element={<ProtectedRoute><UserManagement /></ProtectedRoute>} />
             )}
             <Route path="*" element={<NotFound />} />

@@ -1,7 +1,7 @@
 import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { LogOut, PlusCircle, Users, Home, User, BarChart2, ClipboardList, ShieldCheck } from "lucide-react"; // Import ShieldCheck
+import { LogOut, PlusCircle, Users, Home, User, BarChart2, ClipboardList, ShieldCheck, Sparkles, Settings } from "lucide-react"; // Import Sparkles and Settings
 import { supabase } from "@/integrations/supabase/client";
 import { showError, showSuccess, showLoading, dismissToast } from "@/utils/toast";
 import { cn } from "@/lib/utils";
@@ -20,10 +20,8 @@ const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({ isAdmin }) =>
     { name: t('common.home'), icon: Home, path: "/" },
     { name: t('common.add_contact'), icon: PlusCircle, path: "/add-contact" },
     { name: t('common.groups'), icon: Users, path: "/groups" },
-    { name: t('common.custom_fields'), icon: ClipboardList, path: "/custom-fields" },
-    { name: t('common.profile'), icon: User, path: "/profile" },
-    { name: t('common.statistics'), icon: BarChart2, path: "/statistics" },
-    { name: t('common.settings'), icon: ClipboardList, path: "/settings" },
+    { name: t('ai_suggestions.title'), icon: Sparkles, path: "/ai-suggestions" }, // New AI Suggestions link
+    { name: t('common.settings'), icon: Settings, path: "/settings" }, // Moved settings here for mobile
   ];
 
   // Add User Management only if isAdmin is true
