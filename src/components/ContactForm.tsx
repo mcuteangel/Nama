@@ -31,7 +31,7 @@ import { ErrorManager } from "@/lib/error-manager.ts"; // Import ErrorManager fo
 import LoadingMessage from "./LoadingMessage.tsx"; // Import LoadingMessage
 
 interface ContactFormProps {
-  initialData?: ContactFormValues; // Changed type here
+  initialData?: ContactFormValues;
   contactId?: string;
 }
 
@@ -84,6 +84,13 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
     },
     context: { availableTemplates },
   });
+
+  // Add this useEffect to reset the form when initialData changes
+  useEffect(() => {
+    if (initialData) {
+      form.reset(initialData);
+    }
+  }, [initialData, form]);
 
   const { onSubmit, isSubmitting, error, errorMessage, retrySave, retryCount } = useContactFormLogic(contactId, navigate, session, form, availableTemplates);
 
