@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Loader2, User, CheckCircle, XCircle, LightbulbOff } from "lucide-react"; // Added LightbulbOff icon
+import { Sparkles, Loader2, User, CheckCircle, XCircle, LightbulbOff, Brain } from "lucide-react"; // Added Brain icon
 import { useTranslation } from "react-i18next";
 import { useSession } from "@/integrations/supabase/auth";
 import { useErrorHandler } from "@/hooks/use-error-handler";
@@ -9,7 +9,7 @@ import { ErrorManager } from "@/lib/error-manager";
 import LoadingMessage from "./LoadingMessage";
 import { supabase } from '@/integrations/supabase/client';
 import { invalidateCache } from '@/utils/cache-helpers';
-import { suggestGenderFromName, updateLearnedGenderPreference, clearLearnedGenderPreferences } from '@/utils/gender-learning'; // Import new utility functions
+import { suggestGenderFromName, updateLearnedGenderPreference, clearLearnedGenderPreferences, getLearnedGenderPreferences } from '@/utils/gender-learning'; // Import new utility functions
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import CancelButton from './CancelButton';
 
@@ -34,6 +34,12 @@ const GenderSuggestionManagement: React.FC = () => {
   const [ungenderedContacts, setUngenderedContacts] = useState<ContactForGenderSuggestion[]>([]);
   const [genderSuggestions, setGenderSuggestions] = useState<GenderSuggestionDisplay[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [learnedNamesCount, setLearnedNamesCount] = useState(0); // New state for learned names count
+
+  const updateLearnedNamesCount = useCallback(() => {
+    const preferences = getLearnedGenderPreferences();
+    setLearnedNamesCount(Object.keys(preferences).length);
+  }, []);
 
   const onSuccessFetchContacts = useCallback((result: { data: ContactForGenderSuggestion[] | null; error: string | null; fromCache: boolean }) => {
     if (result.data) {
@@ -76,7 +82,8 @@ const GenderSuggestionManagement: React.FC = () => {
 
   useEffect(() => {
     fetchUngenderedContacts();
-  }, [fetchUngenderedContacts]);
+    updateLearnedNamesCount(); // Update count on mount
+  }, [fetchUngenderedContacts, updateLearnedNamesCount]);
 
   const handleGenerateSuggestions = useCallback(async () => {
     if (!session?.user) {
@@ -94,7 +101,7 @@ const GenderSuggestionManagement: React.FC = () => {
     try {
       const newSuggestions: GenderSuggestionDisplay[] = ungenderedContacts
         .map(contact => {
-          const suggestedGender = suggestGenderFromName(contact.first_name); // Use the updated utility function
+          const suggestedGender = suggestGenderFromName(contact.first_name); // Use the centralized utility function
           return {
             contactId: contact.id,
             contactName: `${contact.first_name} ${contact.last_name}`,
@@ -140,6 +147,7 @@ const GenderSuggestionManagement: React.FC = () => {
         ungenderedContacts.find(c => c.id === suggestion.contactId)?.first_name || '',
         suggestion.suggestedGender
       );
+      updateLearnedNamesCount(); // Update count after learning
 
       ErrorManager.notifyUser(t('ai_suggestions.gender_suggestion_applied_success'), 'success');
       // Remove the applied suggestion from the list
@@ -153,7 +161,7 @@ const GenderSuggestionManagement: React.FC = () => {
     } finally {
       // dismissToast(toastId); // Assuming notifyUser returns a toastId if needed
     }
-  }, [session, t, fetchUngenderedContacts, ungenderedContacts]);
+  }, [session, t, fetchUngenderedContacts, ungenderedContacts, updateLearnedNamesCount]);
 
   const handleDiscardSuggestion = useCallback((contactId: string) => {
     setGenderSuggestions(prev => prev.filter(s => s.contactId !== contactId));
@@ -163,9 +171,10 @@ const GenderSuggestionManagement: React.FC = () => {
   const handleClearLearnedPreferences = useCallback(() => {
     clearLearnedGenderPreferences();
     ErrorManager.notifyUser(t('ai_suggestions.learned_preferences_cleared'), 'success');
+    updateLearnedNamesCount(); // Update count after clearing
     // Re-generate suggestions to reflect cleared learning
     handleGenerateSuggestions();
-  }, [t, handleGenerateSuggestions]);
+  }, [t, handleGenerateSuggestions, updateLearnedNamesCount]);
 
   if (isSessionLoading || isLoadingContacts) {
     return <LoadingMessage message={t('ai_suggestions.loading_gender_management_data')} />;
@@ -183,6 +192,16 @@ const GenderSuggestionManagement: React.FC = () => {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          <div className="flex items-center justify-between p-3 glass rounded-lg shadow-sm">
+            <div className="flex items-center gap-2">
+              <Brain size={20} className="text-indigo-500" />
+              <p className="font-medium text-gray-800 dark:text-gray-100">{t('ai_suggestions.learned_names_count')}</p>
+            </div>
+            <span className="px-3 py-1 text-sm font-semibold rounded-full bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200">
+              {learnedNamesCount} {t('common.names')}
+            </span>
+          </div>
+
           <Button
             onClick={handleGenerateSuggestions}
             disabled={isGenerating || ungenderedContacts.length === 0}
@@ -200,7 +219,7 @@ const GenderSuggestionManagement: React.FC = () => {
             <AlertDialogTrigger asChild>
               <Button
                 variant="outline"
-                disabled={isGenerating}
+                disabled={isGenerating || learnedNamesCount === 0}
                 className="w-full flex items-center gap-2 px-6 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold shadow-sm transition-all duration-300 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-200 dark:border-gray-600"
               >
                 <LightbulbOff size={16} />

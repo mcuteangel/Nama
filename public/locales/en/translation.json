@@ -40,7 +40,8 @@
     "position": "Position",
     "notes": "Notes",
     "extension": "Extension",
-    "auth_required": "You must be logged in to perform this operation."
+    "auth_required": "You must be logged in to perform this operation.",
+    "names": "names"
   },
   "login": {
     "title": "Login to Nama Contacts",
@@ -195,7 +196,8 @@
     "error_fetching_ungendered_contacts": "Error fetching contacts with unspecified gender.",
     "clear_learned_preferences": "Clear Learned Preferences",
     "confirm_clear_learning_title": "Are you sure you want to clear learned preferences?",
-    "confirm_clear_learning_description": "This action will remove all learned gender suggestion data from your browser's local storage. This might reduce the accuracy of future suggestions."
+    "confirm_clear_learning_description": "This action will remove all learned gender suggestion data from your browser's local storage. This might reduce the accuracy of future suggestions.",
+    "learned_names_count": "Number of learned names"
   },
   "gender": {
     "male": "Male",
