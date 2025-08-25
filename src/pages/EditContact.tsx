@@ -11,6 +11,10 @@ import LoadingMessage from "@/components/LoadingMessage"; // Import LoadingMessa
 import CancelButton from "@/components/CancelButton"; // Import CancelButton
 import { ErrorManager } from "@/lib/error-manager"; // Import ErrorManager
 import { useErrorHandler } from "@/hooks/use-error-handler"; // Import useErrorHandler
+import { ExtractedContactInfo } from "@/hooks/use-contact-extractor";
+import { AISuggestionsService } from "@/services/ai-suggestions-service";
+import { useSession } from "@/integrations/supabase/auth";
+import { ContactFormValues } from "@/types/contact"; // Import ContactFormValues
 
 interface PhoneNumber {
   id: string;
@@ -63,7 +67,6 @@ interface ContactDetailType {
   email_addresses: EmailAddress[];
   social_links: SocialLink[];
   contact_groups: ContactGroup[]; // Ensure this is included
-  groupId?: string | null; // Add groupId for easier form initialization
   birthday?: string | null;
   avatar_url?: string | null;
   preferred_contact_method?: 'email' | 'phone' | 'sms' | 'any' | null;
@@ -72,27 +75,105 @@ interface ContactDetailType {
   updated_at: string;
 }
 
+// Helper function to map ContactDetailType (DB format) to ContactFormValues (form format)
+const mapContactDetailToFormValues = (contact: ContactDetailType): ContactFormValues => {
+  return {
+    firstName: contact.first_name,
+    lastName: contact.last_name,
+    gender: contact.gender,
+    position: contact.position || undefined,
+    company: contact.company || undefined,
+    street: contact.street ?? null,
+    city: contact.city ?? null,
+    state: contact.state ?? null,
+    zipCode: contact.zip_code ?? null,
+    country: contact.country ?? null,
+    notes: contact.notes ?? null,
+    groupId: contact.contact_groups?.[0]?.group_id || null,
+    birthday: contact.birthday ?? null,
+    avatarUrl: contact.avatar_url ?? null,
+    preferredContactMethod: contact.preferred_contact_method ?? null,
+    phoneNumbers: contact.phone_numbers.map(p => ({
+      id: p.id,
+      phone_type: p.phone_type,
+      phone_number: p.phone_number,
+      extension: p.extension,
+    })),
+    emailAddresses: contact.email_addresses.map(e => ({
+      id: e.id,
+      email_type: e.email_type,
+      email_address: e.email_address,
+    })),
+    socialLinks: contact.social_links.map(s => ({
+      id: s.id,
+      type: s.type,
+      url: s.url,
+    })),
+    customFields: contact.custom_fields.map(cf => ({
+      template_id: cf.template_id,
+      value: cf.field_value,
+    })),
+  };
+};
+
 const EditContact = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [initialContactData, setInitialContactData] = useState<ContactDetailType | null>(null);
+  const { session } = useSession();
+  const [initialContactData, setInitialContactData] = useState<ContactFormValues | undefined>(undefined); // Changed type here
+
+  const { executeAsync: executeUpdateSuggestionStatus } = useErrorHandler(null, {
+    showToast: false,
+    onError: (err) => ErrorManager.logError(err, { component: 'EditContact', action: 'updateSuggestionStatus' }),
+  });
 
   const onSuccessFetchContact = useCallback((result: { data: ContactDetailType | null; error: string | null; fromCache: boolean }) => {
     if (result.data) {
-      // Extract groupId from contact_groups for form initialization
-      const formattedData: ContactDetailType = {
-        ...result.data,
-        groupId: result.data.contact_groups?.[0]?.group_id || null,
-      };
-      setInitialContactData(formattedData);
+      const mappedData = mapContactDetailToFormValues(result.data); // Map DB data to form values
+      setInitialContactData(mappedData);
       if (!result.fromCache) {
         showSuccess("اطلاعات مخاطب با موفقیت بارگذاری شد.");
       }
+
+      // Check for AI prefill data
+      const storedData = localStorage.getItem('ai_prefill_contact_data');
+      const suggestionId = localStorage.getItem('ai_suggestion_id_to_update');
+
+      if (storedData) {
+        const extracted: ExtractedContactInfo = JSON.parse(storedData);
+        // Merge extracted data (which is ContactFormValues) with mappedData (also ContactFormValues)
+        const mergedData: ContactFormValues = {
+          ...mappedData, // Start with existing contact's form values
+          firstName: extracted.firstName || mappedData.firstName,
+          lastName: extracted.lastName || mappedData.lastName,
+          company: extracted.company || mappedData.company,
+          position: extracted.position || mappedData.position,
+          notes: extracted.notes || mappedData.notes,
+          phoneNumbers: [...(mappedData.phoneNumbers || []), ...extracted.phoneNumbers.filter(p => !(mappedData.phoneNumbers || []).some(ep => ep.phone_number === p.phone_number))],
+          emailAddresses: [...(mappedData.emailAddresses || []), ...extracted.emailAddresses.filter(e => !(mappedData.emailAddresses || []).some(ee => ee.email_address === e.email_address))],
+          socialLinks: [...(mappedData.socialLinks || []), ...extracted.socialLinks.filter(s => !(mappedData.socialLinks || []).some(es => es.url === s.url))],
+          // Other fields can be merged similarly or overwritten if preferred
+        };
+        setInitialContactData(mergedData); // Update with merged data
+
+        // Clear local storage items after use
+        localStorage.removeItem('ai_prefill_contact_data');
+        localStorage.removeItem('ai_suggestion_id_to_update');
+
+        // Update the suggestion status to 'edited' if it came from AI suggestions
+        if (suggestionId && session?.user) {
+          executeUpdateSuggestionStatus(async () => {
+            const { success, error } = await AISuggestionsService.updateSuggestionStatus(suggestionId, 'edited');
+            if (!success) throw new Error(error || 'Failed to update AI suggestion status to edited.');
+          });
+        }
+      }
+
     } else {
       showError("مخاطب برای ویرایش یافت نشد.");
       navigate("/");
     }
-  }, [navigate]);
+  }, [navigate, session, executeUpdateSuggestionStatus]);
 
   const onErrorFetchContact = useCallback((err: Error) => {
     console.error("Error fetching contact details for edit:", err);

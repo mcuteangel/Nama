@@ -5,27 +5,17 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Loader2, PlusCircle, UserCheck } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { useContactExtractor } from "@/hooks/use-contact-extractor";
+import { useContactExtractor, ExtractedContactInfo } from "@/hooks/use-contact-extractor";
 import { ErrorManager } from "@/lib/error-manager";
 import LoadingMessage from "@/components/LoadingMessage";
-import AISuggestionCard from "@/components/AISuggestionCard";
+import AISuggestionCard, { AISuggestion as AISuggestionCardProps } from "@/components/AISuggestionCard"; // Renamed import
 import { ContactFormValues, PhoneNumberFormData, EmailAddressFormData, SocialLinkFormData } from "@/types/contact";
 import { ContactService } from "@/services/contact-service";
 import { useSession } from "@/integrations/supabase/auth";
 import { useErrorHandler } from "@/hooks/use-error-handler";
-import { invalidateCache } from "@/utils/cache-helpers";
+import { invalidateCache, fetchWithCache } from "@/utils/cache-helpers";
 import { useNavigate } from "react-router-dom";
-
-interface ExtractedContactInfo {
-  firstName: string;
-  lastName: string;
-  company: string;
-  position: string;
-  phoneNumbers: PhoneNumberFormData[];
-  emailAddresses: EmailAddressFormData[];
-  socialLinks: SocialLinkFormData[];
-  notes: string;
-}
+import { AISuggestionsService, AISuggestion as AISuggestionServiceType } from "@/services/ai-suggestions-service"; // Import new service
 
 interface ExistingContactSummary {
   id: string;
@@ -35,10 +25,8 @@ interface ExistingContactSummary {
   phone_numbers: { phone_number: string }[];
 }
 
-interface AISuggestion {
-  type: 'new' | 'update';
-  extractedData: ExtractedContactInfo;
-  existingContact?: ExistingContactSummary;
+interface AISuggestionDisplay extends AISuggestionCardProps {
+  id: string; // The ID of the suggestion in the ai_suggestions table
 }
 
 const AISuggestions: React.FC = () => {
@@ -47,10 +35,22 @@ const AISuggestions: React.FC = () => {
   const navigate = useNavigate();
 
   const [rawTextInput, setRawTextInput] = useState('');
-  const [suggestions, setSuggestions] = useState<AISuggestion[]>([]);
+  const [pendingSuggestions, setPendingSuggestions] = useState<AISuggestionDisplay[]>([]);
   const [isProcessingSuggestions, setIsProcessingSuggestions] = useState(false);
 
-  const { extractContactInfo, isLoading: isExtractorLoading, error: extractorError } = useContactExtractor();
+  const { enqueueContactExtraction, isLoading: isExtractorLoading, error: extractorError } = useContactExtractor();
+
+  const onSuccessProcessContact = useCallback(() => {
+    ErrorManager.notifyUser(t('ai_suggestions.contact_processed_success'), 'success');
+    invalidateCache(`contacts_list_${session?.user?.id}_`);
+    invalidateCache(`statistics_dashboard_${session?.user?.id}`);
+    setRawTextInput(''); // Clear input text
+    fetchPendingSuggestions(); // Refresh the list of suggestions
+  }, [session, t]);
+
+  const onErrorProcessContact = useCallback((err: Error) => {
+    ErrorManager.logError(err, { component: 'AISuggestions', action: 'saveOrUpdateContact' });
+  }, []);
 
   const {
     isLoading: isSavingOrUpdating,
@@ -58,76 +58,131 @@ const AISuggestions: React.FC = () => {
   } = useErrorHandler(null, {
     showToast: true,
     customErrorMessage: t('ai_suggestions.error_processing_contact'),
-    onSuccess: () => {
-      ErrorManager.notifyUser(t('ai_suggestions.contact_processed_success'), 'success');
-      invalidateCache(`contacts_list_${session?.user?.id}_`);
-      invalidateCache(`statistics_dashboard_${session?.user?.id}`);
-      setSuggestions([]); // Clear suggestions after processing
-      setRawTextInput(''); // Clear input text
-    },
-    onError: (err) => {
-      ErrorManager.logError(err, { component: 'AISuggestions', action: 'saveOrUpdateContact' });
-    },
+    onSuccess: onSuccessProcessContact,
+    onError: onErrorProcessContact,
   });
 
-  const handleExtractAndSuggest = useCallback(async () => {
+  const onSuccessFetchSuggestions = useCallback((result: { data: AISuggestionServiceType[] | null; error: string | null; fromCache: boolean }) => {
+    if (result.data) {
+      const formattedSuggestions: AISuggestionDisplay[] = result.data.map(s => ({
+        id: s.id,
+        type: 'new', // Default to new, will check for existing later
+        extractedData: s.extracted_data,
+      }));
+      setPendingSuggestions(formattedSuggestions);
+    }
+  }, []);
+
+  const onErrorFetchSuggestions = useCallback((err: Error) => {
+    ErrorManager.logError(err, { component: 'AISuggestions', action: 'fetchPendingSuggestions' });
+    ErrorManager.notifyUser(t('ai_suggestions.error_fetching_suggestions'), 'error');
+  }, [t]);
+
+  const {
+    isLoading: isLoadingSuggestions,
+    executeAsync: executeFetchSuggestions,
+  } = useErrorHandler(null, {
+    showToast: false,
+    onSuccess: onSuccessFetchSuggestions,
+    onError: onErrorFetchSuggestions,
+  });
+
+  const fetchPendingSuggestions = useCallback(async () => {
+    if (isSessionLoading || !session?.user) {
+      setPendingSuggestions([]);
+      return;
+    }
+
+    const userId = session.user.id;
+    const cacheKey = `ai_pending_suggestions_${userId}`;
+
+    await executeFetchSuggestions(async () => {
+      const { data, error, fromCache } = await fetchWithCache<AISuggestionServiceType[]>(
+        cacheKey,
+        async () => {
+          const res = await AISuggestionsService.getPendingSuggestions(userId);
+          if (res.error) {
+            throw new Error(res.error);
+          }
+          return { data: res.data, error: null };
+        }
+      );
+
+      if (error) {
+        throw new Error(error);
+      }
+
+      // Now, for each fetched suggestion, check if it's an update or new
+      const formattedSuggestions: AISuggestionDisplay[] = [];
+      if (data) {
+        const { data: allContacts, error: fetchContactsError } = await ContactService.getFilteredContacts(
+          userId, "", "", "", "first_name_asc" // Fetch all contacts for comparison
+        );
+
+        if (fetchContactsError) {
+          ErrorManager.notifyUser(`${t('ai_suggestions.error_fetching_existing_contacts')}: ${fetchContactsError}`, 'error');
+          throw new Error(fetchContactsError);
+        }
+
+        for (const s of data) {
+          const extracted = s.extracted_data;
+          const existingContact = allContacts?.find(contact =>
+            (contact.first_name === extracted.firstName && contact.last_name === extracted.lastName) ||
+            extracted.emailAddresses.some(e => contact.email_addresses.some((ce: any) => ce.email_address === e.email_address)) ||
+            extracted.phoneNumbers.some(p => contact.phone_numbers.some((cp: any) => cp.phone_number === p.phone_number))
+          );
+
+          if (existingContact) {
+            formattedSuggestions.push({
+              id: s.id,
+              type: 'update',
+              extractedData: extracted,
+              existingContact: {
+                id: existingContact.id,
+                first_name: existingContact.first_name,
+                last_name: existingContact.last_name,
+                email_addresses: existingContact.email_addresses,
+                phone_numbers: existingContact.phone_numbers,
+              },
+            });
+          } else {
+            formattedSuggestions.push({
+              id: s.id,
+              type: 'new',
+              extractedData: extracted,
+            });
+          }
+        }
+      }
+      setPendingSuggestions(formattedSuggestions);
+      return { data, error: null, fromCache };
+    });
+  }, [session, isSessionLoading, executeFetchSuggestions, t]);
+
+  useEffect(() => {
+    fetchPendingSuggestions();
+  }, [fetchPendingSuggestions]);
+
+  const handleExtractAndEnqueue = useCallback(async () => {
     if (!rawTextInput.trim()) {
       ErrorManager.notifyUser(t('ai_suggestions.empty_text_for_extraction'), 'warning');
       return;
     }
 
     setIsProcessingSuggestions(true);
-    setSuggestions([]); // Clear previous suggestions
+    const { success, error, suggestionId } = await enqueueContactExtraction(rawTextInput);
 
-    const extracted = await extractContactInfo(rawTextInput);
-
-    if (extracted) {
-      if (!session?.user?.id) {
-        ErrorManager.notifyUser(t('common.auth_required'), 'error');
-        setIsProcessingSuggestions(false);
-        return;
-      }
-
-      // Fetch all contacts for comparison
-      const { data: allContacts, error: fetchContactsError } = await ContactService.getFilteredContacts(
-        session.user.id, "", "", "", "first_name_asc" // Fetch all contacts
-      );
-
-      if (fetchContactsError) {
-        ErrorManager.notifyUser(`${t('ai_suggestions.error_fetching_existing_contacts')}: ${fetchContactsError}`, 'error');
-        setIsProcessingSuggestions(false);
-        return;
-      }
-
-      const existingContact = allContacts?.find(contact =>
-        (contact.first_name === extracted.firstName && contact.last_name === extracted.lastName) ||
-        extracted.emailAddresses.some(e => contact.email_addresses.some((ce: any) => ce.email_address === e.email_address)) ||
-        extracted.phoneNumbers.some(p => contact.phone_numbers.some((cp: any) => cp.phone_number === p.phone_number))
-      );
-
-      if (existingContact) {
-        setSuggestions([{
-          type: 'update',
-          extractedData: extracted,
-          existingContact: {
-            id: existingContact.id,
-            first_name: existingContact.first_name,
-            last_name: existingContact.last_name,
-            email_addresses: existingContact.email_addresses,
-            phone_numbers: existingContact.phone_numbers,
-          },
-        }]);
-      } else {
-        setSuggestions([{
-          type: 'new',
-          extractedData: extracted,
-        }]);
-      }
+    if (success) {
+      // Invalidate cache for pending suggestions to force a refetch
+      invalidateCache(`ai_pending_suggestions_${session?.user?.id}`);
+      fetchPendingSuggestions(); // Refresh the list immediately
+    } else {
+      ErrorManager.notifyUser(error || t('ai_suggestions.error_enqueuing_text'), 'error');
     }
     setIsProcessingSuggestions(false);
-  }, [rawTextInput, extractContactInfo, session, t]);
+  }, [rawTextInput, enqueueContactExtraction, session, t, fetchPendingSuggestions]);
 
-  const handleProcessSuggestion = useCallback(async (suggestion: AISuggestion) => {
+  const handleProcessSuggestion = useCallback(async (suggestion: AISuggestionDisplay) => {
     const contactValues: ContactFormValues = {
       firstName: suggestion.extractedData.firstName,
       lastName: suggestion.extractedData.lastName,
@@ -141,7 +196,7 @@ const AISuggestions: React.FC = () => {
       groupId: null, // Default value
       birthday: null, // Default value
       avatarUrl: null, // Default value
-      preferredContactMethod: null, // Default value
+      preferredContactMethod: null, // Default address fields
       street: null, city: null, state: null, zipCode: null, country: null, // Default address fields
       customFields: [], // Default empty
     };
@@ -154,8 +209,31 @@ const AISuggestions: React.FC = () => {
         const { error } = await ContactService.updateContact(suggestion.existingContact.id, contactValues);
         if (error) throw new Error(error);
       }
+      // Update suggestion status in DB
+      const { success, error: updateError } = await AISuggestionsService.updateSuggestionStatus(suggestion.id, 'accepted');
+      if (!success) throw new Error(updateError || 'Failed to update suggestion status.');
     });
   }, [executeSaveOrUpdate]);
+
+  const handleDiscardSuggestion = useCallback(async (suggestionId: string) => {
+    await executeSaveOrUpdate(async () => {
+      const { success, error } = await AISuggestionsService.updateSuggestionStatus(suggestionId, 'discarded');
+      if (!success) throw new Error(error || 'Failed to discard suggestion.');
+    });
+  }, [executeSaveOrUpdate]);
+
+  const handleEditSuggestion = useCallback((suggestion: AISuggestionDisplay) => {
+    // Store the extracted data in local storage or a state management solution
+    // Then navigate to the AddContact or EditContact page with pre-filled data
+    localStorage.setItem('ai_prefill_contact_data', JSON.stringify(suggestion.extractedData));
+    localStorage.setItem('ai_suggestion_id_to_update', suggestion.id); // Store suggestion ID to update its status later
+
+    if (suggestion.type === 'update' && suggestion.existingContact) {
+      navigate(`/contacts/edit/${suggestion.existingContact.id}`);
+    } else {
+      navigate('/add-contact');
+    }
+  }, [navigate]);
 
   if (isSessionLoading) {
     return <LoadingMessage message={t('common.loading')} />;
@@ -195,7 +273,7 @@ const AISuggestions: React.FC = () => {
             />
             <Button
               type="button"
-              onClick={handleExtractAndSuggest}
+              onClick={handleExtractAndEnqueue}
               disabled={!rawTextInput.trim() || isExtractorLoading || isProcessingSuggestions || isSavingOrUpdating}
               className="w-full flex items-center gap-2 px-6 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-semibold shadow-md transition-all duration-300 transform hover:scale-105"
             >
@@ -208,27 +286,29 @@ const AISuggestions: React.FC = () => {
             </Button>
           </div>
 
-          {suggestions.length > 0 && (
+          {(isLoadingSuggestions || isSavingOrUpdating) && (
+            <LoadingMessage message={t('ai_suggestions.loading_suggestions')} />
+          )}
+
+          {pendingSuggestions.length > 0 && (
             <div className="space-y-4 pt-4 border-t border-gray-200 dark:border-gray-700">
               <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 flex items-center gap-2">
                 <UserCheck size={20} className="text-green-500" /> {t('ai_suggestions.suggestions_section_title')}
               </h3>
-              {suggestions.map((suggestion, index) => (
+              {pendingSuggestions.map((suggestion) => (
                 <AISuggestionCard
-                  key={index}
+                  key={suggestion.id}
                   suggestion={suggestion}
                   onProcess={handleProcessSuggestion}
+                  onDiscard={handleDiscardSuggestion}
+                  onEdit={handleEditSuggestion}
                   isProcessing={isSavingOrUpdating}
                 />
               ))}
             </div>
           )}
 
-          {(isExtractorLoading || isProcessingSuggestions || isSavingOrUpdating) && (
-            <LoadingMessage message={t('ai_suggestions.loading_suggestions')} />
-          )}
-
-          {suggestions.length === 0 && !isExtractorLoading && !isProcessingSuggestions && !isSavingOrUpdating && rawTextInput.trim() && (
+          {pendingSuggestions.length === 0 && !isLoadingSuggestions && !isProcessingSuggestions && !isSavingOrUpdating && (
             <p className="text-center text-gray-500 dark:text-gray-400">{t('ai_suggestions.no_suggestions_found')}</p>
           )}
         </CardContent>

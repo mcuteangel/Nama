@@ -31,37 +31,7 @@ import { ErrorManager } from "@/lib/error-manager.ts"; // Import ErrorManager fo
 import LoadingMessage from "./LoadingMessage.tsx"; // Import LoadingMessage
 
 interface ContactFormProps {
-  initialData?: {
-    id: string;
-    first_name: string;
-    last_name: string;
-    gender: "male" | "female" | "not_specified";
-    position?: string;
-    company?: string;
-    street?: string | null;
-    city?: string | null;
-    state?: string | null;
-    zip_code?: string | null;
-    country?: string | null;
-    notes?: string | null;
-    phone_numbers?: { id?: string; phone_type: string; phone_number: string; extension?: string | null }[];
-    email_addresses?: { id?: string; email_type: string; email_address: string }[];
-    social_links?: { id?: string; type: string; url: string }[];
-    groupId?: string | null;
-    birthday?: string | null;
-    avatar_url?: string | null;
-    preferred_contact_method?: 'email' | 'phone' | 'sms' | 'any' | null;
-    custom_fields?: {
-      id: string;
-      template_id: string;
-      field_value: string;
-      custom_field_templates: Array<{
-        name: string;
-        type: string;
-        options?: string[];
-      }>;
-    }[];
-  };
+  initialData?: ContactFormValues; // Changed type here
   contactId?: string;
 }
 
@@ -92,28 +62,25 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
   const form = useForm<ContactFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      firstName: initialData?.first_name || "",
-      lastName: initialData?.last_name || "",
+      firstName: initialData?.firstName || "",
+      lastName: initialData?.lastName || "",
       gender: initialData?.gender || "not_specified",
       position: initialData?.position || "",
       company: initialData?.company || "",
       street: initialData?.street ?? null,
       city: initialData?.city ?? null,
       state: initialData?.state ?? null,
-      zipCode: initialData?.zip_code ?? null,
+      zipCode: initialData?.zipCode ?? null,
       country: initialData?.country ?? null,
       notes: initialData?.notes ?? null,
       groupId: initialData?.groupId ?? null,
       birthday: initialData?.birthday ?? null,
-      avatarUrl: initialData?.avatar_url ?? null,
-      preferredContactMethod: initialData?.preferred_contact_method ?? null,
-      phoneNumbers: initialData?.phone_numbers || [],
-      emailAddresses: initialData?.email_addresses || [],
-      socialLinks: initialData?.social_links || [],
-      customFields: initialData?.custom_fields?.map(cf => ({
-        template_id: cf.template_id,
-        value: cf.field_value,
-      })) || [],
+      avatarUrl: initialData?.avatarUrl ?? null,
+      preferredContactMethod: initialData?.preferredContactMethod ?? null,
+      phoneNumbers: initialData?.phoneNumbers || [],
+      emailAddresses: initialData?.emailAddresses || [],
+      socialLinks: initialData?.socialLinks || [],
+      customFields: initialData?.customFields || [],
     },
     context: { availableTemplates },
   });
@@ -149,8 +116,8 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
     const newCustomFieldsFormState: { template_id: string; value: string }[] = [];
     const initialCustomFieldValuesMap = new Map<string, string>();
 
-    initialData?.custom_fields?.forEach(cf => {
-      initialCustomFieldValuesMap.set(cf.template_id, cf.field_value);
+    initialData?.customFields?.forEach(cf => {
+      initialCustomFieldValuesMap.set(cf.template_id, cf.value);
     });
 
     availableTemplates.forEach(template => {

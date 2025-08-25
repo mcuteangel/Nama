@@ -4,7 +4,8 @@ import { ErrorManager } from '@/lib/error-manager';
 import { supabase } from '@/integrations/supabase/client';
 import { useSession } from '@/integrations/supabase/auth'; // Import useSession to get the access token
 
-interface ExtractedContactInfo {
+// Define ExtractedContactInfo here as it's the core output of the AI
+export interface ExtractedContactInfo {
   firstName: string;
   lastName: string;
   company: string;
@@ -20,14 +21,14 @@ export function useContactExtractor() {
   const [error, setError] = useState<string | null>(null);
   const { session } = useSession(); // Get the current session
 
-  const extractContactInfo = useCallback(async (text: string): Promise<ExtractedContactInfo | undefined> => {
+  const enqueueContactExtraction = useCallback(async (text: string): Promise<{ success: boolean; error: string | null; suggestionId?: string }> => {
     setIsLoading(true);
     setError(null);
 
     if (!session?.access_token) {
       ErrorManager.notifyUser('برای استخراج اطلاعات باید وارد شوید.', 'error');
       setIsLoading(false);
-      return undefined;
+      return { success: false, error: 'کاربر احراز هویت نشده است.' };
     }
 
     try {
@@ -45,13 +46,11 @@ export function useContactExtractor() {
         body: JSON.stringify({ text }), // Ensure body is stringified JSON
       });
 
-      // Check if response is OK first
       if (!response.ok) {
         let errorBody = null;
         try {
           errorBody = await response.json();
         } catch (jsonParseError) {
-          // If response is not JSON, just use status text
           throw new Error(`HTTP error! Status: ${response.status}, StatusText: ${response.statusText}`);
         }
         throw new Error(errorBody.error || `HTTP error! Status: ${response.status}, StatusText: ${response.statusText}`);
@@ -59,21 +58,21 @@ export function useContactExtractor() {
 
       const responseData = await response.json();
 
-      if (responseData && responseData.extractedInfo) {
-        ErrorManager.notifyUser('اطلاعات با موفقیت استخراج شد.', 'success');
-        return responseData.extractedInfo as ExtractedContactInfo;
+      if (responseData.message) {
+        ErrorManager.notifyUser('درخواست استخراج اطلاعات با موفقیت به صف اضافه شد.', 'success');
+        return { success: true, error: null, suggestionId: responseData.ai_suggestion_id };
       } else {
         throw new Error('پاسخ نامعتبر از تابع Edge.');
       }
     } catch (err: any) {
-      console.error("Error during contact info extraction:", err);
-      setError(err.message || 'خطا در استخراج اطلاعات از متن.');
-      ErrorManager.notifyUser(err.message || 'خطا در استخراج اطلاعات از متن.', 'error');
-      return undefined;
+      console.error("Error during contact info extraction enqueue:", err);
+      setError(err.message || 'خطا در افزودن درخواست به صف استخراج اطلاعات.');
+      ErrorManager.notifyUser(err.message || 'خطا در افزودن درخواست به صف استخراج اطلاعات.', 'error');
+      return { success: false, error: err.message || 'خطا در افزودن درخواست به صف استخراج اطلاعات.' };
     } finally {
       setIsLoading(false);
     }
-  }, [session]); // Depend on session to re-run if session changes
+  }, [session]);
 
-  return { extractContactInfo, isLoading, error };
+  return { enqueueContactExtraction, isLoading, error };
 }

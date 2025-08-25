@@ -1,20 +1,12 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, UserCheck, Loader2, Phone, Mail, Building, Briefcase, Link as LinkIcon } from "lucide-react";
+import { PlusCircle, UserCheck, Loader2, Phone, Mail, Building, Briefcase, Link as LinkIcon, XCircle, Edit } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { ContactFormValues, PhoneNumberFormData, EmailAddressFormData, SocialLinkFormData } from "@/types/contact";
-
-interface ExtractedContactInfo {
-  firstName: string;
-  lastName: string;
-  company: string;
-  position: string;
-  phoneNumbers: PhoneNumberFormData[];
-  emailAddresses: EmailAddressFormData[];
-  socialLinks: SocialLinkFormData[];
-  notes: string;
-}
+import { PhoneNumberFormData, EmailAddressFormData, SocialLinkFormData } from "@/types/contact";
+import { ExtractedContactInfo } from '@/hooks/use-contact-extractor'; // Import ExtractedContactInfo
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import CancelButton from './CancelButton';
 
 interface ExistingContactSummary {
   id: string;
@@ -24,7 +16,8 @@ interface ExistingContactSummary {
   phone_numbers: { phone_number: string }[];
 }
 
-interface AISuggestion {
+export interface AISuggestion {
+  id: string; // Add ID for the suggestion itself
   type: 'new' | 'update';
   extractedData: ExtractedContactInfo;
   existingContact?: ExistingContactSummary;
@@ -33,10 +26,12 @@ interface AISuggestion {
 interface AISuggestionCardProps {
   suggestion: AISuggestion;
   onProcess: (suggestion: AISuggestion) => void;
+  onDiscard: (suggestionId: string) => void;
+  onEdit: (suggestion: AISuggestion) => void;
   isProcessing: boolean;
 }
 
-const AISuggestionCard: React.FC<AISuggestionCardProps> = ({ suggestion, onProcess, isProcessing }) => {
+const AISuggestionCard: React.FC<AISuggestionCardProps> = ({ suggestion, onProcess, onDiscard, onEdit, isProcessing }) => {
   const { t } = useTranslation();
 
   const { extractedData, existingContact, type } = suggestion;
@@ -130,14 +125,51 @@ const AISuggestionCard: React.FC<AISuggestionCardProps> = ({ suggestion, onProce
           </div>
         )}
 
-        <Button
-          onClick={() => onProcess(suggestion)}
-          disabled={isProcessing}
-          className="w-full mt-4 flex items-center gap-2 px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-md transition-all duration-300 transform hover:scale-105"
-        >
-          {isProcessing ? <Loader2 size={16} className="me-2 animate-spin" /> : null}
-          {getActionLabel()}
-        </Button>
+        <div className="flex gap-2 mt-4">
+          <Button
+            onClick={() => onProcess(suggestion)}
+            disabled={isProcessing}
+            className="flex-grow flex items-center gap-2 px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-md transition-all duration-300 transform hover:scale-105"
+          >
+            {isProcessing ? <Loader2 size={16} className="me-2 animate-spin" /> : null}
+            {getActionLabel()}
+          </Button>
+          <Button
+            onClick={() => onEdit(suggestion)}
+            disabled={isProcessing}
+            variant="outline"
+            className="flex items-center gap-2 px-6 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold shadow-sm transition-all duration-300 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-200 dark:border-gray-600"
+          >
+            <Edit size={16} />
+            {t('common.edit')}
+          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button
+                variant="destructive"
+                disabled={isProcessing}
+                className="flex items-center gap-2 px-6 py-2 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105"
+              >
+                <XCircle size={16} />
+                {t('common.discard')}
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent className="glass rounded-xl p-6">
+              <AlertDialogHeader>
+                <AlertDialogTitle className="text-gray-800 dark:text-gray-100">{t('ai_suggestions.confirm_discard_title')}</AlertDialogTitle>
+                <AlertDialogDescription className="text-gray-600 dark:text-gray-300">
+                  {t('ai_suggestions.confirm_discard_description')}
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <CancelButton text={t('common.cancel')} />
+                <AlertDialogAction onClick={() => onDiscard(suggestion.id)} className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold">
+                  {t('common.discard')}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
       </CardContent>
     </Card>
   );
