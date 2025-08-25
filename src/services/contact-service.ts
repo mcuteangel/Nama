@@ -105,23 +105,28 @@ export const ContactService = {
 
     let sortByColumn: string;
     let ascendingOrder: boolean;
+    let collation: string | undefined; // New variable for collation
 
     switch (sortOption) {
       case "first_name_asc":
         sortByColumn = "first_name";
         ascendingOrder = true;
+        collation = "fa_IR"; // Specify Persian collation
         break;
       case "first_name_desc":
         sortByColumn = "first_name";
         ascendingOrder = false;
+        collation = "fa_IR"; // Specify Persian collation
         break;
       case "last_name_asc":
         sortByColumn = "last_name";
         ascendingOrder = true;
+        collation = "fa_IR"; // Specify Persian collation
         break;
       case "last_name_desc":
         sortByColumn = "last_name";
         ascendingOrder = false;
+        collation = "fa_IR"; // Specify Persian collation
         break;
       case "created_at_desc":
         sortByColumn = "created_at";
@@ -134,10 +139,18 @@ export const ContactService = {
       default:
         sortByColumn = "first_name";
         ascendingOrder = true;
+        collation = "fa_IR"; // Default to Persian collation for name sorts
         break;
     }
 
-    const { data, error } = await query.order(sortByColumn, { ascending: ascendingOrder });
+    // Apply collation directly to the column name string if specified
+    if (collation) {
+      sortByColumn = `${sortByColumn} COLLATE "${collation}"`;
+    }
+    
+    query = query.order(sortByColumn, { ascending: ascendingOrder });
+
+    const { data, error } = await query;
 
     if (error) {
       return { data: null, error: error.message };
