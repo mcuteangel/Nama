@@ -140,7 +140,7 @@ const ContactItem = ({ contact, onContactDeleted, onContactEdited }: { contact: 
             <AlertDialogHeader>
               <AlertDialogTitle className="text-gray-800 dark:text-gray-100">آیا از حذف این مخاطب مطمئن هستید؟</AlertDialogTitle>
               <AlertDialogDescription className="text-gray-600 dark:text-gray-300">
-                این عمل قابل بازگشت نیست. این مخاطب برای همیشه حذف خواهد شد.
+                این عمل قابل بازگشت نیست. این مخاطب برای همیشه حذف خواهد شود.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
@@ -165,10 +165,12 @@ const ContactList = ({ searchTerm, selectedGroup, companyFilter, sortOption }: C
     if (result && !result.fromCache) {
       ErrorManager.notifyUser("مخاطبین با موفقیت بارگذاری شدند.", 'success');
     }
+    console.log("Fetched contacts data:", result.data); // Added log
   }, []);
 
   const onErrorFetch = useCallback((err: Error) => {
     ErrorManager.logError(err, { component: 'ContactList', action: 'fetchContacts' });
+    console.error("Error fetching contacts in ContactList:", err); // Added log
   }, []);
 
   const {
@@ -186,15 +188,18 @@ const ContactList = ({ searchTerm, selectedGroup, companyFilter, sortOption }: C
   const fetchContacts = useCallback(async () => {
     if (isSessionLoading || !session?.user) {
       setContacts([]);
+      console.log("Session not loaded or user not authenticated, clearing contacts."); // Added log
       return;
     }
 
     const cacheKey = `contacts_list_${session.user.id}_${searchTerm}_${selectedGroup}_${companyFilter}_${sortOption}`;
+    console.log("Attempting to fetch contacts with cacheKey:", cacheKey); // Added log
     
     await executeAsync(async () => {
       const { data, error, fromCache } = await fetchWithCache<Contact[]>(
         cacheKey,
         async () => {
+          console.log("Calling ContactService.getFilteredContacts..."); // Added log
           const result = await ContactService.getFilteredContacts(
             session.user.id,
             searchTerm,
@@ -202,14 +207,17 @@ const ContactList = ({ searchTerm, selectedGroup, companyFilter, sortOption }: C
             companyFilter,
             sortOption
           );
+          console.log("ContactService.getFilteredContacts result:", result); // Added log
           return { data: result.data as Contact[], error: result.error };
         }
       );
 
       if (error) {
+        console.error("Error from fetchWithCache:", error); // Added log
         throw new Error(error);
       }
       setContacts(data || []);
+      console.log("Contacts set to state:", data); // Added log
       return { data, error: null, fromCache };
     });
   }, [session, isSessionLoading, searchTerm, selectedGroup, companyFilter, sortOption, executeAsync]);
