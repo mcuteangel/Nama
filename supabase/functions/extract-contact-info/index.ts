@@ -110,7 +110,12 @@ serve(async (req) => {
 
     const result = await model.generateContent(prompt);
     const response = await result.response;
-    const rawText = response.text();
+    let rawText = response.text();
+
+    // Strip markdown code block if present
+    if (rawText.startsWith('```json') && rawText.endsWith('```')) {
+      rawText = rawText.substring(7, rawText.length - 3).trim();
+    }
 
     // Attempt to parse the JSON response
     let extractedInfo;
@@ -118,7 +123,7 @@ serve(async (req) => {
       extractedInfo = JSON.parse(rawText);
     } catch (jsonParseError) {
       console.error("Error parsing Gemini response as JSON:", jsonParseError);
-      console.error("Raw Gemini response:", rawText);
+      console.error("Raw Gemini response (after stripping):", rawText);
       return new Response(JSON.stringify({ error: `Failed to parse AI response: ${jsonParseError.message}. Raw response: ${rawText.substring(0, 200)}...` }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 500,
