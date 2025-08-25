@@ -12,6 +12,7 @@ import { CustomFieldTemplate } from "@/domain/schemas/custom-field-template";
 import { ContactFormValues, contactFormSchema, CustomFieldFormData } from "../types/contact.ts";
 import { fetchWithCache } from "@/utils/cache-helpers";
 import { useTranslation } from "react-i18next";
+import { Button } from "@/components/ui/button"; // Added Button
 
 // Import new modular components
 import ContactBasicInfo from "./contact-form/ContactBasicInfo.tsx";

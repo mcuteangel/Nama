@@ -4,3 +4,7 @@ declare module '*.json' {
 }
 
 declare module 'moment-jalaali';
+declare module 'moment' {
+  import { Moment as MomentType } from 'moment';
+  export type Moment = MomentType;
+}

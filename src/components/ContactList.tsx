@@ -2,14 +2,14 @@ import React, { useEffect, useState, useCallback } from "react";
 import { Card } from "@/components/ui/card"; // Removed CardContent
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Edit, Trash2, Phone, Mail } from "lucide-react"; // Removed Users
+import { Edit, Trash2, Phone, Mail, Users } from "lucide-react"; // Added Users
 import { supabase } from "@/integrations/supabase/client"; // Removed supabase as it's not directly used here
 import { showSuccess, showError, showLoading } from "@/utils/toast"; // Removed dismissToast
 import { useNavigate } from "react-router-dom";
-import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { ContactCrudService } from "@/services/contact-crud-service";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"; // Added AlertDialogCancel
+import { ContactCrudService } => from "@/services/contact-crud-service";
 import { ContactListService } from "@/services/contact-list-service";
-import { fetchWithCache } from "@/utils/cache-helpers";
+import { fetchWithCache, invalidateCache } from "@/utils/cache-helpers"; // Added invalidateCache
 import { useSession } from "@/integrations/supabase/auth";
 import LoadingMessage from "./LoadingMessage";
 import { useErrorHandler } from "@/hooks/use-error-handler";

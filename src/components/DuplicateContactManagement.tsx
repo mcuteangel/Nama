@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Copy, Merge, Info } from "lucide-react"; // Removed Loader2, CheckCircle, XCircle
+import { Copy, Merge, Info, XCircle } from "lucide-react"; // Added XCircle
 import { useTranslation } from "react-i18next";
 import { useSession } from "@/integrations/supabase/auth";
 import { useErrorHandler } from "@/hooks/use-error-handler";
@@ -11,6 +11,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { invalidateCache } from '@/utils/cache-helpers';
 import { ContactCrudService } from '@/services/contact-crud-service';
 import LoadingSpinner from './LoadingSpinner';
+import EmptyState from './EmptyState'; // Added EmptyState
 
 interface DuplicateContact {
   id: string;

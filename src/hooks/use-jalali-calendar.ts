@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback, useEffect } from 'react';
-import moment from 'moment-jalaali';
+import moment, { Moment } from 'moment-jalaali'; // Import Moment type
 import { enUS } from 'date-fns/locale';
 import { format as formatFns } from 'date-fns';
 
@@ -20,8 +20,8 @@ export interface CalendarHookReturn {
   formatDate: (date: Date | undefined, formatString?: string) => string;
   formatDateWithDay: (date: Date | undefined) => string;
   getCalendarLabel: () => string;
-  convertToJalali: (date: Date) => moment.Moment;
-  convertToGregorian: (date: moment.Moment) => Date;
+  convertToJalali: (date: Date) => Moment; // Use Moment type
+  convertToGregorian: (date: Moment) => Date; // Use Moment type
 }
 
 const CALENDAR_TYPE_STORAGE_KEY = 'calendarType';
@@ -83,7 +83,7 @@ export function useJalaliCalendar(options: CalendarOptions = {}): CalendarHookRe
     return moment(date);
   }, []);
 
-  const convertToGregorian = useCallback((date: moment.Moment) => {
+  const convertToGregorian = useCallback((date: Moment) => { // Use Moment type
     return date.toDate();
   }, []);
 

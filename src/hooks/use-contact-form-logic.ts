@@ -72,30 +72,25 @@ export const useContactFormLogic = (
 
     await executeSave(async () => {
       console.log("useContactFormLogic: executeSave async function started.");
-      let res: { data: { id: string } | null; error: string | null } | { success: boolean; error: string | null };
       if (contactId) {
         console.log("useContactFormLogic: Calling ContactCrudService.updateContact...");
-        res = await ContactCrudService.updateContact(contactId, values);
+        const res = await ContactCrudService.updateContact(contactId, values);
         if (res.error) {
           console.error("useContactFormLogic: ContactCrudService.updateContact returned error:", res.error);
           throw new Error(res.error);
         }
         console.log("useContactFormLogic: ContactCrudService.updateContact successful.");
+        return undefined; // No data to return for update success
       } else {
         console.log("useContactFormLogic: Calling ContactCrudService.addContact...");
-        res = await ContactCrudService.addContact(values);
+        const res = await ContactCrudService.addContact(values);
         if (res.error) {
           console.error("useContactFormLogic: ContactCrudService.addContact returned error:", res.error);
           throw new Error(res.error);
         }
         console.log("useContactFormLogic: ContactCrudService.addContact successful.");
+        return res.data; // Return data for add success (which contains id)
       }
-      console.log("useContactFormLogic: executeSave async function finished successfully.");
-      // Ensure the return type is consistent for onSuccessCallback
-      if ('id' in res.data!) { // Check if res.data has 'id' property
-        return { id: res.data.id };
-      }
-      return undefined; // Or handle other success cases
     });
     console.log("useContactFormLogic: onSubmit finished.");
   };

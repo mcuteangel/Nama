@@ -9,8 +9,7 @@ import {
 } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import moment from 'moment-jalaali';
-// Removed useJalaliCalendar as it's not directly used here
+import moment, { Moment } from 'moment-jalaali'; // Import Moment type
 
 interface JalaliCalendarProps {
   selected?: Date | undefined;
@@ -56,7 +55,7 @@ export function JalaliCalendar({
 
   const monthDays = React.useMemo(() => {
     const days: Array<{
-      date: moment.Moment;
+      date: Moment; // Use Moment type
       isCurrentMonth: boolean;
       isToday: boolean;
       isSelected: boolean;
@@ -144,7 +143,7 @@ export function JalaliCalendar({
   }, [currentMoment, selectedMoment, isJalali]);
 
   const goToPreviousMonth = () => {
-    setCurrentDate((prev: any) => { // Explicitly type prev
+    setCurrentDate((prev: number) => { // Explicitly type prev as number
       const date = moment(prev);
       return isJalali 
         ? date.subtract(1, 'jMonth').valueOf()
@@ -153,7 +152,7 @@ export function JalaliCalendar({
   };
 
   const goToNextMonth = () => {
-    setCurrentDate((prev: any) => { // Explicitly type prev
+    setCurrentDate((prev: number) => { // Explicitly type prev as number
       const date = moment(prev);
       return isJalali 
         ? date.add(1, 'jMonth').valueOf()
@@ -174,7 +173,7 @@ export function JalaliCalendar({
     setLocale(prev => prev === 'fa' ? 'en' : 'fa');
   };
 
-  const handleDateClick = (date: moment.Moment) => {
+  const handleDateClick = (date: Moment) => { // Use Moment type
     const newDate = date.clone().startOf('day');
     setSelectedDate(newDate.valueOf());
     if (onSelect) {
@@ -216,7 +215,7 @@ export function JalaliCalendar({
   const { month, yearNumber, monthName } = getMonthYear(); // Removed unused 'year'
 
   const changeMonth = (monthIndex: number) => {
-    setCurrentDate((prev: any) => { // Explicitly type prev
+    setCurrentDate((prev: number) => { // Explicitly type prev as number
       const newDate = moment(prev);
       if (isJalali) {
         newDate.jMonth(monthIndex);
@@ -229,7 +228,7 @@ export function JalaliCalendar({
   };
 
   const changeYear = (year: number) => {
-    setCurrentDate((prev: any) => { // Explicitly type prev
+    setCurrentDate((prev: number) => { // Explicitly type prev as number
       const newDate = moment(prev);
       if (isJalali) {
         newDate.jYear(year);
@@ -271,7 +270,7 @@ export function JalaliCalendar({
   };
 
   // Get day number based on calendar type
-  const getDayNumber = (date: moment.Moment) => {
+  const getDayNumber = (date: Moment) => { // Use Moment type
     return isJalali ? date.format('jD') : date.format('D');
   };
 
