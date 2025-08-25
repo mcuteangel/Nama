@@ -55,9 +55,8 @@ export const exportContactsToCsv = async (session: Session | null, options: Expo
         .map((s: any) => `${s.type}: ${s.url}`)
         .join('; ');
 
-      const groupName = contact.contact_groups && contact.contact_groups.length > 0 && contact.contact_groups[0].groups
-        ? contact.contact_groups[0].groups[0].name
-        : '';
+      // Safely access group name using optional chaining
+      const groupName = contact.contact_groups?.[0]?.groups?.[0]?.name || '';
 
       const preferredContactMethodLabel = (() => {
         switch (contact.preferred_contact_method) {
