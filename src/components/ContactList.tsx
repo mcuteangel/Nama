@@ -165,12 +165,12 @@ const ContactList = ({ searchTerm, selectedGroup, companyFilter, sortOption }: C
     if (result && !result.fromCache) {
       ErrorManager.notifyUser("مخاطبین با موفقیت بارگذاری شدند.", 'success');
     }
-    console.log("Fetched contacts data:", result.data); // Added log
+    console.log("ContactList: Fetched contacts data:", result.data); // Added log
   }, []);
 
   const onErrorFetch = useCallback((err: Error) => {
     ErrorManager.logError(err, { component: 'ContactList', action: 'fetchContacts' });
-    console.error("Error fetching contacts in ContactList:", err); // Added log
+    console.error("ContactList: Error fetching contacts in ContactList:", err); // Added log
   }, []);
 
   const {
@@ -186,38 +186,47 @@ const ContactList = ({ searchTerm, selectedGroup, companyFilter, sortOption }: C
   });
 
   const fetchContacts = useCallback(async () => {
-    if (isSessionLoading || !session?.user) {
+    console.log("ContactList: fetchContacts called."); // New log
+    if (isSessionLoading) {
+      console.log("ContactList: Session is loading, returning early."); // New log
       setContacts([]);
-      console.log("Session not loaded or user not authenticated, clearing contacts."); // Added log
       return;
     }
 
-    const cacheKey = `contacts_list_${session.user.id}_${searchTerm}_${selectedGroup}_${companyFilter}_${sortOption}`;
-    console.log("Attempting to fetch contacts with cacheKey:", cacheKey); // Added log
+    if (!session?.user) {
+      console.log("ContactList: User not authenticated, clearing contacts."); // New log
+      setContacts([]);
+      return;
+    }
+
+    const userId = session.user.id;
+    const cacheKey = `contacts_list_${userId}_${searchTerm}_${selectedGroup}_${companyFilter}_${sortOption}`;
+    console.log("ContactList: Attempting to fetch contacts with cacheKey:", cacheKey); // Existing log
     
     await executeAsync(async () => {
+      console.log("ContactList: Executing async fetch with cache."); // New log
       const { data, error, fromCache } = await fetchWithCache<Contact[]>(
         cacheKey,
         async () => {
-          console.log("Calling ContactService.getFilteredContacts..."); // Added log
+          console.log("ContactList: Calling ContactService.getFilteredContacts..."); // Existing log
           const result = await ContactService.getFilteredContacts(
-            session.user.id,
+            userId, // Pass userId here
             searchTerm,
             selectedGroup,
             companyFilter,
             sortOption
           );
-          console.log("ContactService.getFilteredContacts result:", result); // Added log
+          console.log("ContactList: ContactService.getFilteredContacts result:", result); // Existing log
           return { data: result.data as Contact[], error: result.error };
         }
       );
 
       if (error) {
-        console.error("Error from fetchWithCache:", error); // Added log
+        console.error("ContactList: Error from fetchWithCache:", error); // Existing log
         throw new Error(error);
       }
       setContacts(data || []);
-      console.log("Contacts set to state:", data); // Added log
+      console.log("ContactList: Contacts set to state:", data); // Existing log
       return { data, error: null, fromCache };
     });
   }, [session, isSessionLoading, searchTerm, selectedGroup, companyFilter, sortOption, executeAsync]);

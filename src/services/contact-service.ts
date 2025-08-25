@@ -143,15 +143,16 @@ export const ContactService = {
         break;
     }
 
-    // Apply collation directly to the column name string if specified
+    const orderOptions: { ascending: boolean; collate?: string } = { ascending: ascendingOrder };
     if (collation) {
-      sortByColumn = `${sortByColumn} COLLATE "${collation}"`;
+      orderOptions.collate = collation;
     }
     
-    // Pass only 'ascending' in the options object, as 'collate' is now part of sortByColumn
-    query = query.order(sortByColumn, { ascending: ascendingOrder });
+    query = query.order(sortByColumn, orderOptions);
 
+    console.log("ContactService: Supabase query before execution:", query); // New log
     const { data, error } = await query;
+    console.log("ContactService: Supabase query result - data:", data, "error:", error); // New log
 
     if (error) {
       return { data: null, error: error.message };
