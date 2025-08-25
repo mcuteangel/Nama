@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react"; // Import useRef
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { showError, showLoading, showSuccess, dismissToast } from "@/utils/toast"; // Import toast functions
@@ -120,7 +120,8 @@ const EditContact = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { session } = useSession();
-  const [initialContactData, setInitialContactData] = useState<ContactFormValues | undefined>(undefined); // Changed type here
+  const [initialContactData, setInitialContactData] = useState<ContactFormValues | undefined>(undefined);
+  const lastFetchedContactDataRef = useRef<ContactFormValues | undefined>(undefined); // New ref for deep comparison
 
   const { executeAsync: executeUpdateSuggestionStatus } = useErrorHandler(null, {
     showToast: false,
@@ -129,10 +130,17 @@ const EditContact = () => {
 
   const onSuccessFetchContact = useCallback((result: { data: ContactDetailType | null; error: string | null; fromCache: boolean }) => {
     if (result.data) {
-      const mappedData = mapContactDetailToFormValues(result.data); // Map DB data to form values
-      setInitialContactData(mappedData);
-      if (!result.fromCache) {
-        showSuccess("اطلاعات مخاطب با موفقیت بارگذاری شد.");
+      const mappedData = mapContactDetailToFormValues(result.data);
+
+      // Deep compare before setting state to prevent unnecessary re-renders
+      if (JSON.stringify(mappedData) !== JSON.stringify(lastFetchedContactDataRef.current)) {
+        setInitialContactData(mappedData);
+        lastFetchedContactDataRef.current = mappedData;
+        if (!result.fromCache) {
+          showSuccess("اطلاعات مخاطب با موفقیت بارگذاری شد.");
+        }
+      } else {
+        console.log("EditContact: Fetched data is identical to current state, skipping setInitialContactData.");
       }
 
       // Check for AI prefill data
@@ -154,7 +162,14 @@ const EditContact = () => {
           socialLinks: [...(mappedData.socialLinks || []), ...extracted.socialLinks.filter(s => !(mappedData.socialLinks || []).some(es => es.url === s.url))],
           // Other fields can be merged similarly or overwritten if preferred
         };
-        setInitialContactData(mergedData); // Update with merged data
+        
+        // Apply merged data only if it's different from the current state
+        if (JSON.stringify(mergedData) !== JSON.stringify(lastFetchedContactDataRef.current)) {
+          setInitialContactData(mergedData); // Update with merged data
+          lastFetchedContactDataRef.current = mergedData;
+        } else {
+          console.log("EditContact: Merged AI prefill data is identical to current state, skipping setInitialContactData.");
+        }
 
         // Clear local storage items after use
         localStorage.removeItem('ai_prefill_contact_data');
