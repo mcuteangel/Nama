@@ -30,7 +30,7 @@ export function useSpeechToText(): SpeechToTextHook {
 
   const browserSupportsSpeechRecognition =
     typeof window !== 'undefined' &&
-    (window.SpeechRecognition || window.webkitSpeechRecognition);
+    !!(window.SpeechRecognition || window.webkitSpeechRecognition); // Added !! to ensure boolean type
 
   const startListening = useCallback(() => {
     if (!browserSupportsSpeechRecognition) {
