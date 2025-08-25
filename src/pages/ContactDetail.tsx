@@ -43,7 +43,7 @@ interface GroupData {
 
 interface ContactGroup {
   group_id: string;
-  groups: GroupData | null; // Changed to single GroupData object
+  groups: GroupData | null;
 }
 
 interface CustomField {
@@ -169,7 +169,6 @@ const ContactDetail = () => {
             if (error) throw error;
 
             if (data) {
-              console.log("DEBUG: Raw Supabase data for contact_groups:", data.contact_groups); // Debug log
               return { data: data as unknown as ContactDetailType, error: null };
             }
             return { data: null, error: "مخاطب یافت نشد." };
@@ -179,7 +178,6 @@ const ContactDetail = () => {
         if (error) {
           throw new Error(error);
         }
-        console.log("DEBUG: Data after fetchWithCache:", data);
         return { data, error: null, fromCache };
       });
     };
@@ -187,9 +185,7 @@ const ContactDetail = () => {
     fetchDetails();
   }, [id, navigate, executeFetchContact]);
 
-  // Access the group from the first contact_group entry, and then the group object within it
   const assignedGroup = contact?.contact_groups?.[0]?.groups || null;
-  console.log("DEBUG: Assigned group after processing:", assignedGroup); // Debug log
 
   if (loading) {
     return (
@@ -271,7 +267,6 @@ const ContactDetail = () => {
                 <Input value={contact.country} readOnly className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
               </div>
             )}
-            {/* Display Group Information */}
             <div>
               <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><Users size={16} /> گروه</Label>
               {assignedGroup ? (
