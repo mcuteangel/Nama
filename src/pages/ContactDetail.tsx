@@ -169,7 +169,7 @@ const ContactDetail = () => {
             if (error) throw error;
 
             if (data) {
-              console.log("Raw Supabase data for contact_groups:", data.contact_groups); // Debug log
+              console.log("DEBUG: Raw Supabase data for contact_groups:", data.contact_groups); // Debug log
               return { data: data as unknown as ContactDetailType, error: null };
             }
             return { data: null, error: "مخاطب یافت نشد." };
@@ -179,6 +179,7 @@ const ContactDetail = () => {
         if (error) {
           throw new Error(error);
         }
+        console.log("DEBUG: Data after fetchWithCache:", data);
         return { data, error: null, fromCache };
       });
     };
@@ -188,7 +189,7 @@ const ContactDetail = () => {
 
   // Access the group from the first contact_group entry, and then the first group object within its 'groups' array
   const assignedGroup = contact?.contact_groups?.[0]?.groups?.[0] || null;
-  console.log("Assigned group after processing:", assignedGroup); // Debug log
+  console.log("DEBUG: Assigned group after processing:", assignedGroup); // Debug log
 
   if (loading) {
     return (
