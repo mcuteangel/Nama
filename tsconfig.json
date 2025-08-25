@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "ES2020",
     "useDefineForClassFields": true,
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "lib": ["ES2020", "DOM", "DOM.Iterable", "deno.ns", "deno.window"],
     "module": "ESNext",
     "skipLibCheck": true,
 
@@ -21,11 +21,18 @@
     "noFallthroughCasesInSwitch": true,
 
     /* Path Aliases */
-    "baseUrl": "./",
+    "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
-    }
+      "@/*": ["./src/*"]
+    },
+
+    /* Supabase Edge Functions specific types */
+    "types": [
+      "https://deno.land/std@0.190.0/http/server.d.ts",
+      "https://esm.sh/@supabase/supabase-js@2.55.0/dist/main.d.ts",
+      "npm:@google/generative-ai"
+    ]
   },
-  "include": ["src"],
-  "exclude": ["node_modules", "supabase"]
+  "include": ["src", "supabase/functions/**/*.ts"],
+  "references": [{ "path": "./tsconfig.node.json" }]
 }

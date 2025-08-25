@@ -100,7 +100,7 @@ serve(async (req: Request) => {
       Extract contact information from the following text, which is in Persian (Farsi).
       The output should be a JSON object with the specified structure.
       The JSON keys (e.g., "firstName", "lastName", "company", "phoneNumbers", "emailAddresses", "socialLinks", "notes") must be in English.
-      The *values* for "firstName", "lastName", "company", "position", and "notes" should be extracted directly from the Persian input text.
+      The *values* for "firstName", "lastName", "company", "position", and "notes" should be extracted directly from the Persian input text, *preserving the Persian language*. Do NOT translate these values to English.
       For "phone_type", "email_type", and "socialLinks.type", map the Persian descriptions to their corresponding English enum values.
       For example:
       - 'موبایل' should map to 'mobile'
