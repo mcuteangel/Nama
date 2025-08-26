@@ -1,4 +1,17 @@
 {
+  "name": "nama-1",
+  "version": "1.0.0",
+  "description": "Smart Contact Management System with AI Power",
+  "homepage": "https://github.com/mcuteangel/Nama",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mcuteangel/Nama.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mcuteangel/Nama/issues"
+  },
+  "author": "mcuteangel",
+  "license": "MIT",
   "dependencies": {
     "@capacitor/android": "^7.4.2",
     "@capacitor/cli": "^7.4.2",

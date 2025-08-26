@@ -1,7 +1,7 @@
 # نما-۱ - سیستم مدیریت مخاطبین هوشمند با قدرت هوش مصنوعی
 
-[![وضعیت ساخت](https://github.com/yourusername/nama-1/workflows/CI/badge.svg)](https://github.com/yourusername/nama-1/actions)
-[![وضعیت پوشش](https://coveralls.io/repos/github/yourusername/nama-1/badge.svg?branch=main)](https://coveralls.io/github/yourusername/nama-1?branch=main)
+[![وضعیت ساخت](https://github.com/mcuteangel/Nama/workflows/CI/badge.svg)](https://github.com/mcuteangel/Nama/actions)
+[![وضعیت پوشش](https://coveralls.io/repos/github/mcuteangel/Nama/badge.svg?branch=main)](https://coveralls.io/github/mcuteangel/Nama?branch=main)
 [![مجوز: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## 📱 نمای کلی
@@ -24,6 +24,7 @@
 ## 🏗️ پشته فناوری
 
 ### بخش جلویی (Frontend)
+
 - **فریمورک**: React 18.3.1 با TypeScript 5.5.3
 - **ابزار ساخت**: Vite 6.3.4 با کامپایلر SWC
 - **کامپوننت‌های رابط کاربری**: shadcn/ui + Radix UI primitives
@@ -34,12 +35,14 @@
 - **موبایل**: Capacitor 7.4.2
 
 ### بخش عقبی (Backend)
+
 - **BaaS**: Supabase (PostgreSQL + Auth + Edge Functions)
 - **هوش مصنوعی**: Google Generative AI 0.24.1
 - **احراز هویت**: Supabase Auth با RLS
 - **پایگاه داده**: PostgreSQL با امنیت سطح ردیف
 
 ### توسعه
+
 - **تست**: Vitest + Testing Library + Cypress
 - **بررسی کد**: ESLint 9.9.0 + TypeScript ESLint
 - **عملکرد**: تجزیه و تحلیل بسته + نظارت بر عملکرد
@@ -56,12 +59,14 @@
 ### نصب
 
 1. **کلون کردن مخزن**
+
    ```bash
-   git clone https://github.com/yourusername/nama-1.git
+   git clone https://github.com/mcuteangel/Nama.git
    cd nama-1
    ```
 
 2. **نصب وابستگی‌ها**
+
    ```bash
    pnpm install
    # یا
@@ -69,8 +74,9 @@
    ```
 
 3. **تنظیم محیط**
-   
+
    فایل `.env.local` را در دایرکتوری اصلی ایجاد کنید:
+
    ```env
    VITE_SUPABASE_URL=your_supabase_project_url
    VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
@@ -78,13 +84,15 @@
    ```
 
 4. **تنظیم پایگاه داده**
-   
+
    اجرای migrations مربوط به Supabase:
+
    ```bash
    npx supabase migration up
    ```
 
 5. **شروع سرور توسعه**
+
    ```bash
    pnpm dev
    # یا
@@ -99,14 +107,19 @@
 
 1. **نصب Android Studio** و تنظیم Android SDK
 2. **ساخت اپ وب**:
+
    ```bash
    pnpm build
    ```
+
 3. **اضافه کردن پلتفرم Android**:
+
    ```bash
    npx cap add android
    ```
+
 4. **همگام‌سازی و باز کردن در Android Studio**:
+
    ```bash
    npx cap sync android
    npx cap open android
@@ -116,14 +129,19 @@
 
 1. **نصب Xcode** (فقط macOS)
 2. **ساخت اپ وب**:
+
    ```bash
    pnpm build
    ```
+
 3. **اضافه کردن پلتفرم iOS**:
+
    ```bash
    npx cap add ios
    ```
+
 4. **همگام‌سازی و باز کردن در Xcode**:
+
    ```bash
    npx cap sync ios
    npx cap open ios
@@ -132,6 +150,7 @@
 ## 🧪 تست
 
 ### تست‌های واحد
+
 ```bash
 # اجرای تست‌های واحد
 pnpm test
@@ -144,12 +163,14 @@ pnpm test:coverage
 ```
 
 ### تست‌های یکپارچگی
+
 ```bash
 # اجرای تست‌های یکپارچگی
 pnpm test:integration
 ```
 
 ### تست‌های End-to-End
+
 ```bash
 # نصب Cypress (در صورت عدم نصب)
 pnpm add -D cypress
@@ -162,6 +183,7 @@ npx cypress run
 ```
 
 ### تست‌های دسترسی‌پذیری
+
 ```bash
 # اجرای تست‌های دسترسی‌پذیری
 pnpm test:a11y
@@ -170,6 +192,7 @@ pnpm test:a11y
 ## 🏁 ساخت و استقرار
 
 ### ساخت تولید
+
 ```bash
 # ساخت برای تولید
 pnpm build
@@ -179,6 +202,7 @@ pnpm preview
 ```
 
 ### تجزیه و تحلیل بسته
+
 ```bash
 # تجزیه و تحلیل اندازه بسته
 pnpm analyze
@@ -188,6 +212,7 @@ pnpm analyze:bundle
 ```
 
 ### نظارت بر عملکرد
+
 ```bash
 # اجرای تست‌های عملکرد
 pnpm test:performance
@@ -223,6 +248,7 @@ pnpm test:bundle
 ## 📚 معماری
 
 ### ساختار پروژه
+
 ```
 src/
 ├── components/          # کامپوننت‌های قابل استفاده مجدد رابط کاربری
@@ -284,10 +310,7 @@ cypress/
 
 ## 🆘 پشتیبانی
 
-- 📧 ایمیل: support@nama-app.com
-- 💬 Discord: [به جامعه ما بپیوندید](https://discord.gg/nama-app)
-- 📚 مستندات: [docs.nama-app.com](https://docs.nama-app.com)
-- 🐛 مسائل: [GitHub Issues](https://github.com/yourusername/nama-1/issues)
+- 🐛 مسائل: [GitHub Issues](https://github.com/mcuteangel/Nama/issues)
 
 ## 🙏 تقدیر و تشکر
 

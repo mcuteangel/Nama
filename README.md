@@ -1,7 +1,7 @@
 # نما-۱ - سیستم مدیریت مخاطبین هوشمند با قدرت هوش مصنوعی
 
-[![وضعیت ساخت](https://github.com/yourusername/nama-1/workflows/CI/badge.svg)](https://github.com/yourusername/nama-1/actions)
-[![وضعیت پوشش](https://coveralls.io/repos/github/yourusername/nama-1/badge.svg?branch=main)](https://coveralls.io/github/yourusername/nama-1?branch=main)
+[![وضعیت ساخت](https://github.com/mcuteangel/Nama/workflows/CI/badge.svg)](https://github.com/mcuteangel/Nama/actions)
+[![وضعیت پوشش](https://coveralls.io/repos/github/mcuteangel/Nama/badge.svg?branch=main)](https://coveralls.io/github/mcuteangel/Nama?branch=main)
 [![مجوز: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## 📱 نمای کلی
@@ -61,7 +61,7 @@
 1. **کلون کردن مخزن**
 
    ```bash
-   git clone https://github.com/yourusername/nama-1.git
+   git clone https://github.com/mcuteangel/Nama.git
    cd nama-1
    ```
 
@@ -313,7 +313,7 @@ cypress/
 - 📧 ایمیل: <support@nama-app.com>
 - 💬 Discord: [به جامعه ما بپیوندید](https://discord.gg/nama-app)
 - 📚 مستندات: [docs.nama-app.com](https://docs.nama-app.com)
-- 🐛 مسائل: [GitHub Issues](https://github.com/yourusername/nama-1/issues)
+- 🐛 مسائل: [GitHub Issues](https://github.com/mcuteangel/Nama/issues)
 
 ## 🙏 تقدیر و تشکر
 
