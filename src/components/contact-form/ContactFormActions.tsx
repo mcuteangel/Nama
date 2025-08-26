@@ -1,8 +1,8 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import CancelButton from '../CancelButton';
+import CancelButton from '../common/CancelButton';
 import { useTranslation } from 'react-i18next';
-import LoadingSpinner from '../LoadingSpinner';
+import LoadingSpinner from '../common/LoadingSpinner';
 
 interface ContactFormActionsProps {
   isSubmitting: boolean;

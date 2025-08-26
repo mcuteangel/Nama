@@ -1,10 +1,10 @@
 import { MadeWithDyad } from "@/components/made-with-dyad";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import GroupList from "@/components/GroupList";
+import GroupList from "@/components/groups/GroupList";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
-import EmptyState from '@/components/EmptyState';
+import EmptyState from '@/components/common/EmptyState';
 import { Tag } from 'lucide-react';
 
 const Groups = () => {

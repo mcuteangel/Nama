@@ -3,13 +3,15 @@ import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import CustomFieldTemplateForm from "./CustomFieldTemplateForm";
-import FormDialogWrapper from "./FormDialogWrapper"; // Import the new wrapper
+import FormDialogWrapper from "./common/FormDialogWrapper"; // Import the new wrapper
+import { useTranslation } from 'react-i18next';
 
 interface AddCustomFieldTemplateDialogProps {
   onTemplateAdded: () => void;
 }
 
 const AddCustomFieldTemplateDialog: React.FC<AddCustomFieldTemplateDialogProps> = ({ onTemplateAdded }) => {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
 
   const handleSuccess = () => {
@@ -32,7 +34,7 @@ const AddCustomFieldTemplateDialog: React.FC<AddCustomFieldTemplateDialogProps> 
         >
           <span className="flex items-center gap-1">
             <Plus size={16} />
-            افزودن فیلد جدید
+            {t('actions.add_new_field')}
           </span>
         </Button>
       </DialogTrigger>

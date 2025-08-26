@@ -3,16 +3,15 @@
 import React, { useState, useRef, useCallback } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { UploadCloud, FileText, XCircle, Loader2 } from 'lucide-react';
+import { UploadCloud, FileText, XCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useErrorHandler } from '@/hooks/use-error-handler';
 import { ErrorManager } from '@/lib/error-manager';
 import { DataImportService } from '@/services/data-import-service';
 import { useSession } from '@/integrations/supabase/auth';
-import LoadingSpinner from './LoadingSpinner';
-import CancelButton from './CancelButton';
+import LoadingSpinner from './common/LoadingSpinner';
+import CancelButton from './common/CancelButton';
 
 interface ImportContactsDialogProps {
   onImportSuccess: () => void;

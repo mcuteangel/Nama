@@ -1,6 +1,6 @@
 import { GlobalCustomFieldsManagement } from "@/components/GlobalCustomFieldsManagement";
 import { MadeWithDyad } from "@/components/made-with-dyad";
-import EmptyState from '@/components/EmptyState';
+import EmptyState from '@/components/common/EmptyState';
 import { ClipboardList } from 'lucide-react';
 
 const CustomFields = () => {

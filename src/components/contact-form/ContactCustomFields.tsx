@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils';
 import AddCustomFieldTemplateDialog from '@/components/AddCustomFieldTemplateDialog';
 import { CustomFieldTemplate } from '@/domain/schemas/custom-field-template';
 import { ContactFormValues } from '@/types/contact';
+import { useTranslation } from 'react-i18next';
 
 interface ContactCustomFieldsProps {
   availableTemplates: CustomFieldTemplate[];
@@ -24,18 +25,19 @@ const ContactCustomFields: React.FC<ContactCustomFieldsProps> = ({
   loadingTemplates,
   fetchTemplates,
 }) => {
+  const { t } = useTranslation();
   const form = useFormContext<ContactFormValues>();
 
   return (
     <div className="space-y-4 pt-4 border-t border-gray-200 dark:border-gray-700">
       <div className="flex justify-between items-center mb-2">
-        <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">فیلدهای سفارشی</h3>
+        <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">{t('section_titles.custom_fields')}</h3>
         <AddCustomFieldTemplateDialog onTemplateAdded={fetchTemplates} />
       </div>
       {loadingTemplates ? (
-        <p className="text-center text-gray-500 dark:text-gray-400">در حال بارگذاری قالب‌های فیلد سفارشی...</p>
+        <p className="text-center text-gray-500 dark:text-gray-400">{t('loading_messages.loading_custom_field_templates')}</p>
       ) : availableTemplates.length === 0 ? (
-        <p className="text-center text-gray-500 dark:text-gray-400">هیچ قالب فیلد سفارشی تعریف نشده است.</p>
+        <p className="text-center text-gray-500 dark:text-gray-400">{t('empty_states.no_custom_field_templates')}</p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {form.watch("customFields")?.map((fieldItem, index) => {
@@ -58,7 +60,7 @@ const ContactCustomFields: React.FC<ContactCustomFieldsProps> = ({
                     <FormControl>
                       {template.type === 'text' ? (
                         <Input
-                          placeholder={template.description || `مقدار ${template.name}`}
+                          placeholder={template.description || t('form_placeholders.field_value', { name: template.name })}
                           className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
                           {...field}
                           value={field.value || ''}
@@ -66,7 +68,7 @@ const ContactCustomFields: React.FC<ContactCustomFieldsProps> = ({
                       ) : template.type === 'number' ? (
                         <Input
                           type="number"
-                          placeholder={template.description || `مقدار ${template.name}`}
+                          placeholder={template.description || t('form_placeholders.field_value', { name: template.name })}
                           className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
                           {...field}
                           value={field.value || ''}
@@ -84,7 +86,7 @@ const ContactCustomFields: React.FC<ContactCustomFieldsProps> = ({
                             >
                               <span className="flex items-center">
                                 <CalendarIcon className="ml-2 h-4 w-4" />
-                                {field.value ? format(new Date(field.value), "yyyy/MM/dd") : <span>تاریخ را انتخاب کنید</span>}
+                                {field.value ? format(new Date(field.value), "yyyy/MM/dd") : <span>{t('form_placeholders.select_birth_date')}</span>}
                               </span>
                             </Button>
                           </PopoverTrigger>
@@ -104,7 +106,7 @@ const ContactCustomFields: React.FC<ContactCustomFieldsProps> = ({
                         >
                           <FormControl>
                             <SelectTrigger className="w-full bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100">
-                              <SelectValue placeholder={!template.options || template.options.length === 0 ? "گزینه‌ای یافت نشد" : `انتخاب ${template.name}`} />
+                              <SelectValue placeholder={!template.options || template.options.length === 0 ? t('form_placeholders.no_options_found') : t('form_placeholders.select_field', { name: template.name })} />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent className="backdrop-blur-md bg-white/80 dark:bg-gray-800/80 border border-white/30 dark:border-gray-600/30">
@@ -116,7 +118,7 @@ const ContactCustomFields: React.FC<ContactCustomFieldsProps> = ({
                           </SelectContent>
                         </Select>
                       ) : (
-                        <Input disabled placeholder="نوع فیلد نامشخص" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400" />
+                        <Input disabled placeholder={t('form_placeholders.unknown_field_type_placeholder')} className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400" />
                       )}
                     </FormControl>
                     <FormMessage />

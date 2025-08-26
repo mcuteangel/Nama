@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogTrigger } from "@/components/ui/dialog";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { Dialog } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Trash2, Edit, ClipboardList } from "lucide-react";
 import { CustomFieldTemplateService } from "@/services/custom-field-template-service"; // Updated import
 import { useErrorHandler } from "@/hooks/use-error-handler";
@@ -14,12 +14,12 @@ import { useSession } from "@/integrations/supabase/auth";
 import CustomFieldTemplateForm from "./CustomFieldTemplateForm";
 import AddCustomFieldTemplateDialog from "./AddCustomFieldTemplateDialog";
 import { fetchWithCache, invalidateCache } from "@/utils/cache-helpers";
-import FormDialogWrapper from "./FormDialogWrapper";
-import LoadingMessage from "./LoadingMessage";
-import CancelButton from "./CancelButton";
-import { showLoading, dismissToast, showError, showSuccess } from "@/utils/toast";
-import EmptyState from './EmptyState';
-import LoadingSpinner from './LoadingSpinner';
+import FormDialogWrapper from "./common/FormDialogWrapper";
+import LoadingMessage from "./common/LoadingMessage";
+import CancelButton from "./common/CancelButton";
+import { showError, showSuccess } from "@/utils/toast";
+import EmptyState from './common/EmptyState';
+import LoadingSpinner from './common/LoadingSpinner';
 
 type TemplateType = 'text' | 'number' | 'date' | 'list';
 
@@ -97,7 +97,7 @@ export function GlobalCustomFieldsManagement() {
     loadTemplates();
   }, [session, loadTemplates]);
 
-  const onErrorOperation = useCallback((error) => {
+  const onErrorOperation = useCallback((error: Error) => {
     ErrorManager.logError(error, {
       component: 'GlobalCustomFieldsManagement',
       action: 'customFieldsOperation',
@@ -112,10 +112,6 @@ export function GlobalCustomFieldsManagement() {
 
   const {
     isLoading: isOperationLoading,
-    error: operationError,
-    errorMessage: operationErrorMessage,
-    retryCount: operationRetryCount,
-    retry: retryOperation,
     executeAsync: executeOperation,
   } = useErrorHandler(null, {
     maxRetries: 3,

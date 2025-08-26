@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
-import { Plus, Save, X } from 'lucide-react';
+import { Plus, X } from 'lucide-react';
 import { CustomFieldTemplateService } from '@/services/custom-field-template-service'; // Updated import
 import { useErrorHandler } from '@/hooks/use-error-handler';
 import { ErrorManager } from '@/lib/error-manager';
@@ -18,8 +18,9 @@ import {
 } from '@/domain/schemas/custom-field-template';
 import { useSession } from '@/integrations/supabase/auth';
 import { useNavigate } from 'react-router-dom';
-import CancelButton from './CancelButton';
-import LoadingSpinner from './LoadingSpinner';
+import CancelButton from './common/CancelButton';
+import LoadingSpinner from './common/LoadingSpinner';
+import { t } from 'i18next';
 
 type TemplateType = 'text' | 'number' | 'date' | 'list';
 
@@ -35,11 +36,11 @@ const CustomFieldTemplateForm: React.FC<CustomFieldTemplateFormProps> = ({ initi
 
   const onSuccessCallback = useCallback(() => {
     console.log("CustomFieldTemplateForm: useErrorHandler onSuccess triggered.");
-    ErrorManager.notifyUser(initialData ? 'قالب با موفقیت ویرایش شد.' : 'قالب با موفقیت اضافه شد.', 'success');
+    ErrorManager.notifyUser(initialData ? t('system_messages.template_edit_success') : t('system_messages.template_create_success'), 'success');
     onSuccess?.();
   }, [initialData, onSuccess]);
 
-  const onErrorCallback = useCallback((err) => {
+  const onErrorCallback = useCallback((err: Error) => {
     console.error("CustomFieldTemplateForm: useErrorHandler onError triggered.", err);
     ErrorManager.logError(err, {
       component: "CustomFieldTemplateForm",
@@ -58,7 +59,7 @@ const CustomFieldTemplateForm: React.FC<CustomFieldTemplateFormProps> = ({ initi
     maxRetries: 3,
     retryDelay: 1000,
     showToast: true,
-    customErrorMessage: initialData ? "خطایی در ویرایش قالب فیلد سفارشی رخ داد" : "خطایی در افزودن قالب فیلد سفارشی رخ داد",
+    customErrorMessage: initialData ? t('errors.edit_template_error') : t('errors.create_template_error'),
     onSuccess: onSuccessCallback,
     onError: onErrorCallback,
   });
@@ -242,7 +243,7 @@ const CustomFieldTemplateForm: React.FC<CustomFieldTemplateFormProps> = ({ initi
                 <Plus size={16} className="me-2" /> افزودن گزینه
               </Button>
               {form.formState.errors.options && (
-                <p className="text-sm text-red-500 font-medium mt-1">{(form.formState.errors.options as any)?.message}</p>
+                <p className="text-sm text-red-500 font-medium mt-1">{(form.formState.errors.options as { message?: string })?.message}</p>
               )}
             </div>
           )}

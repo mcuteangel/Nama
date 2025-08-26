@@ -5,15 +5,17 @@ import { Button } from "@/components/ui/button";
 import { PlusCircle, Search, Download, Users } from "lucide-react";
 import ContactList from "@/components/ContactList";
 import { useNavigate } from "react-router-dom";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
+import { useDebounce } from '@/hooks/use-performance';
+import SuspenseWrapper from '@/components/common/SuspenseWrapper';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useGroups } from "@/hooks/use-groups";
 import { exportContactsToCsv } from "@/utils/export-contacts";
 import { useSession } from "@/integrations/supabase/auth";
-import EmptyState from '@/components/EmptyState';
-import LoadingSpinner from '@/components/LoadingSpinner';
+import EmptyState from '@/components/common/EmptyState';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
 
-const Contacts = () => {
+const Contacts = React.memo(() => {
   const navigate = useNavigate();
   const { groups, loadingGroups, fetchGroups } = useGroups();
   const { session } = useSession();
@@ -24,88 +26,94 @@ const Contacts = () => {
   const [sortOption, setSortOption] = useState<string>("last_name_asc"); // Changed default sort option here
   const [isExporting, setIsExporting] = useState(false);
 
+  // Debounce search terms for better performance
+  const debouncedSearchTerm = useDebounce(searchTerm, 300);
+  const debouncedCompanyFilter = useDebounce(companyFilter, 300);
+
   useEffect(() => {
     fetchGroups();
   }, [fetchGroups]);
 
-  const handleAddContactClick = () => {
+  const handleAddContactClick = useCallback(() => {
     navigate("/add-contact");
-  };
+  }, [navigate]);
 
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSearchChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
-  };
+  }, []);
 
-  const handleGroupChange = (value: string) => {
+  const handleGroupChange = useCallback((value: string) => {
     setSelectedGroup(value === "all" ? "" : value);
-  };
+  }, []);
 
-  const handleCompanyChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleCompanyChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     setCompanyFilter(event.target.value);
-  };
+  }, []);
 
-  const handleSortChange = (value: string) => {
+  const handleSortChange = useCallback((value: string) => {
     setSortOption(value);
-  };
+  }, []);
 
-  const handleExportClick = async () => {
+  const handleExportClick = useCallback(async () => {
     setIsExporting(true);
     await exportContactsToCsv(session, {
-      searchTerm,
+      searchTerm: debouncedSearchTerm,
       selectedGroup,
-      companyFilter,
+      companyFilter: debouncedCompanyFilter,
       sortOption,
     });
     setIsExporting(false);
-  };
+  }, [session, debouncedSearchTerm, selectedGroup, debouncedCompanyFilter, sortOption]);
 
   return (
-    <div className="flex flex-col items-center justify-center p-4 h-full w-full">
-      <Card className="w-full max-w-4xl glass rounded-xl p-6">
-        <CardHeader className="text-center">
-          <CardTitle className="text-4xl font-bold text-gray-800 dark:text-gray-100 mb-2">
+    <div className="flex flex-col items-stretch justify-center p-0 sm:p-4 h-full w-full">
+      <Card className="w-full sm:max-w-4xl sm:mx-auto glass rounded-none sm:rounded-xl p-2 sm:p-6">
+        <CardHeader className="text-center p-4 sm:p-6">
+          <CardTitle className="text-3xl sm:text-4xl font-bold text-gray-800 dark:text-gray-100 mb-2">
             مدیریت مخاطبین
           </CardTitle>
-          <CardDescription className="text-lg text-gray-600 dark:text-gray-300">
+          <CardDescription className="text-lg sm:text-lg text-gray-600 dark:text-gray-300">
             ثبت، جستجو و سازماندهی مخاطبین شما
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="flex flex-col sm:flex-row gap-4 justify-between items-center">
+        <CardContent className="space-y-4 sm:space-y-6 p-4 sm:p-6 pt-0">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 justify-between items-center">
             <div className="relative flex-grow w-full sm:w-auto">
               <Input
                 type="text"
                 placeholder="جستجوی مخاطبین..."
-                className="w-full ps-10 pe-4 py-2 rounded-lg bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all duration-300"
+                className="w-full ps-10 pe-4 py-2 rounded-lg bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all duration-300 rtl:pr-10 rtl:pl-4"
                 value={searchTerm}
                 onChange={handleSearchChange}
               />
-              <Search className="absolute inset-inline-start-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400" size={20} />
+              <Search className="absolute inset-inline-start-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 rtl:right-3 rtl:left-auto" size={20} />
             </div>
-            <div className="flex gap-2 w-full sm:w-auto">
+            <div className="flex gap-1 sm:gap-2 w-full sm:w-auto">
               <Button
                 onClick={handleAddContactClick}
-                className="flex items-center gap-2 px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-md transition-all duration-300 transform hover:scale-105 flex-grow sm:flex-grow-0"
+                className="flex items-center gap-2 sm:gap-2 px-4 sm:px-6 py-3 sm:py-2 text-base sm:text-base rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-md transition-all duration-300 transform hover:scale-105 flex-grow sm:flex-grow-0"
               >
-                <PlusCircle size={20} />
-                افزودن مخاطب جدید
+                <PlusCircle size={18} className="sm:w-5 sm:h-5" />
+                <span className="hidden sm:inline">افزودن مخاطب جدید</span>
+                <span className="sm:hidden">جدید</span>
               </Button>
               <Button
                 onClick={handleExportClick}
                 variant="outline"
                 disabled={isExporting}
-                className="flex items-center gap-2 px-6 py-2 rounded-lg text-gray-700 font-semibold shadow-md transition-all duration-300 transform hover:scale-105 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-100 dark:border-gray-600 flex-grow sm:flex-grow-0"
+                className="flex items-center gap-2 sm:gap-2 px-4 sm:px-6 py-3 sm:py-2 text-base sm:text-base rounded-lg text-gray-700 font-semibold shadow-md transition-all duration-300 transform hover:scale-105 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-100 dark:border-gray-600 flex-grow sm:flex-grow-0"
               >
                 {isExporting && <LoadingSpinner size={16} className="me-2" />}
-                <Download size={20} />
-                خروجی
+                <Download size={18} className="sm:w-5 sm:h-5" />
+                <span className="hidden sm:inline">خروجی</span>
+                <span className="sm:hidden">خروجی</span>
               </Button>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-4">
             <div>
-              <label htmlFor="group-filter" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">فیلتر بر اساس گروه:</label>
+              <label htmlFor="group-filter" className="block text-sm sm:text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">فیلتر بر اساس گروه:</label>
               <Select onValueChange={handleGroupChange} value={selectedGroup || "all"}>
                 <SelectTrigger id="group-filter" className="w-full bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100">
                   <SelectValue placeholder="همه گروه‌ها" />
@@ -122,7 +130,7 @@ const Contacts = () => {
             </div>
 
             <div>
-              <label htmlFor="company-filter" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">فیلتر بر اساس شرکت:</label>
+              <label htmlFor="company-filter" className="block text-sm sm:text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">فیلتر بر اساس شرکت:</label>
               <Input
                 id="company-filter"
                 type="text"
@@ -134,7 +142,7 @@ const Contacts = () => {
             </div>
 
             <div>
-              <label htmlFor="sort-option" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">مرتب‌سازی بر اساس:</label>
+              <label htmlFor="sort-option" className="block text-sm sm:text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">مرتب‌سازی بر اساس:</label>
               <Select onValueChange={handleSortChange} value={sortOption}>
                 <SelectTrigger id="sort-option" className="w-full bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100">
                   <SelectValue placeholder="مرتب‌سازی" />
@@ -151,17 +159,21 @@ const Contacts = () => {
             </div>
           </div>
 
-          <ContactList
-            searchTerm={searchTerm}
-            selectedGroup={selectedGroup}
-            companyFilter={companyFilter}
-            sortOption={sortOption}
-          />
+          <SuspenseWrapper>
+            <ContactList
+              searchTerm={debouncedSearchTerm}
+              selectedGroup={selectedGroup}
+              companyFilter={debouncedCompanyFilter}
+              sortOption={sortOption}
+            />
+          </SuspenseWrapper>
         </CardContent>
       </Card>
       <MadeWithDyad />
     </div>
   );
-};
+});
+
+Contacts.displayName = 'Contacts';
 
 export default Contacts;

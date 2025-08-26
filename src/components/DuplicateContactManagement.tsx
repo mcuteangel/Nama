@@ -1,18 +1,17 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Copy, Merge, Loader2, CheckCircle, XCircle, Info } from "lucide-react";
+import { Copy, Merge, XCircle, Info } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useSession } from "@/integrations/supabase/auth";
 import { useErrorHandler } from "@/hooks/use-error-handler";
 import { ErrorManager } from "@/lib/error-manager";
-import LoadingMessage from "./LoadingMessage";
+import LoadingMessage from "./common/LoadingMessage";
 import { supabase } from '@/integrations/supabase/client';
 import { invalidateCache } from '@/utils/cache-helpers';
 import { ContactCrudService } from '@/services/contact-crud-service'; // Updated import
-import { ContactListService } from '@/services/contact-list-service'; // Updated import
-import EmptyState from './EmptyState';
-import LoadingSpinner from './LoadingSpinner';
+import EmptyState from './common/EmptyState';
+import LoadingSpinner from './common/LoadingSpinner';
 
 interface DuplicateContact {
   id: string;
@@ -26,6 +25,34 @@ interface DuplicateContact {
   avatar_url?: string;
 }
 
+interface FullContactData {
+  id: string;
+  first_name: string;
+  last_name: string;
+  company?: string;
+  position?: string;
+  notes?: string;
+  avatar_url?: string;
+  birthday?: string;
+  preferred_contact_method?: string;
+  street?: string;
+  city?: string;
+  state?: string;
+  zip_code?: string;
+  country?: string;
+  email_addresses: Array<{ id?: string; email_address: string; contact_id: string }>;
+  phone_numbers: Array<{ id?: string; phone_number: string; contact_id: string }>;
+  social_links: Array<{ id?: string; url: string; contact_id: string }>;
+  contact_groups: Array<{ id?: string; group_id: string; contact_id: string }>;
+  custom_fields: Array<{ id?: string; template_id: string; contact_id: string }>;
+}
+
+type PhoneNumber = { id?: string; phone_number: string; contact_id: string };
+type EmailAddress = { id?: string; email_address: string; contact_id: string };
+type SocialLink = { id?: string; url: string; contact_id: string };
+type ContactGroup = { id?: string; group_id: string; contact_id: string };
+type CustomField = { id?: string; template_id: string; contact_id: string };
+
 interface DuplicatePair {
   mainContact: DuplicateContact;
   duplicateContact: DuplicateContact;
@@ -38,56 +65,6 @@ const DuplicateContactManagement: React.FC = () => {
 
   const [duplicatePairs, setDuplicatePairs] = useState<DuplicatePair[]>([]);
   const [isScanning, setIsScanning] = useState(false);
-
-  const onSuccessFetchContacts = useCallback((result: { data: DuplicateContact[] | null; error: string | null; fromCache: boolean }) => {
-    if (result.data) {
-      findDuplicates(result.data);
-    }
-  }, []);
-
-  const onErrorFetchContacts = useCallback((err: Error) => {
-    ErrorManager.logError(err, { component: 'DuplicateContactManagement', action: 'fetchAllContactsForDuplicates' });
-    ErrorManager.notifyUser(t('ai_suggestions.error_fetching_contacts_for_duplicates'), 'error');
-  }, [t]);
-
-  const {
-    isLoading: isLoadingContacts,
-    executeAsync: executeFetchContacts,
-  } = useErrorHandler(null, {
-    showToast: false,
-    onSuccess: onSuccessFetchContacts,
-    onError: onErrorFetchContacts,
-  });
-
-  const fetchAllContactsForDuplicates = useCallback(async () => {
-    if (isSessionLoading || !session?.user) {
-      setDuplicatePairs([]);
-      return;
-    }
-
-    setIsScanning(true);
-    await executeFetchContacts(async () => {
-      const { data: contacts, error: contactsError } = await supabase
-        .from('contacts')
-        .select(`
-          id,
-          first_name,
-          last_name,
-          company,
-          position,
-          notes,
-          avatar_url,
-          email_addresses(email_address),
-          phone_numbers(phone_number)
-        `)
-        .eq('user_id', session.user.id);
-
-      if (contactsError) throw new Error(contactsError.message);
-
-      return { data: contacts as DuplicateContact[], error: null, fromCache: false };
-    });
-    setIsScanning(true);
-  }, [session, isSessionLoading, executeFetchContacts]);
 
   const findDuplicates = useCallback((contacts: DuplicateContact[]) => {
     const duplicates: DuplicatePair[] = [];
@@ -135,6 +112,56 @@ const DuplicateContactManagement: React.FC = () => {
     }
   }, [t]);
 
+  const onSuccessFetchContacts = useCallback((result: { data: DuplicateContact[] | null; error: string | null; fromCache: boolean }) => {
+    if (result.data) {
+      findDuplicates(result.data);
+    }
+  }, [findDuplicates]);
+
+  const onErrorFetchContacts = useCallback((err: Error) => {
+    ErrorManager.logError(err, { component: 'DuplicateContactManagement', action: 'fetchAllContactsForDuplicates' });
+    ErrorManager.notifyUser(t('ai_suggestions.error_fetching_contacts_for_duplicates'), 'error');
+  }, [t]);
+
+  const {
+    isLoading: isLoadingContacts,
+    executeAsync: executeFetchContacts,
+  } = useErrorHandler(null, {
+    showToast: false,
+    onSuccess: onSuccessFetchContacts,
+    onError: onErrorFetchContacts,
+  });
+
+  const fetchAllContactsForDuplicates = useCallback(async () => {
+    if (isSessionLoading || !session?.user) {
+      setDuplicatePairs([]);
+      return;
+    }
+
+    setIsScanning(true);
+    await executeFetchContacts(async () => {
+      const { data: contacts, error: contactsError } = await supabase
+        .from('contacts')
+        .select(`
+          id,
+          first_name,
+          last_name,
+          company,
+          position,
+          notes,
+          avatar_url,
+          email_addresses(email_address),
+          phone_numbers(phone_number)
+        `)
+        .eq('user_id', session.user.id);
+
+      if (contactsError) throw new Error(contactsError.message);
+
+      return { data: contacts as DuplicateContact[], error: null, fromCache: false };
+    });
+    setIsScanning(false);
+  }, [session, isSessionLoading, executeFetchContacts]);
+
   useEffect(() => {
     fetchAllContactsForDuplicates();
   }, [fetchAllContactsForDuplicates]);
@@ -145,7 +172,7 @@ const DuplicateContactManagement: React.FC = () => {
       return;
     }
 
-    const toastId = ErrorManager.notifyUser(t('ai_suggestions.merging_contacts'), 'info');
+    ErrorManager.notifyUser(t('ai_suggestions.merging_contacts'), 'info');
     try {
       const { data: mainContactFull, error: mainError } = await supabase
         .from('contacts')
@@ -177,7 +204,7 @@ const DuplicateContactManagement: React.FC = () => {
         throw new Error(mainError?.message || duplicateError?.message || 'Failed to fetch full contact details for merging.');
       }
 
-      const mergedData: any = { ...mainContactFull };
+      const mergedData: FullContactData = { ...mainContactFull };
 
       if (!mergedData.company && duplicateContactFull.company) mergedData.company = duplicateContactFull.company;
       if (!mergedData.position && duplicateContactFull.position) mergedData.position = duplicateContactFull.position;
@@ -193,36 +220,36 @@ const DuplicateContactManagement: React.FC = () => {
 
 
       const mergedPhoneNumbers = [...mainContactFull.phone_numbers];
-      duplicateContactFull.phone_numbers.forEach((dp: any) => {
-        if (!mergedPhoneNumbers.some((mp: any) => mp.phone_number === dp.phone_number)) {
+      duplicateContactFull.phone_numbers.forEach((dp: PhoneNumber) => {
+        if (!mergedPhoneNumbers.some((mp: PhoneNumber) => mp.phone_number === dp.phone_number)) {
           mergedPhoneNumbers.push({ ...dp, contact_id: mainContact.id });
         }
       });
 
       const mergedEmailAddresses = [...mainContactFull.email_addresses];
-      duplicateContactFull.email_addresses.forEach((de: any) => {
-        if (!mergedEmailAddresses.some((me: any) => me.email_address === de.email_address)) {
+      duplicateContactFull.email_addresses.forEach((de: EmailAddress) => {
+        if (!mergedEmailAddresses.some((me: EmailAddress) => me.email_address === de.email_address)) {
           mergedEmailAddresses.push({ ...de, contact_id: mainContact.id });
         }
       });
 
       const mergedSocialLinks = [...mainContactFull.social_links];
-      duplicateContactFull.social_links.forEach((ds: any) => {
-        if (!mergedSocialLinks.some((ms: any) => ms.url === ds.url)) {
+      duplicateContactFull.social_links.forEach((ds: SocialLink) => {
+        if (!mergedSocialLinks.some((ms: SocialLink) => ms.url === ds.url)) {
           mergedSocialLinks.push({ ...ds, contact_id: mainContact.id });
         }
       });
 
       const mergedContactGroups = [...mainContactFull.contact_groups];
-      duplicateContactFull.contact_groups.forEach((dg: any) => {
-        if (!mergedContactGroups.some((mg: any) => mg.group_id === dg.group_id)) {
+      duplicateContactFull.contact_groups.forEach((dg: ContactGroup) => {
+        if (!mergedContactGroups.some((mg: ContactGroup) => mg.group_id === dg.group_id)) {
           mergedContactGroups.push({ ...dg, contact_id: mainContact.id });
         }
       });
 
       const mergedCustomFields = [...mainContactFull.custom_fields];
-      duplicateContactFull.custom_fields.forEach((dcf: any) => {
-        if (!mergedCustomFields.some((mcf: any) => mcf.template_id === dcf.template_id)) {
+      duplicateContactFull.custom_fields.forEach((dcf: CustomField) => {
+        if (!mergedCustomFields.some((mcf: CustomField) => mcf.template_id === dcf.template_id)) {
           mergedCustomFields.push({ ...dcf, contact_id: mainContact.id });
         }
       });
@@ -271,7 +298,7 @@ const DuplicateContactManagement: React.FC = () => {
       invalidateCache(`contacts_list_${session.user.id}_`);
       invalidateCache(`statistics_dashboard_${session.user.id}`);
       fetchAllContactsForDuplicates();
-    } catch (err: any) {
+    } catch (err: unknown) {
       ErrorManager.logError(err, { component: 'DuplicateContactManagement', action: 'mergeContacts', mainContact, duplicateContact });
       ErrorManager.notifyUser(`${t('ai_suggestions.error_merging_contacts')}: ${ErrorManager.getErrorMessage(err)}`, 'error');
     } finally {

@@ -7,8 +7,8 @@ import { Camera, XCircle, UploadCloud } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSession } from '@/integrations/supabase/auth';
 import { showError, showSuccess, showLoading, dismissToast } from '@/utils/toast';
-import { cn } from '@/lib/utils';
-import LoadingSpinner from './LoadingSpinner';
+import LoadingSpinner from './common/LoadingSpinner';
+import { useTranslation } from 'react-i18next';
 
 interface ContactAvatarUploadProps {
   initialAvatarUrl?: string | null;
@@ -17,6 +17,7 @@ interface ContactAvatarUploadProps {
 }
 
 const ContactAvatarUpload: React.FC<ContactAvatarUploadProps> = ({ initialAvatarUrl, onAvatarChange, disabled }) => {
+  const { t } = useTranslation();
   const { session } = useSession();
   const [avatarUrl, setAvatarUrl] = useState<string | null>(initialAvatarUrl || null);
   const [isUploading, setIsUploading] = useState(false);
@@ -28,7 +29,7 @@ const ContactAvatarUpload: React.FC<ContactAvatarUploadProps> = ({ initialAvatar
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (!session?.user) {
-      showError("برای آپلود تصویر پروفایل باید وارد شوید.");
+      showError(t('errors.upload_avatar_auth'));
       return;
     }
 
@@ -36,23 +37,23 @@ const ContactAvatarUpload: React.FC<ContactAvatarUploadProps> = ({ initialAvatar
     if (!file) return;
 
     if (!file.type.startsWith('image/')) {
-      showError("لطفاً یک فایل تصویری انتخاب کنید.");
+      showError(t('errors.select_image_file'));
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      showError("حجم فایل نباید بیشتر از 5 مگابایت باشد.");
+      showError(t('errors.file_size_limit'));
       return;
     }
 
     setIsUploading(true);
-    const toastId = showLoading("در حال آپلود تصویر...");
+    const toastId = showLoading(t('loading_messages.uploading_image'));
 
     try {
       const fileExt = file.name.split('.').pop();
       const fileName = `${session.user.id}/${Date.now()}.${fileExt}`;
 
-      const { data, error } = await supabase.storage
+      const { error } = await supabase.storage
         .from('avatars')
         .upload(fileName, file, {
           cacheControl: '3600',
@@ -68,15 +69,15 @@ const ContactAvatarUpload: React.FC<ContactAvatarUploadProps> = ({ initialAvatar
         .getPublicUrl(fileName);
 
       if (!publicUrlData?.publicUrl) {
-        throw new Error("خطا در دریافت URL عمومی تصویر.");
+        throw new Error(t('errors.public_url_error'));
       }
 
       setAvatarUrl(publicUrlData.publicUrl);
       onAvatarChange(publicUrlData.publicUrl);
-      showSuccess("تصویر با موفقیت آپلود شد.");
-    } catch (error: any) {
+      showSuccess(t('system_messages.upload_success'));
+    } catch (error: unknown) {
       console.error("Error uploading avatar:", error);
-      showError(`خطا در آپلود تصویر: ${error.message || "خطای ناشناخته"}`);
+      showError(t('errors.upload_error', { message: error instanceof Error ? error.message : t('common.unknown_error') }));
       setAvatarUrl(initialAvatarUrl || null);
     } finally {
       dismissToast(toastId);
@@ -91,7 +92,7 @@ const ContactAvatarUpload: React.FC<ContactAvatarUploadProps> = ({ initialAvatar
     if (!session?.user || !avatarUrl) return;
 
     setIsUploading(true);
-    const toastId = showLoading("در حال حذف تصویر...");
+    const toastId = showLoading(t('loading_messages.deleting_image'));
 
     try {
       const urlParts = avatarUrl.split('/');
@@ -107,10 +108,10 @@ const ContactAvatarUpload: React.FC<ContactAvatarUploadProps> = ({ initialAvatar
 
       setAvatarUrl(null);
       onAvatarChange(null);
-      showSuccess("تصویر با موفقیت حذف شد.");
-    } catch (error: any) {
+      showSuccess(t('system_messages.delete_success'));
+    } catch (error: unknown) {
       console.error("Error removing avatar:", error);
-      showError(`خطا در حذف تصویر: ${error.message || "خطای ناشناخته"}`);
+      showError(t('errors.delete_image_error', { message: error instanceof Error ? error.message : t('common.unknown_error') }));
     } finally {
       dismissToast(toastId);
       setIsUploading(false);
@@ -143,7 +144,7 @@ const ContactAvatarUpload: React.FC<ContactAvatarUploadProps> = ({ initialAvatar
         >
           {isUploading && <LoadingSpinner size={16} className="me-2" />}
           <UploadCloud size={16} />
-          {isUploading ? "در حال آپلود..." : "آپلود تصویر"}
+          {isUploading ? t('actions.uploading') : t('actions.upload_image')}
         </Button>
         {avatarUrl && (
           <Button
@@ -155,7 +156,7 @@ const ContactAvatarUpload: React.FC<ContactAvatarUploadProps> = ({ initialAvatar
           >
             {isUploading && <LoadingSpinner size={16} className="me-2" />}
             <XCircle size={16} />
-            حذف تصویر
+            {t('actions.delete_image')}
           </Button>
         )}
       </div>

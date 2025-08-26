@@ -1,0 +1,46 @@
+{
+  "files": [
+    {
+      "path": "./dist/assets/index-*.js",
+      "maxSize": "400kb",
+      "compression": "gzip"
+    },
+    {
+      "path": "./dist/assets/react-vendor-*.js", 
+      "maxSize": "150kb",
+      "compression": "gzip"
+    },
+    {
+      "path": "./dist/assets/ui-vendor-*.js",
+      "maxSize": "100kb",
+      "compression": "gzip"
+    },
+    {
+      "path": "./dist/assets/query-vendor-*.js",
+      "maxSize": "80kb",
+      "compression": "gzip"
+    },
+    {
+      "path": "./dist/assets/supabase-vendor-*.js",
+      "maxSize": "120kb",
+      "compression": "gzip"
+    },
+    {
+      "path": "./dist/assets/animation-vendor-*.js",
+      "maxSize": "60kb",
+      "compression": "gzip"
+    },
+    {
+      "path": "./dist/assets/*.css",
+      "maxSize": "40kb",
+      "compression": "gzip"
+    }
+  ],
+  "ci": {
+    "trackBranches": ["main", "develop"],
+    "repoBranchBase": "main"
+  },
+  "defaultCompression": "gzip",
+  "normalizeFilenames": "^.+?(\\..+?)$",
+  "reportFilePath": "./bundle-report.json"
+}

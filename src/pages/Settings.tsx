@@ -1,23 +1,23 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { MadeWithDyad } from "@/components/made-with-dyad";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
-import { ThemeToggle } from "@/components/ThemeToggle";
-import CalendarTypeSetting from "@/components/CalendarTypeSetting";
-import LanguageSetting from "@/components/LanguageSetting";
-import GeminiSettings from "@/components/GeminiSettings";
-import { Download, User, Settings as SettingsIcon, Sparkles, UploadCloud } from "lucide-react";
+import { ThemeToggle } from "@/components/settings/ThemeToggle";
+import CalendarTypeSetting from "@/components/settings/CalendarTypeSetting";
+import LanguageSetting from "@/components/settings/LanguageSetting";
+import GeminiSettings from "@/components/ai/GeminiSettings";
+import DebugSettings from "@/components/settings/DebugSettings";
+import { Download, User, Settings as SettingsIcon, Sparkles } from "lucide-react";
 import { exportContactsToCsv } from "@/utils/export-contacts";
 import { useSession } from "@/integrations/supabase/auth";
 import { Label } from "@/components/ui/label";
 import ImportContactsDialog from "@/components/ImportContactsDialog";
-import LoadingSpinner from '@/components/LoadingSpinner';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
 
 const Settings = () => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const { session } = useSession();
   const [isExporting, setIsExporting] = useState(false);
 
@@ -98,6 +98,9 @@ const Settings = () => {
               <ImportContactsDialog onImportSuccess={handleImportSuccess} />
             </div>
           </div>
+
+          {/* Debug Settings - Only in Development */}
+          <DebugSettings />
 
           {/* User Profile Link */}
           <div className="space-y-4">

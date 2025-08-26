@@ -1,7 +1,7 @@
-import React, { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { showError, showLoading, showSuccess, dismissToast } from "@/utils/toast";
+import { showError, showSuccess } from "@/utils/toast";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -12,11 +12,10 @@ import { Phone, Mail, Building, Briefcase, MapPin, Info, User, Users, Tag, Calen
 import { MadeWithDyad } from "@/components/made-with-dyad";
 import { useJalaliCalendar } from "@/hooks/use-jalali-calendar";
 import { fetchWithCache } from "@/utils/cache-helpers";
-import LoadingMessage from "@/components/LoadingMessage";
-import CancelButton from "@/components/CancelButton";
+import LoadingMessage from "@/components/common/LoadingMessage";
+import CancelButton from "@/components/common/CancelButton";
 import { ErrorManager } from "@/lib/error-manager";
 import { useErrorHandler } from "@/hooks/use-error-handler";
-import { ContactListService } from "@/services/contact-list-service"; // Updated import
 
 interface PhoneNumber {
   id: string;

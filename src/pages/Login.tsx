@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import IranFlag from '@/assets/icons/flags/IranFlag';
 import UKFlag from '@/assets/icons/flags/UKFlag';
-import LoadingMessage from '@/components/LoadingMessage'; // Import LoadingMessage
+import LoadingMessage from '@/components/common/LoadingMessage'; // Import LoadingMessage
 
 const Login = () => {
   const navigate = useNavigate();

@@ -3,35 +3,29 @@ import { MadeWithDyad } from "@/components/made-with-dyad";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Loader2, PlusCircle, UserCheck, Mic, StopCircle } from "lucide-react";
+import { Sparkles, UserCheck, Mic, StopCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { useContactExtractor, ExtractedContactInfo } from "@/hooks/use-contact-extractor";
+import { useContactExtractor } from "@/hooks/use-contact-extractor";
 import { ErrorManager } from "@/lib/error-manager";
-import LoadingMessage from "@/components/LoadingMessage";
-import AISuggestionCard, { AISuggestion as AISuggestionCardProps } from "@/components/AISuggestionCard";
-import { ContactFormValues, PhoneNumberFormData, EmailAddressFormData, SocialLinkFormData } from "@/types/contact";
+import LoadingMessage from "@/components/common/LoadingMessage";
+import AISuggestionCard, { AISuggestion as AISuggestionCardProps } from "@/components/ai/AISuggestionCard";
+import { ContactFormValues } from "@/types/contact";
 import { ContactCrudService } from "@/services/contact-crud-service"; // Updated import
 import { ContactListService } from "@/services/contact-list-service"; // Updated import
+import { PhoneNumberFormData } from "@/types/contact";
 import { useSession } from "@/integrations/supabase/auth";
 import { useErrorHandler } from "@/hooks/use-error-handler";
 import { invalidateCache, fetchWithCache } from "@/utils/cache-helpers";
 import { useNavigate } from "react-router-dom";
 import { AISuggestionsService, AISuggestion as AISuggestionServiceType } from "@/services/ai-suggestions-service";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import SmartGroupManagement from "@/components/SmartGroupManagement";
+import SmartGroupManagement from "@/components/groups/SmartGroupManagement";
 import DuplicateContactManagement from "@/components/DuplicateContactManagement";
-import GenderSuggestionManagement from "@/components/GenderSuggestionManagement";
+import GenderSuggestionManagement from "@/components/ai/GenderSuggestionManagement";
 import { useSpeechToText } from "@/hooks/use-speech-to-text";
-import EmptyState from '@/components/EmptyState';
-import LoadingSpinner from '@/components/LoadingSpinner';
+import EmptyState from '@/components/common/EmptyState';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
 
-interface ExistingContactSummary {
-  id: string;
-  first_name: string;
-  last_name: string;
-  email_addresses: { email_address: string }[];
-  phone_numbers: { phone_number: string }[];
-}
 
 interface AISuggestionDisplay extends AISuggestionCardProps {
   id: string;
@@ -130,8 +124,8 @@ const AISuggestions: React.FC = () => {
           const extracted = s.extracted_data;
           const existingContact = allContacts?.find(contact =>
             (contact.first_name === extracted.firstName && contact.last_name === extracted.lastName) ||
-            extracted.emailAddresses.some(e => contact.email_addresses.some((ce: any) => ce.email_address === e.email_address)) ||
-            extracted.phoneNumbers.some(p => contact.phone_numbers.some((cp: any) => cp.phone_number === p.phone_number))
+            extracted.emailAddresses.some(e => contact.email_addresses.some((ce: { id: string; email_type: string; email_address: string }) => ce.email_address === e.email_address)) ||
+            extracted.phoneNumbers.some(p => contact.phone_numbers.some((cp: PhoneNumberFormData) => cp.phone_number === p.phone_number))
           );
 
           if (existingContact) {
@@ -195,7 +189,7 @@ const AISuggestions: React.FC = () => {
     }
 
     setIsProcessingSuggestions(true);
-    const { success, error, suggestionId } = await enqueueContactExtraction(rawTextInput);
+    const { success, error } = await enqueueContactExtraction(rawTextInput);
 
     if (success) {
       // Invalidate cache for pending suggestions to force a refetch

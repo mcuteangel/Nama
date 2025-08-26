@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/integrations/supabase/auth";
 import { useErrorHandler } from "@/hooks/use-error-handler";
@@ -69,7 +69,28 @@ interface StatisticsData {
   topPositionsData: PositionData[];
 }
 
-const ContactStatisticsDashboard: React.FC = () => {
+/**
+ * ContactStatisticsDashboard component for displaying contact analytics
+ * 
+ * This component provides comprehensive statistics about contacts including:
+ * - Total contacts count
+ * - Gender distribution
+ * - Group distribution  
+ * - Preferred contact method distribution
+ * - Upcoming birthdays
+ * - Contact creation timeline
+ * - Top companies and positions
+ * 
+ * Features:
+ * - Performance optimized with React.memo and useMemo
+ * - Cached data fetching to reduce API calls
+ * - Error handling and retry functionality
+ * - Responsive skeleton loading states
+ * - Internationalization support
+ * 
+ * @returns JSX element representing the statistics dashboard
+ */
+const ContactStatisticsDashboard: React.FC = React.memo(() => {
   const { session, isLoading: isSessionLoading } = useSession();
   const { t } = useTranslation();
 
@@ -189,101 +210,105 @@ const ContactStatisticsDashboard: React.FC = () => {
     fetchStatistics();
   }, [fetchStatistics]);
 
-  const renderSkeleton = () => (
-    <>
-      <Card className="rounded-xl p-4 flex flex-col items-center justify-center text-center bg-white dark:bg-gray-800 min-h-[256px]">
-        <CardHeader className="pb-2">
-          <Skeleton className="h-6 w-3/4 mb-2" />
-        </CardHeader>
-        <CardContent>
-          <Skeleton className="h-12 w-24" />
-        </CardContent>
-      </Card>
-      <Card className="rounded-xl p-4 bg-white dark:bg-gray-800 min-h-[256px]">
-        <CardHeader className="pb-2">
-          <Skeleton className="h-6 w-3/4 mb-2" />
-        </CardHeader>
-        <CardContent className="h-64 flex items-center justify-center">
-          <Skeleton className="h-full w-full rounded-full" />
-        </CardContent>
-      </Card>
-      <Card className="rounded-xl p-4 bg-white dark:bg-gray-800 min-h-[256px]">
-        <CardHeader className="pb-2">
-          <Skeleton className="h-6 w-3/4 mb-2" />
-        </CardHeader>
-        <CardContent className="h-64 flex items-center justify-center">
-          <Skeleton className="h-full w-full rounded-full" />
-        </CardContent>
-      </Card>
-      <Card className="rounded-xl p-4 bg-white dark:bg-gray-800 min-h-[256px]">
-        <CardHeader className="pb-2">
-          <Skeleton className="h-6 w-3/4 mb-2" />
-        </CardHeader>
-        <CardContent className="h-64 flex items-center justify-center">
-          <Skeleton className="h-full w-full rounded-full" />
-        </CardContent>
-      </Card>
-      <Card className="rounded-xl p-4 col-span-1 md:col-span-2 lg:col-span-1 bg-white dark:bg-gray-800 min-h-[256px]">
-        <CardHeader className="pb-2">
-          <Skeleton className="h-6 w-3/4 mb-2" />
-        </CardHeader>
-        <CardContent className="h-64 overflow-y-auto custom-scrollbar space-y-3">
-          {[...Array(4)].map((_, i) => (
-            <Skeleton key={i} className="h-12 w-full rounded-md" />
-          ))}
-        </CardContent>
-      </Card>
-      <Card className="rounded-xl p-4 col-span-1 md:col-span-2 bg-white dark:bg-gray-800 min-h-[256px]">
-        <CardHeader className="pb-2">
-          <Skeleton className="h-6 w-3/4 mb-2" />
-        </CardHeader>
-        <CardContent className="h-64 flex items-center justify-center">
-          <Skeleton className="h-full w-full" />
-        </CardContent>
-      </Card>
-      <Card className="rounded-xl p-4 col-span-1 bg-white dark:bg-gray-800 min-h-[256px]">
-        <CardHeader className="pb-2">
-          <Skeleton className="h-6 w-3/4 mb-2" />
-        </CardHeader>
-        <CardContent className="h-64 overflow-y-auto custom-scrollbar space-y-3">
-          {[...Array(4)].map((_, i) => (
-            <Skeleton key={i} className="h-12 w-full rounded-md" />
-          ))}
-        </CardContent>
-      </Card>
-      <Card className="rounded-xl p-4 col-span-1 bg-white dark:bg-gray-800 min-h-[256px]">
-        <CardHeader className="pb-2">
-          <Skeleton className="h-6 w-3/4 mb-2" />
-        </CardHeader>
-        <CardContent className="h-64 overflow-y-auto custom-scrollbar space-y-3">
-          {[...Array(4)].map((_, i) => (
-            <Skeleton key={i} className="h-12 w-full rounded-md" />
-          ))}
-        </CardContent>
-      </Card>
-    </>
-  );
+  // Memoized skeleton component to prevent unnecessary re-renders
+  const renderSkeleton = useMemo(() => [
+    <Card key="skeleton-1" className="rounded-xl p-4 flex flex-col items-center justify-center text-center bg-white dark:bg-gray-800 min-h-[256px]">
+      <CardHeader className="pb-2">
+        <Skeleton className="h-6 w-3/4 mb-2" />
+      </CardHeader>
+      <CardContent>
+        <Skeleton className="h-12 w-24" />
+      </CardContent>
+    </Card>,
+    <Card key="skeleton-2" className="rounded-xl p-4 bg-white dark:bg-gray-800 min-h-[256px]">
+      <CardHeader className="pb-2">
+        <Skeleton className="h-6 w-3/4 mb-2" />
+      </CardHeader>
+      <CardContent className="h-64 flex items-center justify-center">
+        <Skeleton className="h-full w-full rounded-full" />
+      </CardContent>
+    </Card>,
+    <Card key="skeleton-3" className="rounded-xl p-4 bg-white dark:bg-gray-800 min-h-[256px]">
+      <CardHeader className="pb-2">
+        <Skeleton className="h-6 w-3/4 mb-2" />
+      </CardHeader>
+      <CardContent className="h-64 flex items-center justify-center">
+        <Skeleton className="h-full w-full rounded-full" />
+      </CardContent>
+    </Card>,
+    <Card key="skeleton-4" className="rounded-xl p-4 bg-white dark:bg-gray-800 min-h-[256px]">
+      <CardHeader className="pb-2">
+        <Skeleton className="h-6 w-3/4 mb-2" />
+      </CardHeader>
+      <CardContent className="h-64 flex items-center justify-center">
+        <Skeleton className="h-full w-full rounded-full" />
+      </CardContent>
+    </Card>,
+    <Card key="skeleton-5" className="rounded-xl p-4 col-span-1 md:col-span-2 lg:col-span-1 bg-white dark:bg-gray-800 min-h-[256px]">
+      <CardHeader className="pb-2">
+        <Skeleton className="h-6 w-3/4 mb-2" />
+      </CardHeader>
+      <CardContent className="h-64 overflow-y-auto custom-scrollbar space-y-3">
+        {[...Array(4)].map((_, i) => (
+          <Skeleton key={i} className="h-12 w-full rounded-md" />
+        ))}
+      </CardContent>
+    </Card>,
+    <Card key="skeleton-6" className="rounded-xl p-4 col-span-1 md:col-span-2 bg-white dark:bg-gray-800 min-h-[256px]">
+      <CardHeader className="pb-2">
+        <Skeleton className="h-6 w-3/4 mb-2" />
+      </CardHeader>
+      <CardContent className="h-64 flex items-center justify-center">
+        <Skeleton className="h-full w-full" />
+      </CardContent>
+    </Card>,
+    <Card key="skeleton-7" className="rounded-xl p-4 col-span-1 bg-white dark:bg-gray-800 min-h-[256px]">
+      <CardHeader className="pb-2">
+        <Skeleton className="h-6 w-3/4 mb-2" />
+      </CardHeader>
+      <CardContent className="h-64 overflow-y-auto custom-scrollbar space-y-3">
+        {[...Array(4)].map((_, i) => (
+          <Skeleton key={i} className="h-12 w-full rounded-md" />
+        ))}
+      </CardContent>
+    </Card>,
+    <Card key="skeleton-8" className="rounded-xl p-4 col-span-1 bg-white dark:bg-gray-800 min-h-[256px]">
+      <CardHeader className="pb-2">
+        <Skeleton className="h-6 w-3/4 mb-2" />
+      </CardHeader>
+      <CardContent className="h-64 overflow-y-auto custom-scrollbar space-y-3">
+        {[...Array(4)].map((_, i) => (
+          <Skeleton key={i} className="h-12 w-full rounded-md" />
+        ))}
+      </CardContent>
+    </Card>
+  ], []);
+
+  // Memoized dashboard components to prevent unnecessary re-renders
+  const dashboardComponents = useMemo(() => [
+    <TotalContactsCard key="total" count={statistics.totalContacts} />,
+    <ContactsByGenderChart key="gender" data={statistics.genderData} />,
+    <ContactsByGroupChart key="group" data={statistics.groupData} />,
+    <ContactsByPreferredMethodChart key="method" data={statistics.preferredMethodData} />,
+    <UpcomingBirthdaysList key="birthdays" data={statistics.upcomingBirthdays} />,
+    <ContactsByCreationTimeChart key="creation" data={statistics.creationTimeData} />,
+    <TopCompaniesList key="companies" data={statistics.topCompaniesData} />,
+    <TopPositionsList key="positions" data={statistics.topPositionsData} />
+  ], [statistics]);
 
   if (isLoading || isSessionLoading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
-        {renderSkeleton()}
+        {renderSkeleton}
       </div>
     );
   }
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <TotalContactsCard count={statistics.totalContacts} />
-      <ContactsByGenderChart data={statistics.genderData} />
-      <ContactsByGroupChart data={statistics.groupData} />
-      <ContactsByPreferredMethodChart data={statistics.preferredMethodData} />
-      <UpcomingBirthdaysList data={statistics.upcomingBirthdays} />
-      <ContactsByCreationTimeChart data={statistics.creationTimeData} />
-      <TopCompaniesList data={statistics.topCompaniesData} />
-      <TopPositionsList data={statistics.topPositionsData} />
+      {dashboardComponents}
     </div>
   );
-};
+});
 
 export default ContactStatisticsDashboard;

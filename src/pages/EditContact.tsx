@@ -1,22 +1,19 @@
-import React, { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { showError, showLoading, showSuccess, dismissToast } from "@/utils/toast";
+import { showError, showSuccess } from "@/utils/toast";
 import ContactForm from "@/components/ContactForm";
 import { MadeWithDyad } from "@/components/made-with-dyad";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { fetchWithCache } from "@/utils/cache-helpers";
-import LoadingMessage from "@/components/LoadingMessage";
-import CancelButton from "@/components/CancelButton";
+import LoadingMessage from "@/components/common/LoadingMessage";
+import CancelButton from "@/components/common/CancelButton";
 import { ErrorManager } from "@/lib/error-manager";
 import { useErrorHandler } from "@/hooks/use-error-handler";
 import { ExtractedContactInfo } from "@/hooks/use-contact-extractor";
 import { AISuggestionsService } from "@/services/ai-suggestions-service";
 import { useSession } from "@/integrations/supabase/auth";
 import { ContactFormValues } from "@/types/contact";
-import { ContactListService } from "@/services/contact-list-service";
-import { ContactCrudService } from "@/services/contact-crud-service";
 
 interface PhoneNumber {
   id: string;
@@ -120,7 +117,7 @@ const mapContactDetailToFormValues = (contact: ContactDetailType): ContactFormVa
 const EditContact = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { session, isLoading: isSessionLoading } = useSession();
+  const { session } = useSession();
   const [initialContactData, setInitialContactData] = useState<ContactFormValues | undefined>(undefined);
   const lastFetchedContactDataRef = useRef<ContactFormValues | undefined>(undefined);
 

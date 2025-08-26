@@ -88,6 +88,63 @@
     /* direction: rtl; Removed fixed direction, now controlled by JS */
     /* text-align: right; Removed fixed text-align, now controlled by JS */
   }
+  
+  /* RTL specific styles */
+  [dir="rtl"] {
+    text-align: right;
+  }
+  
+  [dir="rtl"] .rtl\:right-0 {
+    right: 0;
+    left: auto;
+  }
+  
+  [dir="rtl"] .rtl\:left-auto {
+    left: auto;
+  }
+  
+  [dir="rtl"] .rtl\:border-l {
+    border-left-width: 1px;
+    border-right-width: 0;
+  }
+  
+  [dir="rtl"] .rtl\:border-r-0 {
+    border-right-width: 0;
+  }
+  
+  [dir="rtl"] .rtl\:translate-x-0 {
+    transform: translateX(0);
+  }
+  
+  [dir="rtl"] .rtl\:translate-x-full {
+    transform: translateX(100%);
+  }
+  
+  [dir="rtl"] .rtl\:pr-10 {
+    padding-right: 2.5rem;
+    padding-left: 1rem;
+  }
+  
+  [dir="rtl"] .rtl\:pl-4 {
+    padding-left: 1rem;
+  }
+  
+  /* Mobile full-width utilities */
+  @media (max-width: 767px) {
+    .mobile-full-width {
+      width: 100vw;
+      margin-left: calc(-50vw + 50%);
+    }
+    
+    .mobile-no-padding {
+      padding-left: 0;
+      padding-right: 0;
+    }
+    
+    .mobile-compact {
+      padding: 0.25rem;
+    }
+  }
 }
 
 /* Enhanced Glassmorphism Effect */

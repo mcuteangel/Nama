@@ -12,10 +12,9 @@ import { CustomFieldTemplate } from "@/domain/schemas/custom-field-template";
 import { ContactFormValues, contactFormSchema, CustomFieldFormData } from "../types/contact.ts";
 import { fetchWithCache } from "@/utils/cache-helpers";
 import { Button } from "./ui/button.tsx";
-import { Textarea } from "./ui/textarea.tsx";
-import { Sparkles } from "lucide-react";
-import { useContactExtractor } from "@/hooks/use-contact-extractor";
 import { useTranslation } from "react-i18next";
+import { useAccessibility, useAnnouncement } from './AccessibilityProvider';
+import KeyboardNavigationHandler from './KeyboardNavigationHandler';
 
 // Import new modular components
 import ContactBasicInfo from "./contact-form/ContactBasicInfo.tsx";
@@ -27,20 +26,62 @@ import ContactImportantDates from "./contact-form/ContactImportantDates.tsx";
 import ContactCustomFields from "./contact-form/ContactCustomFields.tsx";
 import ContactFormActions from "./contact-form/ContactFormActions.tsx";
 import ContactAvatarUpload from "./ContactAvatarUpload.tsx";
-import { ErrorManager } from "@/lib/error-manager.ts";
-import LoadingMessage from "./LoadingMessage.tsx";
 
+/**
+ * Props for the ContactForm component
+ * @interface ContactFormProps
+ */
 interface ContactFormProps {
+  /** Initial form data for editing existing contacts */
   initialData?: ContactFormValues;
+  /** ID of the contact being edited (undefined for new contacts) */
   contactId?: string;
 }
 
-const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => {
+/**
+ * ContactForm component for creating and editing contacts
+ * 
+ * This component provides a comprehensive form for managing contact information including:
+ * - Basic information (name, gender, position, company)
+ * - Contact details (phone numbers, email addresses, social links)
+ * - Address information
+ * - Custom fields based on templates
+ * - Important dates and notes
+ * 
+ * Features:
+ * - Form validation using React Hook Form and Zod
+ * - Accessibility support with ARIA labels and announcements
+ * - Performance optimization with React.memo
+ * - Keyboard navigation support
+ * - Error handling and retry functionality
+ * 
+ * @param props - The component props
+ * @param props.initialData - Initial form data for editing existing contacts
+ * @param props.contactId - ID of the contact being edited (undefined for new contacts)
+ * @returns JSX element representing the contact form
+ */
+const ContactForm: React.FC<ContactFormProps> = React.memo(({ initialData, contactId }) => {
   const navigate = useNavigate();
   const { session } = useSession();
   const [availableTemplates, setAvailableTemplates] = useState<CustomFieldTemplate[]>([]);
   const [loadingTemplates, setLoadingTemplates] = useState(true);
   const { t } = useTranslation();
+  const { getAriaLabel, setAriaLabel } = useAccessibility();
+  const announce = useAnnouncement();
+  
+  // Set up ARIA labels for form
+  useEffect(() => {
+    const formTitle = contactId 
+      ? t('accessibility.edit_contact_form', 'Edit Contact Form')
+      : t('accessibility.add_contact_form', 'Add Contact Form');
+    
+    setAriaLabel('contact-form', formTitle);
+    setAriaLabel('contact-form-description', 
+      contactId 
+        ? t('accessibility.edit_contact_description', 'Edit contact information and details')
+        : t('accessibility.add_contact_description', 'Add new contact information and details')
+    );
+  }, [contactId, t, setAriaLabel]);
 
   const formSchema = useMemo(() => {
     return contactFormSchema.superRefine((data, ctx) => {
@@ -50,39 +91,41 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
           if (template && template.required && (!field.value || field.value.trim() === '')) {
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
-              message: `${template.name} الزامی است.`,
+              message: t('errors.field_required', { field: template.name }),
               path: [`customFields`, index, `value`],
             });
           }
         });
       }
     });
-  }, [availableTemplates]);
+  }, [availableTemplates, t]);
+
+  const defaultValues = useMemo(() => ({
+    firstName: "",
+    lastName: "",
+    gender: "not_specified" as const,
+    position: "",
+    company: "",
+    street: null,
+    city: null,
+    state: null,
+    zipCode: null,
+    country: null,
+    notes: null,
+    groupId: null,
+    birthday: null,
+    avatarUrl: null,
+    preferredContactMethod: null,
+    phoneNumbers: [],
+    emailAddresses: [],
+    socialLinks: [],
+    customFields: [],
+  }), []);
 
   const form = useForm<ContactFormValues>({
     resolver: zodResolver(formSchema),
-    // Initialize with empty defaults, initialData will be handled by useEffect
-    defaultValues: {
-      firstName: "",
-      lastName: "",
-      gender: "not_specified",
-      position: "",
-      company: "",
-      street: null,
-      city: null,
-      state: null,
-      zipCode: null,
-      country: null,
-      notes: null,
-      groupId: null,
-      birthday: null,
-      avatarUrl: null,
-      preferredContactMethod: null,
-      phoneNumbers: [],
-      emailAddresses: [],
-      socialLinks: [],
-      customFields: [],
-    },
+    // Initialize with memoized defaults, initialData will be handled by useEffect
+    defaultValues,
     context: { availableTemplates },
   });
 
@@ -97,17 +140,28 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
     } else if (!initialData && lastInitialDataRef.current) {
       // If initialData becomes undefined (e.g., navigating from edit to add), reset to default
       console.log("ContactForm: initialData became undefined, resetting form to defaults.");
-      form.reset({
-        firstName: "", lastName: "", gender: "not_specified", position: "", company: "",
-        street: null, city: null, state: null, zipCode: null, country: null, notes: null,
-        groupId: null, birthday: null, avatarUrl: null, preferredContactMethod: null,
-        phoneNumbers: [], emailAddresses: [], socialLinks: [], customFields: [],
-      });
+      form.reset(defaultValues);
       lastInitialDataRef.current = undefined;
     }
-  }, [initialData, form]);
+  }, [initialData, form, defaultValues]);
 
   const { onSubmit, isSubmitting, error, errorMessage, retrySave, retryCount } = useContactFormLogic(contactId, navigate, session, form, availableTemplates);
+
+  // Announce form state changes
+  useEffect(() => {
+    if (isSubmitting) {
+      announce(contactId 
+        ? t('accessibility.updating_contact', 'Updating contact...')
+        : t('accessibility.creating_contact', 'Creating contact...'), 'polite'
+      );
+    }
+  }, [isSubmitting, contactId, announce, t]);
+
+  useEffect(() => {
+    if (error && errorMessage) {
+      announce(t('accessibility.form_error', 'Form error: {{message}}', { message: errorMessage }), 'assertive');
+    }
+  }, [error, errorMessage, announce, t]);
 
   const fetchTemplates = useCallback(async () => {
     setLoadingTemplates(true);
@@ -189,57 +243,166 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, contactId }) => 
       console.log("ContactForm: Custom fields are the same as last set, no update needed.");
     }
 
-  }, [availableTemplates, initialData, loadingTemplates, form, session?.user?.id]); // Dependencies
+  }, [availableTemplates, initialData, loadingTemplates, form, session?.user]); // Dependencies
 
-  const handleCancel = () => {
+  const handleCancel = useCallback(() => {
+    announce(t('accessibility.form_cancelled', 'Form cancelled'), 'polite');
     navigate(-1);
-  };
+  }, [navigate, announce, t]);
 
   return (
-    <CardContent className="space-y-4">
-      {error && (
-        <div className="text-sm text-destructive flex items-center justify-center gap-2 mt-2">
-          <span>{errorMessage}</span>
-          {retryCount > 0 && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={retrySave}
-              disabled={isSubmitting}
-              className="text-destructive hover:bg-destructive/10"
+    <KeyboardNavigationHandler scope="forms">
+      <CardContent className="space-y-4">
+        {error && (
+          <div 
+            role="alert"
+            aria-live="assertive"
+            className="text-sm text-destructive flex items-center justify-center gap-2 mt-2 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg"
+          >
+            <span id="form-error-message">{errorMessage}</span>
+            {retryCount > 0 && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={retrySave}
+                disabled={isSubmitting}
+                className="text-destructive hover:bg-destructive/10"
+                aria-describedby="form-error-message"
+                aria-label={t('accessibility.retry_save', 'Retry saving form')}
+              >
+                {t('common.retry')} ({retryCount} {t('common.of')} ۳)
+              </Button>
+            )}
+          </div>
+        )}
+        <Form {...form}>
+          <form 
+            onSubmit={form.handleSubmit(onSubmit)} 
+            className="space-y-4"
+            role="form"
+            aria-labelledby="contact-form-title"
+            aria-describedby="contact-form-description"
+            noValidate
+          >
+            {/* Hidden form title and description for screen readers */}
+            <div className="sr-only">
+              <h2 id="contact-form-title">
+                {getAriaLabel('contact-form', contactId ? 'Edit Contact' : 'Add Contact')}
+              </h2>
+              <p id="contact-form-description">
+                {getAriaLabel('contact-form-description', 'Fill out the form to manage contact information')}
+              </p>
+            </div>
+            
+            {/* Form progress indicator for screen readers */}
+            <div 
+              className="sr-only" 
+              aria-live="polite" 
+              aria-atomic="true"
             >
-              {t('common.retry')} ({retryCount} {t('common.of')} ۳)
-            </Button>
-          )}
-        </div>
-      )}
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          <ContactAvatarUpload
-            initialAvatarUrl={form.watch('avatarUrl')}
-            onAvatarChange={(url) => form.setValue('avatarUrl', url)}
-            disabled={isSubmitting}
-          />
-          <ContactBasicInfo />
-          <ContactPhoneNumbers />
-          <ContactEmailAddresses />
-          <ContactSocialLinks />
-          <ContactImportantDates />
-          <ContactOtherDetails />
-          <ContactCustomFields
-            availableTemplates={availableTemplates}
-            loadingTemplates={loadingTemplates}
-            fetchTemplates={fetchTemplates}
-          />
-          <ContactFormActions
-            isSubmitting={isSubmitting}
-            onCancel={handleCancel}
-            contactId={contactId}
-          />
-        </form>
-      </Form>
-    </CardContent>
+              {isSubmitting && (
+                <span>
+                  {contactId 
+                    ? t('accessibility.updating_contact', 'Updating contact...')
+                    : t('accessibility.creating_contact', 'Creating contact...')
+                  }
+                </span>
+              )}
+            </div>
+            
+            <fieldset disabled={isSubmitting} className="space-y-4">
+              <legend className="sr-only">
+                {t('accessibility.contact_information', 'Contact Information')}
+              </legend>
+              
+              <div role="group" aria-labelledby="avatar-section-title">
+                <h3 id="avatar-section-title" className="sr-only">
+                  {t('accessibility.avatar_section', 'Avatar Section')}
+                </h3>
+                <ContactAvatarUpload
+                  initialAvatarUrl={form.watch('avatarUrl')}
+                  onAvatarChange={(url) => {
+                    form.setValue('avatarUrl', url);
+                    announce(url 
+                      ? t('accessibility.avatar_updated', 'Avatar updated')
+                      : t('accessibility.avatar_removed', 'Avatar removed'), 'polite'
+                    );
+                  }}
+                  disabled={isSubmitting}
+                />
+              </div>
+              
+              <div role="group" aria-labelledby="basic-info-section-title">
+                <h3 id="basic-info-section-title" className="sr-only">
+                  {t('accessibility.basic_info_section', 'Basic Information Section')}
+                </h3>
+                <ContactBasicInfo />
+              </div>
+              
+              <div role="group" aria-labelledby="phone-section-title">
+                <h3 id="phone-section-title" className="sr-only">
+                  {t('accessibility.phone_section', 'Phone Numbers Section')}
+                </h3>
+                <ContactPhoneNumbers />
+              </div>
+              
+              <div role="group" aria-labelledby="email-section-title">
+                <h3 id="email-section-title" className="sr-only">
+                  {t('accessibility.email_section', 'Email Addresses Section')}
+                </h3>
+                <ContactEmailAddresses />
+              </div>
+              
+              <div role="group" aria-labelledby="social-section-title">
+                <h3 id="social-section-title" className="sr-only">
+                  {t('accessibility.social_section', 'Social Links Section')}
+                </h3>
+                <ContactSocialLinks />
+              </div>
+              
+              <div role="group" aria-labelledby="dates-section-title">
+                <h3 id="dates-section-title" className="sr-only">
+                  {t('accessibility.dates_section', 'Important Dates Section')}
+                </h3>
+                <ContactImportantDates />
+              </div>
+              
+              <div role="group" aria-labelledby="other-details-section-title">
+                <h3 id="other-details-section-title" className="sr-only">
+                  {t('accessibility.other_details_section', 'Other Details Section')}
+                </h3>
+                <ContactOtherDetails />
+              </div>
+              
+              <div role="group" aria-labelledby="custom-fields-section-title">
+                <h3 id="custom-fields-section-title" className="sr-only">
+                  {t('accessibility.custom_fields_section', 'Custom Fields Section')}
+                </h3>
+                <ContactCustomFields
+                  availableTemplates={availableTemplates}
+                  loadingTemplates={loadingTemplates}
+                  fetchTemplates={fetchTemplates}
+                />
+              </div>
+              
+              <div role="group" aria-labelledby="form-actions-section-title">
+                <h3 id="form-actions-section-title" className="sr-only">
+                  {t('accessibility.form_actions_section', 'Form Actions Section')}
+                </h3>
+                <ContactFormActions
+                  isSubmitting={isSubmitting}
+                  onCancel={handleCancel}
+                  contactId={contactId}
+                />
+              </div>
+            </fieldset>
+          </form>
+        </Form>
+      </CardContent>
+    </KeyboardNavigationHandler>
   );
-};
+});
+
+ContactForm.displayName = 'ContactForm';
 
 export default ContactForm;
