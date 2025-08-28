@@ -142,7 +142,26 @@
     "names": "نام",
     "close": "بستن",
     "error_occurred": "مشکلی پیش آمده است",
-    "error_description": "خطای غیرمنتظره‌ای رخ داده است. لطفاً دوباره تلاش کنید."
+    "error_description": "خطای غیرمنتظره‌ای رخ داده است. لطفاً دوباره تلاش کنید.",
+    "rtl_test": "کامپوننت تست RTL",
+    "test_switch": "تست سوئیچ",
+    "test_modern_select": "تست انتخاب مدرن",
+    "test_traditional_select": "تست انتخاب سنتی",
+    "test_modern_input": "تست ورودی مدرن",
+    "test_traditional_textarea": "تست ناحیه متنی سنتی",
+    "test_tabs": "تست تب‌ها",
+    "select_placeholder": "یک گزینه را انتخاب کنید",
+    "input_placeholder": "متن را اینجا وارد کنید",
+    "textarea_placeholder": "متن را اینجا وارد کنید",
+    "option1": "گزینه 1",
+    "option2": "گزینه 2",
+    "option3": "گزینه 3",
+    "tab1": "تب 1",
+    "tab2": "تب 2",
+    "content1": "محتوای 1",
+    "content2": "محتوای 2",
+    "on": "روشن",
+    "off": "خاموش"
   },
   "login": {
     "title": "ورود به Nama Contacts",
@@ -184,7 +203,13 @@
     "user_profile": "پروفایل کاربری",
     "debug_mode": "حالت دیباگ",
     "enable_debug_mode": "فعال‌سازی حالت دیباگ",
-    "debug_mode_description": "نمایش ابزارهای تشخیص عیب در کامپوننت‌ها"
+    "debug_mode_description": "نمایش ابزارهای تشخیص عیب در کامپوننت‌ها",
+    "accessibility": "دسترس‌پذیری",
+    "accessibility_description": "فعال‌سازی قابلیت‌های دسترس‌پذیری مانند پشتیبانی از صفحه‌خوان و ناوبری با صفحه‌کلید",
+    "component_testing": "تست کامپوننت‌ها",
+    "rtl_components_test": "تست کامپوننت‌های RTL",
+    "rtl_components_test_description": "تست کامپوننت‌های رابط کاربری در چیدمان راست به چپ",
+    "test_components": "تست کامپوننت‌ها"
   },
   "user_management": {
     "title": "مدیریت کاربران",

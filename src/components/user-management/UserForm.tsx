@@ -2,17 +2,22 @@ import React, { useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ModernInput } from "@/components/ui/modern-input";
+import { 
+  Form, 
+  FormControl, 
+  FormDescription, 
+  FormField, 
+  FormItem, 
+  FormLabel, 
+  FormMessage 
+} from "@/components/ui/form";
 import { UserManagementService } from "@/services/user-management-service";
 import { useErrorHandler } from "@/hooks/use-error-handler";
 import { ErrorManager } from "@/lib/error-manager";
 import { useTranslation } from "react-i18next";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import CancelButton from "../common/CancelButton";
-import LoadingSpinner from '../common/LoadingSpinner';
+import { ModernSelect, ModernSelectContent, ModernSelectItem, ModernSelectTrigger, ModernSelectValue } from "@/components/ui/modern-select";
+import { ModernButton } from "@/components/ui/modern-button";
 
 interface UserFormProps {
   initialData?: {
@@ -121,13 +126,13 @@ const UserForm: React.FC<UserFormProps> = ({ initialData, onSuccess, onCancel })
   };
 
   return (
-    <Card className="w-full max-w-md rounded-xl p-6 bg-white dark:bg-gray-900">
-      <CardHeader className="text-center">
-        <CardTitle className="text-2xl font-bold text-gray-800 dark:text-gray-100">
+    <ModernCard variant="glass" className="w-full max-w-md rounded-xl p-6">
+      <ModernCardHeader className="text-center">
+        <ModernCardTitle className="text-2xl font-bold">
           {initialData ? t('user_management.edit_user') : t('user_management.add_new_user')}
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
+        </ModernCardTitle>
+      </ModernCardHeader>
+      <ModernCardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
@@ -137,11 +142,12 @@ const UserForm: React.FC<UserFormProps> = ({ initialData, onSuccess, onCancel })
                 <FormItem>
                   <FormLabel className="text-gray-700 dark:text-gray-300">{t('common.email')}</FormLabel>
                   <FormControl>
-                    <Input
+                    <ModernInput
                       placeholder={t('common.email_placeholder')}
                       {...field}
                       type="email"
                       disabled={!!initialData}
+                      variant="glass"
                       className="bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 focus:ring-blue-500 focus:border-blue-500"
                     />
                   </FormControl>
@@ -156,10 +162,11 @@ const UserForm: React.FC<UserFormProps> = ({ initialData, onSuccess, onCancel })
                 <FormItem>
                   <FormLabel className="text-gray-700 dark:text-gray-300">{t('common.password')}</FormLabel>
                   <FormControl>
-                    <Input
+                    <ModernInput
                       placeholder={initialData ? t('user_management.leave_blank_for_no_change') : t('common.password_placeholder')}
                       {...field}
                       type="password"
+                      variant="glass"
                       className="bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 focus:ring-blue-500 focus:border-blue-500"
                     />
                   </FormControl>
@@ -174,9 +181,10 @@ const UserForm: React.FC<UserFormProps> = ({ initialData, onSuccess, onCancel })
                 <FormItem>
                   <FormLabel className="text-gray-700 dark:text-gray-300">{t('common.first_name')}</FormLabel>
                   <FormControl>
-                    <Input
+                    <ModernInput
                       placeholder={t('common.first_name_placeholder')}
                       {...field}
+                      variant="glass"
                       className="bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 focus:ring-blue-500 focus:border-blue-500"
                     />
                   </FormControl>
@@ -191,9 +199,10 @@ const UserForm: React.FC<UserFormProps> = ({ initialData, onSuccess, onCancel })
                 <FormItem>
                   <FormLabel className="text-gray-700 dark:text-gray-300">{t('common.last_name')}</FormLabel>
                   <FormControl>
-                    <Input
+                    <ModernInput
                       placeholder={t('common.last_name_placeholder')}
                       {...field}
+                      variant="glass"
                       className="bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 focus:ring-blue-500 focus:border-blue-500"
                     />
                   </FormControl>
@@ -207,36 +216,37 @@ const UserForm: React.FC<UserFormProps> = ({ initialData, onSuccess, onCancel })
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-gray-700 dark:text-gray-300">{t('user_management.role')}</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <ModernSelect onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
-                      <SelectTrigger className="bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 focus:ring-blue-500 focus:border-blue-500">
-                        <SelectValue placeholder={t('user_management.select_role')} />
-                      </SelectTrigger>
+                      <ModernSelectTrigger variant="glass" className="w-full">
+                        <ModernSelectValue placeholder={t('user_management.select_role')} />
+                      </ModernSelectTrigger>
                     </FormControl>
-                    <SelectContent className="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700">
-                      <SelectItem value="user">{t('user_management.role_user')}</SelectItem>
-                      <SelectItem value="admin">{t('user_management.role_admin')}</SelectItem>
-                    </SelectContent>
-                  </Select>
+                    <ModernSelectContent variant="glass">
+                      <ModernSelectItem value="user">{t('user_management.role_user')}</ModernSelectItem>
+                      <ModernSelectItem value="admin">{t('user_management.role_admin')}</ModernSelectItem>
+                    </ModernSelectContent>
+                  </ModernSelect>
                   <FormMessage />
                 </FormItem>
               )}
             />
             <div className="flex justify-end gap-2 mt-6">
               <CancelButton onClick={onCancel} disabled={isLoading} />
-              <Button
+              <ModernButton
                 type="submit"
-                className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold"
+                variant="gradient-primary"
+                className="px-4 py-2 rounded-lg font-semibold"
                 disabled={isLoading}
               >
                 {isLoading && <LoadingSpinner size={16} className="me-2" />}
                 {isLoading ? (initialData ? t('common.saving') : t('common.creating')) : (initialData ? t('common.save') : t('common.create'))}
-              </Button>
+              </ModernButton>
             </div>
           </form>
         </Form>
-      </CardContent>
-    </Card>
+      </ModernCardContent>
+    </ModernCard>
   );
 };
 

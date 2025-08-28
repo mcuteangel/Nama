@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { Button } from "@/components/ui/button";
+import { ModernButton } from "@/components/ui/modern-button";
 import { Dialog } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Trash2, Edit, ClipboardList } from "lucide-react";
@@ -9,7 +9,7 @@ import { CustomFieldTemplateService } from "@/services/custom-field-template-ser
 import { useErrorHandler } from "@/hooks/use-error-handler";
 import { ErrorManager } from "@/lib/error-manager";
 import { type CustomFieldTemplate } from "@/domain/schemas/custom-field-template";
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { ModernCard, ModernCardContent, ModernCardHeader, ModernCardTitle } from "@/components/ui/modern-card";
 import { useSession } from "@/integrations/supabase/auth";
 import CustomFieldTemplateForm from "./CustomFieldTemplateForm";
 import AddCustomFieldTemplateDialog from "./AddCustomFieldTemplateDialog";
@@ -17,9 +17,9 @@ import { fetchWithCache, invalidateCache } from "@/utils/cache-helpers";
 import FormDialogWrapper from "./common/FormDialogWrapper";
 import LoadingMessage from "./common/LoadingMessage";
 import CancelButton from "./common/CancelButton";
-import { showError, showSuccess } from "@/utils/toast";
 import EmptyState from './common/EmptyState';
 import LoadingSpinner from './common/LoadingSpinner';
+import { useToast } from "@/components/ui/modern-toast";
 
 type TemplateType = 'text' | 'number' | 'date' | 'list';
 
@@ -34,6 +34,7 @@ interface TemplateViewModel {
 
 export function GlobalCustomFieldsManagement() {
   const { session, isLoading: isSessionLoading } = useSession();
+  const { toast } = useToast(); // Added toast hook
   const [customFields, setCustomFields] = useState<TemplateViewModel[]>([]);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingField, setEditingField] = useState<CustomFieldTemplate | null>(null);
@@ -48,15 +49,15 @@ export function GlobalCustomFieldsManagement() {
       required: t.required
     })));
     if (!result.fromCache) {
-      showSuccess("قالب‌های فیلد سفارشی با موفقیت بارگذاری شدند.");
+      toast.success("قالب‌های فیلد سفارشی با موفقیت بارگذاری شدند.");
     }
-  }, []);
+  }, [toast]);
 
   const onErrorFetchTemplates = useCallback((err: Error) => {
     console.error("Error loading custom field templates:", err);
-    showError(`خطا در دریافت لیست قالب‌های فیلدهای سفارشی: ${ErrorManager.getErrorMessage(err) || "خطای ناشناخته"}`);
+    toast.error(`خطا در دریافت لیست قالب‌های فیلدهای سفارشی: ${ErrorManager.getErrorMessage(err) || "خطای ناشناخته"}`);
     setCustomFields([]);
-  }, []);
+  }, [toast]);
 
   const {
     isLoading: loadingTemplates,
@@ -149,13 +150,13 @@ export function GlobalCustomFieldsManagement() {
   };
 
   return (
-    <Card className="w-full max-w-4xl glass rounded-xl p-6">
-      <CardHeader className="text-center">
-        <CardTitle className="text-4xl font-bold text-gray-800 dark:text-gray-100 mb-2">
+    <ModernCard variant="glass" className="w-full max-w-4xl rounded-xl p-6">
+      <ModernCardHeader className="text-center">
+        <ModernCardTitle className="text-4xl font-bold text-gray-800 dark:text-gray-100 mb-2">
           مدیریت فیلدهای سفارشی
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
+        </ModernCardTitle>
+      </ModernCardHeader>
+      <ModernCardContent>
         <div className="flex justify-end items-center mb-6">
           <AddCustomFieldTemplateDialog onTemplateAdded={loadTemplates} />
         </div>
@@ -197,20 +198,20 @@ export function GlobalCustomFieldsManagement() {
                     )}
                   </div>
                   <div className="flex gap-2">
-                    <Button
+                    <ModernButton
                       variant="ghost"
                       size="icon"
                       onClick={() => handleEditClick(field as CustomFieldTemplate)}
                       className="text-blue-600 hover:bg-blue-100 dark:text-blue-400 dark:hover:bg-gray-600/50 transition-all duration-200"
                     >
                       <Edit size={16} />
-                    </Button>
+                    </ModernButton>
 
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
-                        <Button variant="ghost" size="icon" className="text-red-600 hover:bg-red-100 dark:text-red-400 dark:hover:bg-gray-600/50 transition-all duration-200" disabled={isOperationLoading}>
+                        <ModernButton variant="ghost" size="icon" className="text-red-600 hover:bg-red-100 dark:text-red-400 dark:hover:bg-gray-600/50 transition-all duration-200" disabled={isOperationLoading}>
                           {isOperationLoading ? <LoadingSpinner size={16} /> : <Trash2 size={16} />}
-                        </Button>
+                        </ModernButton>
                       </AlertDialogTrigger>
                       <AlertDialogContent className="glass rounded-xl p-6">
                         <AlertDialogHeader>
@@ -234,7 +235,7 @@ export function GlobalCustomFieldsManagement() {
             ))}
           </div>
         )}
-      </CardContent>
+      </ModernCardContent>
 
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <FormDialogWrapper>
@@ -245,6 +246,6 @@ export function GlobalCustomFieldsManagement() {
           />
         </FormDialogWrapper>
       </Dialog>
-    </Card>
+    </ModernCard>
   );
 }

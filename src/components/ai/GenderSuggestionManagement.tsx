@@ -1,6 +1,4 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Sparkles, User, CheckCircle, XCircle, LightbulbOff, Brain } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useSession } from "@/integrations/supabase/auth";
@@ -14,6 +12,8 @@ import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescript
 import CancelButton from '../common/CancelButton';
 import EmptyState from '../common/EmptyState';
 import LoadingSpinner from '../common/LoadingSpinner';
+import { ModernCard, ModernCardHeader, ModernCardTitle, ModernCardDescription, ModernCardContent } from "@/components/ui/modern-card";
+import { ModernButton } from "@/components/ui/modern-button";
 
 interface ContactForGenderSuggestion {
   id: string;
@@ -178,16 +178,16 @@ const GenderSuggestionManagement: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <Card className="glass rounded-xl p-4">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-xl font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
+      <ModernCard variant="glass" className="rounded-xl p-4">
+        <ModernCardHeader className="pb-2">
+          <ModernCardTitle className="text-xl font-bold flex items-center gap-2">
             <User size={20} className="text-pink-500" /> {t('ai_suggestions.gender_suggestion_title')}
-          </CardTitle>
-          <CardDescription className="text-gray-600 dark:text-gray-300">
+          </ModernCardTitle>
+          <ModernCardDescription>
             {t('ai_suggestions.gender_suggestion_description_local')}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
+          </ModernCardDescription>
+        </ModernCardHeader>
+        <ModernCardContent className="space-y-4">
           <div className="flex items-center justify-between p-3 glass rounded-lg shadow-sm">
             <div className="flex items-center gap-2">
               <Brain size={20} className="text-indigo-500" />
@@ -198,26 +198,27 @@ const GenderSuggestionManagement: React.FC = () => {
             </span>
           </div>
 
-          <Button
+          <ModernButton
             onClick={handleGenerateSuggestions}
             disabled={isGenerating || ungenderedContacts.length === 0}
-            className="w-full flex items-center gap-2 px-6 py-2 rounded-lg bg-pink-600 hover:bg-pink-700 text-white font-semibold shadow-md transition-all duration-300 transform hover:scale-105"
+            variant="gradient-primary"
+            className="w-full flex items-center gap-2 px-6 py-2 rounded-lg font-semibold shadow-md transition-all duration-300 transform hover:scale-105"
           >
             {isGenerating && <LoadingSpinner size={16} className="me-2" />}
             <Sparkles size={16} className="me-2" />
             {t('ai_suggestions.generate_gender_suggestions')}
-          </Button>
+          </ModernButton>
 
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button
+              <ModernButton
                 variant="outline"
                 disabled={isGenerating || learnedNamesCount === 0}
-                className="w-full flex items-center gap-2 px-6 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold shadow-sm transition-all duration-300 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-200 dark:border-gray-600"
+                className="w-full flex items-center gap-2 px-6 py-2 rounded-lg font-semibold shadow-sm transition-all duration-300"
               >
                 <LightbulbOff size={16} />
                 {t('ai_suggestions.clear_learned_preferences')}
-              </Button>
+              </ModernButton>
             </AlertDialogTrigger>
             <AlertDialogContent className="glass rounded-xl p-6">
               <AlertDialogHeader>
@@ -262,29 +263,29 @@ const GenderSuggestionManagement: React.FC = () => {
                     </p>
                   </div>
                   <div className="flex gap-2">
-                    <Button
+                    <ModernButton
                       variant="ghost"
                       size="icon"
                       onClick={() => handleAcceptSuggestion(suggestion)}
                       className="text-green-600 hover:bg-green-100 dark:text-green-400 dark:hover:bg-gray-600/50"
                     >
                       <CheckCircle size={20} />
-                    </Button>
-                    <Button
+                    </ModernButton>
+                    <ModernButton
                       variant="ghost"
                       size="icon"
                       onClick={() => handleDiscardSuggestion(suggestion.contactId)}
                       className="text-red-600 hover:bg-red-100 dark:text-red-400 dark:hover:bg-gray-600/50"
                     >
                       <XCircle size={20} />
-                    </Button>
+                    </ModernButton>
                   </div>
                 </div>
               ))}
             </div>
           )}
-        </CardContent>
-      </Card>
+        </ModernCardContent>
+      </ModernCard>
     </div>
   );
 };

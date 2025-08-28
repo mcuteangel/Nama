@@ -1,19 +1,21 @@
-import { CardContent } from "@/components/ui/card";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Form } from "@/components/ui/form";
 import { useNavigate } from "react-router-dom";
-import React, { useEffect, useState, useCallback, useMemo, useRef } from "react"; // Import useRef
+import React, { useEffect, useState, useCallback, useMemo, useRef } from "react";
 import { useSession } from "@/integrations/supabase/auth";
 import { useContactFormLogic } from "@/hooks/use-contact-form-logic";
-import { CustomFieldTemplateService } from "@/services/custom-field-template-service"; // Updated import
+import { CustomFieldTemplateService } from "@/services/custom-field-template-service";
 import { CustomFieldTemplate } from "@/domain/schemas/custom-field-template";
 import { ContactFormValues, contactFormSchema, CustomFieldFormData } from "../types/contact.ts";
 import { fetchWithCache } from "@/utils/cache-helpers";
-import { Button } from "./ui/button.tsx";
+import { ModernButton } from "./ui/modern-button.tsx";
+import { ModernProgress } from "./ui/modern-progress.tsx";
+import { ModernCard, ModernCardContent } from "@/components/ui/modern-card";
 import { useTranslation } from "react-i18next";
-import { useAccessibility, useAnnouncement } from './AccessibilityProvider';
+import { useAccessibility } from './accessibilityHooks';
+import { useAnnouncement } from './accessibilityHooks';
 import KeyboardNavigationHandler from './KeyboardNavigationHandler';
 
 // Import new modular components
@@ -252,153 +254,168 @@ const ContactForm: React.FC<ContactFormProps> = React.memo(({ initialData, conta
 
   return (
     <KeyboardNavigationHandler scope="forms">
-      <CardContent className="space-y-4">
-        {error && (
-          <div 
-            role="alert"
-            aria-live="assertive"
-            className="text-sm text-destructive flex items-center justify-center gap-2 mt-2 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg"
-          >
-            <span id="form-error-message">{errorMessage}</span>
-            {retryCount > 0 && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={retrySave}
-                disabled={isSubmitting}
-                className="text-destructive hover:bg-destructive/10"
-                aria-describedby="form-error-message"
-                aria-label={t('accessibility.retry_save', 'Retry saving form')}
-              >
-                {t('common.retry')} ({retryCount} {t('common.of')} ۳)
-              </Button>
-            )}
-          </div>
-        )}
-        <Form {...form}>
-          <form 
-            onSubmit={form.handleSubmit(onSubmit)} 
-            className="space-y-4"
-            role="form"
-            aria-labelledby="contact-form-title"
-            aria-describedby="contact-form-description"
-            noValidate
-          >
-            {/* Hidden form title and description for screen readers */}
-            <div className="sr-only">
-              <h2 id="contact-form-title">
-                {getAriaLabel('contact-form', contactId ? 'Edit Contact' : 'Add Contact')}
-              </h2>
-              <p id="contact-form-description">
-                {getAriaLabel('contact-form-description', 'Fill out the form to manage contact information')}
-              </p>
-            </div>
-            
-            {/* Form progress indicator for screen readers */}
+      <ModernCard variant="glass" className="rounded-xl p-6">
+        <ModernCardContent className="space-y-4">
+          {error && (
             <div 
-              className="sr-only" 
-              aria-live="polite" 
-              aria-atomic="true"
+              role="alert"
+              aria-live="assertive"
+              className="text-sm text-destructive flex items-center justify-center gap-2 mt-2 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg"
             >
-              {isSubmitting && (
-                <span>
-                  {contactId 
-                    ? t('accessibility.updating_contact', 'Updating contact...')
-                    : t('accessibility.creating_contact', 'Creating contact...')
-                  }
-                </span>
+              <span id="form-error-message">{errorMessage}</span>
+              {retryCount > 0 && (
+                <ModernButton
+                  variant="ghost"
+                  size="sm"
+                  onClick={retrySave}
+                  disabled={isSubmitting}
+                  className="text-destructive hover:bg-destructive/10"
+                  aria-describedby="form-error-message"
+                  aria-label={t('accessibility.retry_save', 'Retry saving form')}
+                >
+                  {t('common.retry')} ({retryCount} {t('common.of')} ۳)
+                </ModernButton>
               )}
             </div>
-            
-            <fieldset disabled={isSubmitting} className="space-y-4">
-              <legend className="sr-only">
-                {t('accessibility.contact_information', 'Contact Information')}
-              </legend>
-              
-              <div role="group" aria-labelledby="avatar-section-title">
-                <h3 id="avatar-section-title" className="sr-only">
-                  {t('accessibility.avatar_section', 'Avatar Section')}
-                </h3>
-                <ContactAvatarUpload
-                  initialAvatarUrl={form.watch('avatarUrl')}
-                  onAvatarChange={(url) => {
-                    form.setValue('avatarUrl', url);
-                    announce(url 
-                      ? t('accessibility.avatar_updated', 'Avatar updated')
-                      : t('accessibility.avatar_removed', 'Avatar removed'), 'polite'
-                    );
-                  }}
-                  disabled={isSubmitting}
-                />
+          )}
+          
+          {/* Progress indicator for form submission */}
+          {isSubmitting && (
+            <div className="space-y-2">
+              <ModernProgress value={75} className="w-full" />
+              <p className="text-sm text-muted-foreground text-center">
+                {contactId 
+                  ? t('accessibility.updating_contact', 'در حال به‌روزرسانی مخاطب...') 
+                  : t('accessibility.creating_contact', 'در حال ایجاد مخاطب...')
+                }
+              </p>
+            </div>
+          )}
+          <Form {...form}>
+            <form 
+              onSubmit={form.handleSubmit(onSubmit)} 
+              className="space-y-4"
+              role="form"
+              aria-labelledby="contact-form-title"
+              aria-describedby="contact-form-description"
+              noValidate
+            >
+              {/* Hidden form title and description for screen readers */}
+              <div className="sr-only">
+                <h2 id="contact-form-title">
+                  {getAriaLabel('contact-form', contactId ? 'Edit Contact' : 'Add Contact')}
+                </h2>
+                <p id="contact-form-description">
+                  {getAriaLabel('contact-form-description', 'Fill out the form to manage contact information')}
+                </p>
               </div>
               
-              <div role="group" aria-labelledby="basic-info-section-title">
-                <h3 id="basic-info-section-title" className="sr-only">
-                  {t('accessibility.basic_info_section', 'Basic Information Section')}
-                </h3>
-                <ContactBasicInfo />
+              {/* Form progress indicator for screen readers */}
+              <div 
+                className="sr-only" 
+                aria-live="polite" 
+                aria-atomic="true"
+              >
+                {isSubmitting && (
+                  <span>
+                    {contactId 
+                      ? t('accessibility.updating_contact', 'Updating contact...')
+                      : t('accessibility.creating_contact', 'Creating contact...')
+                    }
+                  </span>
+                )}
               </div>
               
-              <div role="group" aria-labelledby="phone-section-title">
-                <h3 id="phone-section-title" className="sr-only">
-                  {t('accessibility.phone_section', 'Phone Numbers Section')}
-                </h3>
-                <ContactPhoneNumbers />
-              </div>
-              
-              <div role="group" aria-labelledby="email-section-title">
-                <h3 id="email-section-title" className="sr-only">
-                  {t('accessibility.email_section', 'Email Addresses Section')}
-                </h3>
-                <ContactEmailAddresses />
-              </div>
-              
-              <div role="group" aria-labelledby="social-section-title">
-                <h3 id="social-section-title" className="sr-only">
-                  {t('accessibility.social_section', 'Social Links Section')}
-                </h3>
-                <ContactSocialLinks />
-              </div>
-              
-              <div role="group" aria-labelledby="dates-section-title">
-                <h3 id="dates-section-title" className="sr-only">
-                  {t('accessibility.dates_section', 'Important Dates Section')}
-                </h3>
-                <ContactImportantDates />
-              </div>
-              
-              <div role="group" aria-labelledby="other-details-section-title">
-                <h3 id="other-details-section-title" className="sr-only">
-                  {t('accessibility.other_details_section', 'Other Details Section')}
-                </h3>
-                <ContactOtherDetails />
-              </div>
-              
-              <div role="group" aria-labelledby="custom-fields-section-title">
-                <h3 id="custom-fields-section-title" className="sr-only">
-                  {t('accessibility.custom_fields_section', 'Custom Fields Section')}
-                </h3>
-                <ContactCustomFields
-                  availableTemplates={availableTemplates}
-                  loadingTemplates={loadingTemplates}
-                  fetchTemplates={fetchTemplates}
-                />
-              </div>
-              
-              <div role="group" aria-labelledby="form-actions-section-title">
-                <h3 id="form-actions-section-title" className="sr-only">
-                  {t('accessibility.form_actions_section', 'Form Actions Section')}
-                </h3>
-                <ContactFormActions
-                  isSubmitting={isSubmitting}
-                  onCancel={handleCancel}
-                  contactId={contactId}
-                />
-              </div>
-            </fieldset>
-          </form>
-        </Form>
-      </CardContent>
+              <fieldset disabled={isSubmitting} className="space-y-4">
+                <legend className="sr-only">
+                  {t('accessibility.contact_information', 'Contact Information')}
+                </legend>
+                
+                <div role="group" aria-labelledby="avatar-section-title">
+                  <h3 id="avatar-section-title" className="sr-only">
+                    {t('accessibility.avatar_section', 'Avatar Section')}
+                  </h3>
+                  <ContactAvatarUpload
+                    initialAvatarUrl={form.watch('avatarUrl')}
+                    onAvatarChange={(url) => {
+                      form.setValue('avatarUrl', url);
+                      announce(url 
+                        ? t('accessibility.avatar_updated', 'Avatar updated')
+                        : t('accessibility.avatar_removed', 'Avatar removed'), 'polite'
+                      );
+                    }}
+                    disabled={isSubmitting}
+                  />
+                </div>
+                
+                <div role="group" aria-labelledby="basic-info-section-title">
+                  <h3 id="basic-info-section-title" className="sr-only">
+                    {t('accessibility.basic_info_section', 'Basic Information Section')}
+                  </h3>
+                  <ContactBasicInfo />
+                </div>
+                
+                <div role="group" aria-labelledby="phone-section-title">
+                  <h3 id="phone-section-title" className="sr-only">
+                    {t('accessibility.phone_section', 'Phone Numbers Section')}
+                  </h3>
+                  <ContactPhoneNumbers />
+                </div>
+                
+                <div role="group" aria-labelledby="email-section-title">
+                  <h3 id="email-section-title" className="sr-only">
+                    {t('accessibility.email_section', 'Email Addresses Section')}
+                  </h3>
+                  <ContactEmailAddresses />
+                </div>
+                
+                <div role="group" aria-labelledby="social-section-title">
+                  <h3 id="social-section-title" className="sr-only">
+                    {t('accessibility.social_section', 'Social Links Section')}
+                  </h3>
+                  <ContactSocialLinks />
+                </div>
+                
+                <div role="group" aria-labelledby="dates-section-title">
+                  <h3 id="dates-section-title" className="sr-only">
+                    {t('accessibility.dates_section', 'Important Dates Section')}
+                  </h3>
+                  <ContactImportantDates />
+                </div>
+                
+                <div role="group" aria-labelledby="other-details-section-title">
+                  <h3 id="other-details-section-title" className="sr-only">
+                    {t('accessibility.other_details_section', 'Other Details Section')}
+                  </h3>
+                  <ContactOtherDetails />
+                </div>
+                
+                <div role="group" aria-labelledby="custom-fields-section-title">
+                  <h3 id="custom-fields-section-title" className="sr-only">
+                    {t('accessibility.custom_fields_section', 'Custom Fields Section')}
+                  </h3>
+                  <ContactCustomFields
+                    availableTemplates={availableTemplates}
+                    loadingTemplates={loadingTemplates}
+                    fetchTemplates={fetchTemplates}
+                  />
+                </div>
+                
+                <div role="group" aria-labelledby="form-actions-section-title">
+                  <h3 id="form-actions-section-title" className="sr-only">
+                    {t('accessibility.form_actions_section', 'Form Actions Section')}
+                  </h3>
+                  <ContactFormActions
+                    isSubmitting={isSubmitting}
+                    onCancel={handleCancel}
+                    contactId={contactId}
+                  />
+                </div>
+              </fieldset>
+            </form>
+          </Form>
+        </ModernCardContent>
+      </ModernCard>
     </KeyboardNavigationHandler>
   );
 });

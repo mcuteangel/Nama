@@ -1,36 +1,64 @@
 import * as React from "react";
 
 import { cn } from "@/lib/utils";
+import { 
+  ModernTable, 
+  ModernTableHeader, 
+  ModernTableBody, 
+  ModernTableFooter, 
+  ModernTableHead, 
+  ModernTableRow, 
+  ModernTableCell, 
+  ModernTableCaption,
+  type ModernTableProps,
+  type ModernTableHeaderProps,
+  type ModernTableBodyProps,
+  type ModernTableFooterProps,
+  type ModernTableRowProps,
+  type ModernTableHeadProps,
+  type ModernTableCellProps
+} from "@/components/ui/modern-table";
 
 const Table = React.forwardRef<
   HTMLTableElement,
-  React.HTMLAttributes<HTMLTableElement>
+  React.HTMLAttributes<HTMLTableElement> & ModernTableProps
 >(({ className, ...props }, ref) => (
-  <div className="relative w-full overflow-auto">
-    <table
-      ref={ref}
-      className={cn("w-full caption-bottom text-sm", className)}
-      {...props}
-    />
-  </div>
+  <ModernTable
+    ref={ref}
+    className={cn(
+      "w-full caption-bottom text-sm",
+      className,
+    )}
+    {...props}
+  />
 ));
 Table.displayName = "Table";
 
 const TableHeader = React.forwardRef<
   HTMLTableSectionElement,
-  React.HTMLAttributes<HTMLTableSectionElement>
+  React.HTMLAttributes<HTMLTableSectionElement> & ModernTableHeaderProps
 >(({ className, ...props }, ref) => (
-  <thead ref={ref} className={cn("[&_tr]:border-b", className)} {...props} />
+  <ModernTableHeader
+    ref={ref}
+    className={cn(
+      "[&_tr]:border-b",
+      className,
+    )}
+    {...props}
+  />
 ));
 TableHeader.displayName = "TableHeader";
 
 const TableBody = React.forwardRef<
   HTMLTableSectionElement,
-  React.HTMLAttributes<HTMLTableSectionElement>
+  React.HTMLAttributes<HTMLTableSectionElement> & ModernTableBodyProps
 >(({ className, ...props }, ref) => (
-  <tbody
+  <ModernTableBody
     ref={ref}
-    className={cn("[&_tr:last-child]:border-0", className)}
+    className={cn(
+      "[&_tr:last-child]:border-0",
+      className,
+    )}
     {...props}
   />
 ));
@@ -38,9 +66,9 @@ TableBody.displayName = "TableBody";
 
 const TableFooter = React.forwardRef<
   HTMLTableSectionElement,
-  React.HTMLAttributes<HTMLTableSectionElement>
+  React.HTMLAttributes<HTMLTableSectionElement> & ModernTableFooterProps
 >(({ className, ...props }, ref) => (
-  <tfoot
+  <ModernTableFooter
     ref={ref}
     className={cn(
       "border-t bg-muted/50 font-medium [&>tr]:last:border-b-0",
@@ -53,9 +81,9 @@ TableFooter.displayName = "TableFooter";
 
 const TableRow = React.forwardRef<
   HTMLTableRowElement,
-  React.HTMLAttributes<HTMLTableRowElement>
+  React.HTMLAttributes<HTMLTableRowElement> & ModernTableRowProps
 >(({ className, ...props }, ref) => (
-  <tr
+  <ModernTableRow
     ref={ref}
     className={cn(
       "border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted",
@@ -68,9 +96,9 @@ TableRow.displayName = "TableRow";
 
 const TableHead = React.forwardRef<
   HTMLTableCellElement,
-  React.ThHTMLAttributes<HTMLTableCellElement>
+  React.ThHTMLAttributes<HTMLTableCellElement> & ModernTableHeadProps
 >(({ className, ...props }, ref) => (
-  <th
+  <ModernTableHead
     ref={ref}
     className={cn(
       "h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0",
@@ -83,11 +111,14 @@ TableHead.displayName = "TableHead";
 
 const TableCell = React.forwardRef<
   HTMLTableCellElement,
-  React.TdHTMLAttributes<HTMLTableCellElement>
+  React.TdHTMLAttributes<HTMLTableCellElement> & ModernTableCellProps
 >(({ className, ...props }, ref) => (
-  <td
+  <ModernTableCell
     ref={ref}
-    className={cn("p-4 align-middle [&:has([role=checkbox])]:pr-0", className)}
+    className={cn(
+      "p-4 align-middle [&:has([role=checkbox])]:pr-0",
+      className,
+    )}
     {...props}
   />
 ));
@@ -97,7 +128,7 @@ const TableCaption = React.forwardRef<
   HTMLTableCaptionElement,
   React.HTMLAttributes<HTMLTableCaptionElement>
 >(({ className, ...props }, ref) => (
-  <caption
+  <ModernTableCaption
     ref={ref}
     className={cn("mt-4 text-sm text-muted-foreground", className)}
     {...props}

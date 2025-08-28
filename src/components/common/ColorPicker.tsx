@@ -1,6 +1,6 @@
 import React from 'react';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Button } from '@/components/ui/button';
+import { ModernPopover, ModernPopoverContent, ModernPopoverTrigger } from '@/components/ui/modern-popover';
+import { ModernButton } from '@/components/ui/modern-button';
 import { cn } from '@/lib/utils';
 
 export const colors = [
@@ -31,9 +31,9 @@ interface ColorPickerProps {
 
 const ColorPicker: React.FC<ColorPickerProps> = ({ selectedColor, onSelectColor }) => {
   return (
-    <Popover>
-      <PopoverTrigger asChild>
-        <Button
+    <ModernPopover>
+      <ModernPopoverTrigger asChild>
+        <ModernButton
           variant="outline"
           className="w-full justify-start text-left font-normal mt-1"
           style={{ backgroundColor: selectedColor, color: '#fff' }}
@@ -45,9 +45,9 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ selectedColor, onSelectColor 
             />
             <span>{selectedColor}</span>
           </div>
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-auto p-0">
+        </ModernButton>
+      </ModernPopoverTrigger>
+      <ModernPopoverContent className="w-auto p-0" glassEffect="glassAdvanced">
         <div className="grid grid-cols-5 gap-2 p-2">
           {colors.map((color) => (
             <div
@@ -61,8 +61,8 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ selectedColor, onSelectColor 
             />
           ))}
         </div>
-      </PopoverContent>
-    </Popover>
+      </ModernPopoverContent>
+    </ModernPopover>
   );
 };
 

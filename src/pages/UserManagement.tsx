@@ -1,28 +1,32 @@
 import { MadeWithDyad } from "@/components/made-with-dyad";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { 
+  ModernCard, 
+  ModernCardContent, 
+  ModernCardDescription, 
+  ModernCardHeader, 
+  ModernCardTitle 
+} from "@/components/ui/modern-card";
 import UserList from "@/components/user-management/UserList";
 import { useTranslation } from "react-i18next";
-import EmptyState from '@/components/common/EmptyState';
-import { Users } from 'lucide-react';
 
 const UserManagement = () => {
   const { t } = useTranslation();
 
   return (
-    <div className="flex flex-col items-center justify-center p-4 h-full w-full">
-      <Card className="w-full max-w-4xl glass rounded-xl p-6">
-        <CardHeader className="text-center">
-          <CardTitle className="text-4xl font-bold text-gray-800 dark:text-gray-100 mb-2">
+    <div className="flex flex-col items-center justify-center p-4 h-full w-full fade-in-up">
+      <ModernCard variant="glass" hover="lift" className="w-full max-w-4xl">
+        <ModernCardHeader className="text-center">
+          <ModernCardTitle className="text-4xl font-bold mb-2 text-gradient">
             {t('user_management.title')}
-          </CardTitle>
-          <CardDescription className="text-lg text-gray-600 dark:text-gray-300">
+          </ModernCardTitle>
+          <ModernCardDescription className="text-lg">
             {t('user_management.description')}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
+          </ModernCardDescription>
+        </ModernCardHeader>
+        <ModernCardContent className="space-y-6">
           <UserList />
-        </CardContent>
-      </Card>
+        </ModernCardContent>
+      </ModernCard>
       <MadeWithDyad />
     </div>
   );

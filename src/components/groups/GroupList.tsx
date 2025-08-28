@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { ModernButton } from "@/components/ui/modern-button";
 import { Edit, Trash2, Users, PlusCircle, Tag } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/integrations/supabase/auth";
@@ -14,6 +13,7 @@ import CancelButton from "../common/CancelButton";
 import { ErrorManager } from "@/lib/error-manager";
 import EmptyState from '../common/EmptyState';
 import LoadingSpinner from '../common/LoadingSpinner';
+import { ModernCard } from "@/components/ui/modern-card";
 
 interface Group {
   id: string;
@@ -55,9 +55,12 @@ const GroupItem = ({ group, onGroupUpdated, onGroupDeleted }: { group: Group; on
   };
 
   return (
-    <Card className="flex items-center justify-between p-4 glass rounded-lg shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.01]">
+    <ModernCard variant="glass" hover="lift" className="flex items-center justify-between p-4 rounded-lg">
       <div className="flex items-center gap-4">
-        <div className="w-10 h-10 rounded-full flex items-center justify-center border border-white/50 dark:border-gray-600/50" style={{ backgroundColor: group.color || "#cccccc" }}>
+        <div 
+          className="w-10 h-10 rounded-full flex items-center justify-center border border-white/50 dark:border-gray-600/50" 
+          style={{ backgroundColor: group.color || "#cccccc" }}
+        >
           <Users size={20} className="text-white" />
         </div>
         <div>
@@ -74,9 +77,9 @@ const GroupItem = ({ group, onGroupUpdated, onGroupDeleted }: { group: Group; on
       <div className="flex gap-2">
         <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
           <DialogTrigger asChild>
-            <Button variant="ghost" size="icon" className="text-blue-600 hover:bg-blue-100 dark:text-blue-400 dark:hover:bg-gray-600/50 transition-all duration-200">
+            <ModernButton variant="ghost" size="icon" className="text-blue-600 hover:bg-blue-100 dark:text-blue-400 dark:hover:bg-gray-600/50 transition-all duration-200">
               <Edit size={20} />
-            </Button>
+            </ModernButton>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px] p-0 border-none bg-transparent shadow-none">
             <GroupForm
@@ -93,9 +96,9 @@ const GroupItem = ({ group, onGroupUpdated, onGroupDeleted }: { group: Group; on
 
         <AlertDialog>
           <AlertDialogTrigger asChild>
-            <Button variant="ghost" size="icon" className="text-red-600 hover:bg-red-100 dark:text-red-400 dark:hover:bg-gray-600/50 transition-all duration-200" disabled={isDeleting}>
+            <ModernButton variant="ghost" size="icon" className="text-red-600 hover:bg-red-100 dark:text-red-400 dark:hover:bg-gray-600/50 transition-all duration-200" disabled={isDeleting}>
               {isDeleting ? <LoadingSpinner size={20} /> : <Trash2 size={20} />}
-            </Button>
+            </ModernButton>
           </AlertDialogTrigger>
           <AlertDialogContent className="glass rounded-xl p-6">
             <AlertDialogHeader>
@@ -114,7 +117,7 @@ const GroupItem = ({ group, onGroupUpdated, onGroupDeleted }: { group: Group; on
           </AlertDialogContent>
         </AlertDialog>
       </div>
-    </Card>
+    </ModernCard>
   );
 };
 
@@ -183,14 +186,14 @@ const GroupList = () => {
     <div className="space-y-4">
       <Dialog open={isAddGroupDialogOpen} onOpenChange={setIsAddGroupDialogOpen}>
         <DialogTrigger asChild>
-          <Button
+          <ModernButton
             className="w-full px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-md transition-all duration-300 transform hover:scale-105"
           >
             <span className="flex items-center gap-2">
               <PlusCircle size={20} className="me-2" />
               افزودن گروه جدید
             </span>
-          </Button>
+          </ModernButton>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px] p-0 border-none bg-transparent shadow-none">
           <GroupForm
@@ -225,3 +228,8 @@ const GroupList = () => {
 };
 
 export default GroupList;
+
+
+
+
+

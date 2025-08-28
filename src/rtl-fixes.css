@@ -1,0 +1,92 @@
+/* RTL Specific Fixes */
+
+/* Direct DOM element selection for RTL fixes */
+[dir="rtl"] [data-radix-select-trigger],
+[dir="rtl"] [data-radix-select-value],
+[dir="rtl"] [data-radix-select-item],
+[dir="rtl"] [data-radix-select-item] *,
+[dir="rtl"] [data-radix-select-content],
+[dir="rtl"] [data-radix-select-content] * {
+  text-align: right !important;
+  direction: rtl !important;
+}
+
+/* Ensure all select placeholders are also RTL */
+[dir="rtl"] [data-placeholder] {
+  text-align: right !important;
+  direction: rtl !important;
+}
+
+/* Fix for checkbox placement in RTL */
+[dir="rtl"] [data-radix-select-item] .absolute.start-2 {
+  right: 0.5rem !important;
+  left: auto !important;
+}
+
+/* Fix padding in RTL for select items */
+[dir="rtl"] [data-radix-select-item] {
+  padding-right: 2rem !important;
+  padding-left: 0.5rem !important;
+}
+
+/* Force RTL direction on select trigger */
+[dir="rtl"] [data-radix-select-trigger] {
+  flex-direction: row-reverse !important;
+}
+
+/* Removing RTL tab indicator styles to prevent conflicts */
+[dir="rtl"] .tab-indicator {
+  /* Only keeping essential positioning properties */
+  transform-origin: right center !important;
+  z-index: 0 !important;
+  pointer-events: none !important;
+  /* Removing all visual styling that causes conflicts */
+}
+
+/* Proper active tab styling for RTL mode */
+[dir="rtl"] button[data-state="active"] {
+  background-color: black !important;
+  color: white !important;
+  z-index: 2 !important;
+  position: relative !important;
+  border-radius: 8px !important;
+}
+
+/* Removing specific style for RTL indicator to avoid conflicts */
+
+/* Fix RTL tab buttons */
+[dir="rtl"] .rtl-tab-button {
+  position: relative !important;
+  z-index: 5 !important;
+}
+
+/* Ensure active tab is visible over indicator */
+[dir="rtl"] .active-tab {
+  position: relative !important;
+  z-index: 10 !important;
+}
+
+/* Fix tab content visibility */
+[dir="rtl"] .tab-content {
+  z-index: 1 !important;
+  position: relative !important;
+  direction: rtl !important;
+  text-align: right !important;
+}
+
+/* Force RTL on all select components */
+[dir="rtl"] .ModernSelect,
+[dir="rtl"] .ModernSelectTrigger,
+[dir="rtl"] .ModernSelectValue,
+[dir="rtl"] .ModernSelectContent,
+[dir="rtl"] .ModernSelectItem,
+[dir="rtl"] .ModernSelectItemText,
+[dir="rtl"] .Select,
+[dir="rtl"] .SelectTrigger,
+[dir="rtl"] .SelectValue,
+[dir="rtl"] .SelectContent,
+[dir="rtl"] .SelectItem,
+[dir="rtl"] .SelectItemText {
+  text-align: right !important;
+  direction: rtl !important;
+}

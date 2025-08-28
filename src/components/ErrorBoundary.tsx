@@ -1,8 +1,8 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
+import { ModernCard, ModernCardHeader, ModernCardTitle, ModernCardContent } from '@/components/ui/modern-card';
+import { ModernButton } from '@/components/ui/modern-button';
 
 interface Props {
   children: ReactNode;
@@ -63,14 +63,14 @@ const ErrorFallback: React.FC<ErrorFallbackProps> = ({ onRetry, error }) => {
   const { t } = useTranslation();
 
   return (
-    <Card className="glass rounded-xl shadow-sm border border-red-200 dark:border-red-800">
-      <CardHeader className="text-center">
-        <CardTitle className="flex items-center justify-center gap-2 text-red-600 dark:text-red-400">
+    <ModernCard variant="glass" className="rounded-xl shadow-sm border border-red-200 dark:border-red-800">
+      <ModernCardHeader className="text-center">
+        <ModernCardTitle className="flex items-center justify-center gap-2 text-red-600 dark:text-red-400">
           <AlertTriangle size={24} />
           {t('common.error_occurred', 'Something went wrong')}
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4 text-center">
+        </ModernCardTitle>
+      </ModernCardHeader>
+      <ModernCardContent className="space-y-4 text-center">
         <p className="text-gray-600 dark:text-gray-300">
           {/* i18n-ally-ignore */}
           {t('common.error_description', 'An unexpected error occurred. Please try again.')}
@@ -87,26 +87,24 @@ const ErrorFallback: React.FC<ErrorFallbackProps> = ({ onRetry, error }) => {
         )}
         
         <div className="flex justify-center gap-2">
-          <Button 
+          <ModernButton 
             onClick={onRetry} 
             variant="outline" 
             className="flex items-center gap-2"
           >
             <RefreshCw size={16} />
             {t('common.retry', 'Try Again')}
-          </Button>
-          <Button 
+          </ModernButton>
+          <ModernButton 
             onClick={() => window.location.reload()} 
             variant="default"
           >
             {t('common.reload_page', 'Reload Page')}
-          </Button>
+          </ModernButton>
         </div>
-      </CardContent>
-    </Card>
+      </ModernCardContent>
+    </ModernCard>
   );
 };
-
-
 
 export default ErrorBoundary;

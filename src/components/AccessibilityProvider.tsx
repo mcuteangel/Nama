@@ -12,13 +12,13 @@ interface AccessibilitySettings {
   announceChanges: boolean;
 }
 
-interface FocusManager {
+export interface FocusManager {
   trapFocus: boolean;
   restoreFocus: boolean;
   initialFocus?: React.RefObject<HTMLElement>;
 }
 
-interface AccessibilityContextType {
+export interface AccessibilityContextType {
   // Settings
   settings: AccessibilitySettings;
   updateSettings: (newSettings: Partial<AccessibilitySettings>) => void;
@@ -55,15 +55,7 @@ const defaultSettings: AccessibilitySettings = {
   announceChanges: true,
 };
 
-const AccessibilityContext = createContext<AccessibilityContextType | null>(null);
-
-export const useAccessibility = () => {
-  const context = useContext(AccessibilityContext);
-  if (!context) {
-    throw new Error('useAccessibility must be used within an AccessibilityProvider');
-  }
-  return context;
-};
+export const AccessibilityContext = createContext<AccessibilityContextType | null>(null);
 
 // Custom hook for screen reader detection
 const useScreenReaderDetection = () => {
@@ -283,19 +275,21 @@ export const AccessibilityProvider: React.FC<AccessibilityProviderProps> = ({
   
   return (
     <AccessibilityContext.Provider value={contextValue}>
-      {/* Skip Links */}
-      <div className="sr-only focus-within:not-sr-only">
-        {skipLinks.map((link, index) => (
-          <a
-            key={link.target}
-            href={link.target}
-            className="absolute top-0 left-0 z-50 p-2 bg-blue-600 text-white text-sm font-medium rounded-br focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-            onFocus={() => announceMessage(link.label)}
-          >
-            {link.label}
-          </a>
-        ))}
-      </div>
+      {/* Skip Links - Only shown when accessibility features are enabled */}
+      {settings.screenReaderOptimized && (
+        <div className="fixed top-0 left-0 z-50">
+          {skipLinks.map((link, _index) => (
+            <a
+              key={link.target}
+              href={link.target}
+              className="skip-link inline-block m-2 p-2 md:p-3 bg-blue-600 hover:bg-blue-700 text-white text-sm md:text-base font-medium rounded-br focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200"
+              onFocus={() => announceMessage(link.label)}
+            >
+              {link.label}
+            </a>
+          ))}
+        </div>
+      )}
       
       {/* Main Content with Focus Trap */}
       {focusManager.trapFocus ? (
@@ -328,46 +322,6 @@ export const AccessibilityProvider: React.FC<AccessibilityProviderProps> = ({
       />
     </AccessibilityContext.Provider>
   );
-};
-
-// Hook for managing focus trap
-export const useFocusTrap = (active: boolean, options?: Partial<FocusManager>) => {
-  const { setFocusManager } = useAccessibility();
-  
-  useEffect(() => {
-    if (active) {
-      setFocusManager({
-        trapFocus: true,
-        ...options,
-      });
-    } else {
-      setFocusManager({
-        trapFocus: false,
-        restoreFocus: true,
-      });
-    }
-    
-    return () => {
-      setFocusManager({ trapFocus: false });
-    };
-  }, [active, options, setFocusManager]);
-};
-
-// Hook for keyboard shortcuts
-export const useKeyboardShortcut = (key: string, callback: () => void, deps: React.DependencyList = []) => {
-  const { registerShortcut, unregisterShortcut } = useAccessibility();
-  
-  useEffect(() => {
-    registerShortcut(key, callback);
-    return () => unregisterShortcut(key);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [key, registerShortcut, unregisterShortcut, ...deps]);
-};
-
-// Hook for accessible announcements
-export const useAnnouncement = () => {
-  const { announce } = useAccessibility();
-  return announce;
 };
 
 export default AccessibilityProvider;

@@ -3,12 +3,12 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react';
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+  ModernPopover,
+  ModernPopoverContent,
+  ModernPopoverTrigger,
+} from '@/components/ui/modern-popover';
+import { ModernButton } from '@/components/ui/modern-button';
+import { cn, applyGlassEffect } from '@/lib/utils';
 import moment from 'moment-jalaali';
 import { useJalaliCalendar } from '@/hooks/use-jalali-calendar';
 
@@ -279,7 +279,7 @@ export function JalaliCalendar({
     <div 
       className={cn(
         "p-4 rounded-lg w-full max-w-xs shadow-lg",
-        variant === 'glass' && "glass bg-opacity-80 backdrop-blur-sm border border-opacity-10",
+        variant === 'glass' && applyGlassEffect("glassAdvanced"),
         "transition-all duration-200 hover:shadow-xl",
         className,
         isJalali ? 'font-sans' : 'font-sans'
@@ -289,20 +289,20 @@ export function JalaliCalendar({
       {/* Calendar Type Toggle */}
       {showToggle && (
         <div className="flex justify-end mb-3">
-          <Button
+          <ModernButton
             variant="outline"
             size="sm"
             onClick={toggleCalendarType}
             className="text-xs h-7 px-2"
           >
             {isJalali ? 'میلادی' : 'شمسی'}
-          </Button>
+          </ModernButton>
         </div>
       )}
 
       {/* Header */}
       <div className={cn("flex items-center justify-between mb-4")}>
-        <Button
+        <ModernButton
           variant="ghost"
           size="icon"
           onClick={isJalali ? goToNextMonth : goToPreviousMonth}
@@ -313,13 +313,13 @@ export function JalaliCalendar({
           ) : (
             <ChevronLeft className="h-4 w-4" />
           )}
-        </Button>
+        </ModernButton>
         
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-1">
-            <Popover open={showMonthPicker} onOpenChange={setShowMonthPicker}>
-              <PopoverTrigger asChild>
-                <Button 
+            <ModernPopover open={showMonthPicker} onOpenChange={setShowMonthPicker}>
+              <ModernPopoverTrigger asChild>
+                <ModernButton 
                   variant="ghost" 
                   size="sm" 
                   className="h-7 px-2 text-sm"
@@ -330,15 +330,15 @@ export function JalaliCalendar({
                 >
                   {monthName}
                   <ChevronDown className="mr-1 h-3 w-3 opacity-50" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-48 p-2" align={isJalali ? 'end' : 'start'}>
+                </ModernButton>
+              </ModernPopoverTrigger>
+              <ModernPopoverContent className="w-48 p-2" align={isJalali ? 'end' : 'start'} glassEffect="glassAdvanced">
                 <div className="grid grid-cols-3 gap-1">
                   {(isJalali 
                     ? ['فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور', 'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند']
                     : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
                   ).map((m, i) => (
-                    <Button
+                    <ModernButton
                       key={i}
                       variant={i === month ? 'default' : 'ghost'}
                       size="sm"
@@ -346,18 +346,18 @@ export function JalaliCalendar({
                       onClick={() => changeMonth(i)}
                     >
                       {m}
-                    </Button>
+                    </ModernButton>
                   ))}
                 </div>
-              </PopoverContent>
-            </Popover>
+              </ModernPopoverContent>
+            </ModernPopover>
             
-            <Popover open={showYearPicker} onOpenChange={open => {
+            <ModernPopover open={showYearPicker} onOpenChange={open => {
               setShowYearPicker(open);
               if (open) setYearPage(0); // Reset to current decade when opening
             }}>
-              <PopoverTrigger asChild>
-                <Button 
+              <ModernPopoverTrigger asChild>
+                <ModernButton 
                   variant="ghost" 
                   size="sm" 
                   className="h-7 px-2 text-sm"
@@ -368,11 +368,11 @@ export function JalaliCalendar({
                 >
                   {yearNumber}
                   <ChevronDown className="mr-1 h-3 w-3 opacity-50" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-64 p-3" align={isJalali ? 'end' : 'start'}>
+                </ModernButton>
+              </ModernPopoverTrigger>
+              <ModernPopoverContent className="w-64 p-3" align={isJalali ? 'end' : 'start'} glassEffect="glassAdvanced">
                 <div className="flex justify-between items-center mb-2">
-                  <Button
+                  <ModernButton
                     variant="ghost"
                     size="icon"
                     className="h-7 w-7"
@@ -382,11 +382,11 @@ export function JalaliCalendar({
                     }}
                   >
                     <ChevronLeft className="h-4 w-4" />
-                  </Button>
+                  </ModernButton>
                   <span className="text-sm font-medium">
                     {getCurrentDecade().start + 2} - {getCurrentDecade().end - 2} ({getCurrentDecade().end - getCurrentDecade().start - 3} سال)
                   </span>
-                  <Button
+                  <ModernButton
                     variant="ghost"
                     size="icon"
                     className="h-7 w-7"
@@ -396,11 +396,11 @@ export function JalaliCalendar({
                     }}
                   >
                     <ChevronRight className="h-4 w-4" />
-                  </Button>
+                  </ModernButton>
                 </div>
                 <div className="grid grid-cols-5 gap-1">
                   {getYearsInDecade().map(({ year, isCurrent, isInDecade }) => (
-                    <Button
+                    <ModernButton
                       key={year}
                       variant={year === yearNumber ? 'default' : 'ghost'}
                       size="sm"
@@ -416,23 +416,23 @@ export function JalaliCalendar({
                       }}
                     >
                       {year}
-                    </Button>
+                    </ModernButton>
                   ))}
                 </div>
-              </PopoverContent>
-            </Popover>
+              </ModernPopoverContent>
+            </ModernPopover>
           </div>
-          <Button
+          <ModernButton
             variant="outline"
             size="sm"
             onClick={goToToday}
             className="text-xs h-7 px-2"
           >
             {isJalali ? 'امروز' : 'Today'}
-          </Button>
+          </ModernButton>
         </div>
         
-        <Button
+        <ModernButton
           variant="ghost"
           size="icon"
           onClick={isJalali ? goToPreviousMonth : goToNextMonth}
@@ -443,7 +443,7 @@ export function JalaliCalendar({
           ) : (
             <ChevronRight className="h-4 w-4" />
           )}
-        </Button>
+        </ModernButton>
       </div>
 
       {/* Days of week */}
@@ -470,7 +470,7 @@ export function JalaliCalendar({
       {/* Calendar grid */}
       <div className="grid grid-cols-7 gap-1">
         {monthDays.map((day, index) => (
-          <Button
+          <ModernButton
             key={index}
             variant="ghost"
             size="sm"
@@ -488,7 +488,7 @@ export function JalaliCalendar({
             {day.isToday && !day.isSelected && (
               <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-primary"></span>
             )}
-          </Button>
+          </ModernButton>
         ))}
       </div>
     </div>

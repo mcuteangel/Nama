@@ -142,7 +142,26 @@
     "names": "names",
     "close": "Close",
     "error_occurred": "Something went wrong",
-    "error_description": "An unexpected error occurred. Please try again."
+    "error_description": "An unexpected error occurred. Please try again.",
+    "rtl_test": "RTL Test Component",
+    "test_switch": "Test Switch",
+    "test_modern_select": "Test Modern Select",
+    "test_traditional_select": "Test Traditional Select",
+    "test_modern_input": "Test Modern Input",
+    "test_traditional_textarea": "Test Traditional Textarea",
+    "test_tabs": "Test Tabs",
+    "select_placeholder": "Select an option",
+    "input_placeholder": "Enter text here",
+    "textarea_placeholder": "Enter text here",
+    "option1": "Option 1",
+    "option2": "Option 2",
+    "option3": "Option 3",
+    "tab1": "Tab 1",
+    "tab2": "Tab 2",
+    "content1": "Content 1",
+    "content2": "Content 2",
+    "on": "On",
+    "off": "Off"
   },
   "login": {
     "title": "Login to Nama Contacts",
@@ -184,7 +203,13 @@
     "user_profile": "User Profile",
     "debug_mode": "Debug Mode",
     "enable_debug_mode": "Enable Debug Mode",
-    "debug_mode_description": "Show debugging tools in components"
+    "debug_mode_description": "Show debugging tools in components",
+    "accessibility": "Accessibility",
+    "accessibility_description": "Enable accessibility features like screen reader support and keyboard navigation",
+    "component_testing": "Component Testing",
+    "rtl_components_test": "RTL Components Test",
+    "rtl_components_test_description": "Test UI components in right-to-left layouts",
+    "test_components": "Test Components"
   },
   "user_management": {
     "title": "User Management",

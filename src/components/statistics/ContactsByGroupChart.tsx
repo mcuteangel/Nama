@@ -1,8 +1,8 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PieChart } from "lucide-react";
 import { Pie, PieChart as RechartsPieChart, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 import { useTranslation } from "react-i18next";
+import { ModernCard, ModernCardHeader, ModernCardTitle, ModernCardContent } from "@/components/ui/modern-card";
 
 interface GroupData {
   name: string;
@@ -26,14 +26,14 @@ const ContactsByGroupChart: React.FC<ContactsByGroupChartProps> = ({ data }) => 
   }));
 
   return (
-    <Card className="rounded-xl p-4 bg-white dark:bg-gray-800">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-lg font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+    <ModernCard variant="glass" className="rounded-xl p-4">
+      <ModernCardHeader className="pb-2">
+        <ModernCardTitle className="text-lg font-semibold flex items-center gap-2">
           <PieChart size={20} className="text-purple-500" />
           {t('statistics.contacts_by_group')}
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="h-64 flex items-center justify-center">
+        </ModernCardTitle>
+      </ModernCardHeader>
+      <ModernCardContent className="h-64 flex items-center justify-center">
         {formattedData.length > 0 ? (
           <ResponsiveContainer width="100%" height={256}>
             <RechartsPieChart>
@@ -57,8 +57,8 @@ const ContactsByGroupChart: React.FC<ContactsByGroupChartProps> = ({ data }) => 
         ) : (
           <p className="text-gray-500 dark:text-gray-400">{t('statistics.no_group_data')}</p>
         )}
-      </CardContent>
-    </Card>
+      </ModernCardContent>
+    </ModernCard>
   );
 };
 

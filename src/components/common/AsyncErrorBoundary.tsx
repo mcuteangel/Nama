@@ -1,7 +1,7 @@
 import React from 'react';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { ModernButton } from '@/components/ui/modern-button';
+import { ModernCard, ModernCardContent, ModernCardDescription, ModernCardHeader, ModernCardTitle } from '@/components/ui/modern-card';
 import { AlertTriangle, RefreshCw, Database, Wifi } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { queryClient } from '@/lib/react-query-config';
@@ -125,19 +125,19 @@ function AsyncErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
 
   return (
     <div className="flex items-center justify-center p-8">
-      <Card className="w-full max-w-md" role="alert">
-        <CardHeader className="text-center">
+      <ModernCard variant="glass" className="w-full max-w-md rounded-xl p-6" role="alert">
+        <ModernCardHeader className="text-center">
           <div className="mx-auto mb-4 flex items-center justify-center w-12 h-12 bg-orange-100 dark:bg-orange-900/20 rounded-full">
             <IconComponent className="w-6 h-6 text-orange-600 dark:text-orange-400" />
           </div>
-          <CardTitle className="text-lg text-orange-600 dark:text-orange-400">
+          <ModernCardTitle className="text-lg text-orange-600 dark:text-orange-400">
             {getErrorInfo.title}
-          </CardTitle>
-          <CardDescription>
+          </ModernCardTitle>
+          <ModernCardDescription>
             {getErrorInfo.description}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
+          </ModernCardDescription>
+        </ModernCardHeader>
+        <ModernCardContent className="space-y-4">
           {/* Network status indicator */}
           {!isOnline && (
             <div className="flex items-center justify-center p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">
@@ -157,7 +157,7 @@ function AsyncErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
           
           {/* Action buttons */}
           <div className="flex flex-col gap-3">
-            <Button 
+            <ModernButton 
               onClick={handleRetry} 
               disabled={isRetrying}
               className="w-full"
@@ -165,16 +165,16 @@ function AsyncErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
             >
               <RefreshCw className={`w-4 h-4 mr-2 ${isRetrying ? 'animate-spin' : ''}`} />
               {isRetrying ? t('error.retrying', 'Retrying...') : t('error.try_again', 'Try Again')}
-            </Button>
+            </ModernButton>
             
             {retryCount >= 3 && (
-              <Button 
+              <ModernButton 
                 variant="outline"
                 onClick={() => window.location.reload()}
                 className="w-full"
               >
                 {t('error.reload_page', 'Reload Page')}
-              </Button>
+              </ModernButton>
             )}
           </div>
           
@@ -189,8 +189,8 @@ function AsyncErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
               </pre>
             </details>
           )}
-        </CardContent>
-      </Card>
+        </ModernCardContent>
+      </ModernCard>
     </div>
   );
 }

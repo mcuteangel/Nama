@@ -1,19 +1,22 @@
 import ContactForm from "@/components/ContactForm";
 import { MadeWithDyad } from "@/components/made-with-dyad";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import React, { useEffect, useState } from "react";
+import { 
+  ModernCard, 
+  ModernCardHeader, 
+  ModernCardTitle, 
+  ModernCardDescription 
+} from "@/components/ui/modern-card";
+import { useEffect, useState } from "react";
 import { ExtractedContactInfo } from "@/hooks/use-contact-extractor";
 import { ContactFormValues } from "@/types/contact";
 import { AISuggestionsService } from "@/services/ai-suggestions-service";
 import { useErrorHandler } from "@/hooks/use-error-handler";
 import { ErrorManager } from "@/lib/error-manager";
 import { useSession } from "@/integrations/supabase/auth";
-import { useNavigate } from "react-router-dom";
 
 const AddContact = () => {
   const [prefillData, setPrefillData] = useState<ContactFormValues | undefined>(undefined);
   const { session } = useSession();
-  const navigate = useNavigate();
 
   const { executeAsync: executeUpdateSuggestionStatus } = useErrorHandler(null, {
     showToast: false,
@@ -60,18 +63,18 @@ const AddContact = () => {
   }, [session, executeUpdateSuggestionStatus]);
 
   return (
-    <div className="flex flex-col items-center justify-center p-4 h-full w-full">
-      <Card className="w-full max-w-3xl glass rounded-xl p-4">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold text-gray-800 dark:text-gray-100">
+    <div className="flex flex-col items-center justify-center p-4 h-full w-full fade-in-up">
+      <ModernCard variant="glass" hover="lift" className="w-full max-w-3xl">
+        <ModernCardHeader className="text-center">
+          <ModernCardTitle className="text-2xl font-bold text-gradient">
             افزودن مخاطب جدید
-          </CardTitle>
-          <CardDescription className="text-gray-600 dark:text-gray-300">
+          </ModernCardTitle>
+          <ModernCardDescription>
             اطلاعات مخاطب جدید را وارد کنید.
-          </CardDescription>
-        </CardHeader>
+          </ModernCardDescription>
+        </ModernCardHeader>
         <ContactForm initialData={prefillData} />
-      </Card>
+      </ModernCard>
       <MadeWithDyad />
     </div>
   );

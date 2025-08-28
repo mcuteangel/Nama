@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Button } from '@/components/ui/button';
+import { ModernButton } from '@/components/ui/modern-button';
+import { ModernCard, ModernCardContent, ModernCardDescription, ModernCardHeader, ModernCardTitle } from '@/components/ui/modern-card';
 import { Separator } from '@/components/ui/separator';
 import { 
   BarChart3, 
@@ -160,21 +160,21 @@ export const BundleSizeMonitor: React.FC = React.memo(() => {
 
   if (isLoading) {
     return (
-      <Card className="w-full">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+      <ModernCard variant="glass" className="w-full rounded-xl p-6">
+        <ModernCardHeader>
+          <ModernCardTitle className="flex items-center gap-2">
             <Package className="h-5 w-5" />
             {t('bundle_monitor.title', 'Bundle Size Monitor')}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
+          </ModernCardTitle>
+        </ModernCardHeader>
+        <ModernCardContent>
           <div className="space-y-4">
             <div className="h-4 bg-gray-200 rounded animate-pulse" />
             <div className="h-4 bg-gray-200 rounded animate-pulse w-3/4" />
             <div className="h-4 bg-gray-200 rounded animate-pulse w-1/2" />
           </div>
-        </CardContent>
-      </Card>
+        </ModernCardContent>
+      </ModernCard>
     );
   }
 
@@ -187,12 +187,12 @@ export const BundleSizeMonitor: React.FC = React.memo(() => {
   return (
     <div className="space-y-6">
       {/* Overview Card */}
-      <Card>
-        <CardHeader>
+      <ModernCard variant="glass" className="rounded-xl p-6">
+        <ModernCardHeader>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Package className="h-5 w-5" />
-              <CardTitle>{t('bundle_monitor.title', 'Bundle Size Monitor')}</CardTitle>
+              <ModernCardTitle>{t('bundle_monitor.title', 'Bundle Size Monitor')}</ModernCardTitle>
             </div>
             <div className="flex items-center gap-2">
               <Badge variant={getBundleStatus.color === 'green' ? 'default' : 'destructive'}>
@@ -202,17 +202,17 @@ export const BundleSizeMonitor: React.FC = React.memo(() => {
                   : t('bundle_monitor.status_warning', 'Needs Attention')
                 }
               </Badge>
-              <Button variant="outline" size="sm" onClick={exportReport}>
+              <ModernButton variant="outline" size="sm" onClick={exportReport}>
                 <Download className="h-4 w-4 mr-2" />
                 {t('bundle_monitor.export', 'Export Report')}
-              </Button>
+              </ModernButton>
             </div>
           </div>
-          <CardDescription>
+          <ModernCardDescription>
             {t('bundle_monitor.description', 'Real-time monitoring of bundle size and performance metrics')}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+          </ModernCardDescription>
+        </ModernCardHeader>
+        <ModernCardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Bundle Size */}
             <div className="space-y-2">
@@ -258,21 +258,21 @@ export const BundleSizeMonitor: React.FC = React.memo(() => {
               </div>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </ModernCardContent>
+      </ModernCard>
 
       {/* Chunks Analysis */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+      <ModernCard variant="glass" className="rounded-xl p-6">
+        <ModernCardHeader>
+          <ModernCardTitle className="flex items-center gap-2">
             <BarChart3 className="h-5 w-5" />
             {t('bundle_monitor.chunks_analysis', 'Chunks Analysis')}
-          </CardTitle>
-          <CardDescription>
+          </ModernCardTitle>
+          <ModernCardDescription>
             {t('bundle_monitor.chunks_description', 'Detailed breakdown of bundle chunks and their impact')}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+          </ModernCardDescription>
+        </ModernCardHeader>
+        <ModernCardContent>
           <div className="space-y-4">
             {metrics.chunks.map((chunk, index) => {
               const chunkStatus = getChunkStatus(chunk);
@@ -306,18 +306,18 @@ export const BundleSizeMonitor: React.FC = React.memo(() => {
               );
             })}
           </div>
-        </CardContent>
-      </Card>
+        </ModernCardContent>
+      </ModernCard>
 
       {/* Performance Insights */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+      <ModernCard variant="glass" className="rounded-xl p-6">
+        <ModernCardHeader>
+          <ModernCardTitle className="flex items-center gap-2">
             <TrendingUp className="h-5 w-5" />
             {t('bundle_monitor.insights', 'Performance Insights')}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
+          </ModernCardTitle>
+        </ModernCardHeader>
+        <ModernCardContent>
           <div className="space-y-3">
             {metrics.totalSize > thresholds.bundleSize && (
               <div className="flex items-start gap-2 p-3 bg-orange-50 border border-orange-200 rounded-lg">
@@ -361,8 +361,8 @@ export const BundleSizeMonitor: React.FC = React.memo(() => {
               </div>
             )}
           </div>
-        </CardContent>
-      </Card>
+        </ModernCardContent>
+      </ModernCard>
     </div>
   );
 });

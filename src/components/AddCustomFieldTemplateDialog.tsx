@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import { ModernButton } from "@/components/ui/modern-button";
 import { Plus } from "lucide-react";
 import CustomFieldTemplateForm from "./CustomFieldTemplateForm";
 import FormDialogWrapper from "./common/FormDialogWrapper"; // Import the new wrapper
@@ -26,17 +26,17 @@ const AddCustomFieldTemplateDialog: React.FC<AddCustomFieldTemplateDialogProps> 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button
+        <ModernButton
           type="button"
-          variant="outline"
+          variant="gradient-primary"
           size="sm"
-          className="flex items-center gap-1 px-3 py-1 rounded-lg bg-blue-500 hover:bg-blue-600 text-white font-semibold shadow-md transition-all duration-300 transform hover:scale-105 dark:bg-blue-700 dark:hover:bg-blue-800"
+          className="flex items-center gap-1 px-3 py-1 rounded-lg font-semibold shadow-md transition-all duration-300 transform hover:scale-105"
         >
           <span className="flex items-center gap-1">
             <Plus size={16} />
             {t('actions.add_new_field')}
           </span>
-        </Button>
+        </ModernButton>
       </DialogTrigger>
       <FormDialogWrapper> {/* Use the new wrapper */}
         <CustomFieldTemplateForm

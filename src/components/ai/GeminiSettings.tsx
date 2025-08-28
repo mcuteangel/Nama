@@ -4,11 +4,11 @@ import React, { useEffect, useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { ModernButton } from '@/components/ui/modern-button';
 import { Label } from '@/components/ui/label';
+import { ModernInput } from '@/components/ui/modern-input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from '@/components/ui/form';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ModernSelect, ModernSelectContent, ModernSelectItem, ModernSelectTrigger, ModernSelectValue } from '@/components/ui/modern-select';
 import { useTranslation } from 'react-i18next';
 import { useSession } from '@/integrations/supabase/auth';
 import { useErrorHandler } from '@/hooks/use-error-handler';
@@ -210,9 +210,10 @@ const GeminiSettings: React.FC = () => {
             <FormItem>
               <FormLabel className="text-gray-700 dark:text-gray-200">{t('settings.gemini_api_key')}</FormLabel>
               <FormControl>
-                <Input
+                <ModernInput
                   type="password"
                   placeholder={t('settings.enter_gemini_api_key')}
+                  variant="glass"
                   className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
                   disabled={isSubmitting}
                   {...field}
@@ -232,26 +233,26 @@ const GeminiSettings: React.FC = () => {
           render={({ field }) => (
             <FormItem>
               <FormLabel className="text-gray-700 dark:text-gray-200">{t('settings.gemini_model')}</FormLabel>
-              <Select onValueChange={field.onChange} value={field.value} disabled={isSubmitting || loadingModels}>
+              <ModernSelect onValueChange={field.onChange} value={field.value} disabled={isSubmitting || loadingModels}>
                 <FormControl>
-                  <SelectTrigger className="w-full bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100">
-                    <SelectValue placeholder={t('settings.select_gemini_model')} />
-                  </SelectTrigger>
+                  <ModernSelectTrigger variant="glass" className="w-full">
+                    <ModernSelectValue placeholder={t('settings.select_gemini_model')} />
+                  </ModernSelectTrigger>
                 </FormControl>
-                <SelectContent className="backdrop-blur-md bg-white/80 dark:bg-gray-800/80 border border-white/30 dark:border-gray-600/30">
+                <ModernSelectContent variant="glass">
                   {loadingModels ? (
-                    <SelectItem value="loading" disabled>{t('settings.loading_gemini_models')}</SelectItem>
+                    <ModernSelectItem value="loading" disabled>{t('settings.loading_gemini_models')}</ModernSelectItem>
                   ) : availableGeminiModels.length > 0 ? (
                     availableGeminiModels.map((model) => (
-                      <SelectItem key={model.name} value={model.name}>
+                      <ModernSelectItem key={model.name} value={model.name}>
                         {model.displayName}
-                      </SelectItem>
+                      </ModernSelectItem>
                     ))
                   ) : (
-                    <SelectItem value="no-models" disabled>{t('settings.no_gemini_models_found')}</SelectItem>
+                    <ModernSelectItem value="no-models" disabled>{t('settings.no_gemini_models_found')}</ModernSelectItem>
                   )}
-                </SelectContent>
-              </Select>
+                </ModernSelectContent>
+              </ModernSelect>
               <FormDescription className="text-xs text-gray-500 dark:text-gray-400">
                 {t('settings.gemini_model_description')}
               </FormDescription>
@@ -264,7 +265,7 @@ const GeminiSettings: React.FC = () => {
           <div className="text-sm text-destructive flex items-center justify-center gap-2 mt-2">
             <span>{submitErrorMessage}</span>
             {submitRetryCount > 0 && (
-              <Button
+              <ModernButton
                 variant="ghost"
                 size="sm"
                 onClick={retrySubmit}
@@ -272,18 +273,19 @@ const GeminiSettings: React.FC = () => {
                 className="text-destructive hover:bg-destructive/10"
               >
                 {t('common.retry')} ({submitRetryCount} {t('common.of')} ۳)
-              </Button>
+              </ModernButton>
             )}
           </div>
         )}
-        <Button
+        <ModernButton
           type="submit"
-          className="w-full px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-md transition-all duration-300 transform hover:scale-105"
+          variant="gradient-primary"
+          className="w-full px-6 py-2 rounded-lg font-semibold"
           disabled={isSubmitting}
         >
           {isSubmitting && <LoadingSpinner size={16} className="me-2" />}
           {isSubmitting ? t('common.saving') : t('common.save')}
-        </Button>
+        </ModernButton>
       </form>
     </Form>
   );

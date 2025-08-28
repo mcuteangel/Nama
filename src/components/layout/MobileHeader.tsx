@@ -1,18 +1,22 @@
-import React from "react";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { ThemeToggle } from "../settings/ThemeToggle"; // Import ThemeToggle
+import { ThemeToggle } from "../settings";
+import { Home } from "lucide-react";
 
 const MobileHeader = () => {
   return (
     <div className={cn(
-      "fixed top-0 right-0 w-full p-4 shadow-lg flex items-center justify-between z-50", // Changed to justify-between
-      "glass border-b text-foreground"
+      "fixed top-0 right-0 w-full p-4 shadow-lg flex items-center justify-between z-50 fade-in-down",
+      "glass-advanced border-b text-foreground backdrop-blur-md"
     )}>
-      <Link to="/" className="text-2xl font-bold">
-        Nama Contacts
+      <Link 
+        to="/" 
+        className="flex items-center gap-2 text-2xl font-bold text-gradient hover:scale-105 transition-transform duration-300"
+      >
+        <Home size={24} className="text-primary" />
+        <span>Nama Contacts</span>
       </Link>
-      <ThemeToggle /> {/* Add ThemeToggle here */}
+      <ThemeToggle />
     </div>
   );
 };

@@ -1,20 +1,27 @@
 import * as React from "react";
 
 import { cn } from "@/lib/utils";
+import { ModernCard, type ModernCardProps } from "./modern-card";
 
 const Card = React.forwardRef<
   HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn(
-      "rounded-lg border bg-card text-card-foreground shadow-sm",
-      className,
-    )}
-    {...props}
-  />
-));
+  React.HTMLAttributes<HTMLDivElement> & { animation?: "fade-in-up" | "fade-in-down" | "scale-in" | "none" }
+>(({ className, animation = "fade-in-up", ...props }, ref) => {
+  // Map animation to hover effect
+  const hoverEffect: ModernCardProps['hover'] = 
+    animation === "fade-in-up" || animation === "scale-in" ? "lift" : 
+    animation === "fade-in-down" ? "glow" : "none";
+  
+  return (
+    <ModernCard
+      ref={ref}
+      variant="glass"
+      hover={hoverEffect}
+      className={cn(className)}
+      {...props}
+    />
+  );
+});
 Card.displayName = "Card";
 
 const CardHeader = React.forwardRef<
@@ -35,10 +42,7 @@ const CardTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <h3
     ref={ref}
-    className={cn(
-      "text-2xl font-semibold leading-none tracking-tight",
-      className,
-    )}
+    className={cn("text-2xl font-semibold leading-none tracking-tight", className)}
     {...props}
   />
 ));
@@ -60,7 +64,11 @@ const CardContent = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
-  <div ref={ref} className={cn("p-6 pt-0", className)} {...props} />
+  <div 
+    ref={ref} 
+    className={cn("p-6 pt-0", className)} 
+    {...props} 
+  />
 ));
 CardContent.displayName = "CardContent";
 

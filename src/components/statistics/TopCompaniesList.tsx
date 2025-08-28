@@ -1,7 +1,7 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Building } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { ModernCard, ModernCardHeader, ModernCardTitle, ModernCardContent } from "@/components/ui/modern-card";
 
 interface CompanyData {
   company: string;
@@ -16,14 +16,14 @@ const TopCompaniesList: React.FC<TopCompaniesListProps> = ({ data }) => {
   const { t } = useTranslation();
 
   return (
-    <Card className="rounded-xl p-4 col-span-1 bg-white dark:bg-gray-800">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-lg font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+    <ModernCard variant="glass" className="rounded-xl p-4 col-span-1">
+      <ModernCardHeader className="pb-2">
+        <ModernCardTitle className="text-lg font-semibold flex items-center gap-2">
           <Building size={20} className="text-indigo-500" />
           {t('statistics.top_companies')}
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="h-64 overflow-y-auto custom-scrollbar">
+        </ModernCardTitle>
+      </ModernCardHeader>
+      <ModernCardContent className="h-64 overflow-y-auto custom-scrollbar">
         {data.length > 0 ? (
           <ul className="space-y-3">
             {data.map((item, index) => (
@@ -38,8 +38,8 @@ const TopCompaniesList: React.FC<TopCompaniesListProps> = ({ data }) => {
         ) : (
           <p className="text-center text-gray-500 dark:text-gray-400">{t('statistics.no_company_data')}</p>
         )}
-      </CardContent>
-    </Card>
+      </ModernCardContent>
+    </ModernCard>
   );
 };
 

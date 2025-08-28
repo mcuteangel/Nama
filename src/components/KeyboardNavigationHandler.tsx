@@ -1,6 +1,6 @@
 import React, { useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useAccessibility, useKeyboardShortcut } from './AccessibilityProvider';
+import { useAccessibility, useKeyboardShortcut } from './accessibilityHooks';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 

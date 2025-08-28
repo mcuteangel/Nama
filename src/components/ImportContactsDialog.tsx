@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useCallback } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
+import { ModernButton } from '@/components/ui/modern-button';
 import { Label } from '@/components/ui/label';
 import { UploadCloud, FileText, XCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -116,13 +116,13 @@ const ImportContactsDialog: React.FC<ImportContactsDialogProps> = ({ onImportSuc
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button
+        <ModernButton
           variant="outline"
-          className="flex items-center gap-2 px-6 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold shadow-md transition-all duration-300 transform hover:scale-105 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-100 dark:border-gray-600"
+          className="flex items-center gap-2 px-6 py-2 rounded-lg font-semibold"
         >
           <UploadCloud size={20} />
           {t('settings.import_contacts')}
-        </Button>
+        </ModernButton>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px] glass rounded-xl p-6">
         <DialogHeader>
@@ -134,14 +134,14 @@ const ImportContactsDialog: React.FC<ImportContactsDialogProps> = ({ onImportSuc
           </p>
         </DialogHeader>
         <div className="space-y-4">
-          <Button
+          <ModernButton
             variant="outline"
             onClick={handleDownloadTemplate}
-            className="w-full flex items-center gap-2 px-6 py-2 rounded-lg bg-blue-100 hover:bg-blue-200 text-blue-800 font-semibold shadow-sm transition-all duration-300 dark:bg-blue-900 dark:hover:bg-blue-800 dark:text-blue-100"
+            className="w-full flex items-center gap-2 px-6 py-2 rounded-lg font-semibold"
           >
             <FileText size={20} />
             {t('import.download_template')}
-          </Button>
+          </ModernButton>
 
           <div className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700">
             <input
@@ -157,7 +157,7 @@ const ImportContactsDialog: React.FC<ImportContactsDialogProps> = ({ onImportSuc
               <div className="flex items-center gap-3">
                 <FileText size={24} className="text-green-500" />
                 <span className="text-gray-800 dark:text-gray-100 font-medium">{selectedFile.name}</span>
-                <Button
+                <ModernButton
                   type="button"
                   variant="ghost"
                   size="icon"
@@ -166,7 +166,7 @@ const ImportContactsDialog: React.FC<ImportContactsDialogProps> = ({ onImportSuc
                   className="text-red-500 hover:bg-red-100 dark:hover:bg-gray-600/50"
                 >
                   <XCircle size={20} />
-                </Button>
+                </ModernButton>
               </div>
             ) : (
               <>
@@ -181,14 +181,15 @@ const ImportContactsDialog: React.FC<ImportContactsDialogProps> = ({ onImportSuc
 
           <div className="flex justify-end gap-2 mt-6">
             <CancelButton onClick={() => setIsOpen(false)} disabled={isImporting} />
-            <Button
+            <ModernButton
               onClick={handleImportClick}
               disabled={!selectedFile || isImporting}
-              className="px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-md transition-all duration-300 transform hover:scale-105"
+              variant="gradient-primary"
+              className="px-6 py-2 rounded-lg font-semibold"
             >
               {isImporting && <LoadingSpinner size={16} className="me-2" />}
               {t('import.import_button')}
-            </Button>
+            </ModernButton>
           </div>
         </div>
       </DialogContent>

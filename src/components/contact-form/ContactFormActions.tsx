@@ -1,8 +1,8 @@
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import CancelButton from '../common/CancelButton';
 import { useTranslation } from 'react-i18next';
-import LoadingSpinner from '../common/LoadingSpinner';
+import { ModernButton } from '@/components/ui/modern-button';
+import { ModernLoader } from '@/components/ui/modern-loader';
+import CancelButton from '@/components/common/CancelButton';
 
 interface ContactFormActionsProps {
   isSubmitting: boolean;
@@ -16,10 +16,15 @@ const ContactFormActions: React.FC<ContactFormActionsProps> = ({ isSubmitting, o
   return (
     <div className="flex justify-end gap-2">
       <CancelButton onClick={onCancel} disabled={isSubmitting} text={t('common.cancel')} />
-      <Button type="submit" className="px-6 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white font-semibold shadow-md transition-all duration-300 transform hover:scale-105" disabled={isSubmitting}>
-        {isSubmitting && <LoadingSpinner size={16} className="me-2" />}
+      <ModernButton 
+        type="submit" 
+        variant="default"
+        className="hover-lift" 
+        disabled={isSubmitting}
+      >
+        {isSubmitting && <ModernLoader variant="spinner" size="sm" className="me-2" />}
         {contactId ? t('common.update_contact') : t('common.save_contact')}
-      </Button>
+      </ModernButton>
     </div>
   );
 };

@@ -1,12 +1,10 @@
 import React, { useEffect, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
+import { ModernInput } from '@/components/ui/modern-input';
+import { ModernTextarea } from '@/components/ui/modern-textarea';
+import { ModernSelect, ModernSelectContent, ModernSelectItem, ModernSelectTrigger, ModernSelectValue } from '@/components/ui/modern-select';
 import { Plus, X } from 'lucide-react';
 import { CustomFieldTemplateService } from '@/services/custom-field-template-service'; // Updated import
 import { useErrorHandler } from '@/hooks/use-error-handler';
@@ -21,6 +19,8 @@ import { useNavigate } from 'react-router-dom';
 import CancelButton from './common/CancelButton';
 import LoadingSpinner from './common/LoadingSpinner';
 import { t } from 'i18next';
+import { ModernCard, ModernCardHeader, ModernCardTitle, ModernCardContent, ModernCardFooter } from '@/components/ui/modern-card';
+import { ModernButton } from '@/components/ui/modern-button';
 
 type TemplateType = 'text' | 'number' | 'date' | 'list';
 
@@ -145,16 +145,16 @@ const CustomFieldTemplateForm: React.FC<CustomFieldTemplateFormProps> = ({ initi
   };
 
   return (
-    <Card className="w-full max-w-md glass rounded-xl p-6 bg-white/90 dark:bg-gray-900/90">
-      <CardHeader className="text-center">
-        <CardTitle className="text-2xl font-bold text-gray-800 dark:text-gray-100">
+    <ModernCard variant="glass" className="w-full max-w-md rounded-xl p-6">
+      <ModernCardHeader className="text-center">
+        <ModernCardTitle className="text-2xl font-bold">
           {initialData ? "ویرایش قالب فیلد سفارشی" : "افزودن قالب فیلد سفارشی جدید"}
-        </CardTitle>
+        </ModernCardTitle>
         {error && (
           <div className="text-sm text-destructive flex items-center justify-center gap-2 mt-2">
             <span>{errorMessage}</span>
             {retryCount > 0 && (
-              <Button
+              <ModernButton
                 variant="ghost"
                 size="sm"
                 onClick={retryLastOperation}
@@ -162,19 +162,20 @@ const CustomFieldTemplateForm: React.FC<CustomFieldTemplateFormProps> = ({ initi
                 className="text-destructive hover:bg-destructive/10"
               >
                 تلاش مجدد ({retryCount} از ۳)
-              </Button>
+              </ModernButton>
             )}
           </div>
         )}
-      </CardHeader>
-      <CardContent>
+      </ModernCardHeader>
+      <ModernCardContent>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <div>
             <Label htmlFor="field-name" className="text-gray-700 dark:text-gray-200">نام فیلد</Label>
-            <Input
+            <ModernInput
               id="field-name"
               {...form.register("name")}
               placeholder="مثال: تاریخ تولد"
+              variant="glass"
               className="mt-1 block w-full bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
               disabled={isSubmitting}
             />
@@ -185,7 +186,7 @@ const CustomFieldTemplateForm: React.FC<CustomFieldTemplateFormProps> = ({ initi
 
           <div>
             <Label htmlFor="field-type" className="text-gray-700 dark:text-gray-200">نوع فیلد</Label>
-            <Select
+            <ModernSelect
               value={values.type || "text"}
               onValueChange={(value) => {
                 form.setValue("type", value as TemplateType, { shouldValidate: true });
@@ -197,16 +198,16 @@ const CustomFieldTemplateForm: React.FC<CustomFieldTemplateFormProps> = ({ initi
               }}
               disabled={isSubmitting}
             >
-              <SelectTrigger className="w-full bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100">
-                <SelectValue placeholder="انتخاب نوع" />
-              </SelectTrigger>
-              <SelectContent className="backdrop-blur-md bg-white/80 dark:bg-gray-800/80 border border-white/30 dark:border-gray-600/30">
-                <SelectItem value="text">متن</SelectItem>
-                <SelectItem value="number">عدد</SelectItem>
-                <SelectItem value="date">تاریخ</SelectItem>
-                <SelectItem value="list">لیست</SelectItem>
-              </SelectContent>
-            </Select>
+              <ModernSelectTrigger variant="glass" className="w-full">
+                <ModernSelectValue placeholder="انتخاب نوع" />
+              </ModernSelectTrigger>
+              <ModernSelectContent variant="glass">
+                <ModernSelectItem value="text">متن</ModernSelectItem>
+                <ModernSelectItem value="number">عدد</ModernSelectItem>
+                <ModernSelectItem value="date">تاریخ</ModernSelectItem>
+                <ModernSelectItem value="list">لیست</ModernSelectItem>
+              </ModernSelectContent>
+            </ModernSelect>
             {form.formState.errors.type && (
               <p className="text-sm text-red-500 font-medium mt-1">{form.formState.errors.type.message}</p>
             )}
@@ -217,14 +218,15 @@ const CustomFieldTemplateForm: React.FC<CustomFieldTemplateFormProps> = ({ initi
               <Label className="text-gray-700 dark:text-gray-200">گزینه‌های لیست</Label>
               {(values.options || []).map((option, index) => (
                 <div key={index} className="flex gap-2">
-                  <Input
+                  <ModernInput
                     value={option}
                     onChange={(e) => setOptionAt(index, e.target.value)}
                     placeholder="گزینه"
+                    variant="glass"
                     className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
                     disabled={isSubmitting}
                   />
-                  <Button
+                  <ModernButton
                     type="button"
                     variant="ghost"
                     size="icon"
@@ -233,15 +235,15 @@ const CustomFieldTemplateForm: React.FC<CustomFieldTemplateFormProps> = ({ initi
                     disabled={isSubmitting}
                   >
                     <X size={16} />
-                  </Button>
+                  </ModernButton>
                 </div>
               ))}
-              <Button type="button" variant="outline" onClick={addOption}
-                className="w-full flex items-center gap-2 px-6 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold shadow-sm transition-all duration-300 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-200 dark:border-gray-600"
+              <ModernButton type="button" variant="outline" onClick={addOption}
+                className="w-full flex items-center gap-2 px-6 py-2 rounded-lg font-semibold"
                 disabled={isSubmitting}
               >
                 <Plus size={16} className="me-2" /> افزودن گزینه
-              </Button>
+              </ModernButton>
               {form.formState.errors.options && (
                 <p className="text-sm text-red-500 font-medium mt-1">{(form.formState.errors.options as { message?: string })?.message}</p>
               )}
@@ -250,10 +252,11 @@ const CustomFieldTemplateForm: React.FC<CustomFieldTemplateFormProps> = ({ initi
 
           <div className="flex flex-col gap-2">
             <Label htmlFor="field-description" className="text-gray-700 dark:text-gray-200">توضیحات (اختیاری)</Label>
-            <Textarea
+            <ModernTextarea
               id="field-description"
               {...form.register("description")}
               placeholder="توضیحات درباره این فیلد"
+              variant="glass"
               className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
               disabled={isSubmitting}
             />
@@ -270,20 +273,21 @@ const CustomFieldTemplateForm: React.FC<CustomFieldTemplateFormProps> = ({ initi
             <Label htmlFor="field-required" className="text-gray-700 dark:text-gray-200">فیلد الزامی</Label>
           </div>
 
-          <CardFooter className="flex justify-end gap-4 p-0 pt-4">
+          <ModernCardFooter className="flex justify-end gap-4 p-0 pt-4">
             <CancelButton onClick={onCancel} disabled={isSubmitting} />
-            <Button
+            <ModernButton
               type="submit"
-              className="px-6 py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white transition-colors"
+              variant="gradient-primary"
+              className="px-6 py-2 rounded-md font-semibold"
               disabled={isSubmitting}
             >
               {isSubmitting && <LoadingSpinner size={16} className="me-2" />}
               {isSubmitting ? (initialData ? "در حال ویرایش..." : "در حال افزودن...") : (initialData ? "ویرایش" : "افزودن")}
-            </Button>
-          </CardFooter>
+            </ModernButton>
+          </ModernCardFooter>
         </form>
-      </CardContent>
-    </Card>
+      </ModernCardContent>
+    </ModernCard>
   );
 };
 

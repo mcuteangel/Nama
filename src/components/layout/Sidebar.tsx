@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
+import { ModernButton } from "@/components/ui/modern-button";
 import { LogOut, PlusCircle, Users, Home, Menu, Settings, User, BarChart2, ClipboardList, ShieldCheck, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { showError, showSuccess, showLoading, dismissToast } from "@/utils/toast";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { ThemeToggle } from "../settings/ThemeToggle";
+import { ThemeToggle } from "../settings";
 import { useTranslation } from 'react-i18next';
 import LoadingSpinner from '../common/LoadingSpinner';
 
@@ -44,9 +44,10 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isAdmin }) => {
       if (error) throw error;
       showSuccess(t('common.logout_success'));
       navigate("/login");
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error logging out:", error);
-      showError(`${t('common.logout_error')}: ${error.message || t('common.unknown_error')}`);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      showError(`${t('common.logout_error')}: ${errorMessage || t('common.unknown_error')}`);
     } finally {
       dismissToast(toastId);
       setIsLoggingOut(false);
@@ -65,7 +66,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isAdmin }) => {
             Nama Contacts
           </h2>
         )}
-        <Button
+        <ModernButton
           variant="ghost"
           size="icon"
           onClick={() => setIsOpen(!isOpen)}
@@ -75,13 +76,13 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isAdmin }) => {
           )}
         >
           <Menu size={24} />
-        </Button>
+        </ModernButton>
       </div>
       <nav className="flex flex-col gap-2 p-4 flex-grow">
         {navItems.map((item) => (
           <Tooltip key={item.path}>
             <TooltipTrigger asChild>
-              <Button
+              <ModernButton
                 variant="ghost"
                 className={cn(
                   "w-full text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
@@ -95,7 +96,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isAdmin }) => {
                     {isOpen && <span className="whitespace-nowrap overflow-hidden">{item.name}</span>}
                   </div>
                 </Link>
-              </Button>
+              </ModernButton>
             </TooltipTrigger>
             {!isOpen && <TooltipContent side="left">{item.name}</TooltipContent>}
           </Tooltip>
@@ -105,7 +106,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isAdmin }) => {
         {isOpen && (
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button
+              <ModernButton
                 variant="ghost"
                 onClick={handleLogout}
                 disabled={isLoggingOut}
@@ -118,7 +119,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isAdmin }) => {
                   {isLoggingOut ? <LoadingSpinner size={20} className="me-2" /> : <LogOut size={20} className="me-2" />}
                   {isOpen && <span className="whitespace-nowrap overflow-hidden">{t('common.logout')}</span>}
                 </div>
-              </Button>
+              </ModernButton>
             </TooltipTrigger>
             {!isOpen && <TooltipContent side="left">{t('common.logout')}</TooltipContent>}
           </Tooltip>
@@ -126,7 +127,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isAdmin }) => {
         {!isOpen && (
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button
+              <ModernButton
                 variant="ghost"
                 size="icon"
                 onClick={handleLogout}
@@ -134,7 +135,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isAdmin }) => {
                 className="text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground mx-auto"
               >
                 {isLoggingOut ? <LoadingSpinner size={20} /> : <LogOut size={20} />}
-              </Button>
+              </ModernButton>
             </TooltipTrigger>
             <TooltipContent side="left">{t('common.logout')}</TooltipContent>
           </Tooltip>

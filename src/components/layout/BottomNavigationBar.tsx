@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { LogOut, PlusCircle, Users, Home, User, BarChart2, ClipboardList, ShieldCheck, Sparkles, Settings } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import { showError, showSuccess, showLoading, dismissToast } from "@/utils/toast";
+import { ModernButton } from "@/components/ui/modern-button";
+import { ModernLoader } from "@/components/ui/modern-loader";
+import { useToast } from "@/components/ui/modern-toast";
 import { cn } from "@/lib/utils";
 import { useTranslation } from 'react-i18next';
-import LoadingSpinner from '../common/LoadingSpinner';
+import { Home, PlusCircle, Users, Sparkles, Settings, ShieldCheck, LogOut } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+
 
 interface BottomNavigationBarProps {
   isAdmin: boolean;
@@ -30,36 +31,36 @@ const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({ isAdmin }) =>
     navItems.push({ name: t('user_management.title'), icon: ShieldCheck, path: "/user-management" });
   }
 
+  const { toast } = useToast();
+  
   const handleLogout = async () => {
     setIsLoggingOut(true);
-    const toastId = showLoading(t('common.logout_loading'));
     try {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
-      showSuccess(t('common.logout_success'));
+      toast.success(t('common.logout_success'));
       navigate("/login");
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error logging out:", error);
-      showError(`${t('common.logout_error')}: ${error.message || t('common.unknown_error')}`);
+      toast.error(`${t('common.logout_error')}: ${(error as Error).message || t('common.unknown_error')}`);
     } finally {
-      dismissToast(toastId);
       setIsLoggingOut(false);
     }
   };
 
   return (
     <div className={cn(
-      "fixed bottom-0 left-0 w-full p-2 shadow-lg flex items-center justify-around z-50",
-      "glass border-t text-foreground"
+      "fixed bottom-0 left-0 w-full p-2 shadow-lg flex items-center justify-around z-50 fade-in-up",
+      "glass-advanced border-t text-foreground backdrop-blur-md"
     )}>
       {navItems.map((item) => (
-        <Button
+        <ModernButton
           key={item.path}
           variant="ghost"
           className={cn(
-            "flex flex-col items-center justify-center text-xs p-1 h-auto min-w-[60px]",
+            "flex flex-col items-center justify-center text-xs p-1 h-auto min-w-[60px] hover-glow",
             "hover:bg-white/20",
-            location.pathname === item.path ? "text-blue-200 dark:text-blue-300" : ""
+            location.pathname === item.path ? "text-primary bg-primary/10" : ""
           )}
           asChild
         >
@@ -69,19 +70,19 @@ const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({ isAdmin }) =>
               {item.name}
             </div>
           </Link>
-        </Button>
+        </ModernButton>
       ))}
-      <Button
+      <ModernButton
         variant="ghost"
         onClick={handleLogout}
         disabled={isLoggingOut}
-        className="flex flex-col items-center justify-center text-xs p-1 h-auto min-w-[60px] hover:bg-white/20"
+        className="flex flex-col items-center justify-center text-xs p-1 h-auto min-w-[60px] hover:bg-white/20 hover-glow"
       >
         <div className="flex flex-col items-center justify-center">
-          {isLoggingOut ? <LoadingSpinner size={20} className="mb-1" /> : <LogOut size={20} className="mb-1" />}
+          {isLoggingOut ? <ModernLoader variant="spinner" size="sm" className="mb-1" /> : <LogOut size={20} className="mb-1" />}
           {t('common.logout')}
         </div>
-      </Button>
+      </ModernButton>
     </div>
   );
 };

@@ -1,6 +1,4 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Copy, Merge, XCircle, Info } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useSession } from "@/integrations/supabase/auth";
@@ -9,9 +7,11 @@ import { ErrorManager } from "@/lib/error-manager";
 import LoadingMessage from "./common/LoadingMessage";
 import { supabase } from '@/integrations/supabase/client';
 import { invalidateCache } from '@/utils/cache-helpers';
-import { ContactCrudService } from '@/services/contact-crud-service'; // Updated import
+import { ContactCrudService } from '@/services/contact-crud-service';
 import EmptyState from './common/EmptyState';
 import LoadingSpinner from './common/LoadingSpinner';
+import { ModernCard, ModernCardHeader, ModernCardTitle, ModernCardDescription, ModernCardContent } from "@/components/ui/modern-card";
+import { ModernButton } from "@/components/ui/modern-button";
 
 interface DuplicateContact {
   id: string;
@@ -317,25 +317,26 @@ const DuplicateContactManagement: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <Card className="glass rounded-xl p-4">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-xl font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
+      <ModernCard variant="glass" className="rounded-xl p-4">
+        <ModernCardHeader className="pb-2">
+          <ModernCardTitle className="text-xl font-bold flex items-center gap-2">
             <Copy size={20} className="text-orange-500" /> {t('ai_suggestions.duplicate_contact_management_title')}
-          </CardTitle>
-          <CardDescription className="text-gray-600 dark:text-gray-300">
+          </ModernCardTitle>
+          <ModernCardDescription>
             {t('ai_suggestions.duplicate_contact_management_description')}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <Button
+          </ModernCardDescription>
+        </ModernCardHeader>
+        <ModernCardContent className="space-y-4">
+          <ModernButton
             onClick={fetchAllContactsForDuplicates}
             disabled={isScanning}
-            className="w-full flex items-center gap-2 px-6 py-2 rounded-lg bg-yellow-600 hover:bg-yellow-700 text-white font-semibold shadow-md transition-all duration-300 transform hover:scale-105"
+            variant="gradient-sunset"
+            className="w-full flex items-center gap-2 px-6 py-2 rounded-lg font-semibold shadow-md transition-all duration-300 transform hover:scale-105"
           >
             {isScanning && <LoadingSpinner size={16} className="me-2" />}
             <Merge size={16} className="me-2" />
             {t('ai_suggestions.scan_for_duplicates')}
-          </Button>
+          </ModernButton>
 
           {duplicatePairs.length === 0 && !isScanning && (
             <EmptyState
@@ -366,29 +367,29 @@ const DuplicateContactManagement: React.FC = () => {
                     </div>
                   </div>
                   <div className="flex justify-end gap-2 mt-3">
-                    <Button
+                    <ModernButton
                       variant="ghost"
                       size="icon"
                       onClick={() => handleMergeContacts(pair.mainContact, pair.duplicateContact)}
                       className="text-green-600 hover:bg-green-100 dark:text-green-400 dark:hover:bg-gray-600/50"
                     >
                       <Merge size={20} />
-                    </Button>
-                    <Button
+                    </ModernButton>
+                    <ModernButton
                       variant="ghost"
                       size="icon"
                       onClick={() => handleDiscardDuplicate(pair.duplicateContact.id)}
                       className="text-red-600 hover:bg-red-100 dark:text-red-400 dark:hover:bg-gray-600/50"
                     >
                       <XCircle size={20} />
-                    </Button>
+                    </ModernButton>
                   </div>
                 </div>
               ))}
             </div>
           )}
-        </CardContent>
-      </Card>
+        </ModernCardContent>
+      </ModernCard>
     </div>
   );
 };

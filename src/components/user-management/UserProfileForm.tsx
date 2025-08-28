@@ -4,10 +4,10 @@ import React, { useEffect, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { ModernButton } from '@/components/ui/modern-button';
 import { Label } from '@/components/ui/label';
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
+import { ModernInput } from '@/components/ui/modern-input';
+import { ModernCard, ModernCardHeader, ModernCardTitle, ModernCardContent, ModernCardFooter } from '@/components/ui/modern-card';
 import { supabase } from '@/integrations/supabase/client';
 import { useSession } from '@/integrations/supabase/auth';
 import { useErrorHandler } from '@/hooks/use-error-handler';
@@ -152,16 +152,16 @@ const UserProfileForm: React.FC = () => {
   }
 
   return (
-    <Card className="w-full max-w-md glass rounded-xl p-6 bg-white/90 dark:bg-gray-900/90">
-      <CardHeader className="text-center">
-        <CardTitle className="text-2xl font-bold text-gray-800 dark:text-gray-100">
+    <ModernCard variant="glass" className="w-full max-w-md rounded-xl p-6">
+      <ModernCardHeader className="text-center">
+        <ModernCardTitle className="text-2xl font-bold text-gray-800 dark:text-gray-100">
           {t('form_labels.profile_user')}
-        </CardTitle>
+        </ModernCardTitle>
         {submitError && (
           <div className="text-sm text-destructive flex items-center justify-center gap-2 mt-2">
             <span>{submitErrorMessage}</span>
             {submitRetryCount > 0 && (
-              <Button
+              <ModernButton
                 variant="ghost"
                 size="sm"
                 onClick={retrySubmit}
@@ -169,19 +169,20 @@ const UserProfileForm: React.FC = () => {
                 className="text-destructive hover:bg-destructive/10"
               >
                 {t('actions.retry_count', { count: submitRetryCount })}
-              </Button>
+              </ModernButton>
             )}
           </div>
         )}
-      </CardHeader>
-      <CardContent>
+      </ModernCardHeader>
+      <ModernCardContent>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <div>
             <Label htmlFor="first_name" className="text-gray-700 dark:text-gray-200">{t('form_labels.first_name')}</Label>
-            <Input
+            <ModernInput
               id="first_name"
               {...form.register('first_name')}
               placeholder={t('form_placeholders.enter_name')}
+              variant="glass"
               className="mt-1 block w-full bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
               disabled={isSubmitting}
             />
@@ -190,10 +191,11 @@ const UserProfileForm: React.FC = () => {
 
           <div>
             <Label htmlFor="last_name" className="text-gray-700 dark:text-gray-200">{t('form_labels.last_name')}</Label>
-            <Input
+            <ModernInput
               id="last_name"
               {...form.register('last_name')}
               placeholder={t('form_placeholders.enter_last_name')}
+              variant="glass"
               className="mt-1 block w-full bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
               disabled={isSubmitting}
             />
@@ -202,27 +204,28 @@ const UserProfileForm: React.FC = () => {
 
           <div>
             <Label className="text-gray-700 dark:text-gray-200">{t('form_labels.user_email')}</Label>
-            <Input
+            <ModernInput
               value={session?.user?.email || ''}
               readOnly
+              variant="glass"
               className="mt-1 block w-full bg-gray-100/50 dark:bg-gray-800/50 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm text-gray-700 dark:text-gray-300 cursor-not-allowed"
             />
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{t('email_change_notice.message')}</p>
           </div>
 
-          <CardFooter className="flex justify-end gap-4 p-0 pt-4">
-            <Button
+          <ModernCardFooter className="flex justify-end gap-4 p-0 pt-4">
+            <ModernButton
               type="submit"
               className="px-6 py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white transition-colors"
               disabled={isSubmitting}
             >
               {isSubmitting && <LoadingSpinner size={16} className="me-2" />}
               {isSubmitting ? t('actions.saving_progress') : t('actions.save_changes')}
-            </Button>
-          </CardFooter>
+            </ModernButton>
+          </ModernCardFooter>
         </form>
-      </CardContent>
-    </Card>
+      </ModernCardContent>
+    </ModernCard>
   );
 };
 

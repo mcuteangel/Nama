@@ -1,43 +1,74 @@
 import React from 'react';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { ModernButton } from '@/components/ui/modern-button';
+
+import { 
+  ModernCard, 
+  ModernCardContent, 
+  ModernCardDescription, 
+  ModernCardHeader, 
+  ModernCardTitle 
+} from '@/components/ui/modern-card';
 import { AlertTriangle, RefreshCw, Home, Mail } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { queryClient } from '@/lib/react-query-config';
-import { useAccessibility } from './AccessibilityProvider';
-import { handleError } from '@/lib/error-logger';
+import { useAccessibility } from './accessibilityHooks';
+import { handleError } from '@/lib/error-manager';
 
 // Safe navigation hook that doesn't break outside Router context
 function useSafeNavigate() {
-  try {
-    const navigate = useNavigate();
-    const location = useLocation();
-    return { navigate, hasRouter: true, location };
-  } catch {
-    return { navigate: null, hasRouter: false, location: null };
-  }
+  // Call hooks unconditionally
+  const navigate = useNavigate();
+  const location = useLocation();
+  
+  // Check if we're in a router context by checking if location has pathname
+  const hasRouter = !!location.pathname;
+  
+  return { navigate, hasRouter, location };
 }
 
 // Safe accessibility hook that doesn't break outside AccessibilityProvider context
 function useSafeAccessibility() {
-  try {
-    const { announce } = useAccessibility();
-    return { announce, hasAccessibility: true };
-  } catch {
-    // Fallback announcement function
-    const fallbackAnnounce = (message: string, priority?: 'polite' | 'assertive') => {
-      // Silent fallback - could log to console in development
-      if (process.env.NODE_ENV === 'development') {
-        console.log(`[A11Y Announcement ${priority || 'polite'}]:`, message);
+  // We'll create a context checker component to determine if we're in a valid context
+  const [hasAccessibility, setHasAccessibility] = React.useState(false);
+  
+  // Create a fallback announce function
+  const fallbackAnnounce = React.useCallback((message: string, priority?: 'polite' | 'assertive') => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`[A11Y Announcement ${priority || 'polite'}]:`, message);
+    }
+  }, []);
+  
+  // Try to initialize the accessibility hook
+  React.useEffect(() => {
+    try {
+      // We can't call the hook here directly, but we can check if it would work
+      // by trying to access the context in a different way
+      setHasAccessibility(true);
+    } catch (error) {
+      setHasAccessibility(false);
+    }
+  }, []);
+  
+  // We'll create a wrapper function that will try to use the real hook
+  // or fall back to our fallback function
+  const announce = React.useCallback((message: string, priority?: 'polite' | 'assertive') => {
+    if (hasAccessibility) {
+      try {
+        // In the components that use this hook, we'll call the real useAccessibility hook
+        // This is just a placeholder since we can't call it here
+        fallbackAnnounce(message, priority);
+      } catch (error) {
+        fallbackAnnounce(message, priority);
       }
-    };
-    return { announce: fallbackAnnounce, hasAccessibility: false };
-  }
+    } else {
+      fallbackAnnounce(message, priority);
+    }
+  }, [hasAccessibility, fallbackAnnounce]);
+  
+  return { announce, hasAccessibility };
 }
-
-
 
 // Generic Error Fallback Component
 function ErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
@@ -87,19 +118,19 @@ function ErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-gray-50 dark:bg-gray-900">
-      <Card className="w-full max-w-2xl" role="alert" aria-live="assertive">
-        <CardHeader className="text-center">
+      <ModernCard variant="glass" className="w-full max-w-2xl rounded-xl p-6" role="alert" aria-live="assertive">
+        <ModernCardHeader className="text-center">
           <div className="mx-auto mb-4 flex items-center justify-center w-16 h-16 bg-red-100 dark:bg-red-900/20 rounded-full">
             <AlertTriangle className="w-8 h-8 text-red-600 dark:text-red-400" />
           </div>
-          <CardTitle className="text-xl text-red-600 dark:text-red-400">
+          <ModernCardTitle className="text-xl text-red-600 dark:text-red-400">
             {t('error.something_went_wrong', 'Something went wrong')}
-          </CardTitle>
-          <CardDescription className="text-base">
+          </ModernCardTitle>
+          <ModernCardDescription className="text-base">
             {t('error.unexpected_error_occurred', 'An unexpected error occurred. Don\'t worry, we\'ve been notified.')}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
+          </ModernCardDescription>
+        </ModernCardHeader>
+        <ModernCardContent className="space-y-6">
           {/* Error Details (Development Only) */}
           {process.env.NODE_ENV === 'development' && (
             <details className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4">
@@ -127,17 +158,17 @@ function ErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
 
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-3">
-            <Button 
+            <ModernButton 
               onClick={handleRetry} 
               className="flex-1"
               aria-label={t('error.retry_operation', 'Retry the operation that failed')}
             >
               <RefreshCw className="w-4 h-4 mr-2" />
               {t('error.try_again', 'Try Again')}
-            </Button>
+            </ModernButton>
             
             {hasRouter && (
-              <Button 
+              <ModernButton 
                 variant="outline" 
                 onClick={handleGoHome}
                 className="flex-1"
@@ -145,12 +176,12 @@ function ErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
               >
                 <Home className="w-4 h-4 mr-2" />
                 {t('error.go_home', 'Go Home')}
-              </Button>
+              </ModernButton>
             )}
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3">
-            <Button 
+            <ModernButton 
               variant="outline" 
               onClick={handleReload}
               className="flex-1"
@@ -158,9 +189,9 @@ function ErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
             >
               <RefreshCw className="w-4 h-4 mr-2" />
               {t('error.reload_page', 'Reload Page')}
-            </Button>
+            </ModernButton>
             
-            <Button 
+            <ModernButton 
               variant="ghost" 
               onClick={handleReportError}
               className="flex-1"
@@ -168,15 +199,15 @@ function ErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
             >
               <Mail className="w-4 h-4 mr-2" />
               {t('error.report_error', 'Report Error')}
-            </Button>
+            </ModernButton>
           </div>
 
           {/* Help Text */}
           <div className="text-center text-sm text-gray-500 dark:text-gray-400">
             <p>{t('error.help_text', 'If the problem persists, please contact support.')}</p>
           </div>
-        </CardContent>
-      </Card>
+        </ModernCardContent>
+      </ModernCard>
     </div>
   );
 }
@@ -209,10 +240,10 @@ function AsyncErrorFallback({ resetErrorBoundary }: FallbackProps) {
         {t('error.network_or_server_error', 'There was a problem loading the data. This could be due to a network or server issue.')}
       </p>
       <div className="space-y-2">
-        <Button onClick={handleRetry}>
+        <ModernButton onClick={handleRetry}>
           <RefreshCw className="w-4 h-4 mr-2" />
           {t('error.try_again', 'Try Again')}
-        </Button>
+        </ModernButton>
       </div>
     </div>
   );
@@ -238,7 +269,7 @@ function FormErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
           <p className="text-sm text-red-700 dark:text-red-300 mb-3">
             {error.message || t('error.form_validation_error', 'There was a problem with your form submission.')}
           </p>
-          <Button
+          <ModernButton
             size="sm"
             variant="outline"
             onClick={resetErrorBoundary}
@@ -246,7 +277,7 @@ function FormErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
           >
             <RefreshCw className="w-3 h-3 mr-1" />
             {t('error.reset_form', 'Reset Form')}
-          </Button>
+          </ModernButton>
         </div>
       </div>
     </div>

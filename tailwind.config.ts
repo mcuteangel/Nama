@@ -1,3 +1,5 @@
+import tailwindcssAnimate from "tailwindcss-animate";
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -62,6 +64,17 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        surface: {
+          1: "hsl(var(--surface-1))",
+          2: "hsl(var(--surface-2))",
+          3: "hsl(var(--surface-3))",
+          4: "hsl(var(--surface-4))",
+        },
+      },
+      fontFamily: {
+        'display': ['Poppins', 'sans-serif'],
+        'persian': ['Vazirmatn', 'sans-serif'],
+        'english': ['Inter', 'sans-serif'],
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -129,6 +142,64 @@ export default {
             overflow: "hidden",
           },
         },
+        "floating": {
+          "0%, 100%": {
+            transform: "translateY(0px)",
+          },
+          "50%": {
+            transform: "translateY(-10px)",
+          },
+        },
+        "fadeInUp": {
+          from: {
+            opacity: "0",
+            transform: "translateY(30px)",
+          },
+          to: {
+            opacity: "1",
+            transform: "translateY(0)",
+          },
+        },
+        "fadeInDown": {
+          from: {
+            opacity: "0",
+            transform: "translateY(-30px)",
+          },
+          to: {
+            opacity: "1",
+            transform: "translateY(0)",
+          },
+        },
+        "fadeInLeft": {
+          from: {
+            opacity: "0",
+            transform: "translateX(-30px)",
+          },
+          to: {
+            opacity: "1",
+            transform: "translateX(0)",
+          },
+        },
+        "fadeInRight": {
+          from: {
+            opacity: "0",
+            transform: "translateX(30px)",
+          },
+          to: {
+            opacity: "1",
+            transform: "translateX(0)",
+          },
+        },
+        "scaleIn": {
+          from: {
+            opacity: "0",
+            transform: "scale(0.9)",
+          },
+          to: {
+            opacity: "1",
+            transform: "scale(1)",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.3s ease-out forwards",
@@ -137,8 +208,14 @@ export default {
         "tabHide": "tabHide 0.2s ease-in forwards",
         "collapsible-down": "collapsible-down 0.3s ease-out forwards",
         "collapsible-up": "collapsible-up 0.2s ease-in forwards",
+        "floating": "floating 3s ease-in-out infinite",
+        "fade-in-up": "fadeInUp 0.6s ease-out",
+        "fade-in-down": "fadeInDown 0.6s ease-out",
+        "fade-in-left": "fadeInLeft 0.6s ease-out",
+        "fade-in-right": "fadeInRight 0.6s ease-out",
+        "scale-in": "scaleIn 0.3s ease-out",
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [tailwindcssAnimate],
 } satisfies Config;

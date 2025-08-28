@@ -1,8 +1,11 @@
+import React from 'react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { renderHook, act } from '@testing-library/react-hooks';
-import AccessibilityProvider, { useAccessibility } from '../AccessibilityProvider';
+import '@testing-library/jest-dom';
+import AccessibilityProvider from '../AccessibilityProvider';
+import { useAccessibility } from '../accessibilityHooks';
 
 // Mock @react-aria/live-announcer
 vi.mock('@react-aria/live-announcer', () => ({
@@ -14,7 +17,8 @@ vi.mock('focus-trap-react', () => ({
   FocusTrap: ({ children }: { children: React.ReactNode }) => <div data-testid="focus-trap">{children}</div>,
 }));
 
-const mockAnnounce = vi.mocked(require('@react-aria/live-announcer').announce);
+import { announce } from '@react-aria/live-announcer';
+const mockAnnounce = vi.mocked(announce);
 
 describe('AccessibilityProvider', () => {
   beforeEach(() => {
@@ -282,9 +286,9 @@ describe('AccessibilityProvider', () => {
     it('focuses element when keyboard navigation enabled', () => {
       const mockElement = {
         focus: vi.fn(),
-        getAttribute: vi.fn(() => 'Test Button'),
-        textContent: 'Button Text',
-      } as any;
+        getAttribute: vi.fn().mockReturnValue(null),
+        textContent: 'Test Element',
+      } as unknown as HTMLElement;
 
       const TestComponent = () => {
         const { focusElement } = useAccessibility();
@@ -355,6 +359,32 @@ describe('AccessibilityProvider', () => {
 
       expect(screen.getByTestId('trap-focus')).toHaveTextContent('true');
       expect(screen.getByTestId('restore-focus')).toHaveTextContent('false');
+    });
+
+    it('focuses element with custom label', () => {
+      const mockElement = {
+        focus: vi.fn(),
+        getAttribute: vi.fn().mockReturnValue('Custom Label'),
+        textContent: 'Test Element',
+      } as unknown as HTMLElement;
+
+      const TestComponent = () => {
+        const { focusElement } = useAccessibility();
+        
+        React.useEffect(() => {
+          focusElement(mockElement);
+        }, [focusElement]);
+
+        return <div>Test</div>;
+      };
+
+      render(
+        <AccessibilityProvider>
+          <TestComponent />
+        </AccessibilityProvider>
+      );
+
+      expect(mockElement.focus).toHaveBeenCalled();
     });
   });
 

@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { showError, showSuccess } from "@/utils/toast";
 import ContactForm from "@/components/ContactForm";
 import { MadeWithDyad } from "@/components/made-with-dyad";
-import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { ModernCard, ModernCardHeader, ModernCardTitle, ModernCardDescription } from "@/components/ui/modern-card";
 import { fetchWithCache } from "@/utils/cache-helpers";
 import LoadingMessage from "@/components/common/LoadingMessage";
 import CancelButton from "@/components/common/CancelButton";
@@ -266,17 +266,17 @@ const EditContact = () => {
 
   return (
     <div className="flex flex-col items-center justify-center p-4 h-full w-full">
-      <Card className="w-full max-w-3xl glass rounded-xl p-4">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold text-gray-800 dark:text-gray-100">
+      <ModernCard variant="glass" className="w-full max-w-3xl rounded-xl p-4">
+        <ModernCardHeader className="text-center">
+          <ModernCardTitle className="text-2xl font-bold text-gray-800 dark:text-gray-100">
             ویرایش مخاطب
-          </CardTitle>
-          <CardDescription className="text-gray-600 dark:text-gray-300">
+          </ModernCardTitle>
+          <ModernCardDescription className="text-gray-600 dark:text-gray-300">
             اطلاعات مخاطب را ویرایش کنید.
-          </CardDescription>
-        </CardHeader>
+          </ModernCardDescription>
+        </ModernCardHeader>
         <ContactForm initialData={initialContactData} contactId={id} />
-      </Card>
+      </ModernCard>
       <MadeWithDyad />
     </div>
   );

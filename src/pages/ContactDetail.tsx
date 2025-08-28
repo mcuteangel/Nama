@@ -2,12 +2,12 @@ import { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { showError, showSuccess } from "@/utils/toast";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { ModernCard, ModernCardContent, ModernCardHeader, ModernCardTitle, ModernCardDescription } from "@/components/ui/modern-card";
+import { ModernButton } from "@/components/ui/modern-button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { ModernInput } from "@/components/ui/modern-input";
+import { ModernTextarea } from "@/components/ui/modern-textarea";
 import { Phone, Mail, Building, Briefcase, MapPin, Info, User, Users, Tag, CalendarClock, Gift, Link as LinkIcon, Linkedin, Twitter, Instagram, Send, HomeIcon, Globe, Map, ClipboardList } from "lucide-react";
 import { MadeWithDyad } from "@/components/made-with-dyad";
 import { useJalaliCalendar } from "@/hooks/use-jalali-calendar";
@@ -203,88 +203,88 @@ const ContactDetail = () => {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center p-4 h-full w-full">
-      <Card className="w-full max-w-2xl glass rounded-xl p-6">
-        <CardHeader className="text-center">
-          <Avatar className="h-24 w-24 mx-auto mb-4 border-4 border-blue-400 dark:border-blue-600">
+    <div className="flex flex-col items-center justify-center p-4 h-full w-full fade-in-up">
+      <ModernCard variant="glass" hover="lift" className="w-full max-w-2xl">
+        <ModernCardHeader className="text-center">
+          <Avatar className="h-24 w-24 mx-auto mb-4 ring-4 ring-primary/20">
             <AvatarImage src={contact.avatar_url || undefined} alt={`${contact.first_name} ${contact.last_name}`} />
-            <AvatarFallback className="bg-blue-500 text-white dark:bg-blue-700 text-4xl font-bold">
+            <AvatarFallback className="bg-primary text-primary-foreground text-4xl font-bold">
               {contact.first_name ? contact.first_name[0] : "?"}
             </AvatarFallback>
           </Avatar>
-          <CardTitle className="text-3xl font-bold text-gray-800 dark:text-gray-100">
+          <ModernCardTitle className="text-3xl font-bold text-gradient">
             {contact.first_name} {contact.last_name}
-          </CardTitle>
-          <CardDescription className="text-lg text-gray-600 dark:text-gray-300">
+          </ModernCardTitle>
+          <ModernCardDescription className="text-lg">
             جزئیات مخاطب
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
+          </ModernCardDescription>
+        </ModernCardHeader>
+        <ModernCardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><User size={16} /> جنسیت</Label>
-              <Input value={contact.gender === "male" ? "مرد" : contact.gender === "female" ? "زن" : "نامشخص"} readOnly className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
+              <ModernInput value={contact.gender === "male" ? "مرد" : contact.gender === "female" ? "زن" : "نامشخص"} readOnly variant="glass" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
             </div>
             {contact.position && (
               <div>
                 <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><Briefcase size={16} /> سمت/شغل</Label>
-                <Input value={contact.position} readOnly className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
+                <ModernInput value={contact.position} readOnly variant="glass" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
               </div>
             )}
             {contact.company && (
               <div>
                 <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><Building size={16} /> شرکت</Label>
-                <Input value={contact.company} readOnly className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
+                <ModernInput value={contact.company} readOnly variant="glass" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
               </div>
             )}
             {contact.street && (
               <div>
                 <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><HomeIcon size={16} /> خیابان/کوچه</Label>
-                <Input value={contact.street} readOnly className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
+                <ModernInput value={contact.street} readOnly variant="glass" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
               </div>
             )}
             {contact.city && (
               <div>
                 <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><Map size={16} /> شهر</Label>
-                <Input value={contact.city} readOnly className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
+                <ModernInput value={contact.city} readOnly variant="glass" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
               </div>
             )}
             {contact.state && (
               <div>
                 <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><MapPin size={16} /> استان</Label>
-                <Input value={contact.state} readOnly className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
+                <ModernInput value={contact.state} readOnly variant="glass" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
               </div>
             )}
             {contact.zip_code && (
               <div>
                 <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><Tag size={16} /> کد پستی</Label>
-                <Input value={contact.zip_code} readOnly className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
+                <ModernInput value={contact.zip_code} readOnly variant="glass" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
               </div>
             )}
             {contact.country && (
               <div>
                 <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><Globe size={16} /> کشور</Label>
-                <Input value={contact.country} readOnly className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
+                <ModernInput value={contact.country} readOnly variant="glass" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
               </div>
             )}
             <div>
               <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><Users size={16} /> گروه</Label>
               {assignedGroup ? (
-                <Input value={assignedGroup.name} readOnly className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" style={{ backgroundColor: assignedGroup.color || 'transparent' }} />
+                <ModernInput value={assignedGroup.name} readOnly variant="glass" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" style={{ backgroundColor: assignedGroup.color || 'transparent' }} />
               ) : (
-                <Input value="بدون گروه" readOnly className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
+                <ModernInput value="بدون گروه" readOnly variant="glass" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
               )}
             </div>
             {contact.birthday && (
               <div>
                 <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><Gift size={16} /> تاریخ تولد</Label>
-                <Input value={formatDate(new Date(contact.birthday), 'jYYYY/jMM/jDD')} readOnly className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
+                <ModernInput value={formatDate(new Date(contact.birthday), 'jYYYY/jMM/jDD')} readOnly variant="glass" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
               </div>
             )}
             {contact.preferred_contact_method && (
               <div>
                 <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><Mail size={16} /> روش ارتباط ترجیحی</Label>
-                <Input value={getPreferredContactMethodLabel(contact.preferred_contact_method)} readOnly className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
+                <ModernInput value={getPreferredContactMethodLabel(contact.preferred_contact_method)} readOnly variant="glass" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
               </div>
             )}
           </div>
@@ -294,7 +294,7 @@ const ContactDetail = () => {
               <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><Phone size={16} /> شماره تلفن‌ها</Label>
               {contact.phone_numbers.map((phone) => (
                 <a key={phone.id} href={`tel:${phone.phone_number}`} className="block">
-                  <Input value={`${phone.phone_number} (${phone.phone_type})${phone.extension ? ` - داخلی: ${phone.extension}` : ''}`} readOnly className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-blue-600 dark:text-blue-400 hover:underline cursor-pointer" />
+                  <ModernInput value={`${phone.phone_number} (${phone.phone_type})${phone.extension ? ` - داخلی: ${phone.extension}` : ''}`} readOnly variant="glass" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-blue-600 dark:text-blue-400 hover:underline cursor-pointer" />
                 </a>
               ))}
             </div>
@@ -305,7 +305,7 @@ const ContactDetail = () => {
               <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><Mail size={16} /> آدرس‌های ایمیل</Label>
               {contact.email_addresses.map((email) => (
                 <a key={email.id} href={`mailto:${email.email_address}`} className="block">
-                  <Input value={`${email.email_address} (${email.email_type})`} readOnly className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-blue-600 dark:text-blue-400 hover:underline cursor-pointer" />
+                  <ModernInput value={`${email.email_address} (${email.email_type})`} readOnly variant="glass" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-blue-600 dark:text-blue-400 hover:underline cursor-pointer" />
                 </a>
               ))}
             </div>
@@ -336,9 +336,9 @@ const ContactDetail = () => {
                       : 'نام فیلد نامشخص:'}
                   </Label>
                   {field.custom_field_templates && field.custom_field_templates.length > 0 && field.custom_field_templates[0].type === 'date' ? (
-                    <Input value={formatDate(new Date(field.field_value), 'jYYYY/jMM/jDD')} readOnly className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
+                    <ModernInput value={formatDate(new Date(field.field_value), 'jYYYY/jMM/jDD')} readOnly variant="glass" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
                   ) : (
-                    <Input value={field.field_value} readOnly className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
+                    <ModernInput value={field.field_value} readOnly variant="glass" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
                   )}
                 </div>
               ))}
@@ -348,32 +348,33 @@ const ContactDetail = () => {
           {contact.notes && (
             <div className="space-y-2 pt-4 border-t border-gray-200 dark:border-gray-700">
               <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><Info size={16} /> یادداشت‌ها</Label>
-              <Textarea value={contact.notes} readOnly className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
+              <ModernTextarea value={contact.notes} readOnly variant="glass" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
             </div>
           )}
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
             <div>
               <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><CalendarClock size={16} /> تاریخ ایجاد</Label>
-              <Input value={formatDate(new Date(contact.created_at), 'jYYYY/jMM/jDD HH:mm')} readOnly className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
+              <ModernInput value={formatDate(new Date(contact.created_at), 'jYYYY/jMM/jDD HH:mm')} readOnly variant="glass" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
             </div>
             <div>
               <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><CalendarClock size={16} /> آخرین ویرایش</Label>
-              <Input value={formatDate(new Date(contact.updated_at), 'jYYYY/jMM/jDD HH:mm')} readOnly className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
+              <ModernInput value={formatDate(new Date(contact.updated_at), 'jYYYY/jMM/jDD HH:mm')} readOnly variant="glass" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
             </div>
           </div>
 
           <div className="flex justify-end gap-2 mt-6">
-            <Button
+            <ModernButton
               onClick={() => navigate(`/contacts/edit/${id}`)}
-              className="px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-md transition-all duration-300 transform hover:scale-105"
+              variant="default"
+              className="hover-lift"
             >
               ویرایش مخاطب
-            </Button>
+            </ModernButton>
             <CancelButton />
           </div>
-        </CardContent>
-      </Card>
+        </ModernCardContent>
+      </ModernCard>
       <MadeWithDyad />
     </div>
   );

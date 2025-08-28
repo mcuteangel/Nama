@@ -6,7 +6,7 @@ interface PerformanceMetric {
   sessionId: string;
   url: string;
   userAgent: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 interface NavigationTiming {
@@ -18,13 +18,29 @@ interface NavigationTiming {
   cumulativeLayoutShift: number;
 }
 
+interface PerformanceMonitorConfig {
+  enableLogging: boolean;
+  logLevel: 'all' | 'important' | 'errors' | 'none';
+  enableApiTracking: boolean;
+  logFilters: string[]; // Metric names to exclude from logging
+}
+
+const DEFAULT_CONFIG: PerformanceMonitorConfig = {
+  enableLogging: process.env.NODE_ENV === 'development',
+  logLevel: 'important', // Only log important metrics, not API calls
+  enableApiTracking: false, // Disable API tracking temporarily
+  logFilters: ['api.analytics', 'api./api/analytics'] // Filter out analytics API logs
+};
+
 class PerformanceMonitor {
   private sessionId: string;
   private userId?: string;
   private metrics: PerformanceMetric[] = [];
   private observer?: PerformanceObserver;
+  private config: PerformanceMonitorConfig;
 
-  constructor() {
+  constructor(config?: Partial<PerformanceMonitorConfig>) {
+    this.config = { ...DEFAULT_CONFIG, ...config };
     this.sessionId = this.generateSessionId();
     this.setupPerformanceObserver();
     this.trackNavigationTiming();
@@ -100,24 +116,30 @@ class PerformanceMonitor {
 
     // First Input Delay (FID)
     this.observeEntry('first-input', (entry) => {
-      this.recordMetric({
-        name: 'web-vitals.fid',
-        value: entry.processingStart - entry.startTime
-      });
+      // Type guard to ensure entry has the required properties
+      if ('processingStart' in entry && 'startTime' in entry) {
+        const fidEntry = entry as PerformanceEntry & { processingStart: number, startTime: number };
+        this.recordMetric({
+          name: 'web-vitals.fid',
+          value: fidEntry.processingStart - fidEntry.startTime
+        });
+      }
     });
 
     // Cumulative Layout Shift (CLS)
     this.observeEntry('layout-shift', (entry) => {
-      if (!entry.hadRecentInput) {
+      // Type guard to ensure entry has the required properties
+      if ('hadRecentInput' in entry && 'value' in entry && !entry.hadRecentInput) {
+        const clsEntry = entry as PerformanceEntry & { hadRecentInput: boolean, value: number };
         this.recordMetric({
           name: 'web-vitals.cls',
-          value: entry.value
+          value: clsEntry.value
         });
       }
     });
   }
 
-  private observeEntry(entryType: string, callback: (entry: any) => void) {
+  private observeEntry(entryType: string, callback: (entry: PerformanceEntry) => void) {
     if (typeof PerformanceObserver === 'undefined') return;
 
     try {
@@ -144,18 +166,62 @@ class PerformanceMonitor {
 
     this.metrics.push(fullMetric);
 
-    // Log in development
-    if (process.env.NODE_ENV === 'development') {
-      console.log(`📊 Performance: ${fullMetric.name} = ${fullMetric.value.toFixed(2)}ms`);
-    }
+    // Intelligent logging based on configuration
+    this.logMetric(fullMetric);
 
-    // Send to analytics if online
-    if (navigator.onLine) {
+    // Send to analytics if enabled and online
+    if (this.config.enableApiTracking && navigator.onLine) {
       this.sendMetric(fullMetric);
     }
   }
 
+  private logMetric(metric: PerformanceMetric) {
+    if (!this.config.enableLogging || this.config.logLevel === 'none') {
+      return;
+    }
+
+    // Check if metric should be filtered out
+    const shouldFilter = this.config.logFilters.some(filter => 
+      metric.name.includes(filter)
+    );
+    
+    if (shouldFilter) {
+      return;
+    }
+
+    // Log based on level
+    switch (this.config.logLevel) {
+      case 'important':
+        // Only log navigation, web vitals, and errors
+        if (metric.name.includes('navigation.') || 
+            metric.name.includes('web-vitals.') || 
+            metric.name.includes('error.') ||
+            metric.metadata?.type === 'user-action') {
+          console.log(`📊 Performance: ${metric.name} = ${metric.value.toFixed(2)}ms`);
+        }
+        break;
+      
+      case 'errors':
+        // Only log errors and failures
+        if (metric.name.includes('error.') || 
+            metric.metadata?.success === false) {
+          console.log(`📊 Performance: ${metric.name} = ${metric.value.toFixed(2)}ms`);
+        }
+        break;
+      
+      case 'all':
+        // Log everything (original behavior)
+        console.log(`📊 Performance: ${metric.name} = ${metric.value.toFixed(2)}ms`);
+        break;
+    }
+  }
+
   private async sendMetric(metric: PerformanceMetric) {
+    // TODO: Implement analytics endpoint properly
+    // Temporarily disabled to prevent console spam and 404 errors
+    console.debug('Analytics tracking disabled (endpoint not implemented):', metric.name);
+    return;
+    
     try {
       await fetch('/api/analytics', {
         method: 'POST',
@@ -233,7 +299,16 @@ class PerformanceMonitor {
       this.observer.disconnect();
     }
   }
+
+  // Configuration management
+  updateConfig(newConfig: Partial<PerformanceMonitorConfig>) {
+    this.config = { ...this.config, ...newConfig };
+  }
+
+  getConfig(): PerformanceMonitorConfig {
+    return { ...this.config };
+  }
 }
 
 export const performanceMonitor = new PerformanceMonitor();
-export type { PerformanceMetric, NavigationTiming };
+export type { PerformanceMetric, NavigationTiming, PerformanceMonitorConfig };

@@ -1,0 +1,44 @@
+/* RTL test specific styles */
+
+/* Override tab styles for test page - removing indicator styling */
+[dir="rtl"] .rtl-test-tabs .tab-indicator {
+  /* Keeping the indicator but making it invisible to avoid conflicts */
+  opacity: 0 !important;
+}
+
+/* Proper active tab styling for test component */
+[dir="rtl"] .rtl-test-tabs [data-state="active"] {
+  background-color: black !important;
+  color: white !important;
+  z-index: 2 !important;
+  position: relative !important;
+  border-radius: 8px !important;
+}
+
+/* Ensure tab buttons are properly sized and spaced */
+[dir="rtl"] .rtl-test-tabs .rtl-tab-button {
+  min-width: 80px !important;
+  text-align: center !important;
+  margin: 0 4px !important;
+}
+
+/* Tab container styling */
+[dir="rtl"] .rtl-test-tabs > div:first-child {
+  display: flex !important;
+  justify-content: flex-start !important;
+  align-items: center !important;
+  flex-wrap: nowrap !important;
+  background-color: #f0f0f0 !important;
+  border-radius: 8px !important;
+  padding: 4px !important;
+}
+
+/* Fix tab content */
+[dir="rtl"] .rtl-test-tabs .tab-content {
+  text-align: right !important;
+  direction: rtl !important;
+  padding: 10px !important;
+  background-color: #f9f9f9 !important;
+  border-radius: 8px !important;
+  margin-top: 10px !important;
+}

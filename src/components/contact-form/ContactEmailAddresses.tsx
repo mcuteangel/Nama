@@ -1,8 +1,8 @@
 import React from 'react';
 import { useFormContext, useFieldArray } from 'react-hook-form';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
+import { ModernInput } from '@/components/ui/modern-input';
+import { ModernSelect, ModernSelectContent, ModernSelectItem, ModernSelectTrigger, ModernSelectValue } from '@/components/ui/modern-select';
+import { ModernButton } from '@/components/ui/modern-button';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { Plus, X } from 'lucide-react';
 import { ContactFormValues } from '@/types/contact';
@@ -38,18 +38,18 @@ const ContactEmailAddresses: React.FC = () => {
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="text-gray-700 dark:text-gray-200">{t('form_labels.email_type')}</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <ModernSelect onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
-                    <SelectTrigger className="w-full bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100">
-                      <SelectValue placeholder={t('form_placeholders.select_type')} />
-                    </SelectTrigger>
+                    <ModernSelectTrigger variant="glass" className="w-full">
+                      <ModernSelectValue placeholder={t('form_placeholders.select_type')} />
+                    </ModernSelectTrigger>
                   </FormControl>
-                  <SelectContent className="backdrop-blur-md bg-white/80 dark:bg-gray-800/80 border border-white/30 dark:border-gray-600/30">
+                  <ModernSelectContent variant="glass">
                     {translatedEmailTypeOptions.map(option => (
-                      <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
+                      <ModernSelectItem key={option.value} value={option.value}>{option.label}</ModernSelectItem>
                     ))}
-                  </SelectContent>
-                </Select>
+                  </ModernSelectContent>
+                </ModernSelect>
                 <FormMessage />
               </FormItem>
             )}
@@ -62,26 +62,26 @@ const ContactEmailAddresses: React.FC = () => {
                 <FormItem className="flex-grow">
                   <FormLabel className="text-gray-700 dark:text-gray-200">{t('form_labels.email_address')}</FormLabel>
                   <FormControl>
-                    <Input type="email" placeholder={t('form_placeholders.email_example')} className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400" {...field} />
+                    <ModernInput type="email" placeholder={t('form_placeholders.email_example')} variant="glass" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <Button type="button" variant="ghost" size="icon" onClick={() => remove(index)} className="text-red-500 hover:bg-red-100 dark:hover:bg-gray-700/50">
+            <ModernButton type="button" variant="ghost" size="icon" onClick={() => remove(index)} className="text-red-500 hover:bg-red-100 dark:hover:bg-gray-700/50">
               <X size={16} />
-            </Button>
+            </ModernButton>
           </div>
         </div>
       ))}
-      <Button
+      <ModernButton
         type="button"
         variant="outline"
         onClick={() => append({ email_type: "personal", email_address: "" })}
-        className="w-full flex items-center gap-2 px-6 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold shadow-sm transition-all duration-300 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-200 dark:border-gray-600"
+        className="w-full flex items-center gap-2 px-6 py-2 rounded-lg font-semibold"
       >
         <Plus size={16} className="me-2" /> {t('button_labels.add_email_address')}
-      </Button>
+      </ModernButton>
     </div>
   );
 };

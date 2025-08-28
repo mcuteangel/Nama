@@ -4,6 +4,11 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { queryClient, networkUtils } from '@/lib/react-query-config';
 import { AppErrorBoundary, AsyncErrorBoundary } from '@/components/EnhancedErrorBoundary';
+import './rtl-fixes.css'; // Import RTL-specific fixes
+// Import performance config utility in development
+if (process.env.NODE_ENV === 'development') {
+  import('@/utils/performance-config');
+}
 // Lazy load page components for better performance with preloading
 const Home = React.lazy(() => import('./pages/Home'));
 const Contacts = React.lazy(() => import('./pages/Contacts'));
@@ -25,6 +30,7 @@ const Settings = React.lazy(() =>
 const Statistics = React.lazy(() => import('./pages/Statistics'));
 const UserManagement = React.lazy(() => import('./pages/UserManagement'));
 const AISuggestions = React.lazy(() => import('./pages/AISuggestions'));
+const RTLTestPage = React.lazy(() => import('./pages/RTLTestPage'));
 const NotFound = React.lazy(() => import('./pages/NotFound'));
 import { SessionContextProvider } from './integrations/supabase/auth';
 import { supabase } from './integrations/supabase/client';
@@ -34,6 +40,7 @@ import Sidebar from './components/layout/Sidebar';
 import LoadingMessage from './components/common/LoadingMessage';
 import SuspenseWrapper from './components/common/SuspenseWrapper';
 import { Toaster } from 'sonner';
+import { ToastProvider as ModernToastProvider } from './components/ui/modern-toast';
 import { cn } from './lib/utils';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import { TooltipProvider } from './components/ui/tooltip';
@@ -146,6 +153,7 @@ function AppLayout() {
                   <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
                   <Route path="/statistics" element={<ProtectedRoute><Statistics /></ProtectedRoute>} />
                   <Route path="/ai-suggestions" element={<ProtectedRoute><AISuggestions /></ProtectedRoute>} />
+                  <Route path="/rtl-test" element={<ProtectedRoute><RTLTestPage /></ProtectedRoute>} />
                   {isAdmin && (
                     <Route path="/user-management" element={<ProtectedRoute><UserManagement /></ProtectedRoute>} />
                   )}
@@ -167,18 +175,20 @@ export default function App() {
         <SessionContextProvider supabaseClient={supabase}>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             <AccessibilityProvider>
-              <Toaster 
-                position="top-right" 
-                toastOptions={{
-                  duration: 4000,
-                  className: 'text-sm',
-                }}
-              />
-              <BrowserRouter>
-                <TooltipProvider>
-                  <AppLayout />
-                </TooltipProvider>
-              </BrowserRouter>
+              <ModernToastProvider>
+                <Toaster 
+                  position="top-right" 
+                  toastOptions={{
+                    duration: 4000,
+                    className: 'text-sm',
+                  }}
+                />
+                <BrowserRouter>
+                  <TooltipProvider>
+                    <AppLayout />
+                  </TooltipProvider>
+                </BrowserRouter>
+              </ModernToastProvider>
               {/* React Query DevTools - only in development */}
               {process.env.NODE_ENV === 'development' && (
                 <ReactQueryDevtools 

@@ -1,8 +1,8 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart as BarChartIcon } from "lucide-react";
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 import { useTranslation } from "react-i18next";
+import { ModernCard, ModernCardHeader, ModernCardTitle, ModernCardContent } from "@/components/ui/modern-card";
 
 interface CreationTimeData {
   month_year: string;
@@ -17,14 +17,14 @@ const ContactsByCreationTimeChart: React.FC<ContactsByCreationTimeChartProps> = 
   const { t } = useTranslation();
 
   return (
-    <Card className="rounded-xl p-4 col-span-1 md:col-span-2 bg-white dark:bg-gray-800">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-lg font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+    <ModernCard variant="glass" className="rounded-xl p-4 col-span-1 md:col-span-2">
+      <ModernCardHeader className="pb-2">
+        <ModernCardTitle className="text-lg font-semibold flex items-center gap-2">
           <BarChartIcon size={20} className="text-teal-500" />
           {t('statistics.contacts_by_creation_time')}
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="h-64 flex items-center justify-center">
+        </ModernCardTitle>
+      </ModernCardHeader>
+      <ModernCardContent className="h-64 flex items-center justify-center">
         {data.length > 0 ? (
           <ResponsiveContainer width="100%" height={256}>
             <BarChart data={data} margin={{ top: 5, right: 10, left: 10, bottom: 5 }}>
@@ -42,8 +42,8 @@ const ContactsByCreationTimeChart: React.FC<ContactsByCreationTimeChartProps> = 
         ) : (
           <p className="text-center text-gray-500 dark:text-gray-400">{t('statistics.no_creation_time_data')}</p>
         )}
-      </CardContent>
-    </Card>
+      </ModernCardContent>
+    </ModernCard>
   );
 };
 

@@ -1,10 +1,11 @@
 import React, { useEffect, useState, useCallback, useMemo } from "react";
-import { supabase } from "@/integrations/supabase/client";
+
 import { useSession } from "@/integrations/supabase/auth";
 import { useErrorHandler } from "@/hooks/use-error-handler";
 import { ErrorManager } from "@/lib/error-manager";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, PieChart, CalendarClock, Building, Mail, Phone } from "lucide-react";
+
+import { ModernCard, ModernCardContent, ModernCardHeader } from "@/components/ui/modern-card";
+
 import TotalContactsCard from "@/components/statistics/TotalContactsCard";
 import ContactsByGenderChart from "@/components/statistics/ContactsByGenderChart";
 import ContactsByGroupChart from "@/components/statistics/ContactsByGroupChart";
@@ -15,7 +16,7 @@ import TopCompaniesList from "@/components/statistics/TopCompaniesList";
 import TopPositionsList from "@/components/statistics/TopPositionsList";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ContactStatisticsService } from "@/services/contact-statistics-service"; // Updated import
-import { ContactListService } from "@/services/contact-list-service"; // Added import for getFilteredContacts
+
 import { useTranslation } from "react-i18next";
 import { fetchWithCache } from "@/utils/cache-helpers";
 
@@ -111,7 +112,7 @@ const ContactStatisticsDashboard: React.FC = React.memo(() => {
     }
   }, [t]);
 
-  const onErrorStats = useCallback((err) => {
+  const onErrorStats = useCallback((err: Error) => {
     ErrorManager.logError(err, { component: 'ContactStatisticsDashboard', action: 'fetchStatistics' });
   }, []);
 
@@ -151,7 +152,7 @@ const ContactStatisticsDashboard: React.FC = React.memo(() => {
     const cacheKey = `statistics_dashboard_${userId}`;
 
     await executeAsync(async () => {
-      const { data, error, fromCache } = await fetchWithCache<StatisticsData>(
+      const { data, fromCache } = await fetchWithCache<StatisticsData>(
         cacheKey,
         async () => {
           const [
@@ -204,7 +205,7 @@ const ContactStatisticsDashboard: React.FC = React.memo(() => {
       }
       return { data, error: null, fromCache }; // Added error: null
     });
-  }, [session, isSessionLoading, executeAsync, isLoading, t]); // Add isLoading to dependencies
+  }, [session, isSessionLoading, executeAsync, isLoading]); // Removed 't' from dependencies as it's not used in the callback
 
   useEffect(() => {
     fetchStatistics();
@@ -212,76 +213,76 @@ const ContactStatisticsDashboard: React.FC = React.memo(() => {
 
   // Memoized skeleton component to prevent unnecessary re-renders
   const renderSkeleton = useMemo(() => [
-    <Card key="skeleton-1" className="rounded-xl p-4 flex flex-col items-center justify-center text-center bg-white dark:bg-gray-800 min-h-[256px]">
-      <CardHeader className="pb-2">
+    <ModernCard key="skeleton-1" variant="glass" className="rounded-xl p-4 flex flex-col items-center justify-center text-center min-h-[256px]">
+      <ModernCardHeader className="pb-2">
         <Skeleton className="h-6 w-3/4 mb-2" />
-      </CardHeader>
-      <CardContent>
+      </ModernCardHeader>
+      <ModernCardContent>
         <Skeleton className="h-12 w-24" />
-      </CardContent>
-    </Card>,
-    <Card key="skeleton-2" className="rounded-xl p-4 bg-white dark:bg-gray-800 min-h-[256px]">
-      <CardHeader className="pb-2">
+      </ModernCardContent>
+    </ModernCard>,
+    <ModernCard key="skeleton-2" variant="glass" className="rounded-xl p-4 min-h-[256px]">
+      <ModernCardHeader className="pb-2">
         <Skeleton className="h-6 w-3/4 mb-2" />
-      </CardHeader>
-      <CardContent className="h-64 flex items-center justify-center">
+      </ModernCardHeader>
+      <ModernCardContent className="h-64 flex items-center justify-center">
         <Skeleton className="h-full w-full rounded-full" />
-      </CardContent>
-    </Card>,
-    <Card key="skeleton-3" className="rounded-xl p-4 bg-white dark:bg-gray-800 min-h-[256px]">
-      <CardHeader className="pb-2">
+      </ModernCardContent>
+    </ModernCard>,
+    <ModernCard key="skeleton-3" variant="glass" className="rounded-xl p-4 min-h-[256px]">
+      <ModernCardHeader className="pb-2">
         <Skeleton className="h-6 w-3/4 mb-2" />
-      </CardHeader>
-      <CardContent className="h-64 flex items-center justify-center">
+      </ModernCardHeader>
+      <ModernCardContent className="h-64 flex items-center justify-center">
         <Skeleton className="h-full w-full rounded-full" />
-      </CardContent>
-    </Card>,
-    <Card key="skeleton-4" className="rounded-xl p-4 bg-white dark:bg-gray-800 min-h-[256px]">
-      <CardHeader className="pb-2">
+      </ModernCardContent>
+    </ModernCard>,
+    <ModernCard key="skeleton-4" variant="glass" className="rounded-xl p-4 min-h-[256px]">
+      <ModernCardHeader className="pb-2">
         <Skeleton className="h-6 w-3/4 mb-2" />
-      </CardHeader>
-      <CardContent className="h-64 flex items-center justify-center">
+      </ModernCardHeader>
+      <ModernCardContent className="h-64 flex items-center justify-center">
         <Skeleton className="h-full w-full rounded-full" />
-      </CardContent>
-    </Card>,
-    <Card key="skeleton-5" className="rounded-xl p-4 col-span-1 md:col-span-2 lg:col-span-1 bg-white dark:bg-gray-800 min-h-[256px]">
-      <CardHeader className="pb-2">
+      </ModernCardContent>
+    </ModernCard>,
+    <ModernCard key="skeleton-5" variant="glass" className="rounded-xl p-4 col-span-1 md:col-span-2 lg:col-span-1 min-h-[256px]">
+      <ModernCardHeader className="pb-2">
         <Skeleton className="h-6 w-3/4 mb-2" />
-      </CardHeader>
-      <CardContent className="h-64 overflow-y-auto custom-scrollbar space-y-3">
+      </ModernCardHeader>
+      <ModernCardContent className="h-64 overflow-y-auto custom-scrollbar space-y-3">
         {[...Array(4)].map((_, i) => (
           <Skeleton key={i} className="h-12 w-full rounded-md" />
         ))}
-      </CardContent>
-    </Card>,
-    <Card key="skeleton-6" className="rounded-xl p-4 col-span-1 md:col-span-2 bg-white dark:bg-gray-800 min-h-[256px]">
-      <CardHeader className="pb-2">
+      </ModernCardContent>
+    </ModernCard>,
+    <ModernCard key="skeleton-6" variant="glass" className="rounded-xl p-4 col-span-1 md:col-span-2 min-h-[256px]">
+      <ModernCardHeader className="pb-2">
         <Skeleton className="h-6 w-3/4 mb-2" />
-      </CardHeader>
-      <CardContent className="h-64 flex items-center justify-center">
+      </ModernCardHeader>
+      <ModernCardContent className="h-64 flex items-center justify-center">
         <Skeleton className="h-full w-full" />
-      </CardContent>
-    </Card>,
-    <Card key="skeleton-7" className="rounded-xl p-4 col-span-1 bg-white dark:bg-gray-800 min-h-[256px]">
-      <CardHeader className="pb-2">
+      </ModernCardContent>
+    </ModernCard>,
+    <ModernCard key="skeleton-7" variant="glass" className="rounded-xl p-4 col-span-1 min-h-[256px]">
+      <ModernCardHeader className="pb-2">
         <Skeleton className="h-6 w-3/4 mb-2" />
-      </CardHeader>
-      <CardContent className="h-64 overflow-y-auto custom-scrollbar space-y-3">
+      </ModernCardHeader>
+      <ModernCardContent className="h-64 overflow-y-auto custom-scrollbar space-y-3">
         {[...Array(4)].map((_, i) => (
           <Skeleton key={i} className="h-12 w-full rounded-md" />
         ))}
-      </CardContent>
-    </Card>,
-    <Card key="skeleton-8" className="rounded-xl p-4 col-span-1 bg-white dark:bg-gray-800 min-h-[256px]">
-      <CardHeader className="pb-2">
+      </ModernCardContent>
+    </ModernCard>,
+    <ModernCard key="skeleton-8" variant="glass" className="rounded-xl p-4 col-span-1 min-h-[256px]">
+      <ModernCardHeader className="pb-2">
         <Skeleton className="h-6 w-3/4 mb-2" />
-      </CardHeader>
-      <CardContent className="h-64 overflow-y-auto custom-scrollbar space-y-3">
+      </ModernCardHeader>
+      <ModernCardContent className="h-64 overflow-y-auto custom-scrollbar space-y-3">
         {[...Array(4)].map((_, i) => (
           <Skeleton key={i} className="h-12 w-full rounded-md" />
         ))}
-      </CardContent>
-    </Card>
+      </ModernCardContent>
+    </ModernCard>
   ], []);
 
   // Memoized dashboard components to prevent unnecessary re-renders

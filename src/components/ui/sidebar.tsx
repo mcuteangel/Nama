@@ -5,10 +5,10 @@ import { PanelLeft } from "lucide-react";
 
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { ModernButton } from "@/components/ui/modern-button";
+import { ModernInput } from "@/components/ui/modern-input";
 import { Separator } from "@/components/ui/separator";
-import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { ModernSheet, ModernSheetContent } from "@/components/ui/modern-sheet";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Tooltip,
@@ -200,8 +200,8 @@ const Sidebar = React.forwardRef<
 
     if (isMobile) {
       return (
-        <Sheet open={openMobile} onOpenChange={setOpenMobile} {...props}>
-          <SheetContent
+        <ModernSheet open={openMobile} onOpenChange={setOpenMobile} {...props}>
+          <ModernSheetContent
             data-sidebar="sidebar"
             data-mobile="true"
             className="w-[--sidebar-width] bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden"
@@ -213,8 +213,8 @@ const Sidebar = React.forwardRef<
             side={side}
           >
             <div className="flex h-full w-full flex-col">{children}</div>
-          </SheetContent>
-        </Sheet>
+          </ModernSheetContent>
+        </ModernSheet>
       );
     }
 
@@ -266,13 +266,13 @@ const Sidebar = React.forwardRef<
 Sidebar.displayName = "Sidebar";
 
 const SidebarTrigger = React.forwardRef<
-  React.ElementRef<typeof Button>,
-  React.ComponentProps<typeof Button>
+  React.ElementRef<typeof ModernButton>,
+  React.ComponentProps<typeof ModernButton>
 >(({ className, onClick, ...props }, ref) => {
   const { toggleSidebar } = useSidebar();
 
   return (
-    <Button
+    <ModernButton
       ref={ref}
       data-sidebar="trigger"
       variant="ghost"
@@ -286,7 +286,7 @@ const SidebarTrigger = React.forwardRef<
     >
       <PanelLeft />
       <span className="sr-only">Toggle Sidebar</span>
-    </Button>
+    </ModernButton>
   );
 });
 SidebarTrigger.displayName = "SidebarTrigger";
@@ -339,11 +339,11 @@ const SidebarInset = React.forwardRef<
 SidebarInset.displayName = "SidebarInset";
 
 const SidebarInput = React.forwardRef<
-  React.ElementRef<typeof Input>,
-  React.ComponentProps<typeof Input>
+  React.ElementRef<typeof ModernInput>,
+  React.ComponentProps<typeof ModernInput>
 >(({ className, ...props }, ref) => {
   return (
-    <Input
+    <ModernInput
       ref={ref}
       data-sidebar="input"
       className={cn(

@@ -2,10 +2,10 @@ import React, { useRef, useCallback, useMemo } from 'react';
 import { useSpring, animated, config } from 'react-spring';
 import { useGesture } from '@use-gesture/react';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { TouchGestureConfig, GestureCallbacks } from './TouchGestureHandler/types';
+import { TouchGestureConfig, GestureCallbacks } from './TouchGestureHandler.types';
 
 interface TouchGestureHandlerProps {
-  children: React.ReactNode;
+  children?: React.ReactNode;
   config?: TouchGestureConfig;
   callbacks?: GestureCallbacks;
   className?: string;

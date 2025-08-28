@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Button } from '@/components/ui/button';
+import { ModernButton } from '@/components/ui/modern-button';
+import { ModernCard, ModernCardContent, ModernCardDescription, ModernCardHeader, ModernCardTitle } from '@/components/ui/modern-card';
 import { 
   Activity,
   Zap,
@@ -203,53 +203,53 @@ export const PerformanceDashboard: React.FC = React.memo(() => {
 
   if (isLoading) {
     return (
-      <Card className="w-full">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+      <ModernCard variant="glass" className="w-full rounded-xl p-6">
+        <ModernCardHeader>
+          <ModernCardTitle className="flex items-center gap-2">
             <Activity className="h-5 w-5" />
             {t('performance.title', 'Performance Dashboard')}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
+          </ModernCardTitle>
+        </ModernCardHeader>
+        <ModernCardContent>
           <div className="space-y-4">
             <div className="h-4 bg-gray-200 rounded animate-pulse" />
             <div className="h-4 bg-gray-200 rounded animate-pulse w-3/4" />
             <div className="h-4 bg-gray-200 rounded animate-pulse w-1/2" />
           </div>
-        </CardContent>
-      </Card>
+        </ModernCardContent>
+      </ModernCard>
     );
   }
 
   return (
     <div className="space-y-6">
       {/* نمای کلی عملکرد */}
-      <Card>
-        <CardHeader>
+      <ModernCard variant="glass" className="rounded-xl p-6">
+        <ModernCardHeader>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Activity className="h-5 w-5" />
-              <CardTitle>{t('performance.title', 'Performance Dashboard')}</CardTitle>
+              <ModernCardTitle>{t('performance.title', 'Performance Dashboard')}</ModernCardTitle>
             </div>
             <div className="flex items-center gap-2">
               <Badge variant={overallScore >= 80 ? 'default' : overallScore >= 60 ? 'secondary' : 'destructive'}>
                 {t('performance.score', 'Score')}: {overallScore}/100
               </Badge>
-              <Button variant="outline" size="sm" onClick={refreshMetrics} disabled={isLoading}>
+              <ModernButton variant="outline" size="sm" onClick={refreshMetrics} disabled={isLoading}>
                 <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
                 {t('performance.refresh', 'Refresh')}
-              </Button>
-              <Button variant="outline" size="sm" onClick={exportData}>
+              </ModernButton>
+              <ModernButton variant="outline" size="sm" onClick={exportData}>
                 <Download className="h-4 w-4 mr-2" />
                 {t('performance.export', 'Export')}
-              </Button>
+              </ModernButton>
             </div>
           </div>
-          <CardDescription>
+          <ModernCardDescription>
             {t('performance.description', 'Real-time Web Vitals and performance metrics monitoring')}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+          </ModernCardDescription>
+        </ModernCardHeader>
+        <ModernCardContent>
           <div className="mb-4">
             <div className="flex items-center justify-between mb-2">
               <span className="font-medium">{t('performance.overall_health', 'Overall Performance Health')}</span>
@@ -264,8 +264,8 @@ export const PerformanceDashboard: React.FC = React.memo(() => {
               <span>{t('performance.excellent', 'Excellent')}</span>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </ModernCardContent>
+      </ModernCard>
 
       {/* معیارهای Web Vitals */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -274,20 +274,20 @@ export const PerformanceDashboard: React.FC = React.memo(() => {
           const MetricIcon = metric.icon;
           
           return (
-            <Card key={metric.name}>
-              <CardHeader className="pb-3">
+            <ModernCard variant="glass" className="rounded-xl p-6" key={metric.name}>
+              <ModernCardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <MetricIcon className="h-4 w-4 text-blue-500" />
-                    <CardTitle className="text-lg">{metric.name}</CardTitle>
+                    <ModernCardTitle className="text-lg">{metric.name}</ModernCardTitle>
                   </div>
                   <StatusIcon className={`h-4 w-4 text-${getStatusColor(metric.status)}-500`} />
                 </div>
-                <CardDescription className="text-sm">
+                <ModernCardDescription className="text-sm">
                   {metric.description}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
+                </ModernCardDescription>
+              </ModernCardHeader>
+              <ModernCardContent>
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="text-2xl font-bold">
@@ -319,21 +319,21 @@ export const PerformanceDashboard: React.FC = React.memo(() => {
                     </>
                   )}
                 </div>
-              </CardContent>
-            </Card>
+              </ModernCardContent>
+            </ModernCard>
           );
         })}
       </div>
 
       {/* بینش‌های عملکرد */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+      <ModernCard variant="glass" className="rounded-xl p-6">
+        <ModernCardHeader>
+          <ModernCardTitle className="flex items-center gap-2">
             <TrendingUp className="h-5 w-5" />
             {t('performance.insights', 'Performance Insights')}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
+          </ModernCardTitle>
+        </ModernCardHeader>
+        <ModernCardContent>
           <div className="space-y-3">
             {overallScore >= 80 && (
               <div className="flex items-start gap-2 p-3 bg-green-50 border border-green-200 rounded-lg">
@@ -400,8 +400,8 @@ export const PerformanceDashboard: React.FC = React.memo(() => {
               </div>
             )}
           </div>
-        </CardContent>
-      </Card>
+        </ModernCardContent>
+      </ModernCard>
     </div>
   );
 });

@@ -1,6 +1,4 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Edit, Trash2, User as UserIcon, PlusCircle, Users, Bug } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
@@ -18,6 +16,8 @@ import EmptyState from '../common/EmptyState';
 import LoadingSpinner from '../common/LoadingSpinner';
 import { EdgeFunctionDebugger } from '@/utils/edge-function-debugger';
 import { useDebugMode } from '@/hooks/use-debug-mode';
+import { ModernCard } from "@/components/ui/modern-card";
+import { ModernButton } from "@/components/ui/modern-button";
 
 interface UserProfile {
   id: string;
@@ -63,7 +63,7 @@ const UserItem = ({ user, onUserUpdated, onUserDeleted }: { user: UserProfile; o
   };
 
   return (
-    <Card className="flex items-center justify-between p-4 rounded-lg shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.01] bg-white dark:bg-gray-800">
+    <ModernCard variant="glass" className="flex items-center justify-between p-4 rounded-lg transition-all duration-300 hover-lift">
       <div className="flex items-center gap-4">
         <div className="w-10 h-10 rounded-full flex items-center justify-center bg-blue-500 text-white dark:bg-blue-700">
           <UserIcon size={20} />
@@ -86,9 +86,9 @@ const UserItem = ({ user, onUserUpdated, onUserDeleted }: { user: UserProfile; o
       <div className="flex gap-2">
         <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
           <DialogTrigger asChild>
-            <Button variant="ghost" size="icon" className="text-blue-600 hover:bg-blue-100 dark:text-blue-400 dark:hover:bg-gray-600/50 transition-all duration-200">
+            <ModernButton variant="ghost" size="icon" className="text-blue-600 hover:bg-blue-100 dark:text-blue-400 dark:hover:bg-gray-600/50 transition-all duration-200">
               <Edit size={20} />
-            </Button>
+            </ModernButton>
           </DialogTrigger>
           <FormDialogWrapper>
             <UserForm
@@ -104,9 +104,9 @@ const UserItem = ({ user, onUserUpdated, onUserDeleted }: { user: UserProfile; o
 
         <AlertDialog>
           <AlertDialogTrigger asChild>
-            <Button variant="ghost" size="icon" className="text-red-600 hover:bg-red-100 dark:text-red-400 dark:hover:bg-gray-600/50 transition-all duration-200" disabled={isDeleting}>
+            <ModernButton variant="ghost" size="icon" className="text-red-600 hover:bg-red-100 dark:text-red-400 dark:hover:bg-gray-600/50 transition-all duration-200" disabled={isDeleting}>
               {isDeleting ? <LoadingSpinner size={20} /> : <Trash2 size={20} />}
-            </Button>
+            </ModernButton>
           </AlertDialogTrigger>
           <AlertDialogContent className="rounded-xl p-6 bg-white dark:bg-gray-800">
             <AlertDialogHeader>
@@ -125,7 +125,7 @@ const UserItem = ({ user, onUserUpdated, onUserDeleted }: { user: UserProfile; o
           </AlertDialogContent>
         </AlertDialog>
       </div>
-    </Card>
+    </ModernCard>
   );
 };
 
@@ -218,9 +218,9 @@ const UserList: React.FC = () => {
 
   if (session?.user?.user_metadata.role !== 'admin') {
     return (
-      <div className="text-center text-red-500 dark:text-red-400 p-4">
+      <ModernCard variant="glass" className="text-center text-red-500 dark:text-red-400 p-4">
         <p>{t('user_management.admin_access_required')}</p>
-      </div>
+      </ModernCard>
     );
   }
 
@@ -228,26 +228,27 @@ const UserList: React.FC = () => {
     <div className="space-y-4">
       {/* Debug Button - Only show when debug mode is enabled */}
       {isDebugMode && (
-        <Button
+        <ModernButton
           onClick={handleDebugConnection}
           variant="outline"
           className="w-full px-4 py-2 rounded-lg border-2 border-dashed border-orange-300 bg-orange-50 hover:bg-orange-100 text-orange-700 font-medium transition-all duration-300"
         >
           <Bug size={16} className="me-2" />
           {t('actions.test_connection')}
-        </Button>
+        </ModernButton>
       )}
       
       <Dialog open={isAddUserDialogOpen} onOpenChange={setIsAddUserDialogOpen}>
         <DialogTrigger asChild>
-          <Button
-            className="w-full px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-md transition-all duration-300 transform hover:scale-105"
+          <ModernButton
+            variant="gradient-primary"
+            className="w-full px-6 py-2 rounded-lg font-semibold shadow-md transition-all duration-300 transform hover:scale-105"
           >
             <span className="flex items-center gap-2">
               <PlusCircle size={20} className="me-2" />
               {t('user_management.add_new_user')}
             </span>
-          </Button>
+          </ModernButton>
         </DialogTrigger>
         <FormDialogWrapper>
             <UserForm

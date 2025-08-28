@@ -1,7 +1,7 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ModernCard, ModernCardContent, ModernCardHeader, ModernCardTitle } from '@/components/ui/modern-card';
 import { Switch } from '@/components/ui/switch';
-import { Button } from '@/components/ui/button';
+import { ModernButton } from '@/components/ui/modern-button';
 import { Bug, Info, Zap, TestTube } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useDebugMode } from '@/hooks/use-debug-mode';
@@ -72,17 +72,17 @@ const DebugSettings: React.FC = () => {
   };
 
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-orange-600 dark:text-orange-400">
+    <ModernCard variant="glass" className="w-full rounded-xl p-6">
+      <ModernCardHeader>
+        <ModernCardTitle className="flex items-center gap-2 text-orange-600 dark:text-orange-400">
           <Bug size={20} />
           {t('settings.debug_mode', 'حالت دیباگ')}
           <span className="text-xs bg-orange-100 dark:bg-orange-900 px-2 py-1 rounded-full">
             DEV ONLY
           </span>
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
+        </ModernCardTitle>
+      </ModernCardHeader>
+      <ModernCardContent className="space-y-4">
         {/* Debug Mode Toggle */}
         <div className="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-800">
           <div className="flex items-center gap-2">
@@ -112,7 +112,7 @@ const DebugSettings: React.FC = () => {
             </h4>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <Button
+              <ModernButton
                 onClick={handleTestConnection}
                 variant="outline"
                 size="sm"
@@ -120,9 +120,9 @@ const DebugSettings: React.FC = () => {
               >
                 <Bug size={14} className="me-2" />
                 تست Edge Function
-              </Button>
+              </ModernButton>
               
-              <Button
+              <ModernButton
                 onClick={handleClearCache}
                 variant="outline"
                 size="sm"
@@ -130,9 +130,9 @@ const DebugSettings: React.FC = () => {
               >
                 <Zap size={14} className="me-2" />
                 پاک کردن Cache
-              </Button>
+              </ModernButton>
               
-              <Button
+              <ModernButton
                 onClick={handleShowStorageInfo}
                 variant="outline"
                 size="sm"
@@ -140,7 +140,7 @@ const DebugSettings: React.FC = () => {
               >
                 <Info size={14} className="me-2" />
                 اطلاعات Storage
-              </Button>
+              </ModernButton>
             </div>
             
             <div className="text-xs text-orange-700 dark:text-orange-300 mt-2">
@@ -152,8 +152,8 @@ const DebugSettings: React.FC = () => {
         <div className="text-xs text-gray-500 dark:text-gray-400 mt-4">
           ⚠️ این تنظیمات فقط در محیط Development در دسترس هستند
         </div>
-      </CardContent>
-    </Card>
+      </ModernCardContent>
+    </ModernCard>
   );
 };
 

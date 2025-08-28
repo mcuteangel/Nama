@@ -2,18 +2,25 @@ import * as React from "react";
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 
 import { cn } from "@/lib/utils";
+import { 
+  ModernTooltip, 
+  ModernTooltipTrigger, 
+  ModernTooltipContent, 
+  ModernTooltipProvider,
+  type ModernTooltipContentProps
+} from "@/components/ui/modern-tooltip";
 
-const TooltipProvider = TooltipPrimitive.Provider;
+const TooltipProvider = ModernTooltipProvider;
 
-const Tooltip = TooltipPrimitive.Root;
+const Tooltip = ModernTooltip;
 
-const TooltipTrigger = TooltipPrimitive.Trigger;
+const TooltipTrigger = ModernTooltipTrigger;
 
 const TooltipContent = React.forwardRef<
   React.ElementRef<typeof TooltipPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof TooltipPrimitive.Content>
+  React.ComponentPropsWithoutRef<typeof TooltipPrimitive.Content> & ModernTooltipContentProps
 >(({ className, sideOffset = 4, ...props }, ref) => (
-  <TooltipPrimitive.Content
+  <ModernTooltipContent
     ref={ref}
     sideOffset={sideOffset}
     className={cn(

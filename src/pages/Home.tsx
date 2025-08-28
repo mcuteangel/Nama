@@ -1,14 +1,24 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { 
+  ModernCard, 
+  ModernCardContent, 
+  ModernCardDescription, 
+  ModernCardHeader, 
+  ModernCardTitle,
+  ModernCardFooter 
+} from "@/components/ui/modern-card";
+import { GradientButton, ModernButton } from "@/components/ui/modern-button";
+import { useToast } from "@/components/ui/modern-toast";
 import { MadeWithDyad } from "@/components/made-with-dyad";
-import { JalaliCalendar } from "@/components/JalaliCalendar"; // Changed to named import
-import { format } from "date-fns-jalali"; // Import format from date-fns-jalali
+import { JalaliCalendar } from "@/components/JalaliCalendar";
+import { format } from "date-fns-jalali";
+import { Calendar, Users, Plus, Sparkles, Heart } from "lucide-react";
 
 const Home = () => {
   const navigate = useNavigate();
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date()); // State for selected date
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  const { toast } = useToast();
 
   useEffect(() => {
     const hasSeenWelcome = localStorage.getItem('hasSeenWelcome');
@@ -16,47 +26,137 @@ const Home = () => {
       navigate('/contacts');
     } else {
       localStorage.setItem('hasSeenWelcome', 'true');
+      // خوش‌آمدگویی با toast
+      setTimeout(() => {
+        toast.success('به Nama Contacts خوش آمدید!', {
+          title: 'خوش آمدید',
+          description: 'مدیریت مخاطبین شما آسان‌تر از همیشه'
+        });
+      }, 1000);
     }
-  }, [navigate]);
+  }, [navigate, toast]);
+
+  const handleContactsClick = () => {
+    toast.info('انتقال به صفحه مخاطبین...');
+    navigate('/contacts');
+  };
+
+  const handleAddContactClick = () => {
+    toast.info('انتقال به افزودن مخاطب جدید...');
+    navigate('/add-contact');
+  };
 
   return (
-    <div className="flex flex-col items-center justify-center p-4 h-full w-full bg-gradient-to-br from-blue-100 to-purple-100 dark:from-gray-900 dark:to-gray-800">
-      <Card className="w-full max-w-md glass rounded-xl p-6 text-center mb-6">
-        <CardHeader>
-          <CardTitle className="text-4xl font-bold text-gray-800 dark:text-gray-100 mb-4">
+    <div className="flex flex-col items-center justify-center p-4 h-full w-full bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-900 dark:to-gray-800 min-h-screen">
+      {/* کارت خوش‌آمدگویی اصلی */}
+      <ModernCard 
+        variant="glass" 
+        hover="lift" 
+        className="w-full max-w-md mb-8 fade-in-up"
+      >
+        <ModernCardHeader>
+          <div className="flex items-center justify-center mb-4">
+            <div className="w-16 h-16 bg-gradient-primary rounded-full flex items-center justify-center floating">
+              <Sparkles className="w-8 h-8 text-white" />
+            </div>
+          </div>
+          <ModernCardTitle gradient className="text-center heading-2">
             به Nama Contacts خوش آمدید!
-          </CardTitle>
-          <CardDescription className="text-lg text-gray-600 dark:text-gray-300">
+          </ModernCardTitle>
+          <ModernCardDescription className="text-center body-large">
             مدیریت مخاطبین شما هرگز آسان‌تر از این نبوده است.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <p className="text-gray-700 dark:text-gray-200">
+          </ModernCardDescription>
+        </ModernCardHeader>
+        <ModernCardContent className="space-y-6">
+          <p className="text-center body-regular text-muted-foreground">
             با استفاده از این برنامه می‌توانید به راحتی مخاطبین خود را اضافه، ویرایش، حذف و سازماندهی کنید.
           </p>
-          <Button asChild className="w-full px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-md transition-all duration-300 transform hover:scale-105">
-            <Link to="/contacts">مشاهده مخاطبین</Link>
-          </Button>
-          <Button asChild variant="outline" className="w-full px-6 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold shadow-md transition-all duration-300 transform hover:scale-105 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-100 dark:border-gray-600">
-            <Link to="/add-contact">افزودن مخاطب جدید</Link>
-          </Button>
-        </CardContent>
-      </Card>
+          
+          <div className="grid grid-cols-1 gap-4">
+            <GradientButton 
+              gradientType="ocean"
+              size="lg"
+              onClick={handleContactsClick}
+              className="w-full font-persian"
+            >
+              <Users className="w-5 h-5 mr-2" />
+              مشاهده مخاطبین
+            </GradientButton>
+            
+            <ModernButton 
+              variant="glass" 
+              size="lg"
+              onClick={handleAddContactClick}
+              className="w-full font-persian"
+            >
+              <Plus className="w-5 h-5 mr-2" />
+              افزودن مخاطب جدید
+            </ModernButton>
+          </div>
+        </ModernCardContent>
+      </ModernCard>
 
-      {/* Add Jalali Calendar here */}
-      <Card className="w-full max-w-md glass rounded-xl p-6 text-center">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2">
-            تقویم جلالی
-          </CardTitle>
-          <CardDescription className="text-md text-gray-600 dark:text-gray-300">
+      {/* کارت تقویم جلالی */}
+      <ModernCard 
+        variant="neomorphism" 
+        hover="glow"
+        className="w-full max-w-md mb-8 fade-in-up"
+        style={{ animationDelay: '0.2s' }}
+      >
+        <ModernCardHeader>
+          <div className="flex items-center justify-center mb-2">
+            <Calendar className="w-6 h-6 text-primary mr-2" />
+            <ModernCardTitle className="heading-3">
+              تقویم جلالی
+            </ModernCardTitle>
+          </div>
+          <ModernCardDescription className="text-center">
             تاریخ انتخاب شده: {selectedDate ? format(selectedDate, 'yyyy/MM/dd') : 'هیچ تاریخی انتخاب نشده است.'}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="flex justify-center">
+          </ModernCardDescription>
+        </ModernCardHeader>
+        <ModernCardContent className="flex justify-center">
           <JalaliCalendar selected={selectedDate} onSelect={setSelectedDate} />
-        </CardContent>
-      </Card>
+        </ModernCardContent>
+      </ModernCard>
+
+      {/* کارت‌های آمار سریع */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-4xl mb-8">
+        <ModernCard 
+          variant="gradient-sunset" 
+          hover="scale"
+          className="fade-in-left stagger-item"
+        >
+          <ModernCardContent className="text-center text-white">
+            <Heart className="w-8 h-8 mx-auto mb-2" />
+            <h3 className="heading-4 mb-1">مخاطبین</h3>
+            <p className="body-small opacity-90">مدیریت آسان</p>
+          </ModernCardContent>
+        </ModernCard>
+
+        <ModernCard 
+          variant="gradient-success" 
+          hover="scale"
+          className="fade-in-up stagger-item"
+        >
+          <ModernCardContent className="text-center text-white">
+            <Users className="w-8 h-8 mx-auto mb-2" />
+            <h3 className="heading-4 mb-1">گروه‌بندی</h3>
+            <p className="body-small opacity-90">سازماندهی هوشمند</p>
+          </ModernCardContent>
+        </ModernCard>
+
+        <ModernCard 
+          variant="gradient-info" 
+          hover="scale"
+          className="fade-in-right stagger-item"
+        >
+          <ModernCardContent className="text-center text-white">
+            <Sparkles className="w-8 h-8 mx-auto mb-2" />
+            <h3 className="heading-4 mb-1">هوش مصنوعی</h3>
+            <p className="body-small opacity-90">پیشنهادات هوشمند</p>
+          </ModernCardContent>
+        </ModernCard>
+      </div>
 
       <MadeWithDyad />
     </div>

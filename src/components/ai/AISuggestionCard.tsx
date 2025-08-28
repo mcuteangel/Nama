@@ -1,12 +1,12 @@
 import React, { useCallback, useMemo } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { PlusCircle, UserCheck, Phone, Mail, Building, Briefcase, Link as LinkIcon, XCircle, Edit } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { ExtractedContactInfo } from '@/hooks/use-contact-extractor';
 import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import CancelButton from '../common/CancelButton';
 import LoadingSpinner from '../common/LoadingSpinner';
+import { ModernCard, ModernCardHeader, ModernCardTitle, ModernCardDescription, ModernCardContent } from "@/components/ui/modern-card";
+import { ModernButton } from "@/components/ui/modern-button";
 
 interface ExistingContactSummary {
   id: string;
@@ -59,23 +59,23 @@ const AISuggestionCard: React.FC<AISuggestionCardProps> = React.memo(({ suggesti
   const actionLabel = useMemo(() => getActionLabel(), [getActionLabel]);
 
   return (
-    <Card className="glass rounded-xl p-4 shadow-sm">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-xl font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
+    <ModernCard variant="glass" className="rounded-xl p-4 shadow-sm">
+      <ModernCardHeader className="pb-2">
+        <ModernCardTitle className="text-xl font-bold flex items-center gap-2">
           {type === 'new' ? (
             <PlusCircle size={20} className="text-blue-500" />
           ) : (
             <UserCheck size={20} className="text-green-500" />
           )}
           {type === 'new' ? t('ai_suggestions.new_contact_suggestion') : t('ai_suggestions.update_contact_suggestion')}
-        </CardTitle>
+        </ModernCardTitle>
         {type === 'update' && existingContact && (
-          <CardDescription className="text-sm text-gray-600 dark:text-gray-300">
+          <ModernCardDescription>
             {t('ai_suggestions.found_existing_contact', { name: `${existingContact.first_name} ${existingContact.last_name}` })}
-          </CardDescription>
+          </ModernCardDescription>
         )}
-      </CardHeader>
-      <CardContent className="space-y-3">
+      </ModernCardHeader>
+      <ModernCardContent className="space-y-3">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div>
             <p className="text-sm font-medium text-gray-700 dark:text-gray-200">{t('common.first_name')}:</p>
@@ -140,33 +140,34 @@ const AISuggestionCard: React.FC<AISuggestionCardProps> = React.memo(({ suggesti
         )}
 
         <div className="flex gap-2 mt-4">
-          <Button
+          <ModernButton
             onClick={handleProcess}
             disabled={isProcessing}
-            className="flex-grow flex items-center gap-2 px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-md transition-all duration-300 transform hover:scale-105"
+            variant="gradient-primary"
+            className="flex-grow flex items-center gap-2 px-6 py-2 rounded-lg font-semibold shadow-md transition-all duration-300 transform hover:scale-105"
           >
             {isProcessing && <LoadingSpinner size={16} className="me-2" />}
             {actionLabel}
-          </Button>
-          <Button
+          </ModernButton>
+          <ModernButton
             onClick={handleEdit}
             disabled={isProcessing}
             variant="outline"
-            className="flex items-center gap-2 px-6 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold shadow-sm transition-all duration-300 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-200 dark:border-gray-600"
+            className="flex items-center gap-2 px-6 py-2 rounded-lg font-semibold shadow-sm transition-all duration-300"
           >
             <Edit size={16} />
             {t('common.edit')}
-          </Button>
+          </ModernButton>
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button
+              <ModernButton
                 variant="destructive"
                 disabled={isProcessing}
                 className="flex items-center gap-2 px-6 py-2 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105"
               >
                 <XCircle size={16} />
                 {t('common.discard')}
-              </Button>
+              </ModernButton>
             </AlertDialogTrigger>
             <AlertDialogContent className="glass rounded-xl p-6">
               <AlertDialogHeader>
@@ -184,8 +185,8 @@ const AISuggestionCard: React.FC<AISuggestionCardProps> = React.memo(({ suggesti
             </AlertDialogContent>
           </AlertDialog>
         </div>
-      </CardContent>
-    </Card>
+      </ModernCardContent>
+    </ModernCard>
   );
 });
 

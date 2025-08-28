@@ -1,5 +1,6 @@
-import { config } from 'react-spring';
+import type { SpringConfig } from 'react-spring';
 
+// Types for TouchGestureHandler
 export interface TouchGestureConfig {
   // Swipe configuration
   swipeThreshold?: number;
@@ -16,7 +17,7 @@ export interface TouchGestureConfig {
   longPressDelay?: number;
   
   // Animation configuration
-  springConfig?: typeof config.default;
+  springConfig?: SpringConfig;
   
   // Haptic feedback
   enableHapticFeedback?: boolean;

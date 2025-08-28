@@ -1,10 +1,11 @@
 import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 
-import { cn } from "@/lib/utils";
+import { cn, applyGlobalStyles, applyAnimation } from "@/lib/utils";
+import { ModernBadge, type ModernBadgeProps } from "@/components/ui/modern-badge";
 
 const badgeVariants = cva(
-  "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+  "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold",
   {
     variants: {
       variant: {
@@ -24,12 +25,36 @@ const badgeVariants = cva(
 );
 
 export interface BadgeProps
-  extends React.HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof badgeVariants> {}
+  extends Omit<ModernBadgeProps, 'variant' | 'size'>,
+    VariantProps<typeof badgeVariants> {
+  animation?: "fade-in-up" | "fade-in-down" | "scale-in" | "none";
+  transition?: boolean;
+  focusRing?: boolean;
+}
 
-function Badge({ className, variant, ...props }: BadgeProps) {
+function Badge({ 
+  className, 
+  variant, 
+  animation = "none",
+  transition = true,
+  focusRing = false,
+  ...props 
+}: BadgeProps) {
+  // Map legacy variants to modern equivalents
+  const modernVariant = variant || "default";
+  
   return (
-    <div className={cn(badgeVariants({ variant }), className)} {...props} />
+    <ModernBadge
+      variant={modernVariant}
+      className={cn(
+        // Preserve any custom className passed in
+        className,
+      )}
+      animation={animation}
+      transition={transition}
+      focusRing={focusRing}
+      {...props}
+    />
   );
 }
 

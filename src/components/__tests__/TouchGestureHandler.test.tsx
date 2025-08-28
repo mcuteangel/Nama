@@ -1,7 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import TouchGestureHandler, { useTouchGestures, withTouchGestures } from '../TouchGestureHandler';
+import TouchGestureHandler from '../TouchGestureHandler';
+import { useTouchGestures, withTouchGestures } from '../TouchGestures.utils';
 
 // Mock dependencies
 vi.mock('@/hooks/use-mobile');

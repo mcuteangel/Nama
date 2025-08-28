@@ -1,7 +1,7 @@
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Button } from '@/components/ui/button';
+import { ModernPopover, ModernPopoverContent, ModernPopoverTrigger } from '@/components/ui/modern-popover';
+import { ModernButton } from '@/components/ui/modern-button';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { CalendarIcon } from 'lucide-react';
 import { format } from 'date-fns-jalali';
@@ -24,10 +24,10 @@ const ContactImportantDates: React.FC = () => {
           render={({ field }) => (
             <FormItem className="flex flex-col">
               <FormLabel className="text-gray-700 dark:text-gray-200">{t('form_labels.birth_date')}</FormLabel>
-              <Popover>
-                <PopoverTrigger asChild>
+              <ModernPopover>
+                <ModernPopoverTrigger asChild>
                   <FormControl>
-                    <Button
+                    <ModernButton
                       variant={"outline"}
                       className={cn(
                         "w-full justify-start text-left font-normal bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100",
@@ -38,17 +38,17 @@ const ContactImportantDates: React.FC = () => {
                         <CalendarIcon className="ml-2 h-4 w-4" />
                         {field.value ? format(new Date(field.value), "yyyy/MM/dd") : <span>{t('form_placeholders.select_birth_date')}</span>}
                       </span>
-                    </Button>
+                    </ModernButton>
                   </FormControl>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
+                </ModernPopoverTrigger>
+                <ModernPopoverContent className="w-auto p-0" glassEffect="glassAdvanced">
                   <JalaliCalendar
                     selected={field.value ? new Date(field.value) : undefined}
                     onSelect={(date) => field.onChange(date ? date.toISOString() : "")}
                     showToggle={false} // Hide calendar type toggle for simplicity in this context
                   />
-                </PopoverContent>
-              </Popover>
+                </ModernPopoverContent>
+              </ModernPopover>
               <FormMessage />
             </FormItem>
           )}

@@ -6,7 +6,8 @@ import { useEffect } from 'react';
 import { useSession } from '@/integrations/supabase/auth';
 import { MadeWithDyad } from '@/components/made-with-dyad';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@/components/ui/button';
+import { ModernButton } from '@/components/ui/modern-button';
+import { ModernCard } from '@/components/ui/modern-card';
 import IranFlag from '@/assets/icons/flags/IranFlag';
 import UKFlag from '@/assets/icons/flags/UKFlag';
 import LoadingMessage from '@/components/common/LoadingMessage'; // Import LoadingMessage
@@ -33,13 +34,13 @@ const Login = () => {
 
   return (
     <div className="flex flex-col items-center justify-center p-4 h-full w-full">
-      <div className="w-full max-w-md p-8 glass rounded-xl">
+      <ModernCard variant="glass" className="w-full max-w-md p-8 rounded-xl">
         <h2 className="text-2xl font-bold text-center text-gray-800 dark:text-gray-100 mb-6">
           {t('login.title')}
         </h2>
 
         <div className="flex justify-center gap-4 mb-6">
-          <Button
+          <ModernButton
             variant="outline"
             size="lg"
             onClick={() => handleLanguageChange('fa')}
@@ -51,8 +52,8 @@ const Login = () => {
           >
             <IranFlag className="w-6 h-6" />
             <span className="font-semibold">{t('settings.persian')}</span>
-          </Button>
-          <Button
+          </ModernButton>
+          <ModernButton
             variant="outline"
             size="lg"
             onClick={() => handleLanguageChange('en')}
@@ -64,7 +65,7 @@ const Login = () => {
           >
             <UKFlag className="w-6 h-6" />
             <span className="font-semibold">{t('settings.english')}</span>
-          </Button>
+          </ModernButton>
         </div>
 
         <Auth
@@ -98,7 +99,7 @@ const Login = () => {
             },
           }}
         />
-      </div>
+      </ModernCard>
       <MadeWithDyad />
     </div>
   );

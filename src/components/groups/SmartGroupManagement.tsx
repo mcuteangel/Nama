@@ -1,6 +1,4 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Users, CheckCircle, XCircle, Sparkles } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useSession } from "@/integrations/supabase/auth";
@@ -12,6 +10,8 @@ import { invalidateCache } from '@/utils/cache-helpers';
 import { useGroups } from '@/hooks/use-groups';
 import EmptyState from '../common/EmptyState';
 import LoadingSpinner from '../common/LoadingSpinner';
+import { ModernCard, ModernCardHeader, ModernCardTitle, ModernCardDescription, ModernCardContent } from "@/components/ui/modern-card";
+import { ModernButton } from "@/components/ui/modern-button";
 
 interface ContactWithoutGroup {
   id: string;
@@ -167,25 +167,26 @@ const SmartGroupManagement: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <Card className="glass rounded-xl p-4">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-xl font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
+      <ModernCard variant="glass" className="rounded-xl p-4">
+        <ModernCardHeader className="pb-2">
+          <ModernCardTitle className="text-xl font-bold flex items-center gap-2">
             <Users size={20} className="text-purple-500" /> {t('ai_suggestions.smart_group_management_title')}
-          </CardTitle>
-          <CardDescription className="text-gray-600 dark:text-gray-300">
+          </ModernCardTitle>
+          <ModernCardDescription>
             {t('ai_suggestions.smart_group_management_description')}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <Button
+          </ModernCardDescription>
+        </ModernCardHeader>
+        <ModernCardContent className="space-y-4">
+          <ModernButton
             onClick={generateGroupSuggestions}
             disabled={isGeneratingSuggestions || contactsWithoutGroup.length === 0}
-            className="w-full flex items-center gap-2 px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-md transition-all duration-300 transform hover:scale-105"
+            variant="gradient-primary"
+            className="w-full flex items-center gap-2 px-6 py-2 rounded-lg font-semibold shadow-md transition-all duration-300 transform hover:scale-105"
           >
             {isGeneratingSuggestions && <LoadingSpinner size={16} className="me-2" />}
             <Sparkles size={16} className="me-2" />
             {t('ai_suggestions.generate_group_suggestions')}
-          </Button>
+          </ModernButton>
 
           {contactsWithoutGroup.length === 0 && !isGeneratingSuggestions && (
             <EmptyState
@@ -210,29 +211,29 @@ const SmartGroupManagement: React.FC = () => {
                     </p>
                   </div>
                   <div className="flex gap-2">
-                    <Button
+                    <ModernButton
                       variant="ghost"
                       size="icon"
                       onClick={() => handleApplySuggestion(suggestion)}
                       className="text-green-600 hover:bg-green-100 dark:text-green-400 dark:hover:bg-gray-600/50"
                     >
                       <CheckCircle size={20} />
-                    </Button>
-                    <Button
+                    </ModernButton>
+                    <ModernButton
                       variant="ghost"
                       size="icon"
                       onClick={() => handleDiscardSuggestion(suggestion.contact_id)}
                       className="text-red-600 hover:bg-red-100 dark:text-red-400 dark:hover:bg-gray-600/50"
                     >
                       <XCircle size={20} />
-                    </Button>
+                    </ModernButton>
                   </div>
                 </div>
               ))}
             </div>
           )}
-        </CardContent>
-      </Card>
+        </ModernCardContent>
+      </ModernCard>
     </div>
   );
 };

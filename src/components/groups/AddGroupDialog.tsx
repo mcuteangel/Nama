@@ -1,6 +1,5 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import GroupForm from "./GroupForm";
 import FormDialogWrapper from "../common/FormDialogWrapper";
@@ -11,6 +10,8 @@ import { ErrorManager } from '@/lib/error-manager';
 import LoadingMessage from '../common/LoadingMessage';
 import { colors } from '../common/ColorPicker'; // Import colors array
 import { useTranslation } from 'react-i18next';
+import { ModernButton } from "@/components/ui/modern-button";
+import { ModernCard } from "@/components/ui/modern-card";
 
 interface FetchColorsResult {
   data: { color: string }[];
@@ -97,28 +98,28 @@ const AddGroupDialog: React.FC<AddGroupDialogProps> = ({ onGroupAdded, open, onO
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
-        <Button
+        <ModernButton
           type="button"
-          variant="outline"
+          variant="gradient-primary"
           size="sm"
-          className="flex items-center gap-1 px-3 py-1 rounded-lg bg-blue-500 hover:bg-blue-600 text-white font-semibold shadow-md transition-all duration-300 transform hover:scale-105 dark:bg-blue-700 dark:hover:bg-blue-800"
+          className="flex items-center gap-1 px-3 py-1 rounded-lg font-semibold shadow-md transition-all duration-300 transform hover:scale-105"
         >
           <span className="flex items-center gap-1">
             <Plus size={16} />
             {t('actions.add_new_group')}
           </span>
-        </Button>
+        </ModernButton>
       </DialogTrigger>
       <FormDialogWrapper>
         {isFetchingColors ? (
-          <div className="w-full max-w-md glass rounded-xl p-6 bg-white/90 dark:bg-gray-900/90">
+          <ModernCard className="w-full max-w-md rounded-xl p-6">
             <LoadingMessage message={t('system_messages.preparing_group_form')} />
-          </div>
+          </ModernCard>
         ) : fetchColorsError ? (
-          <div className="w-full max-w-md glass rounded-xl p-6 bg-white/90 dark:bg-gray-900/90 text-center text-red-500 dark:text-red-400">
+          <ModernCard className="w-full max-w-md rounded-xl p-6 text-center text-red-500 dark:text-red-400">
             <p>{fetchColorsError.message}</p>
-            <Button onClick={() => onOpenChange(false)} className="mt-4">{t('actions.close')}</Button>
-          </div>
+            <ModernButton onClick={() => onOpenChange(false)} className="mt-4">{t('actions.close')}</ModernButton>
+          </ModernCard>
         ) : (
           <GroupForm
             onSuccess={handleSuccess}

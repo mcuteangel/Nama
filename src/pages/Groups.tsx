@@ -1,8 +1,14 @@
 import { MadeWithDyad } from "@/components/made-with-dyad";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { 
+  ModernCard, 
+  ModernCardContent, 
+  ModernCardDescription, 
+  ModernCardHeader, 
+  ModernCardTitle 
+} from "@/components/ui/modern-card";
+import { ModernButton } from "@/components/ui/modern-button";
 import GroupList from "@/components/groups/GroupList";
 import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import EmptyState from '@/components/common/EmptyState';
 import { Tag } from 'lucide-react';
@@ -11,28 +17,28 @@ const Groups = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="flex flex-col items-center justify-center p-4 h-full w-full">
-      <Card className="w-full max-w-4xl glass rounded-xl p-6">
-        <CardHeader className="text-center">
-          <CardTitle className="text-4xl font-bold text-gray-800 dark:text-gray-100 mb-2">
+    <div className="flex flex-col items-center justify-center p-4 h-full w-full fade-in-up">
+      <ModernCard variant="glass" hover="lift" className="w-full max-w-4xl">
+        <ModernCardHeader className="text-center">
+          <ModernCardTitle className="text-4xl font-bold mb-2 text-gradient">
             مدیریت گروه‌ها
-          </CardTitle>
-          <CardDescription className="text-lg text-gray-600 dark:text-gray-300">
+          </ModernCardTitle>
+          <ModernCardDescription className="text-lg">
             ایجاد، ویرایش و حذف گروه‌های مخاطبین
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
+          </ModernCardDescription>
+        </ModernCardHeader>
+        <ModernCardContent className="space-y-6">
           <GroupList />
-          <Button
+          <ModernButton
             onClick={() => navigate('/')}
             variant="outline"
-            className="w-full px-6 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold shadow-md transition-all duration-300 transform hover:scale-105 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-100 dark:border-gray-600"
+            className="w-full hover-lift"
           >
             <ArrowLeft size={20} className="me-2" />
             بازگشت به مخاطبین
-          </Button>
-        </CardContent>
-      </Card>
+          </ModernButton>
+        </ModernCardContent>
+      </ModernCard>
       <MadeWithDyad />
     </div>
   );

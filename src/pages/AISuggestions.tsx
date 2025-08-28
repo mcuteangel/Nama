@@ -1,8 +1,8 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { MadeWithDyad } from "@/components/made-with-dyad";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
+import { ModernCard, ModernCardContent, ModernCardDescription, ModernCardHeader, ModernCardTitle } from "@/components/ui/modern-card";
+import { ModernTextarea } from "@/components/ui/modern-textarea";
+import { ModernButton } from "@/components/ui/modern-button";
 import { Sparkles, UserCheck, Mic, StopCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useContactExtractor } from "@/hooks/use-contact-extractor";
@@ -25,7 +25,6 @@ import GenderSuggestionManagement from "@/components/ai/GenderSuggestionManageme
 import { useSpeechToText } from "@/hooks/use-speech-to-text";
 import EmptyState from '@/components/common/EmptyState';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
-
 
 interface AISuggestionDisplay extends AISuggestionCardProps {
   id: string;
@@ -262,23 +261,23 @@ const AISuggestions: React.FC = () => {
     return (
       <div className="text-center text-red-500 dark:text-red-400 p-4">
         <p>{t('ai_suggestions.extractor_error')}: {extractorError || speechError}</p>
-        <Button onClick={() => window.location.reload()} className="mt-4">{t('common.reload_page')}</Button>
+        <ModernButton onClick={() => window.location.reload()} className="mt-4">{t('common.reload_page')}</ModernButton>
       </div>
     );
   }
 
   return (
     <div className="flex flex-col items-center justify-center p-4 h-full w-full">
-      <Card className="w-full max-w-4xl glass rounded-xl p-6">
-        <CardHeader className="text-center">
-          <CardTitle className="text-4xl font-bold text-gray-800 dark:text-gray-100 mb-2">
+      <ModernCard variant="glass" className="w-full max-w-4xl rounded-xl p-6">
+        <ModernCardHeader className="text-center">
+          <ModernCardTitle className="text-4xl font-bold text-gray-800 dark:text-gray-100 mb-2">
             {t('ai_suggestions.title')}
-          </CardTitle>
-          <CardDescription className="text-lg text-gray-600 dark:text-gray-300">
+          </ModernCardTitle>
+          <ModernCardDescription className="text-lg text-gray-600 dark:text-gray-300">
             {t('ai_suggestions.description')}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
+          </ModernCardDescription>
+        </ModernCardHeader>
+        <ModernCardContent className="space-y-6">
           <Tabs defaultValue="extract-info" className="w-full">
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="extract-info">{t('ai_suggestions.tab_extract_info')}</TabsTrigger>
@@ -291,15 +290,16 @@ const AISuggestions: React.FC = () => {
                   <Sparkles size={20} className="text-blue-500" /> {t('ai_suggestions.input_section_title')}
                 </h3>
                 <div className="relative">
-                  <Textarea
+                  <ModernTextarea
                     placeholder={t('ai_suggestions.paste_text_placeholder')}
                     value={rawTextInput}
                     onChange={(e) => setRawTextInput(e.target.value)}
+                    variant="glass"
                     className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-400 min-h-[150px] pr-12"
                     disabled={isExtractorLoading || isProcessingSuggestions || isSavingOrUpdating}
                   />
                   {browserSupportsSpeechRecognition && (
-                    <Button
+                    <ModernButton
                       type="button"
                       variant="ghost"
                       size="icon"
@@ -308,10 +308,10 @@ const AISuggestions: React.FC = () => {
                       disabled={isExtractorLoading || isProcessingSuggestions || isSavingOrUpdating}
                     >
                       {isListening ? <StopCircle size={20} className="animate-pulse text-red-500" /> : <Mic size={20} />}
-                    </Button>
+                    </ModernButton>
                   )}
                 </div>
-                <Button
+                <ModernButton
                   type="button"
                   onClick={handleExtractAndEnqueue}
                   disabled={!rawTextInput.trim() || isExtractorLoading || isProcessingSuggestions || isSavingOrUpdating}
@@ -319,7 +319,7 @@ const AISuggestions: React.FC = () => {
                 >
                   {(isExtractorLoading || isProcessingSuggestions || isSavingOrUpdating) && <LoadingSpinner size={16} className="me-2" />}
                   {isExtractorLoading || isProcessingSuggestions || isSavingOrUpdating ? t('ai_suggestions.processing_text') : t('ai_suggestions.extract_and_suggest_button')}
-                </Button>
+                </ModernButton>
               </div>
 
               {(isLoadingSuggestions || isSavingOrUpdating) && (
@@ -360,8 +360,8 @@ const AISuggestions: React.FC = () => {
               <GenderSuggestionManagement />
             </TabsContent>
           </Tabs>
-        </CardContent>
-      </Card>
+        </ModernCardContent>
+      </ModernCard>
       <MadeWithDyad />
     </div>
   );
