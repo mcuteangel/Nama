@@ -110,7 +110,10 @@ const AddGroupDialog: React.FC<AddGroupDialogProps> = ({ onGroupAdded, open, onO
           </span>
         </ModernButton>
       </DialogTrigger>
-      <FormDialogWrapper>
+      <FormDialogWrapper 
+        title={t('group.add_title', 'Add Group')}
+        description={t('group.add_description', 'Form for creating a new contact group')}
+      >
         {isFetchingColors ? (
           <ModernCard className="w-full max-w-md rounded-xl p-6">
             <LoadingMessage message={t('system_messages.preparing_group_form')} />

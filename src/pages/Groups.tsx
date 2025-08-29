@@ -10,8 +10,6 @@ import { ModernButton } from "@/components/ui/modern-button";
 import GroupList from "@/components/groups/GroupList";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
-import EmptyState from '@/components/common/EmptyState';
-import { Tag } from 'lucide-react';
 
 const Groups = () => {
   const navigate = useNavigate();

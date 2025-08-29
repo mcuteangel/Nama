@@ -10,7 +10,7 @@ import LanguageSetting from "@/components/settings/LanguageSetting";
 import { AccessibilitySetting, RTLTestSetting } from "@/components/settings";
 import GeminiSettings from "@/components/ai/GeminiSettings";
 import DebugSettings from "@/components/settings/DebugSettings";
-import { Download, User, Settings as SettingsIcon, Sparkles, Accessibility } from "lucide-react";
+import { Download, User, Settings as SettingsIcon, Sparkles } from "lucide-react";
 import { exportContactsToCsv } from "@/utils/export-contacts";
 import { useSession } from "@/integrations/supabase/auth";
 import { Label } from "@/components/ui/label";

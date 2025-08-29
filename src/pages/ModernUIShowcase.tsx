@@ -17,7 +17,7 @@ import {
 import { ModernLoader, LoadingOverlay, Skeleton } from '@/components/ui/modern-loader';
 import { ModernGrid, MasonryGrid, ResponsiveGrid } from '@/components/ui/modern-grid';
 import { ModernProgress, CircularProgress, ProgressSteps } from '@/components/ui/modern-progress';
-import { useToast } from '@/components/ui/modern-toast';
+import { useToast } from '@/components/ui/use-toast';
 import { 
   ModernNavigation, 
   ModernBreadcrumb, 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useFormContext, useFieldArray } from 'react-hook-form';
 import { ModernInput } from '@/components/ui/modern-input';
 import { ModernSelect, ModernSelectContent, ModernSelectItem, ModernSelectTrigger, ModernSelectValue } from '@/components/ui/modern-select';
@@ -23,6 +23,13 @@ const ContactPhoneNumbers: React.FC = () => {
     control: form.control,
     name: "phoneNumbers",
   });
+
+  // Ensure at least one phone number field exists by default
+  useEffect(() => {
+    if (fields.length === 0) {
+      append({ phone_type: "mobile", phone_number: "", extension: null });
+    }
+  }, [fields.length, append]);
 
   const translatedPhoneTypeOptions = phoneTypeOptions.map(option => ({
     ...option,
@@ -89,14 +96,17 @@ const ContactPhoneNumbers: React.FC = () => {
           </div>
         </div>
       ))}
-      <ModernButton
-        type="button"
-        variant="outline"
-        onClick={() => append({ phone_type: "mobile", phone_number: "", extension: null })}
-        className="w-full flex items-center gap-2 px-6 py-2 rounded-lg font-semibold"
-      >
-        <Plus size={16} className="me-2" /> {t('button_labels.add_phone_number')}
-      </ModernButton>
+      <div className="flex justify-start mt-2">
+        <ModernButton
+          type="button"
+          variant="glass"
+          size="sm"
+          onClick={() => append({ phone_type: "mobile", phone_number: "", extension: null })}
+          className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium"
+        >
+          <Plus size={16} className="me-2" /> {t('button_labels.add_phone_number')}
+        </ModernButton>
+      </div>
     </div>
   );
 };

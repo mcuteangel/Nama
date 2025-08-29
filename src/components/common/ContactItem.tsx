@@ -116,19 +116,7 @@ export const ContactItem = React.memo<ContactItemProps>(({
     navigate(`/contacts/edit/${contact.id}`);
   }, [onContactEdited, contact.id, navigate]);
 
-  const handleCall = useCallback((e?: React.MouseEvent) => {
-    if (e) e.stopPropagation();
-    if (contact.phone_numbers.length > 0) {
-      window.location.href = `tel:${contact.phone_numbers[0].phone_number}`;
-    }
-  }, [contact.phone_numbers]);
 
-  const handleEmail = useCallback((e?: React.MouseEvent) => {
-    if (e) e.stopPropagation();
-    if (contact.email_addresses.length > 0) {
-      window.location.href = `mailto:${contact.email_addresses[0].email_address}`;
-    }
-  }, [contact.email_addresses]);
 
   if (!contact) return null;
 

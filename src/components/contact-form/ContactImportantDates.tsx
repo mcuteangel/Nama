@@ -28,9 +28,9 @@ const ContactImportantDates: React.FC = () => {
                 <ModernPopoverTrigger asChild>
                   <FormControl>
                     <ModernButton
-                      variant={"outline"}
+                      variant={"glass"}
                       className={cn(
-                        "w-full justify-start text-left font-normal bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100",
+                        "w-full justify-start text-left font-normal",
                         !field.value && "text-muted-foreground"
                       )}
                     >

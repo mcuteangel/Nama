@@ -312,7 +312,7 @@ describe('AccessibilityProvider', () => {
     it('does not focus when keyboard navigation disabled', () => {
       const mockElement = {
         focus: vi.fn(),
-      } as any;
+      } as unknown as HTMLElement;
 
       const initialSettings = { keyboardNavigation: false };
 
@@ -539,7 +539,7 @@ describe('AccessibilityProvider', () => {
   describe('Accessibility Hook', () => {
     it('provides all expected context methods', () => {
       const { result } = renderHook(() => useAccessibility(), {
-        wrapper: ({ children }) => (
+        wrapper: ({ children }: { children: React.ReactNode }) => (
           <AccessibilityProvider>{children}</AccessibilityProvider>
         ),
       });

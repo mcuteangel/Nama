@@ -74,14 +74,17 @@ const ContactEmailAddresses: React.FC = () => {
           </div>
         </div>
       ))}
-      <ModernButton
-        type="button"
-        variant="outline"
-        onClick={() => append({ email_type: "personal", email_address: "" })}
-        className="w-full flex items-center gap-2 px-6 py-2 rounded-lg font-semibold"
-      >
-        <Plus size={16} className="me-2" /> {t('button_labels.add_email_address')}
-      </ModernButton>
+      <div className="flex justify-start mt-2">
+        <ModernButton
+          type="button"
+          variant="glass"
+          size="sm"
+          onClick={() => append({ email_type: "personal", email_address: "" })}
+          className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium"
+        >
+          <Plus size={16} className="me-2" /> {t('button_labels.add_email_address')}
+        </ModernButton>
+      </div>
     </div>
   );
 };

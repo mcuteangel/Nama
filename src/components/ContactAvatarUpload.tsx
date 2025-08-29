@@ -5,7 +5,7 @@ import { ModernButton } from '@/components/ui/modern-button';
 import { ModernLoader } from '@/components/ui/modern-loader';
 import { useTranslation } from 'react-i18next';
 import { useSession } from '@/integrations/supabase/auth';
-import { useToast } from '@/components/ui/modern-toast';
+import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Camera, UploadCloud, XCircle } from 'lucide-react';
@@ -137,7 +137,7 @@ const ContactAvatarUpload: React.FC<ContactAvatarUploadProps> = ({ initialAvatar
           type="button"
           onClick={() => fileInputRef.current?.click()}
           disabled={disabled || isUploading}
-          variant="outline"
+          variant="glass"
           className="hover-lift"
         >
           {isUploading && <ModernLoader variant="spinner" size="sm" className="me-2" />}
@@ -147,7 +147,7 @@ const ContactAvatarUpload: React.FC<ContactAvatarUploadProps> = ({ initialAvatar
         {avatarUrl && (
           <ModernButton
             type="button"
-            variant="destructive"
+            variant="glass"
             onClick={handleRemoveAvatar}
             disabled={disabled || isUploading}
             className="hover-lift"

@@ -6,7 +6,7 @@ export interface ModernInputProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
   variant?: "default" | "glass" | "neomorphism" | "gradient";
   gradientType?: "primary" | "ocean" | "sunset" | "success" | "info" | "warning" | "danger" | "forest";
-  size?: "sm" | "md" | "lg";
+  inputSize?: "sm" | "md" | "lg";
   transition?: boolean;
   focusRing?: boolean;
   disabledState?: boolean;
@@ -18,7 +18,7 @@ const ModernInput = React.forwardRef<HTMLInputElement, ModernInputProps>(
     type, 
     variant = "default",
     gradientType = "primary",
-    size = "md",
+    inputSize = "md",
     transition = true, 
     focusRing = true, 
     disabledState = true, 
@@ -52,7 +52,7 @@ const ModernInput = React.forwardRef<HTMLInputElement, ModernInputProps>(
         type={type}
         className={cn(
           baseClasses,
-          sizes[size],
+          sizes[inputSize],
           variantClasses[variant],
           focusClasses[variant],
           applyGlobalStyles(className, {

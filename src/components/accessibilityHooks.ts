@@ -1,6 +1,6 @@
 import { useEffect, useContext } from 'react';
-import type { AccessibilityContextType, FocusManager } from './AccessibilityProvider';
-import { AccessibilityContext } from './AccessibilityProvider';
+import type { AccessibilityContextType, FocusManager } from './AccessibilityContext';
+import { AccessibilityContext } from './AccessibilityContext';
 
 export const useAccessibility = (): AccessibilityContextType => {
   const context = useContext(AccessibilityContext);

@@ -13,7 +13,6 @@ import { AlertTriangle, RefreshCw, Home, Mail } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { queryClient } from '@/lib/react-query-config';
-import { useAccessibility } from './accessibilityHooks';
 import { handleError } from '@/lib/error-manager';
 
 // Safe navigation hook that doesn't break outside Router context

@@ -28,9 +28,9 @@ const AddCustomFieldTemplateDialog: React.FC<AddCustomFieldTemplateDialogProps> 
       <DialogTrigger asChild>
         <ModernButton
           type="button"
-          variant="gradient-primary"
+          variant="glass"
           size="sm"
-          className="flex items-center gap-1 px-3 py-1 rounded-lg font-semibold shadow-md transition-all duration-300 transform hover:scale-105"
+          className="flex items-center gap-1 px-3 py-1 rounded-lg font-medium"
         >
           <span className="flex items-center gap-1">
             <Plus size={16} />
@@ -38,7 +38,10 @@ const AddCustomFieldTemplateDialog: React.FC<AddCustomFieldTemplateDialogProps> 
           </span>
         </ModernButton>
       </DialogTrigger>
-      <FormDialogWrapper> {/* Use the new wrapper */}
+      <FormDialogWrapper 
+        title={t('custom_field_template.add_title', 'Add Custom Field Template')}
+        description={t('custom_field_template.add_description', 'Form for creating a new custom field template')}
+      >
         <CustomFieldTemplateForm
           onSuccess={handleSuccess}
           onCancel={handleCancel}

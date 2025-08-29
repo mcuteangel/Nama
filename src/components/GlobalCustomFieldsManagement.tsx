@@ -3,7 +3,7 @@
 import { useState, useCallback } from "react";
 import { ModernButton } from "@/components/ui/modern-button";
 import { Dialog } from "@/components/ui/dialog";
-import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Trash2, Edit, ClipboardList } from "lucide-react";
 import { CustomFieldTemplateService } from "@/services/custom-field-template-service"; // Updated import
 import { useErrorHandler } from "@/hooks/use-error-handler";
@@ -19,7 +19,8 @@ import LoadingMessage from "./common/LoadingMessage";
 import CancelButton from "./common/CancelButton";
 import EmptyState from './common/EmptyState';
 import LoadingSpinner from './common/LoadingSpinner';
-import { useToast } from "@/components/ui/modern-toast";
+import { useToast } from "@/components/ui/use-toast";
+import { useTranslation } from 'react-i18next';
 
 type TemplateType = 'text' | 'number' | 'date' | 'list';
 
@@ -33,6 +34,7 @@ interface TemplateViewModel {
 }
 
 export function GlobalCustomFieldsManagement() {
+  const { t } = useTranslation();
   const { session, isLoading: isSessionLoading } = useSession();
   const { toast } = useToast(); // Added toast hook
   const [customFields, setCustomFields] = useState<TemplateViewModel[]>([]);
@@ -199,8 +201,8 @@ export function GlobalCustomFieldsManagement() {
                   </div>
                   <div className="flex gap-2">
                     <ModernButton
-                      variant="ghost"
-                      size="icon"
+                      variant="glass"
+                      size="sm"
                       onClick={() => handleEditClick(field as CustomFieldTemplate)}
                       className="text-blue-600 hover:bg-blue-100 dark:text-blue-400 dark:hover:bg-gray-600/50 transition-all duration-200"
                     >
@@ -209,7 +211,7 @@ export function GlobalCustomFieldsManagement() {
 
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
-                        <ModernButton variant="ghost" size="icon" className="text-red-600 hover:bg-red-100 dark:text-red-400 dark:hover:bg-gray-600/50 transition-all duration-200" disabled={isOperationLoading}>
+                        <ModernButton variant="glass" size="sm" className="text-red-600 hover:bg-red-100 dark:text-red-400 dark:hover:bg-gray-600/50 transition-all duration-200" disabled={isOperationLoading}>
                           {isOperationLoading ? <LoadingSpinner size={16} /> : <Trash2 size={16} />}
                         </ModernButton>
                       </AlertDialogTrigger>
@@ -222,10 +224,15 @@ export function GlobalCustomFieldsManagement() {
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                           <CancelButton onClick={() => {}} text="لغو" />
-                          <AlertDialogAction onClick={() => handleDeleteField(field.id)} className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold" disabled={isOperationLoading}>
+                          <ModernButton 
+                            variant="glass"
+                            onClick={() => handleDeleteField(field.id)} 
+                            className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold" 
+                            disabled={isOperationLoading}
+                          >
                             {isOperationLoading && <LoadingSpinner size={16} className="me-2" />}
                             حذف
-                          </AlertDialogAction>
+                          </ModernButton>
                         </AlertDialogFooter>
                       </AlertDialogContent>
                     </AlertDialog>
@@ -238,7 +245,10 @@ export function GlobalCustomFieldsManagement() {
       </ModernCardContent>
 
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <FormDialogWrapper>
+        <FormDialogWrapper 
+          title={t('custom_field_template.edit_title', 'Edit Custom Field Template')}
+          description={t('custom_field_template.edit_description', 'Form for editing a custom field template')}
+        >
           <CustomFieldTemplateForm
             initialData={editingField || undefined}
             onSuccess={handleEditSuccess}

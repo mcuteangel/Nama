@@ -90,7 +90,10 @@ const UserItem = ({ user, onUserUpdated, onUserDeleted }: { user: UserProfile; o
               <Edit size={20} />
             </ModernButton>
           </DialogTrigger>
-          <FormDialogWrapper>
+          <FormDialogWrapper 
+            title={t('user_management.edit_user_title', 'Edit User')}
+            description={t('user_management.edit_user_description', 'Form for editing user information')}
+          >
             <UserForm
               initialData={user}
               onSuccess={() => {
@@ -250,7 +253,10 @@ const UserList: React.FC = () => {
             </span>
           </ModernButton>
         </DialogTrigger>
-        <FormDialogWrapper>
+        <FormDialogWrapper 
+          title={t('user_management.add_user_title', 'Add User')}
+          description={t('user_management.add_user_description', 'Form for adding a new user')}
+        >
             <UserForm
               onSuccess={() => {
                 setIsAddUserDialogOpen(false);

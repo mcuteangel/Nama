@@ -155,7 +155,7 @@ const CustomFieldTemplateForm: React.FC<CustomFieldTemplateFormProps> = ({ initi
             <span>{errorMessage}</span>
             {retryCount > 0 && (
               <ModernButton
-                variant="ghost"
+                variant="glass"
                 size="sm"
                 onClick={retryLastOperation}
                 disabled={isSubmitting}
@@ -228,8 +228,8 @@ const CustomFieldTemplateForm: React.FC<CustomFieldTemplateFormProps> = ({ initi
                   />
                   <ModernButton
                     type="button"
-                    variant="ghost"
-                    size="icon"
+                    variant="glass"
+                    size="sm"
                     onClick={() => removeOption(index)}
                     className="text-red-500 hover:bg-red-100 dark:hover:bg-gray-700/50"
                     disabled={isSubmitting}
@@ -238,8 +238,8 @@ const CustomFieldTemplateForm: React.FC<CustomFieldTemplateFormProps> = ({ initi
                   </ModernButton>
                 </div>
               ))}
-              <ModernButton type="button" variant="outline" onClick={addOption}
-                className="w-full flex items-center gap-2 px-6 py-2 rounded-lg font-semibold"
+              <ModernButton type="button" variant="glass" size="sm" onClick={addOption}
+                className="w-full flex items-center gap-2 px-3 py-2 rounded-lg font-medium"
                 disabled={isSubmitting}
               >
                 <Plus size={16} className="me-2" /> افزودن گزینه
@@ -277,8 +277,8 @@ const CustomFieldTemplateForm: React.FC<CustomFieldTemplateFormProps> = ({ initi
             <CancelButton onClick={onCancel} disabled={isSubmitting} />
             <ModernButton
               type="submit"
-              variant="gradient-primary"
-              className="px-6 py-2 rounded-md font-semibold"
+              variant="glass"
+              className="px-4 py-2 rounded-lg font-medium"
               disabled={isSubmitting}
             >
               {isSubmitting && <LoadingSpinner size={16} className="me-2" />}

@@ -21,8 +21,11 @@ export * from './modern-select';
 export { 
   Badge,
   type BadgeProps,
-  badgeVariants
 } from './badge';
+
+export { 
+  badgeVariants
+} from './badge-variants';
 
 export { 
   ModernBadge,

@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { X, CheckCircle, AlertCircle, AlertTriangle, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ModernButton } from './modern-button';
+import { ToastContext, ToastState } from './toast-context';
 
 export interface ToastProps {
   id: string;
@@ -38,6 +39,11 @@ export function Toast({
   const [isVisible, setIsVisible] = useState(false);
   const [isLeaving, setIsLeaving] = useState(false);
 
+  const handleDismiss = useCallback(() => {
+    setIsLeaving(true);
+    setTimeout(() => onDismiss(id), 300);
+  }, [id, onDismiss]);
+
   useEffect(() => {
     // ورود با انیمیشن
     const enterTimer = setTimeout(() => setIsVisible(true), 100);
@@ -51,12 +57,7 @@ export function Toast({
       clearTimeout(enterTimer);
       clearTimeout(exitTimer);
     };
-  }, [duration]);
-
-  const handleDismiss = () => {
-    setIsLeaving(true);
-    setTimeout(() => onDismiss(id), 300);
-  };
+  }, [duration, handleDismiss]);
 
   const variants = {
     default: {
@@ -162,17 +163,6 @@ export interface ToastProviderProps {
   children: React.ReactNode;
 }
 
-interface ToastState extends Omit<ToastProps, 'onDismiss'> {
-  id: string;
-}
-
-// Toast Context
-const ToastContext = React.createContext<{
-  toasts: ToastState[];
-  addToast: (toast: Omit<ToastState, 'id'>) => void;
-  removeToast: (id: string) => void;
-} | null>(null);
-
 /**
  * ToastProvider - ارائه‌دهنده Context برای مدیریت Toast ها
  */
@@ -206,58 +196,7 @@ export function ToastProvider({ children }: ToastProviderProps) {
   );
 }
 
-/**
- * useToast - Hook برای استفاده از Toast
- */
-export function useToast() {
-  const context = React.useContext(ToastContext);
-  
-  if (!context) {
-    throw new Error('useToast must be used within a ToastProvider');
-  }
 
-  const { addToast } = context;
-
-  const toast = {
-    success: (message: string, options?: Partial<Omit<ToastState, 'id' | 'variant'>>) => {
-      addToast({ 
-        variant: 'success', 
-        title: 'موفق', 
-        description: message, 
-        ...options 
-      });
-    },
-    error: (message: string, options?: Partial<Omit<ToastState, 'id' | 'variant'>>) => {
-      addToast({ 
-        variant: 'error', 
-        title: 'خطا', 
-        description: message, 
-        ...options 
-      });
-    },
-    warning: (message: string, options?: Partial<Omit<ToastState, 'id' | 'variant'>>) => {
-      addToast({ 
-        variant: 'warning', 
-        title: 'هشدار', 
-        description: message, 
-        ...options 
-      });
-    },
-    info: (message: string, options?: Partial<Omit<ToastState, 'id' | 'variant'>>) => {
-      addToast({ 
-        variant: 'info', 
-        title: 'اطلاع', 
-        description: message, 
-        ...options 
-      });
-    },
-    custom: (options: Omit<ToastState, 'id'>) => {
-      addToast(options);
-    }
-  };
-
-  return { toast };
-}
 
 // CSS Animation برای progress bar
 const toastProgressStyles = `

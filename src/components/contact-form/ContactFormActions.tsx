@@ -18,7 +18,7 @@ const ContactFormActions: React.FC<ContactFormActionsProps> = ({ isSubmitting, o
       <CancelButton onClick={onCancel} disabled={isSubmitting} text={t('common.cancel')} />
       <ModernButton 
         type="submit" 
-        variant="default"
+        variant="glass"
         className="hover-lift" 
         disabled={isSubmitting}
       >

@@ -33,7 +33,8 @@ export function useExpensiveComputation<T>(
   computationFn: () => T,
   deps: unknown[]
 ): T {
-  return useMemo(() => computationFn(), deps);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  return useMemo(() => computationFn(), [computationFn, ...deps]);
 }
 
 /**
@@ -43,7 +44,8 @@ export function useStableCallback<T extends (...args: unknown[]) => unknown>(
   callback: T,
   deps: unknown[]
 ): T {
-  return useCallback(callback, deps);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  return useCallback((...args: Parameters<T>) => callback(...args), deps) as T;
 }
 
 /**
@@ -204,7 +206,7 @@ export function useOptimizedList<T>(
   items: T[],
   filterFn: (item: T) => boolean,
   sortFn?: (a: T, b: T) => number,
-  searchTerm?: string
+  _searchTerm?: string
 ) {
   return useMemo(() => {
     let result = items;
@@ -220,6 +222,6 @@ export function useOptimizedList<T>(
     }
     
     return result;
-  }, [items, filterFn, sortFn, searchTerm]);
+  }, [items, filterFn, sortFn]);
 }
 

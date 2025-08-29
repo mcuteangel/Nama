@@ -24,9 +24,9 @@ const CancelButton: React.FC<CancelButtonProps> = ({ onClick, disabled, text }) 
   return (
     <ModernButton
       type="button"
-      variant="outline"
+      variant="glass"
       onClick={handleClick}
-      className="hover-lift"
+      className="hover-lift !bg-gradient-to-br !from-gray-300/20 !via-gray-400/15 !to-gray-500/10 !border !border-gray-400/20 dark:!from-gray-500/20 dark:!via-gray-600/15 dark:!to-gray-700/10 dark:!border-gray-500/20 text-gray-700 dark:text-gray-300"
       disabled={disabled}
     >
       {text || t('common.cancel')}

@@ -1,6 +1,6 @@
 import React, { useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useAccessibility, useKeyboardShortcut } from './accessibilityHooks';
+import { useAccessibility } from './accessibilityHooks';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
@@ -28,7 +28,6 @@ export const KeyboardNavigationHandler: React.FC<KeyboardNavigationHandlerProps>
   
   // Refs for managing focus
   const searchInputRef = useRef<HTMLInputElement | null>(null);
-  const modalRef = useRef<HTMLElement | null>(null);
   const mainContentRef = useRef<HTMLElement | null>(null);
   
   // State for shortcut help modal
@@ -50,7 +49,7 @@ export const KeyboardNavigationHandler: React.FC<KeyboardNavigationHandlerProps>
   }, []);
 
   // Navigation shortcuts
-  const navigationShortcuts: KeyboardShortcut[] = [
+  const navigationShortcuts = React.useMemo<KeyboardShortcut[]>(() => [
     {
       key: 'alt+1',
       description: t('shortcuts.home', 'Go to Home'),
@@ -111,10 +110,10 @@ export const KeyboardNavigationHandler: React.FC<KeyboardNavigationHandlerProps>
       category: 'navigation',
       scope: 'global'
     }
-  ];
+  ], [t, navigate, announce]);
 
   // Search and action shortcuts
-  const actionShortcuts: KeyboardShortcut[] = [
+  const actionShortcuts = React.useMemo<KeyboardShortcut[]>(() => [
     {
       key: 'ctrl+k',
       description: t('shortcuts.search', 'Focus Search'),
@@ -172,10 +171,10 @@ export const KeyboardNavigationHandler: React.FC<KeyboardNavigationHandlerProps>
       category: 'actions',
       scope: 'modal'
     }
-  ];
+  ], [t, location.pathname, navigate, announce, focusElement]);
 
   // Accessibility shortcuts
-  const accessibilityShortcuts: KeyboardShortcut[] = [
+  const accessibilityShortcuts = React.useMemo<KeyboardShortcut[]>(() => [
     {
       key: 'alt+h',
       description: t('shortcuts.help', 'Show Keyboard Shortcuts'),
@@ -228,10 +227,10 @@ export const KeyboardNavigationHandler: React.FC<KeyboardNavigationHandlerProps>
       category: 'accessibility',
       scope: 'global'
     }
-  ];
+  ], [t, setShowShortcuts, announce, focusElement, findFocusableElements]);
 
   // Contact-specific shortcuts
-  const contactShortcuts: KeyboardShortcut[] = [
+  const contactShortcuts = React.useMemo<KeyboardShortcut[]>(() => [
     {
       key: 'ctrl+e',
       description: t('shortcuts.edit_contact', 'Edit Selected Contact'),
@@ -275,10 +274,10 @@ export const KeyboardNavigationHandler: React.FC<KeyboardNavigationHandlerProps>
       category: 'actions',
       scope: 'contacts'
     }
-  ];
+  ], [t, announce]);
 
   // Combine all shortcuts based on scope
-  const getAllShortcuts = useCallback(() => {
+  const getAllShortcuts = React.useMemo(() => {
     const allShortcuts = [
       ...navigationShortcuts,
       ...actionShortcuts,
@@ -289,14 +288,55 @@ export const KeyboardNavigationHandler: React.FC<KeyboardNavigationHandlerProps>
     return allShortcuts.filter(shortcut => 
       !shortcut.scope || shortcut.scope === 'global' || shortcut.scope === scope
     );
-  }, [scope]);
+  }, [scope, navigationShortcuts, actionShortcuts, accessibilityShortcuts, contactShortcuts]);
 
   // Register all shortcuts
-  const shortcuts = getAllShortcuts();
+  const shortcuts = getAllShortcuts;
   
-  shortcuts.forEach(shortcut => {
-    useKeyboardShortcut(shortcut.key, shortcut.action, [shortcut.action]);
-  });
+  // Custom hook to register all keyboard shortcuts
+  const registerShortcuts = React.useCallback(() => {
+    // We'll handle the shortcut registration in a useEffect instead of calling hooks directly
+  }, []);
+  
+  // Register shortcuts using useEffect
+  React.useEffect(() => {
+    // Create a map to store cleanup functions for each shortcut
+    
+    // Register each shortcut manually by adding event listeners
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Find matching shortcut
+      const matchingShortcut = shortcuts.find(shortcut => {
+        const keys = shortcut.key.toLowerCase().split('+');
+        const hasAlt = keys.includes('alt');
+        const hasCtrl = keys.includes('ctrl');
+        const hasShift = keys.includes('shift');
+        const mainKey = keys[keys.length - 1];
+        
+        return (
+          event.altKey === hasAlt &&
+          event.ctrlKey === hasCtrl &&
+          event.shiftKey === hasShift &&
+          event.key.toLowerCase() === mainKey
+        );
+      });
+      
+      if (matchingShortcut) {
+        event.preventDefault();
+        matchingShortcut.action();
+      }
+    };
+    
+    // Add event listener
+    document.addEventListener('keydown', handleKeyDown);
+    
+    // Cleanup function
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [shortcuts]);
+  
+  // Call the register function
+  registerShortcuts();
 
   // Handle special keys that might conflict with form inputs
   useEffect(() => {

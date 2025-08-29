@@ -241,7 +241,8 @@ Create `src/components/__tests__/AccessibilityProvider.test.tsx`:
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { renderHook } from '@testing-library/react-hooks';
-import AccessibilityProvider, { useAccessibility } from '../AccessibilityProvider';
+import AccessibilityProvider from '../AccessibilityProvider';
+import { useAccessibility } from '../accessibilityHooks';
 
 describe('AccessibilityProvider', () => {
   it('provides accessibility context', () => {
@@ -438,7 +439,7 @@ Add to `package.json`:
 
 Add to GitHub Actions workflow:
 
-```yaml
+``yaml
 name: Tests
 on: [push, pull_request]
 

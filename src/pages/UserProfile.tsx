@@ -1,4 +1,3 @@
-import React from "react";
 import { MadeWithDyad } from "@/components/made-with-dyad";
 import UserProfileForm from "@/components/user-management/UserProfileForm";
 

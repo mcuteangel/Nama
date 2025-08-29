@@ -1,15 +1,13 @@
-import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { 
   ModernCard, 
   ModernCardContent, 
   ModernCardDescription, 
   ModernCardHeader, 
-  ModernCardTitle,
-  ModernCardFooter 
-} from "@/components/ui/modern-card";
+  ModernCardTitle} from "@/components/ui/modern-card";
 import { GradientButton, ModernButton } from "@/components/ui/modern-button";
-import { useToast } from "@/components/ui/modern-toast";
+import { useToast } from "@/components/ui/use-toast";
 import { MadeWithDyad } from "@/components/made-with-dyad";
 import { JalaliCalendar } from "@/components/JalaliCalendar";
 import { format } from "date-fns-jalali";

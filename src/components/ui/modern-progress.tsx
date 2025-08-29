@@ -256,7 +256,6 @@ export function ProgressSteps({
       {steps.map((step, index) => {
         const isCompleted = index < currentStep;
         const isActive = index === currentStep;
-        const isPending = index > currentStep;
 
         const circleStyle = isCompleted 
           ? colors.completed 

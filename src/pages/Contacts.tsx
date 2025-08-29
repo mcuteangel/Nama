@@ -7,25 +7,23 @@ import {
   ModernCardTitle 
 } from "@/components/ui/modern-card";
 import { GradientButton, ModernButton } from "@/components/ui/modern-button";
-import { ModernLoader, LoadingOverlay } from "@/components/ui/modern-loader";
-import { useToast } from "@/components/ui/modern-toast";
+import { ModernLoader } from "@/components/ui/modern-loader";
+import { useToast } from "@/components/ui/use-toast";
 import { ModernInput } from "@/components/ui/modern-input";
-import { PlusCircle, Search, Download, Users } from "lucide-react";
+import { PlusCircle, Search, Download } from "lucide-react";
 import ContactList from "@/components/ContactList";
 import { useNavigate } from "react-router-dom";
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useDebounce } from '@/hooks/use-performance';
 import SuspenseWrapper from '@/components/common/SuspenseWrapper';
 import { ModernSelect, ModernSelectContent, ModernSelectItem, ModernSelectTrigger, ModernSelectValue } from "@/components/ui/modern-select";
 import { useGroups } from "@/hooks/use-groups";
 import { exportContactsToCsv } from "@/utils/export-contacts";
 import { useSession } from "@/integrations/supabase/auth";
-import EmptyState from '@/components/common/EmptyState';
-import LoadingSpinner from '@/components/common/LoadingSpinner';
 
 const Contacts = React.memo(() => {
   const navigate = useNavigate();
-  const { groups, loadingGroups, fetchGroups } = useGroups();
+  const { groups, fetchGroups } = useGroups();
   const { session } = useSession();
   const { toast } = useToast();
 

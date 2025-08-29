@@ -2,7 +2,7 @@ import * as React from "react";
 import * as TabsPrimitive from "@radix-ui/react-tabs";
 
 import { cn, applyGlassEffect, applyGradientEffect, applyNeomorphismEffect, applyHoverEffect } from "@/lib/utils";
-import { GlassEffect, GradientType, HoverEffect } from "@/types/global-style-types";
+import { GlassEffect, GradientType, HoverEffect } from "@/types";
 
 const ModernTabs = TabsPrimitive.Root;
 
@@ -16,7 +16,7 @@ const ModernTabsList = React.forwardRef<
   }
 >(({ 
   className, 
-  glassEffect = "glass",
+  glassEffect = "medium",
   gradientType = "none",
   neomorphism = false,
   hoverEffect = "lift",
@@ -31,10 +31,10 @@ const ModernTabsList = React.forwardRef<
       ref={ref}
       className={cn(
         "inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground",
-        shouldApplyGlass && applyGlassEffect(glassEffect),
-        shouldApplyNeomorphism && applyNeomorphismEffect(),
-        shouldApplyGradient && applyGradientEffect(gradientType),
-        applyHoverEffect(hoverEffect),
+        shouldApplyGlass && applyGlassEffect(undefined, glassEffect),
+        shouldApplyNeomorphism && applyNeomorphismEffect(undefined, false),
+        shouldApplyGradient && applyGradientEffect(undefined, gradientType),
+        applyHoverEffect(undefined, hoverEffect),
         className,
       )}
       {...props}
@@ -68,10 +68,10 @@ const ModernTabsTrigger = React.forwardRef<
       ref={ref}
       className={cn(
         "inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm",
-        shouldApplyGlass && applyGlassEffect(glassEffect),
-        shouldApplyNeomorphism && applyNeomorphismEffect(),
-        shouldApplyGradient && applyGradientEffect(gradientType),
-        applyHoverEffect(hoverEffect),
+        shouldApplyGlass && applyGlassEffect(undefined, glassEffect),
+        shouldApplyNeomorphism && applyNeomorphismEffect(undefined, false),
+        shouldApplyGradient && applyGradientEffect(undefined, gradientType),
+        applyHoverEffect(undefined, hoverEffect),
         className,
       )}
       {...props}

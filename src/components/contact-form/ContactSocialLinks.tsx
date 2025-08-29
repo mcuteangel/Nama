@@ -77,14 +77,17 @@ const ContactSocialLinks: React.FC = () => {
           </div>
         </div>
       ))}
-      <ModernButton
-        type="button"
-        variant="outline"
-        onClick={() => append({ type: "other", url: "" })}
-        className="w-full flex items-center gap-2 px-6 py-2 rounded-lg font-semibold"
-      >
-        <Plus size={16} className="me-2" /> {t('button_labels.add_social_link')}
-      </ModernButton>
+      <div className="flex justify-start mt-2">
+        <ModernButton
+          type="button"
+          variant="glass"
+          size="sm"
+          onClick={() => append({ type: "other", url: "" })}
+          className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium"
+        >
+          <Plus size={16} className="me-2" /> {t('button_labels.add_social_link')}
+        </ModernButton>
+      </div>
     </div>
   );
 };

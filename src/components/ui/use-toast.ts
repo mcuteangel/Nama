@@ -1,3 +1,62 @@
-import { useToast, toast } from "@/hooks/use-toast";
+import React from 'react';
+import { ToastProps } from './modern-toast';
+import { ToastContext, ToastState } from './toast-context';
 
-export { useToast, toast };
+type ToastVariant = 'default' | 'success' | 'error' | 'warning' | 'info';
+
+
+
+/**
+ * useToast - Hook برای استفاده از Toast
+ */
+export function useToast() {
+  const context = React.useContext(ToastContext);
+  
+  if (!context) {
+    throw new Error('useToast must be used within a ToastProvider');
+  }
+
+  const { addToast } = context;
+
+  const toast = {
+    success: (message: string, options?: Partial<Omit<ToastState, 'id' | 'variant'>>) => {
+      addToast({ 
+        variant: 'success', 
+        title: 'موفق', 
+        description: message, 
+        ...options 
+      });
+    },
+    error: (message: string, options?: Partial<Omit<ToastState, 'id' | 'variant'>>) => {
+      addToast({ 
+        variant: 'error', 
+        title: 'خطا', 
+        description: message, 
+        ...options 
+      });
+    },
+    warning: (message: string, options?: Partial<Omit<ToastState, 'id' | 'variant'>>) => {
+      addToast({ 
+        variant: 'warning', 
+        title: 'هشدار', 
+        description: message, 
+        ...options 
+      });
+    },
+    info: (message: string, options?: Partial<Omit<ToastState, 'id' | 'variant'>>) => {
+      addToast({ 
+        variant: 'info', 
+        title: 'اطلاع', 
+        description: message, 
+        ...options 
+      });
+    },
+    custom: (options: Omit<ToastState, 'id'>) => {
+      addToast(options);
+    }
+  };
+
+  return { toast };
+}
+
+export { ToastContext };

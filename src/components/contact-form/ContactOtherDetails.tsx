@@ -15,6 +15,7 @@ import FormDialogWrapper from '@/components/common/FormDialogWrapper';
 import { Dialog } from '@/components/ui/dialog';
 import LoadingMessage from '@/components/common/LoadingMessage';
 import { ModernButton } from '@/components/ui/modern-button';
+import { ModernCard } from '@/components/ui/modern-card';
 
 const ContactOtherDetails: React.FC = React.memo(() => {
   const form = useFormContext<ContactFormValues>();
@@ -89,7 +90,10 @@ const ContactOtherDetails: React.FC = React.memo(() => {
           
           {/* Clean Dialog Implementation */}
           <Dialog open={isAddGroupDialogOpen} onOpenChange={setIsAddGroupDialogOpen}>
-            <FormDialogWrapper>
+            <FormDialogWrapper 
+              title={t('contact_form.add_group_title', 'Add Group')}
+              description={t('contact_form.add_group_description', 'Form for adding a new contact group')}
+            >
               {isFetchingColors ? (
                 <ModernCard variant="glass" className="w-full max-w-md rounded-xl p-6 bg-white/90 dark:bg-gray-900/90">
                   <LoadingMessage message={t('contact_form.preparing_group_form')} />
