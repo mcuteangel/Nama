@@ -217,11 +217,11 @@
 /* Enhanced Glassmorphism Effects */
 .glass {
   /* Use CSS variables for dynamic theming */
-  background-color: hsla(var(--background), 0.7); /* 70% opacity of background color */
-  backdrop-filter: blur(12px) saturate(180%);
-  -webkit-backdrop-filter: blur(12px) saturate(180%);
-  border: 1px solid hsla(var(--border), 0.5); /* 50% opacity of border color */
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1); /* Subtle shadow */
+  background-color: hsla(var(--background), 0.6); /* 60% opacity for more transparency */
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid hsla(var(--border), 0.4); /* 40% opacity of border color */
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15); /* Slightly enhanced shadow */
   border-radius: calc(var(--radius) - 2px); /* Slightly smaller radius */
   /* Ensure content inside is readable */
   /* The text color is inherited from parent or set by Tailwind classes */
@@ -229,14 +229,14 @@
 
 .glass-advanced {
   background: linear-gradient(135deg, 
-    rgba(255, 255, 255, 0.1), 
-    rgba(255, 255, 255, 0.05)
+    rgba(255, 255, 255, 0.08), 
+    rgba(255, 255, 255, 0.03)
   );
-  backdrop-filter: blur(15px) saturate(180%);
-  -webkit-backdrop-filter: blur(15px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   box-shadow: 
-    0 8px 32px 0 rgba(31, 38, 135, 0.37),
+    0 8px 32px 0 rgba(31, 38, 135, 0.4),
     0 0 0 1px rgba(255, 255, 255, 0.05) inset;
   border-radius: 16px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -244,14 +244,14 @@
 
 .glass-card {
   background: linear-gradient(135deg,
-    hsla(var(--background), 0.8),
-    hsla(var(--background), 0.4)
+    hsla(var(--background), 0.7),
+    hsla(var(--background), 0.3)
   );
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid hsla(var(--border), 0.3);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid hsla(var(--border), 0.25);
   box-shadow: 
-    0 20px 40px -12px rgba(0, 0, 0, 0.25),
+    0 20px 40px -12px rgba(0, 0, 0, 0.3),
     0 0 0 1px hsla(var(--border), 0.05) inset;
   border-radius: 20px;
 }
@@ -325,15 +325,29 @@
 /* Optional: Add a slight inner shadow for depth on light mode */
 .glass:not(.dark) {
   box-shadow: 
-    0 8px 32px 0 rgba(31, 38, 135, 0.1),
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.1); /* Light inner highlight */
+    0 8px 32px 0 rgba(31, 38, 135, 0.15),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.15); /* Light inner highlight */
 }
 
 /* Optional: Adjust inner shadow for dark mode */
 .dark .glass {
   box-shadow: 
-    0 8px 32px 0 rgba(0, 0, 0, 0.2),
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.05); /* Very subtle inner highlight */
+    0 8px 32px 0 rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.08); /* Enhanced subtle inner highlight */
+}
+
+/* New glass background class for app-wide blur effects */
+.glass-background {
+  background-color: hsla(var(--background), 0.5); /* 50% opacity for more blurred background */
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+}
+
+/* Dark mode adjustment for glass background */
+.dark .glass-background {
+  background-color: hsla(var(--background), 0.4); /* 40% opacity for dark mode */
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
 }
 
 /* Modern Animations and Micro-interactions */
@@ -1007,13 +1021,15 @@
 
 .dark .glass-advanced {
   background: linear-gradient(135deg, 
-    rgba(255, 255, 255, 0.05), 
-    rgba(255, 255, 255, 0.02)
+    rgba(255, 255, 255, 0.04), 
+    rgba(255, 255, 255, 0.01)
   );
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 
-    0 8px 32px 0 rgba(0, 0, 0, 0.6),
-    0 0 0 1px rgba(255, 255, 255, 0.02) inset;
+    0 8px 32px 0 rgba(0, 0, 0, 0.65),
+    0 0 0 1px rgba(255, 255, 255, 0.03) inset;
+  backdrop-filter: blur(24px) saturate(150%);
+  -webkit-backdrop-filter: blur(24px) saturate(150%);
 }
 
 .dark .neomorphism {

@@ -64,20 +64,38 @@ export function getGlobalVariantClasses<T extends string>(
 }
 
 /**
- * applyGlassEffect - Apply glassmorphism effect using global variables
+ * applyGlassEffect - Apply glassmorphism effects to elements
  * @param className - Custom class names to merge
- * @param intensity - Intensity of the glass effect
+ * @param options - Options object containing either intensity or variant
  */
 export function applyGlassEffect(
   className: string | undefined,
-  intensity: "light" | "medium" | "strong" = "medium"
+  options?: { 
+    intensity?: "light" | "medium" | "strong",
+    variant?: "default" | "advanced" | "card" | "background" 
+  }
 ) {
-  const glassClasses = {
+  // Default values
+  const intensity = options?.intensity || "medium";
+  const variant = options?.variant || "default";
+  
+  // If variant is explicitly provided, use it
+  if (options?.variant !== undefined) {
+    const glassClasses: Record<"default" | "advanced" | "card" | "background", string> = {
+      default: "glass",
+      advanced: "glass-advanced",
+      card: "glass-card",
+      background: "glass-background"
+    };
+    return cn(glassClasses[variant], className);
+  }
+  
+  // Otherwise, use intensity (backward compatibility)
+  const glassClasses: Record<"light" | "medium" | "strong", string> = {
     light: "glass",
     medium: "glass-advanced",
     strong: "glass-card"
   };
-
   return cn(glassClasses[intensity], className);
 }
 
