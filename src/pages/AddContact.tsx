@@ -1,5 +1,4 @@
 import ContactForm from "@/components/ContactForm";
-import { MadeWithDyad } from "@/components/made-with-dyad";
 import { 
   ModernCard, 
   ModernCardHeader, 
@@ -75,7 +74,6 @@ const AddContact = () => {
         </ModernCardHeader>
         <ContactForm initialData={prefillData} />
       </ModernCard>
-      <MadeWithDyad />
     </div>
   );
 };

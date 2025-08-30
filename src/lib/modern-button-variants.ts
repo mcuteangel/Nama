@@ -11,7 +11,7 @@ export const modernButtonVariants = cva(
         secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80 shadow-sm hover:shadow-md',
         ghost: 'hover:bg-accent hover:text-accent-foreground',
         link: 'text-primary underline-offset-4 hover:underline',
-        glass: 'glass-advanced text-foreground hover:bg-opacity-80',
+        glass: 'glass-advanced text-foreground hover:bg-opacity-80 border border-white/20 hover:bg-white/10 dark:hover:bg-white/5',
         neomorphism: 'neomorphism text-foreground hover:shadow-lg',
         'gradient-primary': 'bg-gradient-primary text-white hover:opacity-90 shadow-lg hover:shadow-xl',
         'gradient-ocean': 'bg-gradient-ocean text-white hover:opacity-90 shadow-lg hover:shadow-xl',

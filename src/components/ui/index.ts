@@ -97,6 +97,9 @@ export {
 
 export * from './modern-skeleton';
 
+// Export GlassButton component
+export * from './glass-button';
+
 // Re-export existing components for convenience
 export * from './button';
 export * from './card';

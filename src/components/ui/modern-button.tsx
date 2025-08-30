@@ -78,7 +78,7 @@ export function GradientButton({
     <ModernButton
       variant={gradientVariant}
       effect="scale"
-      className={cn('font-semibold', className)}
+      className={cn('font-semibold neomorphism', className)}
       {...props}
     >
       {children}

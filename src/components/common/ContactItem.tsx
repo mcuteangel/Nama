@@ -145,7 +145,7 @@ export const ContactItem = React.memo<ContactItemProps>(({
     <ModernCard
       variant="glass"
       hover="lift"
-      className={`flex items-center justify-between p-3 sm:p-4 rounded-lg cursor-pointer w-full ${className}`}
+      className={`flex items-center justify-between p-3 sm:p-4 rounded-lg cursor-pointer w-full ${className} border border-white/20 backdrop-blur-md`}
       onClick={handleContactClick}
     >
       <div className="flex items-center gap-4">
@@ -190,7 +190,7 @@ export const ContactItem = React.memo<ContactItemProps>(({
               {isDeleting ? <LoadingSpinner size={20} /> : <Trash2 size={20} />}
             </ModernButton>
           </ModernAlertDialogTrigger>
-          <ModernAlertDialogContent className="glass rounded-xl p-6">
+          <ModernAlertDialogContent className="glass rounded-xl p-6 border border-white/20 backdrop-blur-md">
             <ModernAlertDialogHeader>
               <ModernAlertDialogTitle className="text-gray-800 dark:text-gray-100">
                 {t('contact_list.confirm_delete_title', 'Are you sure you want to delete this contact?')}
@@ -230,9 +230,3 @@ export const ContactItem = React.memo<ContactItemProps>(({
 ContactItem.displayName = 'ContactItem';
 
 export default ContactItem;
-
-
-
-
-
-

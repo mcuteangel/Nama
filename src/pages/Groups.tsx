@@ -1,4 +1,3 @@
-import { MadeWithDyad } from "@/components/made-with-dyad";
 import { 
   ModernCard, 
   ModernCardContent, 
@@ -37,7 +36,6 @@ const Groups = () => {
           </ModernButton>
         </ModernCardContent>
       </ModernCard>
-      <MadeWithDyad />
     </div>
   );
 };

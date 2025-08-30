@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { MadeWithDyad } from "@/components/made-with-dyad";
 import { ModernCard, ModernCardContent, ModernCardDescription, ModernCardHeader, ModernCardTitle } from "@/components/ui/modern-card";
 import { ModernButton } from "@/components/ui/modern-button";
 import { Link } from "react-router-dom";
@@ -136,7 +135,6 @@ const Settings = () => {
           </div>
         </ModernCardContent>
       </ModernCard>
-      <MadeWithDyad />
     </div>
   );
 };

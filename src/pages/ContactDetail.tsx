@@ -2,21 +2,23 @@ import { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { showError, showSuccess } from "@/utils/toast";
-import { ModernCard, ModernCardContent, ModernCardHeader, ModernCardTitle, ModernCardDescription } from "@/components/ui/modern-card";
-import { ModernButton } from "@/components/ui/modern-button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Label } from "@/components/ui/label";
-import { ModernInput } from "@/components/ui/modern-input";
-import { ModernTextarea } from "@/components/ui/modern-textarea";
-import { Phone, Mail, Building, Briefcase, MapPin, Info, User, Users, Tag, CalendarClock, Gift, Link as LinkIcon, Linkedin, Twitter, Instagram, Send, HomeIcon, Globe, Map, ClipboardList } from "lucide-react";
-import { MadeWithDyad } from "@/components/made-with-dyad";
-import { useJalaliCalendar } from "@/hooks/use-jalali-calendar";
+import { ModernGrid, GridItem } from "@/components/ui/modern-grid";
 import { fetchWithCache } from "@/utils/cache-helpers";
 import LoadingMessage from "@/components/common/LoadingMessage";
 import CancelButton from "@/components/common/CancelButton";
 import { ErrorManager } from "@/lib/error-manager";
 import { useErrorHandler } from "@/hooks/use-error-handler";
+import { ContactHeader } from "./contact-detail/ContactHeader";
+import { BasicInfoCard } from "./contact-detail/BasicInfoCard";
+import { AddressCard } from "./contact-detail/AddressCard";
+import { ContactMethodsCard } from "./contact-detail/ContactMethodsCard";
+import { SocialLinksCard } from "./contact-detail/SocialLinksCard";
+import { CustomFieldsCard } from "./contact-detail/CustomFieldsCard";
+import { NotesCard } from "./contact-detail/NotesCard";
+import { TimestampsCard } from "./contact-detail/TimestampsCard";
+import { useTranslation } from "react-i18next";
 
+// Interfaces
 interface PhoneNumber {
   id: string;
   phone_type: string;
@@ -82,61 +84,49 @@ interface ContactDetailType {
   updated_at: string;
 }
 
-const getSocialIcon = (type: string) => {
-  switch (type) {
-    case 'linkedin': return <Linkedin size={16} />;
-    case 'twitter': return <Twitter size={16} />;
-    case 'instagram': return <Instagram size={16} />;
-    case 'telegram': return <Send size={16} />;
-    case 'website': return <LinkIcon size={16} />;
-    default: return <LinkIcon size={16} />;
+// Helper functions
+const getGenderLabel = (gender: string, t: (key: string) => string) => {
+  switch (gender) {
+    case "male": return t('gender.male');
+    case "female": return t('gender.female');
+    default: return t('gender.not_specified');
   }
 };
 
-const getSocialLabel = (type: string) => {
-  switch (type) {
-    case 'linkedin': return 'لینکدین';
-    case 'twitter': return 'توییتر';
-    case 'instagram': return 'اینستاگرام';
-    case 'telegram': return 'تلگرام';
-    case 'website': return 'وب‌سایت';
-    default: return 'سایر';
-  }
-};
-
-const getPreferredContactMethodLabel = (method: string | null | undefined) => {
+const getPreferredContactMethodLabel = (method: string | null | undefined, t: (key: string) => string) => {
   switch (method) {
-    case 'email': return 'ایمیل';
-    case 'phone': return 'تلفن';
-    case 'sms': return 'پیامک';
-    case 'any': return 'هر کدام';
-    default: return 'نامشخص';
+    case 'email': return t('contact_method.email');
+    case 'phone': return t('contact_method.phone');
+    case 'sms': return t('contact_method.sms');
+    case 'any': return t('contact_method.any');
+    default: return t('gender.not_specified');
   }
 };
 
+// Main Component
 const ContactDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [contact, setContact] = useState<ContactDetailType | null>(null);
-  const { formatDate } = useJalaliCalendar();
 
   const onSuccessFetchContact = useCallback((result: { data: ContactDetailType | null; error: string | null; fromCache: boolean }) => {
     setContact(result.data || null);
     if (!result.data) {
-      showError("مخاطب یافت نشد.");
+      showError(t('contact.delete_error'));
       navigate("/");
     } else {
       if (!result.fromCache) {
-        showSuccess("جزئیات مخاطب با موفقیت بارگذاری شد.");
+        showSuccess(t('contact.delete_success'));
       }
     }
-  }, [navigate]);
+  }, [navigate, t]);
 
   const onErrorFetchContact = useCallback((err: Error) => {
     console.error("Error fetching contact details:", err);
-    showError(`خطا در بارگذاری جزئیات مخاطب: ${ErrorManager.getErrorMessage(err) || "خطای ناشناخته"}`);
+    showError(`${t('contact.delete_error')}: ${ErrorManager.getErrorMessage(err) || t('common.unknown_error')}`);
     navigate("/");
-  }, [navigate]);
+  }, [navigate, t]);
 
   const {
     isLoading: loading,
@@ -150,7 +140,7 @@ const ContactDetail = () => {
   useEffect(() => {
     const fetchDetails = async () => {
       if (!id) {
-        showError("شناسه مخاطب یافت نشد.");
+        showError(t('contact.delete_error'));
         navigate("/");
         return;
       }
@@ -171,7 +161,7 @@ const ContactDetail = () => {
             if (data) {
               return { data: data as unknown as ContactDetailType, error: null };
             }
-            return { data: null, error: "مخاطب یافت نشد." };
+            return { data: null, error: t('contact.delete_error') };
           }
         );
 
@@ -183,199 +173,87 @@ const ContactDetail = () => {
     };
 
     fetchDetails();
-  }, [id, navigate, executeFetchContact]);
+  }, [id, navigate, executeFetchContact, t]);
 
-  const assignedGroup = contact?.contact_groups?.[0]?.groups || null;
-
+  // Loading state
   if (loading) {
     return (
-      <LoadingMessage message="در حال بارگذاری جزئیات مخاطب..." />
-    );
-  }
-
-  if (!contact) {
-    return (
-      <div className="flex flex-col items-center justify-center h-full w-full p-4">
-        <p className="text-gray-700 dark:text-gray-300">مخاطب یافت نشد.</p>
-        <CancelButton text="بازگشت به لیست مخاطبین" />
+      <div className="flex flex-col items-center justify-center p-4 h-full w-full">
+        <LoadingMessage message={t('loading_messages.loading_contacts')} />
       </div>
     );
   }
 
+  // Error state
+  if (!contact) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full w-full p-4">
+        <p className="text-gray-700 dark:text-gray-300">{t('contact.delete_error')}</p>
+        <CancelButton text={t('common.cancel')} />
+      </div>
+    );
+  }
+
+  // Main content
   return (
-    <div className="flex flex-col items-center justify-center p-4 h-full w-full fade-in-up">
-      <ModernCard variant="glass" hover="lift" className="w-full max-w-2xl">
-        <ModernCardHeader className="text-center">
-          <Avatar className="h-24 w-24 mx-auto mb-4 ring-4 ring-primary/20">
-            <AvatarImage src={contact.avatar_url || undefined} alt={`${contact.first_name} ${contact.last_name}`} />
-            <AvatarFallback className="bg-primary text-primary-foreground text-4xl font-bold">
-              {contact.first_name ? contact.first_name[0] : "?"}
-            </AvatarFallback>
-          </Avatar>
-          <ModernCardTitle className="text-3xl font-bold text-gradient">
-            {contact.first_name} {contact.last_name}
-          </ModernCardTitle>
-          <ModernCardDescription className="text-lg">
-            جزئیات مخاطب
-          </ModernCardDescription>
-        </ModernCardHeader>
-        <ModernCardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><User size={16} /> جنسیت</Label>
-              <ModernInput value={contact.gender === "male" ? "مرد" : contact.gender === "female" ? "زن" : "نامشخص"} readOnly variant="glass" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
-            </div>
-            {contact.position && (
-              <div>
-                <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><Briefcase size={16} /> سمت/شغل</Label>
-                <ModernInput value={contact.position} readOnly variant="glass" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
-              </div>
-            )}
-            {contact.company && (
-              <div>
-                <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><Building size={16} /> شرکت</Label>
-                <ModernInput value={contact.company} readOnly variant="glass" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
-              </div>
-            )}
-            {contact.street && (
-              <div>
-                <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><HomeIcon size={16} /> خیابان/کوچه</Label>
-                <ModernInput value={contact.street} readOnly variant="glass" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
-              </div>
-            )}
-            {contact.city && (
-              <div>
-                <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><Map size={16} /> شهر</Label>
-                <ModernInput value={contact.city} readOnly variant="glass" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
-              </div>
-            )}
-            {contact.state && (
-              <div>
-                <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><MapPin size={16} /> استان</Label>
-                <ModernInput value={contact.state} readOnly variant="glass" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
-              </div>
-            )}
-            {contact.zip_code && (
-              <div>
-                <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><Tag size={16} /> کد پستی</Label>
-                <ModernInput value={contact.zip_code} readOnly variant="glass" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
-              </div>
-            )}
-            {contact.country && (
-              <div>
-                <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><Globe size={16} /> کشور</Label>
-                <ModernInput value={contact.country} readOnly variant="glass" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
-              </div>
-            )}
-            <div>
-              <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><Users size={16} /> گروه</Label>
-              {assignedGroup ? (
-                <ModernInput value={assignedGroup.name} readOnly variant="glass" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" style={{ backgroundColor: assignedGroup.color || 'transparent' }} />
-              ) : (
-                <ModernInput value="بدون گروه" readOnly variant="glass" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
-              )}
-            </div>
-            {contact.birthday && (
-              <div>
-                <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><Gift size={16} /> تاریخ تولد</Label>
-                <ModernInput value={formatDate(new Date(contact.birthday), 'jYYYY/jMM/jDD')} readOnly variant="glass" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
-              </div>
-            )}
-            {contact.preferred_contact_method && (
-              <div>
-                <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><Mail size={16} /> روش ارتباط ترجیحی</Label>
-                <ModernInput value={getPreferredContactMethodLabel(contact.preferred_contact_method)} readOnly variant="glass" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
-              </div>
-            )}
-          </div>
-
-          {contact.phone_numbers.length > 0 && (
-            <div className="space-y-2 pt-4 border-t border-gray-200 dark:border-gray-700">
-              <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><Phone size={16} /> شماره تلفن‌ها</Label>
-              {contact.phone_numbers.map((phone) => (
-                <a key={phone.id} href={`tel:${phone.phone_number}`} className="block">
-                  <ModernInput value={`${phone.phone_number} (${phone.phone_type})${phone.extension ? ` - داخلی: ${phone.extension}` : ''}`} readOnly variant="glass" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-blue-600 dark:text-blue-400 hover:underline cursor-pointer" />
-                </a>
-              ))}
-            </div>
-          )}
-
-          {contact.email_addresses.length > 0 && (
-            <div className="space-y-2 pt-4 border-t border-gray-200 dark:border-gray-700">
-              <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><Mail size={16} /> آدرس‌های ایمیل</Label>
-              {contact.email_addresses.map((email) => (
-                <a key={email.id} href={`mailto:${email.email_address}`} className="block">
-                  <ModernInput value={`${email.email_address} (${email.email_type})`} readOnly variant="glass" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-blue-600 dark:text-blue-400 hover:underline cursor-pointer" />
-                </a>
-              ))}
-            </div>
-          )}
-
-          {contact.social_links.length > 0 && (
-            <div className="space-y-2 pt-4 border-t border-gray-200 dark:border-gray-700">
-              <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><LinkIcon size={16} /> لینک‌های شبکه‌های اجتماعی</Label>
-              {contact.social_links.map((link) => (
-                <div key={link.id} className="flex items-center gap-2 bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 rounded-md p-2">
-                  {getSocialIcon(link.type)}
-                  <a href={link.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline dark:text-blue-400 text-sm">
-                    {getSocialLabel(link.type)}: {link.url}
-                  </a>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {contact.custom_fields.length > 0 && (
-            <div className="space-y-2 pt-4 border-t border-gray-200 dark:border-gray-700">
-              <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><ClipboardList size={16} /> فیلدهای سفارشی</Label>
-              {contact.custom_fields.map((field) => (
-                <div key={field.id} className="flex flex-col gap-1">
-                  <Label className="text-gray-700 dark:text-gray-200 text-sm font-medium">
-                    {field.custom_field_templates && field.custom_field_templates.length > 0
-                      ? `${field.custom_field_templates[0].name}:`
-                      : 'نام فیلد نامشخص:'}
-                  </Label>
-                  {field.custom_field_templates && field.custom_field_templates.length > 0 && field.custom_field_templates[0].type === 'date' ? (
-                    <ModernInput value={formatDate(new Date(field.field_value), 'jYYYY/jMM/jDD')} readOnly variant="glass" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
-                  ) : (
-                    <ModernInput value={field.field_value} readOnly variant="glass" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
-
-          {contact.notes && (
-            <div className="space-y-2 pt-4 border-t border-gray-200 dark:border-gray-700">
-              <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><Info size={16} /> یادداشت‌ها</Label>
-              <ModernTextarea value={contact.notes} readOnly variant="glass" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
-            </div>
-          )}
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-            <div>
-              <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><CalendarClock size={16} /> تاریخ ایجاد</Label>
-              <ModernInput value={formatDate(new Date(contact.created_at), 'jYYYY/jMM/jDD HH:mm')} readOnly variant="glass" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
-            </div>
-            <div>
-              <Label className="text-gray-700 dark:text-gray-200 flex items-center gap-2 mb-1"><CalendarClock size={16} /> آخرین ویرایش</Label>
-              <ModernInput value={formatDate(new Date(contact.updated_at), 'jYYYY/jMM/jDD HH:mm')} readOnly variant="glass" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100" />
-            </div>
-          </div>
-
-          <div className="flex justify-end gap-2 mt-6">
-            <ModernButton
-              onClick={() => navigate(`/contacts/edit/${id}`)}
-              variant="default"
-              className="hover-lift"
-            >
-              ویرایش مخاطب
-            </ModernButton>
-            <CancelButton />
-          </div>
-        </ModernCardContent>
-      </ModernCard>
-      <MadeWithDyad />
+    <div className="flex flex-col items-center justify-center p-4 md:p-6 h-full w-full fade-in-up">
+      <ContactHeader contact={contact} />
+      
+      {/* Main Content Grid */}
+      <ModernGrid 
+        variant="dynamic" 
+        minWidth="300px" 
+        gap="lg" 
+        className="w-full max-w-4xl mx-auto"
+      >
+        <GridItem>
+          <BasicInfoCard 
+            contact={contact} 
+            getGenderLabel={(gender) => getGenderLabel(gender, t)}
+            getPreferredContactMethodLabel={(method) => getPreferredContactMethodLabel(method, t)}
+          />
+        </GridItem>
+        
+        {(contact.street || contact.city || contact.state || contact.zip_code || contact.country) && (
+          <GridItem>
+            <AddressCard contact={contact} />
+          </GridItem>
+        )}
+        
+        {(contact.phone_numbers.length > 0 || contact.email_addresses.length > 0) && (
+          <GridItem>
+            <ContactMethodsCard 
+              phone_numbers={contact.phone_numbers} 
+              email_addresses={contact.email_addresses} 
+            />
+          </GridItem>
+        )}
+        
+        {contact.social_links.length > 0 && (
+          <GridItem>
+            <SocialLinksCard social_links={contact.social_links} />
+          </GridItem>
+        )}
+        
+        {contact.custom_fields.length > 0 && (
+          <GridItem>
+            <CustomFieldsCard custom_fields={contact.custom_fields} />
+          </GridItem>
+        )}
+        
+        {contact.notes && (
+          <GridItem>
+            <NotesCard notes={contact.notes} />
+          </GridItem>
+        )}
+        
+        <GridItem>
+          <TimestampsCard 
+            created_at={contact.created_at} 
+            updated_at={contact.updated_at} 
+          />
+        </GridItem>
+      </ModernGrid>
     </div>
   );
 };

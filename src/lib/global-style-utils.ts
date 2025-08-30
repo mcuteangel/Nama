@@ -72,7 +72,7 @@ export function applyGlassEffect(
   className: string | undefined,
   options?: { 
     intensity?: "light" | "medium" | "strong",
-    variant?: "default" | "advanced" | "card" | "background" 
+    variant?: "default" | "advanced" | "card" | "background" | "button"
   }
 ) {
   // Default values
@@ -81,11 +81,12 @@ export function applyGlassEffect(
   
   // If variant is explicitly provided, use it
   if (options?.variant !== undefined) {
-    const glassClasses: Record<"default" | "advanced" | "card" | "background", string> = {
+    const glassClasses: Record<"default" | "advanced" | "card" | "background" | "button", string> = {
       default: "glass",
       advanced: "glass-advanced",
       card: "glass-card",
-      background: "glass-background"
+      background: "glass-background",
+      button: "glass-advanced border border-white/20 hover:bg-white/10 dark:hover:bg-white/5"
     };
     return cn(glassClasses[variant], className);
   }

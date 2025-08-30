@@ -41,7 +41,7 @@ const ContactImportantDates: React.FC = () => {
                     </ModernButton>
                   </FormControl>
                 </ModernPopoverTrigger>
-                <ModernPopoverContent className="w-auto p-0" glassEffect="glassAdvanced">
+                <ModernPopoverContent className="w-auto p-0" glassEffect="strong">
                   <JalaliCalendar
                     selected={field.value ? new Date(field.value) : undefined}
                     onSelect={(date) => field.onChange(date ? date.toISOString() : "")}

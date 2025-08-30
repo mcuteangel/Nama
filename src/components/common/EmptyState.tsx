@@ -23,7 +23,7 @@ const EmptyState: React.FC<EmptyStateProps> = ({
   const { t } = useTranslation();
   return (
     <div className={cn(
-      "flex flex-col items-center justify-center p-8 text-center rounded-lg glass",
+      "flex flex-col items-center justify-center p-8 text-center rounded-lg glass-advanced border border-white/20 backdrop-blur-md",
       className
     )}>
       <Icon size={48} className="text-gray-400 dark:text-gray-600 mb-4" />

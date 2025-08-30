@@ -4,7 +4,7 @@ import { ModernInput } from '@/components/ui/modern-input';
 import { ModernSelect, ModernSelectContent, ModernSelectItem, ModernSelectTrigger, ModernSelectValue } from '@/components/ui/modern-select';
 import { ModernButton } from '@/components/ui/modern-button';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
-import { Plus, X, Link as LinkIcon } from 'lucide-react'; // Renamed Link to LinkIcon to avoid conflict
+import { Plus, X } from 'lucide-react'; // Renamed Link to LinkIcon to avoid conflict
 import { ContactFormValues } from '@/types/contact';
 import { useTranslation } from 'react-i18next';
 

@@ -1,5 +1,3 @@
-import React from "react";
-import { MadeWithDyad } from "@/components/made-with-dyad";
 import { ModernCard, ModernCardContent, ModernCardDescription, ModernCardHeader, ModernCardTitle } from "@/components/ui/modern-card";
 import ContactStatisticsDashboard from "@/components/ContactStatisticsDashboard";
 import { useTranslation } from "react-i18next";
@@ -22,7 +20,6 @@ const Statistics = () => {
           <ContactStatisticsDashboard />
         </ModernCardContent>
       </ModernCard>
-      <MadeWithDyad />
     </div>
   );
 };

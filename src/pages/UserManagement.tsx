@@ -1,4 +1,3 @@
-import { MadeWithDyad } from "@/components/made-with-dyad";
 import { 
   ModernCard, 
   ModernCardContent, 
@@ -27,7 +26,6 @@ const UserManagement = () => {
           <UserList />
         </ModernCardContent>
       </ModernCard>
-      <MadeWithDyad />
     </div>
   );
 };

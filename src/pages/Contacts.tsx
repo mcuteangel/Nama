@@ -1,4 +1,3 @@
-import { MadeWithDyad } from "@/components/made-with-dyad";
 import { 
   ModernCard, 
   ModernCardContent, 
@@ -84,7 +83,7 @@ const Contacts = React.memo(() => {
     <div className="flex flex-col items-stretch justify-center p-0 sm:p-4 h-full w-full">
       <ModernCard 
         variant="glass" 
-        className="w-full sm:max-w-4xl sm:mx-auto rounded-none sm:rounded-xl p-2 sm:p-6 fade-in-up"
+        className="w-full sm:max-w-4xl sm:mx-auto rounded-none sm:rounded-xl p-2 sm:p-6 fade-in-up border border-white/20"
       >
         <ModernCardHeader className="text-center p-4 sm:p-6">
           <ModernCardTitle gradient className="heading-1 mb-2">
@@ -111,7 +110,7 @@ const Contacts = React.memo(() => {
               <GradientButton
                 gradientType="primary"
                 onClick={handleAddContactClick}
-                className="flex items-center gap-2 sm:gap-2 px-4 sm:px-6 py-3 sm:py-2 text-base sm:text-base flex-grow sm:flex-grow-0 font-persian"
+                className="flex items-center gap-2 sm:gap-2 px-4 sm:px-6 py-3 sm:py-2 text-base sm:text-base flex-grow sm:flex-grow-0 font-persian neomorphism"
               >
                 <PlusCircle size={18} className="sm:w-5 sm:h-5" />
                 <span className="hidden sm:inline">افزودن مخاطب جدید</span>
@@ -121,7 +120,7 @@ const Contacts = React.memo(() => {
                 variant="glass"
                 onClick={handleExportClick}
                 disabled={isExporting}
-                className="flex items-center gap-2 sm:gap-2 px-4 sm:px-6 py-3 sm:py-2 text-base sm:text-base flex-grow sm:flex-grow-0 font-persian"
+                className="flex items-center gap-2 sm:gap-2 px-4 sm:px-6 py-3 sm:py-2 text-base sm:text-base flex-grow sm:flex-grow-0 font-persian backdrop-blur-md border border-white/20 hover:bg-white/10 dark:hover:bg-white/5"
               >
                 {isExporting ? (
                   <ModernLoader variant="spinner" size="sm" className="me-2" />
@@ -135,15 +134,15 @@ const Contacts = React.memo(() => {
           </div>
 
           {/* Compact filter and sorting section */}
-          <div className="bg-white/20 dark:bg-gray-700/20 rounded-lg p-3 border border-white/30 dark:border-gray-600/30">
+          <div className="bg-white/20 dark:bg-gray-700/20 rounded-lg p-3 border border-white/30 dark:border-gray-600/30 backdrop-blur-sm">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
               <div>
                 <label htmlFor="group-filter" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">گروه:</label>
                 <ModernSelect onValueChange={handleGroupChange} value={selectedGroup || "all"}>
-                  <ModernSelectTrigger id="group-filter" variant="glass" className="w-full">
+                  <ModernSelectTrigger id="group-filter" variant="glass" className="w-full backdrop-blur-md border border-white/20 hover:bg-white/10 dark:hover:bg-white/5">
                     <ModernSelectValue placeholder="همه گروه‌ها" />
                   </ModernSelectTrigger>
-                  <ModernSelectContent variant="glass">
+                  <ModernSelectContent variant="glass" className="backdrop-blur-md border border-white/20">
                     <ModernSelectItem value="all">همه گروه‌ها</ModernSelectItem>
                     {groups.map((group) => (
                       <ModernSelectItem key={group.id} value={group.id}>
@@ -161,7 +160,7 @@ const Contacts = React.memo(() => {
                   type="text"
                   placeholder="نام شرکت..."
                   variant="glass"
-                  className="w-full bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
+                  className="w-full bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 backdrop-blur-md"
                   value={companyFilter}
                   onChange={handleCompanyChange}
                 />
@@ -170,10 +169,10 @@ const Contacts = React.memo(() => {
               <div>
                 <label htmlFor="sort-option" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">مرتب‌سازی:</label>
                 <ModernSelect onValueChange={handleSortChange} value={sortOption}>
-                  <ModernSelectTrigger id="sort-option" variant="glass" className="w-full">
+                  <ModernSelectTrigger id="sort-option" variant="glass" className="w-full backdrop-blur-md border border-white/20 hover:bg-white/10 dark:hover:bg-white/5">
                     <ModernSelectValue placeholder="مرتب‌سازی" />
                   </ModernSelectTrigger>
-                  <ModernSelectContent variant="glass">
+                  <ModernSelectContent variant="glass" className="backdrop-blur-md border border-white/20">
                     <ModernSelectItem value="first_name_asc">نام (صعودی)</ModernSelectItem>
                     <ModernSelectItem value="first_name_desc">نام (نزولی)</ModernSelectItem>
                     <ModernSelectItem value="last_name_asc">نام خانوادگی (صعودی)</ModernSelectItem>
@@ -196,7 +195,6 @@ const Contacts = React.memo(() => {
           </SuspenseWrapper>
         </ModernCardContent>
       </ModernCard>
-      <MadeWithDyad />
     </div>
   );
 });

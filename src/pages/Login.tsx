@@ -4,7 +4,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import { useSession } from '@/integrations/supabase/auth';
-import { MadeWithDyad } from '@/components/made-with-dyad';
 import { useTranslation } from 'react-i18next';
 import { ModernButton } from '@/components/ui/modern-button';
 import { ModernCard } from '@/components/ui/modern-card';
@@ -100,7 +99,6 @@ const Login = () => {
           }}
         />
       </ModernCard>
-      <MadeWithDyad />
     </div>
   );
 };

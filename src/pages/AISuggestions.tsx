@@ -1,5 +1,4 @@
 import React, { useState, useCallback, useEffect } from "react";
-import { MadeWithDyad } from "@/components/made-with-dyad";
 import { ModernCard, ModernCardContent, ModernCardDescription, ModernCardHeader, ModernCardTitle } from "@/components/ui/modern-card";
 import { ModernTextarea } from "@/components/ui/modern-textarea";
 import { ModernButton } from "@/components/ui/modern-button";
@@ -362,7 +361,6 @@ const AISuggestions: React.FC = () => {
           </Tabs>
         </ModernCardContent>
       </ModernCard>
-      <MadeWithDyad />
     </div>
   );
 };

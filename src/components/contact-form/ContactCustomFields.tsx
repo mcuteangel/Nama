@@ -92,7 +92,7 @@ const ContactCustomFields: React.FC<ContactCustomFieldsProps> = ({
                               </span>
                             </ModernButton>
                           </ModernPopoverTrigger>
-                          <ModernPopoverContent className="w-auto p-0" glassEffect="glassAdvanced">
+                          <ModernPopoverContent className="w-auto p-0" glassEffect="medium">
                             <JalaliCalendar
                               selected={field.value ? new Date(field.value) : undefined}
                               onSelect={(date) => field.onChange(date ? date.toISOString() : "")}

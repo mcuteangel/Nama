@@ -3,7 +3,6 @@ import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { showError, showSuccess } from "@/utils/toast";
 import ContactForm from "@/components/ContactForm";
-import { MadeWithDyad } from "@/components/made-with-dyad";
 import { ModernCard, ModernCardHeader, ModernCardTitle, ModernCardDescription } from "@/components/ui/modern-card";
 import { fetchWithCache } from "@/utils/cache-helpers";
 import LoadingMessage from "@/components/common/LoadingMessage";
@@ -277,7 +276,6 @@ const EditContact = () => {
         </ModernCardHeader>
         <ContactForm initialData={initialContactData} contactId={id} />
       </ModernCard>
-      <MadeWithDyad />
     </div>
   );
 };

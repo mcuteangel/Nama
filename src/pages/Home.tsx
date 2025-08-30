@@ -6,9 +6,9 @@ import {
   ModernCardDescription, 
   ModernCardHeader, 
   ModernCardTitle} from "@/components/ui/modern-card";
-import { GradientButton, ModernButton } from "@/components/ui/modern-button";
+import { GradientButton } from "@/components/ui/modern-button";
+import { GlassButton } from "@/components/ui/glass-button";
 import { useToast } from "@/components/ui/use-toast";
-import { MadeWithDyad } from "@/components/made-with-dyad";
 import { JalaliCalendar } from "@/components/JalaliCalendar";
 import { format } from "date-fns-jalali";
 import { Calendar, Users, Plus, Sparkles, Heart } from "lucide-react";
@@ -75,21 +75,20 @@ const Home = () => {
               gradientType="ocean"
               size="lg"
               onClick={handleContactsClick}
-              className="w-full font-persian"
+              className="w-full font-persian neomorphism"
             >
               <Users className="w-5 h-5 mr-2" />
               مشاهده مخاطبین
             </GradientButton>
             
-            <ModernButton 
-              variant="glass" 
+            <GlassButton 
               size="lg"
               onClick={handleAddContactClick}
               className="w-full font-persian"
             >
               <Plus className="w-5 h-5 mr-2" />
               افزودن مخاطب جدید
-            </ModernButton>
+            </GlassButton>
           </div>
         </ModernCardContent>
       </ModernCard>
@@ -156,7 +155,6 @@ const Home = () => {
         </ModernCard>
       </div>
 
-      <MadeWithDyad />
     </div>
   );
 };
