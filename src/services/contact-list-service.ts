@@ -67,15 +67,43 @@ interface Contact {
   preferred_contact_method?: string | null;
 }
 
+
+
+// Helper function to sort contacts
+const sortContacts = (contacts: Contact[], sortOption: string): Contact[] => {
+  const sorted = [...contacts];
+  
+  sorted.sort((a, b) => {
+    switch (sortOption) {
+      case "first_name_asc":
+        return (a.first_name || '').localeCompare(b.first_name || '', 'fa');
+      case "first_name_desc":
+        return (b.first_name || '').localeCompare(a.first_name || '', 'fa');
+      case "last_name_asc":
+        return (a.last_name || '').localeCompare(b.last_name || '', 'fa');
+      case "last_name_desc":
+        return (b.last_name || '').localeCompare(a.last_name || '', 'fa');
+      case "created_at_asc":
+        return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+      case "created_at_desc":
+      default:
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    }
+  });
+  
+  return sorted;
+};
+
 export const ContactListService = {
   async getFilteredContacts(
     userId: string,
-    searchTerm: string,
-    selectedGroup: string,
-    companyFilter: string,
-    sortOption: string
+    searchTerm: string = '',
+    selectedGroup: string = '',
+    companyFilter: string = '',
+    sortOption: string = 'last_name_asc'
   ): Promise<{ data: Contact[] | null; error: string | null }> {
     try {
+      // ابتدا تمام مخاطبین را با فیلترهای اولیه دریافت می‌کنیم
       let query = supabase
         .from("contacts")
         .select(`
@@ -129,87 +157,83 @@ export const ContactListService = {
         `)
         .eq("user_id", userId);
 
-      // Apply group filter if selected
+      // اعمال فیلتر گروه در صورت انتخاب
       if (selectedGroup) {
         query = query.filter('contact_groups.group_id', 'eq', selectedGroup);
       }
 
-      // Apply company filter if provided
+      // اعمال فیلتر شرکت در صورت وجود
       if (companyFilter) {
         query = query.ilike('company', `%${companyFilter}%`);
       }
 
-      // Apply search term across multiple fields
-      if (searchTerm) {
-        const lowerCaseSearchTerm = searchTerm.toLowerCase();
-        query = query.or(
-          `first_name.ilike.%${lowerCaseSearchTerm}%,last_name.ilike.%${lowerCaseSearchTerm}%,company.ilike.%${lowerCaseSearchTerm}%`
-        );
-      }
-
-      // Determine sort parameters
-      let sortByColumn: string;
-      let ascendingOrder: boolean;
-      let collation: string | undefined;
-
-      switch (sortOption) {
-        case "first_name_asc":
-          sortByColumn = "first_name";
-          ascendingOrder = true;
-          collation = "fa_IR";
-          break;
-        case "first_name_desc":
-          sortByColumn = "first_name";
-          ascendingOrder = false;
-          collation = "fa_IR";
-          break;
-        case "last_name_asc":
-          sortByColumn = "last_name";
-          ascendingOrder = true;
-          collation = "fa_IR";
-          break;
-        case "last_name_desc":
-          sortByColumn = "last_name";
-          ascendingOrder = false;
-          collation = "fa_IR";
-          break;
-        case "created_at_desc":
-          sortByColumn = "created_at";
-          ascendingOrder = false;
-          break;
-        case "created_at_asc":
-          sortByColumn = "created_at";
-          ascendingOrder = true;
-          break;
-        default:
-          sortByColumn = "last_name";
-          ascendingOrder = true;
-          collation = "fa_IR";
-          break;
-      }
-
-      // Apply sorting with collation for Persian text when needed
-      const orderOptions: { ascending: boolean; collate?: string } = { ascending: ascendingOrder };
-      if (collation) {
-        orderOptions.collate = collation;
-      }
-      
-      query = query.order(sortByColumn, orderOptions);
-
+      // دریافت داده‌ها از دیتابیس
       const { data, error } = await query;
-
+      
       if (error) {
-        return { data: null, error: error.message };
+        console.error('خطای پایگاه داده:', error);
+        return { data: null, error: 'خطا در دریافت اطلاعات از پایگاه داده' };
       }
       
-      // Cast the data to the expected type since Supabase returns 'any' by default
-      return { data: data as Contact[], error: null };
-    } catch (error: unknown) {
-      console.error("Error in ContactListService.getFilteredContacts:", error);
-      if (error instanceof Error) {
-        return { data: null, error: error.message || "Unknown error occurred" };
+      // اعمال فیلتر جستجو در صورت وجود عبارت جستجو
+      let filteredData = data as Contact[];
+      
+      const trimmedSearch = searchTerm.trim();
+      if (trimmedSearch.length >= 2) {
+        const cleanSearchTerm = trimmedSearch.replace(/\D/g, '').toLowerCase();
+        const searchTermLower = trimmedSearch.toLowerCase();
+        const isNumericSearch = /^\d+$/.test(trimmedSearch);
+        
+        filteredData = filteredData.filter(contact => {
+          // اگر جستجوی عددی بود، فقط شماره تلفن‌ها را بررسی کن
+          if (isNumericSearch) {
+            return contact.phone_numbers?.some(phone => {
+              const cleanPhone = phone.phone_number?.replace(/\D/g, '').toLowerCase() || '';
+              return cleanPhone.includes(cleanSearchTerm);
+            }) || false;
+          }
+          
+          // در غیر این صورت فقط فیلدهای متنی را جستجو کن
+          const matchesFirstName = contact.first_name?.toLowerCase().includes(searchTermLower) || false;
+          const matchesLastName = contact.last_name?.toLowerCase().includes(searchTermLower) || false;
+          const matchesCompany = contact.company?.toLowerCase().includes(searchTermLower) || false;
+          
+          // برای جستجوی دو حرفی، بررسی می‌کنیم که حتماً با ابتدای کلمه تطابق داشته باشد
+          const isMatch = 
+            (matchesFirstName && contact.first_name?.toLowerCase().startsWith(searchTermLower)) ||
+            (matchesLastName && contact.last_name?.toLowerCase().startsWith(searchTermLower)) ||
+            (matchesCompany && contact.company?.toLowerCase().includes(searchTermLower));
+          
+          // لاگ برای دیباگ
+          if (isMatch) {
+            console.log('مورد مطابقت یافت شد:', {
+              id: contact.id,
+              name: `${contact.first_name} ${contact.last_name}`,
+              company: contact.company,
+              searchTerm: searchTerm,
+              isNumericSearch: isNumericSearch,
+              matches: {
+                firstName: matchesFirstName,
+                lastName: matchesLastName,
+                company: matchesCompany
+              }
+            });
+          }
+          
+          return isMatch;
+        });
       }
-      return { data: null, error: "Unknown error occurred" };
+      
+      // اعمال مرتب‌سازی
+      const sortedData = sortContacts(filteredData, sortOption);
+      
+      return { data: sortedData, error: null };
+    } catch (error) {
+      console.error('خطا در پردازش لیست مخاطبین:', error);
+      return { 
+        data: null, 
+        error: 'خطا در پردازش لیست مخاطبین' 
+      };
     }
-  },
+  }
 };
