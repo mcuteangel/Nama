@@ -94,6 +94,13 @@ const Settings = () => {
               <ModernCard variant="glass" className="p-4 rounded-lg shadow-sm">
                 <RTLTestSetting />
               </ModernCard>
+              <ModernCard variant="glass" className="p-4 rounded-lg shadow-sm">
+                <ModernButton asChild variant="gradient-primary" className="w-full">
+                  <Link to="/modern-ui-showcase">
+                    {t('settings.ui_showcase')}
+                  </Link>
+                </ModernButton>
+              </ModernCard>
             </div>
           </div>
 

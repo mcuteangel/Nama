@@ -23,45 +23,17 @@ import ContactBasicInfo from "./contact-form/ContactBasicInfo.tsx";
 import ContactPhoneNumbers from "./contact-form/ContactPhoneNumbers.tsx";
 import ContactEmailAddresses from "./contact-form/ContactEmailAddresses.tsx";
 import ContactSocialLinks from "./contact-form/ContactSocialLinks.tsx";
-import ContactOtherDetails from "./contact-form/ContactOtherDetails.tsx";
 import ContactImportantDates from "./contact-form/ContactImportantDates.tsx";
+import ContactOtherDetails from "./contact-form/ContactOtherDetails.tsx";
 import ContactCustomFields from "./contact-form/ContactCustomFields.tsx";
 import ContactFormActions from "./contact-form/ContactFormActions.tsx";
 import ContactAvatarUpload from "./ContactAvatarUpload.tsx";
 
-/**
- * Props for the ContactForm component
- * @interface ContactFormProps
- */
 interface ContactFormProps {
-  /** Initial form data for editing existing contacts */
   initialData?: ContactFormValues;
-  /** ID of the contact being edited (undefined for new contacts) */
   contactId?: string;
 }
 
-/**
- * ContactForm component for creating and editing contacts
- * 
- * This component provides a comprehensive form for managing contact information including:
- * - Basic information (name, gender, position, company)
- * - Contact details (phone numbers, email addresses, social links)
- * - Address information
- * - Custom fields based on templates
- * - Important dates and notes
- * 
- * Features:
- * - Form validation using React Hook Form and Zod
- * - Accessibility support with ARIA labels and announcements
- * - Performance optimization with React.memo
- * - Keyboard navigation support
- * - Error handling and retry functionality
- * 
- * @param props - The component props
- * @param props.initialData - Initial form data for editing existing contacts
- * @param props.contactId - ID of the contact being edited (undefined for new contacts)
- * @returns JSX element representing the contact form
- */
 const ContactForm: React.FC<ContactFormProps> = React.memo(({ initialData, contactId }) => {
   const navigate = useNavigate();
   const { session } = useSession();
@@ -252,6 +224,82 @@ const ContactForm: React.FC<ContactFormProps> = React.memo(({ initialData, conta
     navigate(-1);
   }, [navigate, announce, t]);
 
+  // Memoize form sections to prevent unnecessary re-renders
+  const formSections = useMemo(() => [
+    {
+      id: 'avatar',
+      title: t('accessibility.avatar_section', 'Avatar Section'),
+      component: (
+        <ContactAvatarUpload
+          initialAvatarUrl={form.watch('avatarUrl')}
+          onAvatarChange={(url) => {
+            form.setValue('avatarUrl', url);
+            announce(url 
+              ? t('accessibility.avatar_updated', 'Avatar updated')
+              : t('accessibility.avatar_removed', 'Avatar removed'), 'polite'
+            );
+          }}
+          disabled={isSubmitting}
+        />
+      )
+    },
+    {
+      id: 'basic-info',
+      title: t('accessibility.basic_info_section', 'Basic Information Section'),
+      component: <ContactBasicInfo />
+    },
+    {
+      id: 'phone',
+      title: t('accessibility.phone_section', 'Phone Numbers Section'),
+      component: <ContactPhoneNumbers />
+    },
+    {
+      id: 'email',
+      title: t('accessibility.email_section', 'Email Addresses Section'),
+      component: <ContactEmailAddresses />
+    },
+    {
+      id: 'social',
+      title: t('accessibility.social_section', 'Social Links Section'),
+      component: <ContactSocialLinks />
+    },
+    {
+      id: 'dates',
+      title: t('accessibility.dates_section', 'Important Dates Section'),
+      component: <ContactImportantDates />
+    },
+    {
+      id: 'other-details',
+      title: t('accessibility.other_details_section', 'Other Details Section'),
+      component: <ContactOtherDetails />
+    },
+    {
+      id: 'custom-fields',
+      title: t('accessibility.custom_fields_section', 'Custom Fields Section'),
+      component: (
+        <ContactCustomFields
+          availableTemplates={availableTemplates}
+          loadingTemplates={loadingTemplates}
+          fetchTemplates={fetchTemplates}
+        />
+      )
+    },
+    {
+      id: 'actions',
+      title: t('accessibility.form_actions_section', 'Form Actions Section'),
+      component: (
+        <ContactFormActions
+          isSubmitting={isSubmitting}
+          onCancel={handleCancel}
+          contactId={contactId}
+        />
+      )
+    }
+  ], [
+    t, form, isSubmitting, announce, availableTemplates, loadingTemplates, 
+    fetchTemplates, handleCancel, contactId
+  ]);
+
   return (
     <KeyboardNavigationHandler scope="forms">
       <ModernCard variant="glass" className="rounded-xl p-6">
@@ -331,86 +379,14 @@ const ContactForm: React.FC<ContactFormProps> = React.memo(({ initialData, conta
                   {t('accessibility.contact_information', 'Contact Information')}
                 </legend>
                 
-                <div role="group" aria-labelledby="avatar-section-title">
-                  <h3 id="avatar-section-title" className="sr-only">
-                    {t('accessibility.avatar_section', 'Avatar Section')}
-                  </h3>
-                  <ContactAvatarUpload
-                    initialAvatarUrl={form.watch('avatarUrl')}
-                    onAvatarChange={(url) => {
-                      form.setValue('avatarUrl', url);
-                      announce(url 
-                        ? t('accessibility.avatar_updated', 'Avatar updated')
-                        : t('accessibility.avatar_removed', 'Avatar removed'), 'polite'
-                      );
-                    }}
-                    disabled={isSubmitting}
-                  />
-                </div>
-                
-                <div role="group" aria-labelledby="basic-info-section-title">
-                  <h3 id="basic-info-section-title" className="sr-only">
-                    {t('accessibility.basic_info_section', 'Basic Information Section')}
-                  </h3>
-                  <ContactBasicInfo />
-                </div>
-                
-                <div role="group" aria-labelledby="phone-section-title">
-                  <h3 id="phone-section-title" className="sr-only">
-                    {t('accessibility.phone_section', 'Phone Numbers Section')}
-                  </h3>
-                  <ContactPhoneNumbers />
-                </div>
-                
-                <div role="group" aria-labelledby="email-section-title">
-                  <h3 id="email-section-title" className="sr-only">
-                    {t('accessibility.email_section', 'Email Addresses Section')}
-                  </h3>
-                  <ContactEmailAddresses />
-                </div>
-                
-                <div role="group" aria-labelledby="social-section-title">
-                  <h3 id="social-section-title" className="sr-only">
-                    {t('accessibility.social_section', 'Social Links Section')}
-                  </h3>
-                  <ContactSocialLinks />
-                </div>
-                
-                <div role="group" aria-labelledby="dates-section-title">
-                  <h3 id="dates-section-title" className="sr-only">
-                    {t('accessibility.dates_section', 'Important Dates Section')}
-                  </h3>
-                  <ContactImportantDates />
-                </div>
-                
-                <div role="group" aria-labelledby="other-details-section-title">
-                  <h3 id="other-details-section-title" className="sr-only">
-                    {t('accessibility.other_details_section', 'Other Details Section')}
-                  </h3>
-                  <ContactOtherDetails />
-                </div>
-                
-                <div role="group" aria-labelledby="custom-fields-section-title">
-                  <h3 id="custom-fields-section-title" className="sr-only">
-                    {t('accessibility.custom_fields_section', 'Custom Fields Section')}
-                  </h3>
-                  <ContactCustomFields
-                    availableTemplates={availableTemplates}
-                    loadingTemplates={loadingTemplates}
-                    fetchTemplates={fetchTemplates}
-                  />
-                </div>
-                
-                <div role="group" aria-labelledby="form-actions-section-title">
-                  <h3 id="form-actions-section-title" className="sr-only">
-                    {t('accessibility.form_actions_section', 'Form Actions Section')}
-                  </h3>
-                  <ContactFormActions
-                    isSubmitting={isSubmitting}
-                    onCancel={handleCancel}
-                    contactId={contactId}
-                  />
-                </div>
+                {formSections.map((section) => (
+                  <div key={section.id} role="group" aria-labelledby={`${section.id}-section-title`}>
+                    <h3 id={`${section.id}-section-title`} className="sr-only">
+                      {section.title}
+                    </h3>
+                    {section.component}
+                  </div>
+                ))}
               </fieldset>
             </form>
           </Form>

@@ -10,20 +10,24 @@ import { cn } from '@/lib/utils';
 import { ContactFormValues } from '@/types/contact';
 import { useTranslation } from 'react-i18next';
 
-const ContactImportantDates: React.FC = () => {
+const ContactImportantDates: React.FC = React.memo(() => {
   const { t } = useTranslation();
   const form = useFormContext<ContactFormValues>();
 
   return (
     <div className="space-y-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-      <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">{t('section_titles.important_dates')}</h3>
+      <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
+        {t('section_titles.important_dates')}
+      </h3>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <FormField
           control={form.control}
           name="birthday"
           render={({ field }) => (
             <FormItem className="flex flex-col">
-              <FormLabel className="text-gray-700 dark:text-gray-200">{t('form_labels.birth_date')}</FormLabel>
+              <FormLabel className="text-gray-700 dark:text-gray-200">
+                {t('form_labels.birth_date')}
+              </FormLabel>
               <ModernPopover>
                 <ModernPopoverTrigger asChild>
                   <FormControl>
@@ -45,7 +49,7 @@ const ContactImportantDates: React.FC = () => {
                   <JalaliCalendar
                     selected={field.value ? new Date(field.value) : undefined}
                     onSelect={(date) => field.onChange(date ? date.toISOString() : "")}
-                    showToggle={false} // Hide calendar type toggle for simplicity in this context
+                    showToggle={false}
                   />
                 </ModernPopoverContent>
               </ModernPopover>
@@ -57,6 +61,8 @@ const ContactImportantDates: React.FC = () => {
       </div>
     </div>
   );
-};
+});
+
+ContactImportantDates.displayName = 'ContactImportantDates';
 
 export default ContactImportantDates;

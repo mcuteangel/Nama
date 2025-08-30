@@ -209,7 +209,8 @@
     "component_testing": "تست کامپوننت‌ها",
     "rtl_components_test": "تست کامپوننت‌های RTL",
     "rtl_components_test_description": "تست کامپوننت‌های رابط کاربری در چیدمان راست به چپ",
-    "test_components": "تست کامپوننت‌ها"
+    "test_components": "تست کامپوننت‌ها",
+    "ui_showcase": "نمایش رابط کاربری"
   },
   "contact_detail": {
     "contact_details": "جزئیات مخاطب",

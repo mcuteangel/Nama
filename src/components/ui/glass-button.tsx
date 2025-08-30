@@ -24,7 +24,6 @@ const GlassButton = React.forwardRef<HTMLButtonElement, GlassButtonProps>(
       <Comp
         className={cn(
           modernButtonVariants({ variant, size, effect }),
-          'backdrop-blur-md border border-white/20 hover:bg-white/10 dark:hover:bg-white/5',
           className
         )}
         ref={ref}

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ModernButton } from '@/components/ui/modern-button';
 import { ModernLoader } from '@/components/ui/modern-loader';
@@ -10,12 +10,22 @@ interface ContactFormActionsProps {
   contactId?: string;
 }
 
-const ContactFormActions: React.FC<ContactFormActionsProps> = ({ isSubmitting, onCancel, contactId }) => {
+const ContactFormActions: React.FC<ContactFormActionsProps> = React.memo(({ isSubmitting, onCancel, contactId }) => {
   const { t } = useTranslation();
-  console.log("ContactFormActions: isSubmitting prop:", isSubmitting); // Added log
+  
+  // Memoize button labels to prevent unnecessary re-renders
+  const buttonLabels = useMemo(() => ({
+    submit: contactId ? t('common.update_contact') : t('common.save_contact'),
+    cancel: t('common.cancel')
+  }), [contactId, t]);
+
   return (
     <div className="flex justify-end gap-2">
-      <CancelButton onClick={onCancel} disabled={isSubmitting} text={t('common.cancel')} />
+      <CancelButton 
+        onClick={onCancel} 
+        disabled={isSubmitting} 
+        text={buttonLabels.cancel} 
+      />
       <ModernButton 
         type="submit" 
         variant="glass"
@@ -23,10 +33,12 @@ const ContactFormActions: React.FC<ContactFormActionsProps> = ({ isSubmitting, o
         disabled={isSubmitting}
       >
         {isSubmitting && <ModernLoader variant="spinner" size="sm" className="me-2" />}
-        {contactId ? t('common.update_contact') : t('common.save_contact')}
+        {buttonLabels.submit}
       </ModernButton>
     </div>
   );
-};
+});
+
+ContactFormActions.displayName = 'ContactFormActions';
 
 export default ContactFormActions;

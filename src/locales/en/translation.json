@@ -208,7 +208,8 @@
     "component_testing": "Component Testing",
     "rtl_components_test": "RTL Components Test",
     "rtl_components_test_description": "Test UI components in right-to-left layouts",
-    "test_components": "Test Components"
+    "test_components": "Test Components",
+    "ui_showcase": "UI Showcase"
   },
   "contact_detail": {
     "contact_details": "Contact Details",

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { ModernInput } from '@/components/ui/modern-input';
 import { ModernSelect, ModernSelectContent, ModernSelectItem, ModernSelectTrigger, ModernSelectValue } from '@/components/ui/modern-select';
@@ -20,7 +20,7 @@ interface ContactCustomFieldsProps {
   fetchTemplates: () => void;
 }
 
-const ContactCustomFields: React.FC<ContactCustomFieldsProps> = ({
+const ContactCustomFields: React.FC<ContactCustomFieldsProps> = React.memo(({
   availableTemplates,
   loadingTemplates,
   fetchTemplates,
@@ -28,21 +28,42 @@ const ContactCustomFields: React.FC<ContactCustomFieldsProps> = ({
   const { t } = useTranslation();
   const form = useFormContext<ContactFormValues>();
 
+  // Memoize custom fields to prevent unnecessary re-renders
+  const customFields = useMemo(() => form.watch("customFields") || [], [form]);
+
+  // Memoize template mapping to prevent unnecessary re-renders
+  const templateMap = useMemo(() => {
+    const map = new Map<string, CustomFieldTemplate>();
+    availableTemplates.forEach(template => {
+      if (template.id) {
+        map.set(template.id, template);
+      }
+    });
+    return map;
+  }, [availableTemplates]);
+
   return (
     <div className="space-y-4 pt-4 border-t border-gray-200 dark:border-gray-700">
       <div className="flex justify-between items-center mb-2">
-        <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">{t('section_titles.custom_fields')}</h3>
+        <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
+          {t('section_titles.custom_fields')}
+        </h3>
         <AddCustomFieldTemplateDialog onTemplateAdded={fetchTemplates} />
       </div>
+      
       {loadingTemplates ? (
-        <p className="text-center text-gray-500 dark:text-gray-400">{t('loading_messages.loading_custom_field_templates')}</p>
+        <p className="text-center text-gray-500 dark:text-gray-400">
+          {t('loading_messages.loading_custom_field_templates')}
+        </p>
       ) : availableTemplates.length === 0 ? (
-        <p className="text-center text-gray-500 dark:text-gray-400">{t('empty_states.no_custom_field_templates')}</p>
+        <p className="text-center text-gray-500 dark:text-gray-400">
+          {t('empty_states.no_custom_field_templates')}
+        </p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {form.watch("customFields")?.map((fieldItem, index) => {
-            const template = availableTemplates.find(t => t.id === fieldItem.template_id);
-            if (!template) return null; // Should not happen if logic is correct
+          {customFields.map((fieldItem, index) => {
+            const template = templateMap.get(fieldItem.template_id);
+            if (!template) return null;
 
             const fieldName = `customFields.${index}.value` as const;
             
@@ -120,7 +141,12 @@ const ContactCustomFields: React.FC<ContactCustomFieldsProps> = ({
                           </ModernSelectContent>
                         </ModernSelect>
                       ) : (
-                        <ModernInput disabled placeholder={t('form_placeholders.unknown_field_type_placeholder')} variant="glass" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400" />
+                        <ModernInput 
+                          disabled 
+                          placeholder={t('form_placeholders.unknown_field_type_placeholder')} 
+                          variant="glass" 
+                          className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400" 
+                        />
                       )}
                     </FormControl>
                     <FormMessage />
@@ -133,6 +159,8 @@ const ContactCustomFields: React.FC<ContactCustomFieldsProps> = ({
       )}
     </div>
   );
-};
+});
+
+ContactCustomFields.displayName = 'ContactCustomFields';
 
 export default ContactCustomFields;

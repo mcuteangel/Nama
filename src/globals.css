@@ -1062,6 +1062,26 @@
   opacity: 0.9;
 }
 
+.dark .bg-gradient-success {
+  background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+  opacity: 0.9;
+}
+
+.dark .bg-gradient-warning {
+  background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+  opacity: 0.9;
+}
+
+.dark .bg-gradient-danger {
+  background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+  opacity: 0.9;
+}
+
+.dark .bg-gradient-info {
+  background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);
+  opacity: 0.9;
+}
+
 .dark .bg-gradient-ocean {
   background: linear-gradient(135deg, #667eea 0%, #64b3f4 100%);
   opacity: 0.9;
@@ -1069,6 +1089,11 @@
 
 .dark .bg-gradient-sunset {
   background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+  opacity: 0.9;
+}
+
+.dark .bg-gradient-forest {
+  background: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%);
   opacity: 0.9;
 }
 

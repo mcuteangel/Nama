@@ -303,13 +303,21 @@ function ButtonsDemo({ onToast }: { onToast: (type: 'success' | 'error' | 'warni
           گرادیانت اقیانوس
         </GradientButton>
         
-        <GlassButton onClick={() => onToast('warning', 'دکمه شیشه‌ای کلیک شد!')}>
-          دکمه شیشه‌ای
-        </GlassButton>
+        <GradientButton 
+          gradientType="sunset"
+          styleVariant="glass"
+          onClick={() => onToast('warning', 'دکمه گرادیانت شیشه‌ای کلیک شد!')}
+        >
+          گرادیانت شیشه‌ای
+        </GradientButton>
         
-        <NeomorphismButton onClick={() => onToast('error', 'دکمه نئومورفیسم کلیک شد!')}>
-          نئومورفیسم
-        </NeomorphismButton>
+        <GradientButton 
+          gradientType="forest"
+          styleVariant="3d"
+          onClick={() => onToast('error', 'دکمه گرادیانت سه بعدی کلیک شد!')}
+        >
+          گرادیانت سه بعدی
+        </GradientButton>
       </div>
 
       <div className="flex justify-center space-x-4">
@@ -322,6 +330,36 @@ function ButtonsDemo({ onToast }: { onToast: (type: 'success' | 'error' | 'warni
         <ModernButton variant="ghost" size="icon">
           <Star size={18} />
         </ModernButton>
+      </div>
+      
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <GradientButton 
+          gradientType="primary"
+          styleVariant="glass"
+        >
+          شیشه‌ای اولیه
+        </GradientButton>
+        
+        <GradientButton 
+          gradientType="ocean"
+          styleVariant="glass"
+        >
+          شیشه‌ای اقیانوس
+        </GradientButton>
+        
+        <GradientButton 
+          gradientType="sunset"
+          styleVariant="3d"
+        >
+          سه بعدی غروب
+        </GradientButton>
+        
+        <GradientButton 
+          gradientType="success"
+          styleVariant="3d"
+        >
+          سه بعدی موفقیت
+        </GradientButton>
       </div>
     </div>
   );

@@ -123,13 +123,14 @@ export const ContactHeader = ({ contact }: ContactHeaderProps) => {
           >
             <ArrowLeft size={20} />
           </ModernButton>
-          <GradientButton
+          <ModernButton
             onClick={() => navigate(`/contacts/edit/${contact.id}`)}
-            className="rounded-full"
+            variant="glass"
+            className="rounded-full !bg-gradient-to-br !from-blue-500/20 !via-blue-600/15 !to-purple-600/20 !border !border-blue-400/30 dark:!from-blue-600/20 dark:!via-blue-700/15 dark:!to-purple-800/20 dark:!border-blue-500/30"
           >
             <Edit size={20} className="ml-1" />
             {t('contact_detail.edit')}
-          </GradientButton>
+          </ModernButton>
         </div>
       </div>
     </ModernCard>

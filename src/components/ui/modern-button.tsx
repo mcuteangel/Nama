@@ -31,6 +31,7 @@ const ModernButton = React.forwardRef<HTMLButtonElement, ModernButtonProps>(
 );
 ModernButton.displayName = 'ModernButton';
 
+// Export the ModernButton component
 export { ModernButton };
 
 // کامپوننت‌های خاص برای استفاده آسان‌تر
@@ -60,7 +61,8 @@ export function FloatingActionButton({ icon, className, ...props }: FloatingActi
 }
 
 export interface GradientButtonProps extends ModernButtonProps {
-  gradientType?: 'primary' | 'ocean' | 'sunset' | 'success';
+  gradientType?: 'primary' | 'ocean' | 'sunset' | 'success' | 'warning' | 'danger' | 'info' | 'forest';
+  styleVariant?: 'default' | 'glass' | '3d';
 }
 
 /**
@@ -68,17 +70,36 @@ export interface GradientButtonProps extends ModernButtonProps {
  */
 export function GradientButton({ 
   gradientType = 'primary', 
+  styleVariant = 'default',
   children, 
   className, 
   ...props 
 }: GradientButtonProps) {
-  const gradientVariant = `gradient-${gradientType}` as const;
+  // Construct the variant based on gradient type and style
+  let gradientVariant: 
+    | 'gradient-primary' | 'gradient-ocean' | 'gradient-sunset' | 'gradient-success' | 'gradient-warning' | 'gradient-danger' | 'gradient-info' | 'gradient-forest'
+    | 'glass-gradient-primary' | 'glass-gradient-ocean' | 'glass-gradient-sunset' | 'glass-gradient-success' | 'glass-gradient-warning' | 'glass-gradient-danger' | 'glass-gradient-info' | 'glass-gradient-forest'
+    | '3d-gradient-primary' | '3d-gradient-ocean' | '3d-gradient-sunset' | '3d-gradient-success' | '3d-gradient-warning' | '3d-gradient-danger' | '3d-gradient-info' | '3d-gradient-forest';
+  
+  switch (styleVariant) {
+    case 'glass':
+      gradientVariant = `glass-gradient-${gradientType}` as 
+        | 'glass-gradient-primary' | 'glass-gradient-ocean' | 'glass-gradient-sunset' | 'glass-gradient-success' | 'glass-gradient-warning' | 'glass-gradient-danger' | 'glass-gradient-info' | 'glass-gradient-forest';
+      break;
+    case '3d':
+      gradientVariant = `3d-gradient-${gradientType}` as 
+        | '3d-gradient-primary' | '3d-gradient-ocean' | '3d-gradient-sunset' | '3d-gradient-success' | '3d-gradient-warning' | '3d-gradient-danger' | '3d-gradient-info' | '3d-gradient-forest';
+      break;
+    default:
+      gradientVariant = `gradient-${gradientType}` as 
+        | 'gradient-primary' | 'gradient-ocean' | 'gradient-sunset' | 'gradient-success' | 'gradient-warning' | 'gradient-danger' | 'gradient-info' | 'gradient-forest';
+  }
   
   return (
     <ModernButton
       variant={gradientVariant}
       effect="scale"
-      className={cn('font-semibold neomorphism', className)}
+      className={cn('font-semibold', className)}
       {...props}
     >
       {children}
@@ -96,7 +117,7 @@ export function GlassButton({ children, className, ...props }: GlassButtonProps)
     <ModernButton
       variant="glass"
       effect="lift"
-      className={cn('backdrop-blur-md', className)}
+      className={className}
       {...props}
     >
       {children}

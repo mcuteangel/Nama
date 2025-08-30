@@ -31,6 +31,7 @@ const Statistics = React.lazy(() => import('./pages/Statistics'));
 const UserManagement = React.lazy(() => import('./pages/UserManagement'));
 const AISuggestions = React.lazy(() => import('./pages/AISuggestions'));
 const RTLTestPage = React.lazy(() => import('./pages/RTLTestPage'));
+const ModernUIShowcase = React.lazy(() => import('./pages/ModernUIShowcase'));
 const NotFound = React.lazy(() => import('./pages/NotFound'));
 import { SessionContextProvider } from './integrations/supabase/auth';
 import { supabase } from './integrations/supabase/client';
@@ -154,6 +155,7 @@ function AppLayout() {
                   <Route path="/statistics" element={<ProtectedRoute><Statistics /></ProtectedRoute>} />
                   <Route path="/ai-suggestions" element={<ProtectedRoute><AISuggestions /></ProtectedRoute>} />
                   <Route path="/rtl-test" element={<ProtectedRoute><RTLTestPage /></ProtectedRoute>} />
+                  <Route path="/modern-ui-showcase" element={<ProtectedRoute><ModernUIShowcase /></ProtectedRoute>} />
                   {isAdmin && (
                     <Route path="/user-management" element={<ProtectedRoute><UserManagement /></ProtectedRoute>} />
                   )}
