@@ -1,6 +1,6 @@
 import { showLoading, dismissToast, showSuccess, showError } from "@/utils/toast";
 
-const CACHE_EXPIRATION_TIME = 5 * 60 * 1000; // 5 minutes in milliseconds
+const CACHE_EXPIRATION_TIME = 10 * 60 * 1000; // Increase to 10 minutes from 5 minutes
 
 interface CacheEntry<T> {
   timestamp: number;

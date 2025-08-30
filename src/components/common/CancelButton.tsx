@@ -25,6 +25,8 @@ const CancelButton: React.FC<CancelButtonProps> = ({ onClick, disabled, text }) 
     <ModernButton
       type="button"
       variant="glass"
+      effect="lift"
+      className="px-6 py-2 font-medium"
       onClick={handleClick}
       disabled={disabled}
     >

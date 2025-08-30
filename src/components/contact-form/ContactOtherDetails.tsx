@@ -50,24 +50,24 @@ const ContactOtherDetails: React.FC = React.memo(() => {
 
   return (
     <>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4 rounded-xl glass">
         <div>
           <FormField
             control={form.control}
             name="groupId"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-gray-700 dark:text-gray-200">{t('contact_form.group')}</FormLabel>
+                <FormLabel className="text-gray-700 dark:text-gray-200 font-medium">{t('contact_form.group')}</FormLabel>
                 <ModernSelect
                   onValueChange={handleGroupSelection}
                   value={field.value === null ? "no-group-selected" : field.value}
                 >
                   <FormControl>
-                    <ModernSelectTrigger variant="glass" className="w-full">
+                    <ModernSelectTrigger variant="glass" className="w-full bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30">
                       <ModernSelectValue placeholder={t('contact_form.select_group')} />
                     </ModernSelectTrigger>
                   </FormControl>
-                  <ModernSelectContent variant="glass">
+                  <ModernSelectContent variant="glass" className="bg-white/80 dark:bg-gray-800/80 border border-white/30 dark:border-gray-600/30">
                     <ModernSelectItem value="no-group-selected">{t('contact_form.no_group')}</ModernSelectItem>
                     {groups.map((group) => (
                       <ModernSelectItem key={group.id} value={group.id}>
@@ -75,7 +75,7 @@ const ContactOtherDetails: React.FC = React.memo(() => {
                       </ModernSelectItem>
                     ))}
                     <Separator className="my-1" />
-                    <ModernSelectItem value="__ADD_NEW_GROUP__" className="text-blue-600 dark:text-blue-400">
+                    <ModernSelectItem value="__ADD_NEW_GROUP__" className="text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/50">
                       <div className="flex items-center gap-2">
                         <PlusCircle size={16} />
                         {t('contact_form.add_new_group')}
@@ -95,11 +95,11 @@ const ContactOtherDetails: React.FC = React.memo(() => {
               description={t('contact_form.add_group_description', 'Form for adding a new contact group')}
             >
               {isFetchingColors ? (
-                <ModernCard variant="glass" className="w-full max-w-md rounded-xl p-6 bg-white/90 dark:bg-gray-900/90">
+                <ModernCard variant="glass" className="w-full max-w-md rounded-xl p-6">
                   <LoadingMessage message={t('contact_form.preparing_group_form')} />
                 </ModernCard>
               ) : fetchColorsError ? (
-                <ModernCard variant="glass" className="w-full max-w-md rounded-xl p-6 bg-white/90 dark:bg-gray-900/90 text-center text-red-500 dark:text-red-400">
+                <ModernCard variant="glass" className="w-full max-w-md rounded-xl p-6 text-center text-red-500 dark:text-red-400">
                   <p>{fetchColorsError.message}</p>
                   <ModernButton onClick={() => setIsAddGroupDialogOpen(false)} className="mt-4">{t('common.close')}</ModernButton>
                 </ModernCard>
@@ -118,9 +118,9 @@ const ContactOtherDetails: React.FC = React.memo(() => {
           name="company"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-gray-700 dark:text-gray-200">{t('contact_form.company')}</FormLabel>
+              <FormLabel className="text-gray-700 dark:text-gray-200 font-medium">{t('contact_form.company')}</FormLabel>
               <FormControl>
-                <ModernInput placeholder={t('contact_form.company_placeholder')} variant="glass" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400" {...field} value={field.value || ''} />
+                <ModernInput placeholder={t('contact_form.company_placeholder')} variant="glass" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-primary/50" {...field} value={field.value || ''} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -131,9 +131,9 @@ const ContactOtherDetails: React.FC = React.memo(() => {
           name="position"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-gray-700 dark:text-gray-200">{t('contact_form.position')}</FormLabel>
+              <FormLabel className="text-gray-700 dark:text-gray-200 font-medium">{t('contact_form.position')}</FormLabel>
               <FormControl>
-                <ModernInput placeholder={t('contact_form.position_placeholder')} variant="glass" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400" {...field} value={field.value || ''} />
+                <ModernInput placeholder={t('contact_form.position_placeholder')} variant="glass" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-primary/50" {...field} value={field.value || ''} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -142,119 +142,130 @@ const ContactOtherDetails: React.FC = React.memo(() => {
       </div>
 
       {/* Detailed Address Fields */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-        <h3 className="col-span-full text-lg font-semibold text-gray-800 dark:text-gray-100 mb-2">{t('contact_form.address')}</h3>
-        <FormField
-          control={form.control}
-          name="street"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-gray-700 dark:text-gray-200">{t('contact_form.street')}</FormLabel>
-              <FormControl>
-                <ModernInput placeholder={t('contact_form.street_placeholder')} variant="glass" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400" {...field} value={field.value || ''} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="city"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-gray-700 dark:text-gray-200">{t('contact_form.city')}</FormLabel>
-              <FormControl>
-                <ModernInput placeholder={t('contact_form.city_placeholder')} variant="glass" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400" {...field} value={field.value || ''} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="state"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-gray-700 dark:text-gray-200">{t('contact_form.state')}</FormLabel>
-              <FormControl>
-                <ModernInput placeholder={t('contact_form.state_placeholder')} variant="glass" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400" {...field} value={field.value || ''} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="zipCode"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-gray-700 dark:text-gray-200">{t('contact_form.zip_code')}</FormLabel>
-              <FormControl>
-                <ModernInput placeholder={t('contact_form.zip_code_placeholder')} variant="glass" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400" {...field} value={field.value || ''} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="country"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-gray-700 dark:text-gray-200">{t('contact_form.country')}</FormLabel>
-              <FormControl>
-                <ModernInput placeholder={t('contact_form.country_placeholder')} variant="glass" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400" {...field} value={field.value || ''} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-6 border-t border-gray-200 dark:border-gray-700">
+        <h3 className="col-span-full text-lg font-semibold text-gray-800 dark:text-gray-100 heading-3 mb-2">{t('contact_form.address')}</h3>
+        <div className="col-span-full p-4 rounded-xl glass">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <FormField
+              control={form.control}
+              name="street"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-gray-700 dark:text-gray-200 font-medium">{t('contact_form.street')}</FormLabel>
+                  <FormControl>
+                    <ModernInput placeholder={t('contact_form.street_placeholder')} variant="glass" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-primary/50" {...field} value={field.value || ''} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="city"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-gray-700 dark:text-gray-200 font-medium">{t('contact_form.city')}</FormLabel>
+                  <FormControl>
+                    <ModernInput placeholder={t('contact_form.city_placeholder')} variant="glass" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-primary/50" {...field} value={field.value || ''} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="state"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-gray-700 dark:text-gray-200 font-medium">{t('contact_form.state')}</FormLabel>
+                  <FormControl>
+                    <ModernInput placeholder={t('contact_form.state_placeholder')} variant="glass" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-primary/50" {...field} value={field.value || ''} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="zipCode"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-gray-700 dark:text-gray-200 font-medium">{t('contact_form.zip_code')}</FormLabel>
+                  <FormControl>
+                    <ModernInput placeholder={t('contact_form.zip_code_placeholder')} variant="glass" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-primary/50" {...field} value={field.value || ''} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="country"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-gray-700 dark:text-gray-200 font-medium">{t('contact_form.country')}</FormLabel>
+                  <FormControl>
+                    <ModernInput placeholder={t('contact_form.country_placeholder')} variant="glass" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-primary/50" {...field} value={field.value || ''} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+        </div>
       </div>
 
       {/* Preferred Communication Method */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-        <FormField
-          control={form.control}
-          name="preferredContactMethod"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-gray-700 dark:text-gray-200">{t('contact_form.preferred_contact_method')}</FormLabel>
-              <ModernSelect onValueChange={(value) => field.onChange(value === "" ? null : value)} value={field.value || ""}>
-                <FormControl>
-                  <ModernSelectTrigger variant="glass" className="w-full">
-                    <ModernSelectValue placeholder={t('contact_form.select_contact_method')} />
-                  </ModernSelectTrigger>
-                </FormControl>
-                <ModernSelectContent variant="glass">
-                  <ModernSelectItem value="any">{t('contact_form.any_method')}</ModernSelectItem>
-                  <ModernSelectItem value="email">{t('contact_form.email')}</ModernSelectItem>
-                  <ModernSelectItem value="phone">{t('contact_form.phone')}</ModernSelectItem>
-                  <ModernSelectItem value="sms">{t('contact_form.sms')}</ModernSelectItem>
-                </ModernSelectContent>
-              </ModernSelect>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-6 border-t border-gray-200 dark:border-gray-700">
+        <div className="p-4 rounded-xl glass">
+          <FormField
+            control={form.control}
+            name="preferredContactMethod"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-gray-700 dark:text-gray-200 font-medium">{t('contact_form.preferred_contact_method')}</FormLabel>
+                <ModernSelect onValueChange={(value) => field.onChange(value === "" ? null : value)} value={field.value || ""}>
+                  <FormControl>
+                    <ModernSelectTrigger variant="glass" className="w-full bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30">
+                      <ModernSelectValue placeholder={t('contact_form.select_contact_method')} />
+                    </ModernSelectTrigger>
+                  </FormControl>
+                  <ModernSelectContent variant="glass" className="bg-white/80 dark:bg-gray-800/80 border border-white/30 dark:border-gray-600/30">
+                    <ModernSelectItem value="any">{t('contact_form.any_method')}</ModernSelectItem>
+                    <ModernSelectItem value="email">{t('contact_form.email')}</ModernSelectItem>
+                    <ModernSelectItem value="phone">{t('contact_form.phone')}</ModernSelectItem>
+                    <ModernSelectItem value="sms">{t('contact_form.sms')}</ModernSelectItem>
+                  </ModernSelectContent>
+                </ModernSelect>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-        <FormField
-          control={form.control}
-          name="notes"
-          render={({ field }) => (
-            <FormItem className="col-span-full">
-              <FormLabel className="text-gray-700 dark:text-gray-200">{t('contact_form.notes')}</FormLabel>
-              <FormControl>
-                <ModernTextarea placeholder={t('contact_form.notes_placeholder')} variant="glass" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400" {...field} value={field.value || ''} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+      <div className="grid grid-cols-1 gap-4 pt-6 border-t border-gray-200 dark:border-gray-700">
+        <div className="p-4 rounded-xl glass">
+          <FormField
+            control={form.control}
+            name="notes"
+            render={({ field }) => (
+              <FormItem className="col-span-full">
+                <FormLabel className="text-gray-700 dark:text-gray-200 font-medium">{t('contact_form.notes')}</FormLabel>
+                <FormControl>
+                  <ModernTextarea placeholder={t('contact_form.notes_placeholder')} variant="glass" className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-primary/50 min-h-[120px]" {...field} value={field.value || ''} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
       </div>
     </>
   );
+}, (prevProps, nextProps) => {
+  // Custom comparison function for React.memo - prevent re-renders unless necessary
+  return true;
 });
 
 ContactOtherDetails.displayName = 'ContactOtherDetails';

@@ -18,16 +18,26 @@ import { useAccessibility } from './accessibilityHooks';
 import { useAnnouncement } from './accessibilityHooks';
 import KeyboardNavigationHandler from './KeyboardNavigationHandler';
 
-// Import new modular components
-import ContactBasicInfo from "./contact-form/ContactBasicInfo.tsx";
-import ContactPhoneNumbers from "./contact-form/ContactPhoneNumbers.tsx";
-import ContactEmailAddresses from "./contact-form/ContactEmailAddresses.tsx";
-import ContactSocialLinks from "./contact-form/ContactSocialLinks.tsx";
-import ContactImportantDates from "./contact-form/ContactImportantDates.tsx";
-import ContactOtherDetails from "./contact-form/ContactOtherDetails.tsx";
-import ContactCustomFields from "./contact-form/ContactCustomFields.tsx";
+// Import new modular components with lazy loading
+import { lazy, Suspense } from "react";
 import ContactFormActions from "./contact-form/ContactFormActions.tsx";
 import ContactAvatarUpload from "./ContactAvatarUpload.tsx";
+
+// Lazy load form sections to improve initial loading performance
+const ContactBasicInfo = lazy(() => import("./contact-form/ContactBasicInfo.tsx"));
+const ContactPhoneNumbers = lazy(() => import("./contact-form/ContactPhoneNumbers.tsx"));
+const ContactEmailAddresses = lazy(() => import("./contact-form/ContactEmailAddresses.tsx"));
+const ContactSocialLinks = lazy(() => import("./contact-form/ContactSocialLinks.tsx"));
+const ContactImportantDates = lazy(() => import("./contact-form/ContactImportantDates.tsx"));
+const ContactOtherDetails = lazy(() => import("./contact-form/ContactOtherDetails.tsx"));
+const ContactCustomFields = lazy(() => import("./contact-form/ContactCustomFields.tsx"));
+
+// Loading component for lazy-loaded sections
+const SectionLoader = () => (
+  <div className="flex justify-center items-center p-4">
+    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 animate-pulse"></div>
+  </div>
+);
 
 interface ContactFormProps {
   initialData?: ContactFormValues;
@@ -137,23 +147,34 @@ const ContactForm: React.FC<ContactFormProps> = React.memo(({ initialData, conta
     }
   }, [error, errorMessage, announce, t]);
 
+  // Optimize template fetching with useCallback
   const fetchTemplates = useCallback(async () => {
+    if (!session?.user) return;
+    
     setLoadingTemplates(true);
-    const cacheKey = `custom_field_templates_${session?.user?.id}`;
-    const { data, error } = await fetchWithCache<CustomFieldTemplate[]>(
-      cacheKey,
-      async () => {
-        const result = await CustomFieldTemplateService.getAllCustomFieldTemplates(); // Updated service call
-        return { data: result.data, error: result.error };
+    const cacheKey = `custom_field_templates_${session.user.id}`;
+    
+    try {
+      const { data, error } = await fetchWithCache<CustomFieldTemplate[]>(
+        cacheKey,
+        async () => {
+          const result = await CustomFieldTemplateService.getAllCustomFieldTemplates();
+          return { data: result.data, error: result.error };
+        }
+      );
+      
+      if (error) {
+        console.error("Error fetching custom field templates:", error);
+        setAvailableTemplates([]);
+      } else {
+        setAvailableTemplates(data || []);
       }
-    );
-    if (error) {
-      console.error("Error fetching custom field templates:", error);
+    } catch (err) {
+      console.error("Error in fetchTemplates:", err);
       setAvailableTemplates([]);
-    } else {
-      setAvailableTemplates(data || []);
+    } finally {
+      setLoadingTemplates(false);
     }
-    setLoadingTemplates(false);
   }, [session]);
 
   useEffect(() => {
@@ -246,42 +267,68 @@ const ContactForm: React.FC<ContactFormProps> = React.memo(({ initialData, conta
     {
       id: 'basic-info',
       title: t('accessibility.basic_info_section', 'Basic Information Section'),
-      component: <ContactBasicInfo />
+      component: (
+        <Suspense fallback={<SectionLoader />}>
+          <ContactBasicInfo />
+        </Suspense>
+      )
     },
     {
       id: 'phone',
       title: t('accessibility.phone_section', 'Phone Numbers Section'),
-      component: <ContactPhoneNumbers />
+      component: (
+        <Suspense fallback={<SectionLoader />}>
+          <ContactPhoneNumbers />
+        </Suspense>
+      )
     },
     {
       id: 'email',
       title: t('accessibility.email_section', 'Email Addresses Section'),
-      component: <ContactEmailAddresses />
+      component: (
+        <Suspense fallback={<SectionLoader />}>
+          <ContactEmailAddresses />
+        </Suspense>
+      )
     },
     {
       id: 'social',
       title: t('accessibility.social_section', 'Social Links Section'),
-      component: <ContactSocialLinks />
+      component: (
+        <Suspense fallback={<SectionLoader />}>
+          <ContactSocialLinks />
+        </Suspense>
+      )
     },
     {
       id: 'dates',
       title: t('accessibility.dates_section', 'Important Dates Section'),
-      component: <ContactImportantDates />
+      component: (
+        <Suspense fallback={<SectionLoader />}>
+          <ContactImportantDates />
+        </Suspense>
+      )
     },
     {
       id: 'other-details',
       title: t('accessibility.other_details_section', 'Other Details Section'),
-      component: <ContactOtherDetails />
+      component: (
+        <Suspense fallback={<SectionLoader />}>
+          <ContactOtherDetails />
+        </Suspense>
+      )
     },
     {
       id: 'custom-fields',
       title: t('accessibility.custom_fields_section', 'Custom Fields Section'),
       component: (
-        <ContactCustomFields
-          availableTemplates={availableTemplates}
-          loadingTemplates={loadingTemplates}
-          fetchTemplates={fetchTemplates}
-        />
+        <Suspense fallback={<SectionLoader />}>
+          <ContactCustomFields
+            availableTemplates={availableTemplates}
+            loadingTemplates={loadingTemplates}
+            fetchTemplates={fetchTemplates}
+          />
+        </Suspense>
       )
     },
     {
@@ -302,22 +349,22 @@ const ContactForm: React.FC<ContactFormProps> = React.memo(({ initialData, conta
 
   return (
     <KeyboardNavigationHandler scope="forms">
-      <ModernCard variant="glass" className="rounded-xl p-6">
-        <ModernCardContent className="space-y-4">
+      <ModernCard variant="glass" className="w-full rounded-xl shadow-lg">
+        <ModernCardContent className="space-y-6">
           {error && (
             <div 
               role="alert"
               aria-live="assertive"
-              className="text-sm text-destructive flex items-center justify-center gap-2 mt-2 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg"
+              className="text-sm text-destructive flex flex-col sm:flex-row items-center justify-center gap-2 mt-2 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg"
             >
-              <span id="form-error-message">{errorMessage}</span>
+              <span id="form-error-message" className="text-center sm:text-start">{errorMessage}</span>
               {retryCount > 0 && (
                 <ModernButton
                   variant="ghost"
                   size="sm"
                   onClick={retrySave}
                   disabled={isSubmitting}
-                  className="text-destructive hover:bg-destructive/10"
+                  className="text-destructive hover:bg-destructive/10 whitespace-nowrap"
                   aria-describedby="form-error-message"
                   aria-label={t('accessibility.retry_save', 'Retry saving form')}
                 >
@@ -329,9 +376,9 @@ const ContactForm: React.FC<ContactFormProps> = React.memo(({ initialData, conta
           
           {/* Progress indicator for form submission */}
           {isSubmitting && (
-            <div className="space-y-2">
-              <ModernProgress value={75} className="w-full" />
-              <p className="text-sm text-muted-foreground text-center">
+            <div className="space-y-3">
+              <ModernProgress value={75} className="w-full" variant="gradient" />
+              <p className="text-sm text-muted-foreground text-center animate-pulse">
                 {contactId 
                   ? t('accessibility.updating_contact', 'در حال به‌روزرسانی مخاطب...') 
                   : t('accessibility.creating_contact', 'در حال ایجاد مخاطب...')
@@ -342,7 +389,7 @@ const ContactForm: React.FC<ContactFormProps> = React.memo(({ initialData, conta
           <Form {...form}>
             <form 
               onSubmit={form.handleSubmit(onSubmit)} 
-              className="space-y-4"
+              className="space-y-6"
               role="form"
               aria-labelledby="contact-form-title"
               aria-describedby="contact-form-description"
@@ -374,7 +421,7 @@ const ContactForm: React.FC<ContactFormProps> = React.memo(({ initialData, conta
                 )}
               </div>
               
-              <fieldset disabled={isSubmitting} className="space-y-4">
+              <fieldset disabled={isSubmitting} className="space-y-6">
                 <legend className="sr-only">
                   {t('accessibility.contact_information', 'Contact Information')}
                 </legend>
@@ -393,6 +440,12 @@ const ContactForm: React.FC<ContactFormProps> = React.memo(({ initialData, conta
         </ModernCardContent>
       </ModernCard>
     </KeyboardNavigationHandler>
+  );
+}, (prevProps, nextProps) => {
+  // Custom comparison function for React.memo
+  return (
+    prevProps.contactId === nextProps.contactId &&
+    JSON.stringify(prevProps.initialData) === JSON.stringify(nextProps.initialData)
   );
 });
 

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { ModernButton } from '@/components/ui/modern-button';
 import { ModernLoader } from '@/components/ui/modern-loader';
 import { useTranslation } from 'react-i18next';
@@ -16,7 +16,7 @@ interface ContactAvatarUploadProps {
   disabled?: boolean;
 }
 
-const ContactAvatarUpload: React.FC<ContactAvatarUploadProps> = ({ initialAvatarUrl, onAvatarChange, disabled }) => {
+const ContactAvatarUpload: React.FC<ContactAvatarUploadProps> = React.memo(({ initialAvatarUrl, onAvatarChange, disabled }) => {
   const { t } = useTranslation();
   const { session } = useSession();
   const { toast } = useToast();
@@ -28,7 +28,8 @@ const ContactAvatarUpload: React.FC<ContactAvatarUploadProps> = ({ initialAvatar
     setAvatarUrl(initialAvatarUrl || null);
   }, [initialAvatarUrl]);
 
-  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  // Memoize the file change handler
+  const handleFileChange = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (!session?.user) {
       toast.error(t('errors.upload_avatar_auth'));
       return;
@@ -85,9 +86,10 @@ const ContactAvatarUpload: React.FC<ContactAvatarUploadProps> = ({ initialAvatar
         fileInputRef.current.value = '';
       }
     }
-  };
+  }, [session, t, toast, initialAvatarUrl, onAvatarChange]);
 
-  const handleRemoveAvatar = async () => {
+  // Memoize the remove avatar handler
+  const handleRemoveAvatar = useCallback(async () => {
     if (!session?.user || !avatarUrl) return;
 
     setIsUploading(true);
@@ -113,17 +115,17 @@ const ContactAvatarUpload: React.FC<ContactAvatarUploadProps> = ({ initialAvatar
     } finally {
       setIsUploading(false);
     }
-  };
+  }, [session, avatarUrl, toast, onAvatarChange]);
 
   return (
-    <div className="flex flex-col items-center gap-4 mb-6">
-      <Avatar className="h-28 w-28 border-4 border-blue-400 dark:border-blue-600 shadow-lg">
+    <div className="flex flex-col items-center gap-4 mb-6 p-6 rounded-xl glass">
+      <Avatar className="h-32 w-32 border-4 border-blue-400 dark:border-blue-600 shadow-xl hover-lift">
         <AvatarImage src={avatarUrl || undefined} alt="Contact Avatar" />
-        <AvatarFallback className="bg-blue-500 text-white dark:bg-blue-700 text-5xl font-bold flex items-center justify-center">
+        <AvatarFallback className="bg-gradient-primary text-white text-5xl font-bold flex items-center justify-center">
           <Camera size={48} />
         </AvatarFallback>
       </Avatar>
-      <div className="flex gap-2">
+      <div className="flex flex-col sm:flex-row gap-3 w-full justify-center">
         <input
           type="file"
           ref={fileInputRef}
@@ -137,29 +139,39 @@ const ContactAvatarUpload: React.FC<ContactAvatarUploadProps> = ({ initialAvatar
           type="button"
           onClick={() => fileInputRef.current?.click()}
           disabled={disabled || isUploading}
-          variant="glass"
-          className="hover-lift"
+          variant="gradient-primary"
+          effect="lift"
+          className="w-full sm:w-auto px-6 py-3 font-semibold shadow-lg hover:shadow-xl"
         >
           {isUploading && <ModernLoader variant="spinner" size="sm" className="me-2" />}
-          <UploadCloud size={16} className="mr-2" />
+          <UploadCloud size={18} className="mr-2" />
           {isUploading ? t('actions.uploading') : t('actions.upload_image')}
         </ModernButton>
         {avatarUrl && (
           <ModernButton
             type="button"
-            variant="glass"
+            variant="gradient-danger"
+            effect="lift"
             onClick={handleRemoveAvatar}
             disabled={disabled || isUploading}
-            className="hover-lift"
+            className="w-full sm:w-auto px-6 py-3 font-semibold shadow-lg hover:shadow-xl"
           >
             {isUploading && <ModernLoader variant="spinner" size="sm" className="me-2" />}
-            <XCircle size={16} className="mr-2" />
+            <XCircle size={18} className="mr-2" />
             {t('actions.delete_image')}
           </ModernButton>
         )}
       </div>
     </div>
   );
-};
+}, (prevProps, nextProps) => {
+  // Custom comparison function for React.memo
+  return (
+    prevProps.initialAvatarUrl === nextProps.initialAvatarUrl &&
+    prevProps.disabled === nextProps.disabled
+  );
+});
+
+ContactAvatarUpload.displayName = 'ContactAvatarUpload';
 
 export default ContactAvatarUpload;

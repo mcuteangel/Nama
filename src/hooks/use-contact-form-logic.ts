@@ -6,7 +6,7 @@ import { ContactFormValues, CustomFieldFormData } from "../types/contact.ts";
 import { invalidateCache } from "@/utils/cache-helpers";
 import { useErrorHandler } from "./use-error-handler";
 import { ErrorManager } from "@/lib/error-manager";
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
 import { ContactCrudService } from "@/services/contact-crud-service"; // Updated import
 import { updateLearnedGenderPreference } from "@/utils/gender-learning"; // New import
 
@@ -17,6 +17,9 @@ export const useContactFormLogic = (
   form: UseFormReturn<ContactFormValues>,
   availableTemplates: CustomFieldTemplate[]
 ) => {
+  // Use a ref to prevent multiple submissions
+  const isSubmittingRef = useRef(false);
+
   const onSuccessCallback = useCallback(() => {
     console.log("useContactFormLogic: onSuccessCallback triggered.");
     ErrorManager.notifyUser(contactId ? "مخاطب با موفقیت به‌روزرسانی شد!" : "مخاطب با موفقیت ذخیره شد!", 'success');
@@ -62,11 +65,21 @@ export const useContactFormLogic = (
 
   const onSubmit = async (values: ContactFormValues) => {
     console.log("useContactFormLogic: onSubmit started. isSubmitting:", isSubmitting);
+    
+    // Prevent multiple submissions
+    if (isSubmittingRef.current) {
+      console.log("useContactFormLogic: Submission already in progress, ignoring.");
+      return;
+    }
+    
+    isSubmittingRef.current = true;
+    
     const user = session?.user;
 
     if (!user) {
       ErrorManager.notifyUser("برای افزودن/ویرایش مخاطب باید وارد شوید.", 'error');
       navigate("/login");
+      isSubmittingRef.current = false;
       return;
     }
 
@@ -91,8 +104,13 @@ export const useContactFormLogic = (
         console.log("useContactFormLogic: ContactCrudService.addContact successful.");
       }
       console.log("useContactFormLogic: executeSave async function finished successfully.");
-      return res.data; // Return data for onSuccess callback if needed
+      // Fix the return value to match the expected type
+      return res && 'data' in res ? res.data : null; // Return data for onSuccess callback if needed
+    }).finally(() => {
+      // Reset submission flag when done
+      isSubmittingRef.current = false;
     });
+    
     console.log("useContactFormLogic: onSubmit finished.");
   };
 
