@@ -210,7 +210,12 @@
     "rtl_components_test": "تست کامپوننت‌های RTL",
     "rtl_components_test_description": "تست کامپوننت‌های رابط کاربری در چیدمان راست به چپ",
     "test_components": "تست کامپوننت‌ها",
-    "ui_showcase": "نمایش رابط کاربری"
+    "ui_showcase": "نمایش رابط کاربری",
+    "default_contact_display_mode": "حالت نمایش پیش‌فرض مخاطبین",
+    "select_display_mode": "انتخاب حالت نمایش",
+    "display_mode_grid": "نمایش کارتی",
+    "display_mode_list": "نمایش لیستی",
+    "default_contact_display_mode_description": "حالت نمایش پیش‌فرض برای لیست مخاطبین را انتخاب کنید"
   },
   "contact_detail": {
     "contact_details": "جزئیات مخاطب",

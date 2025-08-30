@@ -7,6 +7,7 @@ import { ThemeToggle } from "@/components/settings";
 import CalendarTypeSetting from "@/components/settings/CalendarTypeSetting";
 import LanguageSetting from "@/components/settings/LanguageSetting";
 import { AccessibilitySetting, RTLTestSetting } from "@/components/settings";
+import ContactDisplaySetting from "@/components/settings/ContactDisplaySetting";
 import GeminiSettings from "@/components/ai/GeminiSettings";
 import DebugSettings from "@/components/settings/DebugSettings";
 import { Download, User, Settings as SettingsIcon, Sparkles } from "lucide-react";
@@ -71,6 +72,9 @@ const Settings = () => {
               </ModernCard>
               <ModernCard variant="glass" className="p-4 rounded-lg shadow-sm">
                 <AccessibilitySetting />
+              </ModernCard>
+              <ModernCard variant="glass" className="p-4 rounded-lg shadow-sm md:col-span-2">
+                <ContactDisplaySetting />
               </ModernCard>
             </div>
           </div>

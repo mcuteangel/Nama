@@ -38,6 +38,16 @@ interface EmailAddress {
   email_type: string;
 }
 
+interface Group {
+  name: string;
+  color?: string;
+}
+
+interface ContactGroup {
+  group_id: string;
+  groups: Group[];
+}
+
 export interface Contact {
   id: string;
   first_name: string;
@@ -53,6 +63,7 @@ export interface Contact {
   notes?: string | null;
   phone_numbers: PhoneNumber[];
   email_addresses: EmailAddress[];
+  contact_groups: ContactGroup[];
   avatar_url?: string | null;
 }
 
@@ -254,3 +265,5 @@ export const ContactItem = React.memo<ContactItemProps>(({
 ContactItem.displayName = 'ContactItem';
 
 export default ContactItem;
+
+

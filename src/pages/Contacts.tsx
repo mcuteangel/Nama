@@ -9,7 +9,7 @@ import { GradientButton, ModernButton } from "@/components/ui/modern-button";
 import { ModernLoader } from "@/components/ui/modern-loader";
 import { useToast } from "@/components/ui/use-toast";
 import { ModernInput } from "@/components/ui/modern-input";
-import { PlusCircle, Search, Download } from "lucide-react";
+import { PlusCircle, Search, Download, Grid, List } from "lucide-react";
 import ContactList from "@/components/ContactList";
 import { useNavigate } from "react-router-dom";
 import React, { useState, useEffect, useCallback, useMemo } from "react";
@@ -31,6 +31,15 @@ const Contacts = React.memo(() => {
   const [companyFilter, setCompanyFilter] = useState<string>("");
   const [sortOption, setSortOption] = useState<string>("last_name_asc");
   const [isExporting, setIsExporting] = useState(false);
+  const [displayMode, setDisplayMode] = useState<'grid' | 'list'>('grid');
+
+  // Load default display mode from localStorage
+  useEffect(() => {
+    const savedMode = localStorage.getItem('defaultContactDisplayMode');
+    if (savedMode === 'list' || savedMode === 'grid') {
+      setDisplayMode(savedMode);
+    }
+  }, []);
 
   // Debounce search terms for better performance
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
@@ -67,6 +76,10 @@ const Contacts = React.memo(() => {
 
   const handleSortChange = useCallback((value: string) => {
     setSortOption(value);
+  }, []);
+
+  const handleDisplayModeChange = useCallback((mode: 'grid' | 'list') => {
+    setDisplayMode(mode);
   }, []);
 
   const handleExportClick = useCallback(async () => {
@@ -143,7 +156,7 @@ const Contacts = React.memo(() => {
 
           {/* Compact filter and sorting section */}
           <div className="bg-white/20 dark:bg-gray-700/20 rounded-lg p-3 border border-white/30 dark:border-gray-600/30 backdrop-blur-sm">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 items-end">
               <div>
                 <label htmlFor="group-filter" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">گروه:</label>
                 <ModernSelect onValueChange={handleGroupChange} value={selectedGroup || "all"}>
@@ -190,6 +203,30 @@ const Contacts = React.memo(() => {
                   </ModernSelectContent>
                 </ModernSelect>
               </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">نمایش:</label>
+                <div className="flex rounded-lg bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 p-1">
+                  <ModernButton
+                    variant={displayMode === 'grid' ? "default" : "ghost"}
+                    size="sm"
+                    className={`flex-1 flex items-center justify-center gap-2 ${displayMode === 'grid' ? 'bg-blue-500 text-white' : 'text-gray-700 dark:text-gray-300'}`}
+                    onClick={() => handleDisplayModeChange('grid')}
+                  >
+                    <Grid size={16} />
+                    <span className="hidden sm:inline">کارتی</span>
+                  </ModernButton>
+                  <ModernButton
+                    variant={displayMode === 'list' ? "default" : "ghost"}
+                    size="sm"
+                    className={`flex-1 flex items-center justify-center gap-2 ${displayMode === 'list' ? 'bg-blue-500 text-white' : 'text-gray-700 dark:text-gray-300'}`}
+                    onClick={() => handleDisplayModeChange('list')}
+                  >
+                    <List size={16} />
+                    <span className="hidden sm:inline">لیستی</span>
+                  </ModernButton>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -199,6 +236,7 @@ const Contacts = React.memo(() => {
               selectedGroup={filterValues.selectedGroup}
               companyFilter={filterValues.companyFilter}
               sortOption={filterValues.sortOption}
+              displayMode={displayMode}
             />
           </SuspenseWrapper>
         </ModernCardContent>

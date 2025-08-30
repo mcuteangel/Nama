@@ -9,6 +9,7 @@ import { useErrorHandler } from "@/hooks/use-error-handler";
 import { ErrorManager } from "@/lib/error-manager";
 import EmptyState from './common/EmptyState';
 import ContactItem, { Contact } from './common/ContactItem';
+import ContactListItem from './common/ContactListItem';
 import VirtualizedContactList from './VirtualizedContactList';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useTranslation } from 'react-i18next';
@@ -25,13 +26,21 @@ interface ContactListProps {
   companyFilter: string;
   /** Sort option for contact ordering */
   sortOption: string;
+  /** Display mode for contacts: 'grid' or 'list' */
+  displayMode?: 'grid' | 'list';
 }
 
 /**
  * Main ContactList component that handles both regular and virtualized rendering
  * based on the number of contacts
  */
-const ContactList: React.FC<ContactListProps> = ({ searchTerm, selectedGroup, companyFilter, sortOption }) => {
+const ContactList: React.FC<ContactListProps> = ({ 
+  searchTerm, 
+  selectedGroup, 
+  companyFilter, 
+  sortOption,
+  displayMode = 'grid'
+}) => {
   const { session, isLoading: isSessionLoading } = useSession();
   const { t } = useTranslation();
   const isMobile = useIsMobile();
@@ -64,8 +73,8 @@ const ContactList: React.FC<ContactListProps> = ({ searchTerm, selectedGroup, co
 
   // Memoize the cache key to prevent unnecessary re-renders
   const cacheKey = useMemo(() => {
-    return `contacts_list_${session?.user?.id}_${searchTerm}_${selectedGroup}_${companyFilter}_${sortOption}`;
-  }, [session?.user?.id, searchTerm, selectedGroup, companyFilter, sortOption]);
+    return `contacts_list_${session?.user?.id}_${searchTerm}_${selectedGroup}_${companyFilter}_${sortOption}_${displayMode}`;
+  }, [session?.user?.id, searchTerm, selectedGroup, companyFilter, sortOption, displayMode]);
 
   const fetchContacts = useCallback(async () => {
     if (isSessionLoading || !session?.user) {
@@ -117,6 +126,22 @@ const ContactList: React.FC<ContactListProps> = ({ searchTerm, selectedGroup, co
       );
     }
     
+    // Use list view when displayMode is 'list'
+    if (displayMode === 'list') {
+      return (
+        <div className="w-full space-y-3 sm:space-y-4 px-0">
+          {contacts.map((contact) => (
+            <ContactListItem
+              key={contact.id}
+              contact={contact}
+              onContactDeleted={handleContactDeleted}
+              onContactEdited={handleContactEdited}
+            />
+          ))}
+        </div>
+      );
+    }
+    
     if (contacts.length > 50) {
       // Use virtualized list for large datasets
       return (
@@ -148,7 +173,7 @@ const ContactList: React.FC<ContactListProps> = ({ searchTerm, selectedGroup, co
         ))}
       </ModernGrid>
     );
-  }, [contacts, handleContactDeleted, handleContactEdited, isMobile, t]);
+  }, [contacts, handleContactDeleted, handleContactEdited, isMobile, t, displayMode]);
 
   if (isLoading || isSessionLoading) {
     return (

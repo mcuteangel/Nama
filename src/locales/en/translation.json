@@ -209,7 +209,12 @@
     "rtl_components_test": "RTL Components Test",
     "rtl_components_test_description": "Test UI components in right-to-left layouts",
     "test_components": "Test Components",
-    "ui_showcase": "UI Showcase"
+    "ui_showcase": "UI Showcase",
+    "default_contact_display_mode": "Default Contact Display Mode",
+    "select_display_mode": "Select Display Mode",
+    "display_mode_grid": "Card View",
+    "display_mode_list": "List View",
+    "default_contact_display_mode_description": "Select the default display mode for the contacts list"
   },
   "contact_detail": {
     "contact_details": "Contact Details",
