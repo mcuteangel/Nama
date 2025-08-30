@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ModernButton } from "@/components/ui/modern-button";
 import { ModernCard } from "@/components/ui/modern-card";
@@ -116,32 +116,41 @@ export const ContactItem = React.memo<ContactItemProps>(({
     navigate(`/contacts/edit/${contact.id}`);
   }, [onContactEdited, contact.id, navigate]);
 
+  // Memoize display values to prevent unnecessary re-calculations
+  const displayPhoneNumber = useMemo(() => {
+    return contact.phone_numbers.length > 0 
+      ? contact.phone_numbers[0].phone_number 
+      : t('contact_list.no_phone', 'No phone number');
+  }, [contact.phone_numbers, t]);
 
+  const displayEmail = useMemo(() => {
+    return contact.email_addresses.length > 0 
+      ? contact.email_addresses[0].email_address 
+      : undefined;
+  }, [contact.email_addresses]);
 
-  if (!contact) return null;
-
-  const displayPhoneNumber = contact.phone_numbers.length > 0 
-    ? contact.phone_numbers[0].phone_number 
-    : t('contact_list.no_phone', 'No phone number');
-  const displayEmail = contact.email_addresses.length > 0 
-    ? contact.email_addresses[0].email_address 
-    : undefined;
+  const avatarFallback = useMemo(() => {
+    return contact?.first_name ? contact.first_name[0] : "?";
+  }, [contact?.first_name]);
 
   // Touch gesture callbacks for mobile
-  const gestureCallbacks: GestureCallbacks = {
-    onTap: handleContactClick,
-    onLongPress: () => {
-      // Show action menu on long press
-    },
-    onSwipeLeft: () => {
-      if (isMobile) handleDelete();
-    },
-    onSwipeRight: () => {
-      if (isMobile) handleEditClick();
-    }
-  };
+  const gestureCallbacks = useMemo(() => {
+    const callbacks: GestureCallbacks = {
+      onTap: handleContactClick,
+      onLongPress: () => {
+        // Show action menu on long press
+      },
+      onSwipeLeft: () => {
+        if (isMobile) handleDelete();
+      },
+      onSwipeRight: () => {
+        if (isMobile) handleEditClick();
+      }
+    };
+    return callbacks;
+  }, [handleContactClick, handleDelete, handleEditClick, isMobile]);
 
-  const cardContent = (
+  const cardContent = useMemo(() => (
     <ModernCard
       variant="glass"
       hover="lift"
@@ -152,7 +161,7 @@ export const ContactItem = React.memo<ContactItemProps>(({
         <Avatar className="h-12 w-12 border border-white/50 dark:border-gray-600/50">
           <AvatarImage src={contact?.avatar_url || undefined} alt={contact?.first_name} />
           <AvatarFallback className="bg-blue-500 text-white dark:bg-blue-700">
-            {contact?.first_name ? contact.first_name[0] : "?"}
+            {avatarFallback}
           </AvatarFallback>
         </Avatar>
         <div>
@@ -212,7 +221,22 @@ export const ContactItem = React.memo<ContactItemProps>(({
         </ModernAlertDialog>
       </div>
     </ModernCard>
-  );
+  ), [
+    className,
+    handleContactClick,
+    contact?.avatar_url,
+    contact?.first_name,
+    contact?.last_name,
+    avatarFallback,
+    displayPhoneNumber,
+    displayEmail,
+    handleEditClick,
+    isDeleting,
+    t,
+    handleDelete
+  ]);
+
+  if (!contact) return null;
 
   return (
     <div style={style} className="px-0 sm:px-2">

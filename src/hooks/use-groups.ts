@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/integrations/supabase/auth";
 import { fetchWithCache, invalidateCache } from "@/utils/cache-helpers";
@@ -21,21 +21,26 @@ export const useGroups = () => {
     }
   }, []);
 
-  const onErrorGroups = useCallback((err) => {
+  const onErrorGroups = useCallback((err: unknown) => {
     ErrorManager.logError(err, { component: 'useGroups', action: 'fetchGroups' });
   }, []);
 
   const {
     isLoading: loadingGroups,
     executeAsync,
-  } = useErrorHandler<{ data: Group[] | null; error: string | null; fromCache: boolean }>(null, { // Explicitly define TResult here
+  } = useErrorHandler<{ data: Group[] | null; error: string | null; fromCache: boolean }>(null, {
     maxRetries: 3,
     retryDelay: 1000,
-    showToast: false, // Changed to false to manually control success toast
+    showToast: false,
     customErrorMessage: "خطا در بارگذاری گروه‌ها",
     onSuccess: onSuccessGroups,
     onError: onErrorGroups,
   });
+
+  // Memoize the cache key to prevent unnecessary re-renders
+  const cacheKey = useMemo(() => {
+    return `user_groups_${session?.user?.id}`;
+  }, [session?.user?.id]);
 
   const fetchGroups = useCallback(async () => {
     if (isSessionLoading || !session?.user) {
@@ -43,8 +48,6 @@ export const useGroups = () => {
       return;
     }
 
-    const cacheKey = `user_groups_${session.user.id}`;
-    
     await executeAsync(async () => {
       const { data, error, fromCache } = await fetchWithCache<Group[]>(
         cacheKey,
@@ -63,13 +66,25 @@ export const useGroups = () => {
         throw new Error(error);
       }
       setGroups(data || []);
-      return { data, error: null, fromCache }; // Added error: null
+      return { data, error: null, fromCache };
     });
-  }, [session, isSessionLoading, executeAsync]);
+  }, [session, isSessionLoading, executeAsync, cacheKey]);
+
+  // Add a function to refresh groups when needed
+  const refreshGroups = useCallback(() => {
+    invalidateCache(cacheKey);
+    fetchGroups();
+  }, [cacheKey, fetchGroups]);
 
   useEffect(() => {
     fetchGroups();
   }, [fetchGroups]);
 
-  return { groups, loadingGroups, fetchGroups };
+  // Memoize the return value to prevent unnecessary re-renders
+  return useMemo(() => ({
+    groups,
+    loadingGroups,
+    fetchGroups,
+    refreshGroups
+  }), [groups, loadingGroups, fetchGroups, refreshGroups]);
 };

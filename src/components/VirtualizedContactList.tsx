@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, memo } from 'react';
 import { FixedSizeList as List } from 'react-window';
 import ContactItem, { Contact } from './common/ContactItem';
 
@@ -20,7 +20,7 @@ interface ContactItemWrapperProps {
   };
 }
 
-const ContactItemWrapper = React.memo<ContactItemWrapperProps>(({ index, style, data }) => {
+const ContactItemWrapper = memo<ContactItemWrapperProps>(({ index, style, data }) => {
   const { contacts, onContactDeleted, onContactEdited } = data;
   const contact = contacts[index];
 
@@ -39,27 +39,31 @@ const ContactItemWrapper = React.memo<ContactItemWrapperProps>(({ index, style, 
 
 ContactItemWrapper.displayName = 'ContactItemWrapper';
 
-const VirtualizedContactList = React.memo<VirtualizedContactListProps>(({ 
+const VirtualizedContactList = memo<VirtualizedContactListProps>(({ 
   contacts, 
   onContactDeleted, 
   onContactEdited, 
   height, 
   itemHeight = 100 
 }) => {
+  // Memoize item data to prevent unnecessary re-renders
   const itemData = useMemo(() => ({
     contacts,
     onContactDeleted,
     onContactEdited,
   }), [contacts, onContactDeleted, onContactEdited]);
 
+  // Memoize list props to prevent unnecessary re-renders
+  const listProps = useMemo(() => ({
+    height,
+    width: "100%" as const,
+    itemCount: contacts.length,
+    itemSize: itemHeight,
+    itemData,
+  }), [height, contacts.length, itemHeight, itemData]);
+
   return (
-    <List
-      height={height}
-      width="100%"
-      itemCount={contacts.length}
-      itemSize={itemHeight}
-      itemData={itemData}
-    >
+    <List {...listProps}>
       {ContactItemWrapper}
     </List>
   );
@@ -68,5 +72,3 @@ const VirtualizedContactList = React.memo<VirtualizedContactListProps>(({
 VirtualizedContactList.displayName = 'VirtualizedContactList';
 
 export default VirtualizedContactList;
-
-

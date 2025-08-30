@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { ModernLoader } from "@/components/ui/modern-loader";
 import { ModernGrid } from "@/components/ui/modern-grid";
 import { Users } from "lucide-react";
@@ -62,13 +62,16 @@ const ContactList: React.FC<ContactListProps> = ({ searchTerm, selectedGroup, co
     onError: onErrorContacts,
   });
 
+  // Memoize the cache key to prevent unnecessary re-renders
+  const cacheKey = useMemo(() => {
+    return `contacts_list_${session?.user?.id}_${searchTerm}_${selectedGroup}_${companyFilter}_${sortOption}`;
+  }, [session?.user?.id, searchTerm, selectedGroup, companyFilter, sortOption]);
+
   const fetchContacts = useCallback(async () => {
     if (isSessionLoading || !session?.user) {
       setContacts([]);
       return;
     }
-
-    const cacheKey = `contacts_list_${session.user.id}_${searchTerm}_${selectedGroup}_${companyFilter}_${sortOption}`;
 
     await executeAsync(async () => {
       return await fetchWithCache(
@@ -86,23 +89,66 @@ const ContactList: React.FC<ContactListProps> = ({ searchTerm, selectedGroup, co
         }
       );
     });
-  }, [session, isSessionLoading, searchTerm, selectedGroup, companyFilter, sortOption, executeAsync]);
+  }, [session, isSessionLoading, searchTerm, selectedGroup, companyFilter, sortOption, executeAsync, cacheKey]);
 
   useEffect(() => {
     fetchContacts();
   }, [fetchContacts]);
 
-  const handleContactDeleted = (_deletedId: string) => {
-    const cacheKey = `contacts_list_${session?.user?.id}_${searchTerm}_${selectedGroup}_${companyFilter}_${sortOption}`;
+  const handleContactDeleted = useCallback((_deletedId: string) => {
     invalidateCache(cacheKey);
     fetchContacts();
-  };
+  }, [cacheKey, fetchContacts]);
 
-  const handleContactEdited = () => {
-    const cacheKey = `contacts_list_${session?.user?.id}_${searchTerm}_${selectedGroup}_${companyFilter}_${sortOption}`;
+  const handleContactEdited = useCallback(() => {
     invalidateCache(cacheKey);
     fetchContacts();
-  };
+  }, [cacheKey, fetchContacts]);
+
+  // Memoize the contact list rendering to prevent unnecessary re-renders
+  const contactListContent = useMemo(() => {
+    if (contacts.length === 0) {
+      return (
+        <EmptyState
+          icon={Users}
+          title={t('empty_states.no_contacts_found')}
+          description={t('empty_states.add_first_contact')}
+        />
+      );
+    }
+    
+    if (contacts.length > 50) {
+      // Use virtualized list for large datasets
+      return (
+        <VirtualizedContactList
+          contacts={contacts}
+          onContactDeleted={handleContactDeleted}
+          onContactEdited={handleContactEdited}
+          height={600}
+          itemHeight={100}
+        />
+      );
+    }
+    
+    // Use regular grid for small datasets with better UX
+    return (
+      <ModernGrid
+        cols={1}
+        gap="sm"
+        className="w-full"
+      >
+        {contacts.map((contact) => (
+          <ContactItem
+            key={contact.id}
+            contact={contact}
+            onContactDeleted={handleContactDeleted}
+            onContactEdited={handleContactEdited}
+            enableGestures={isMobile}
+          />
+        ))}
+      </ModernGrid>
+    );
+  }, [contacts, handleContactDeleted, handleContactEdited, isMobile, t]);
 
   if (isLoading || isSessionLoading) {
     return (
@@ -114,39 +160,7 @@ const ContactList: React.FC<ContactListProps> = ({ searchTerm, selectedGroup, co
 
   return (
     <div className="space-y-2 sm:space-y-4 w-full px-0">
-      {contacts.length === 0 ? (
-        <EmptyState
-          icon={Users}
-          title={t('empty_states.no_contacts_found')}
-          description={t('empty_states.add_first_contact')}
-        />
-      ) : contacts.length > 50 ? (
-        // Use virtualized list for large datasets
-        <VirtualizedContactList
-          contacts={contacts}
-          onContactDeleted={handleContactDeleted}
-          onContactEdited={handleContactEdited}
-          height={600}
-          itemHeight={100}
-        />
-      ) : (
-        // Use regular grid for small datasets with better UX
-        <ModernGrid
-          cols={1}
-          gap="sm"
-          className="w-full"
-        >
-          {contacts.map((contact) => (
-            <ContactItem
-              key={contact.id}
-              contact={contact}
-              onContactDeleted={handleContactDeleted}
-              onContactEdited={handleContactEdited}
-              enableGestures={isMobile}
-            />
-          ))}
-        </ModernGrid>
-      )}
+      {contactListContent}
     </div>
   );
 };

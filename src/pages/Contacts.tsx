@@ -12,7 +12,7 @@ import { ModernInput } from "@/components/ui/modern-input";
 import { PlusCircle, Search, Download } from "lucide-react";
 import ContactList from "@/components/ContactList";
 import { useNavigate } from "react-router-dom";
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useDebounce } from '@/hooks/use-performance';
 import SuspenseWrapper from '@/components/common/SuspenseWrapper';
 import { ModernSelect, ModernSelectContent, ModernSelectItem, ModernSelectTrigger, ModernSelectValue } from "@/components/ui/modern-select";
@@ -35,6 +35,14 @@ const Contacts = React.memo(() => {
   // Debounce search terms for better performance
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
   const debouncedCompanyFilter = useDebounce(companyFilter, 300);
+
+  // Memoize filter values to prevent unnecessary re-renders
+  const filterValues = useMemo(() => ({
+    searchTerm: debouncedSearchTerm,
+    selectedGroup,
+    companyFilter: debouncedCompanyFilter,
+    sortOption,
+  }), [debouncedSearchTerm, selectedGroup, debouncedCompanyFilter, sortOption]);
 
   useEffect(() => {
     fetchGroups();
@@ -62,22 +70,22 @@ const Contacts = React.memo(() => {
   }, []);
 
   const handleExportClick = useCallback(async () => {
+    if (!session?.user) {
+      toast.error('برای خروجی گرفتن باید وارد شوید.');
+      return;
+    }
+    
     setIsExporting(true);
     toast.info('شروع خروجی مخاطبین...');
     try {
-      await exportContactsToCsv(session, {
-        searchTerm: debouncedSearchTerm,
-        selectedGroup,
-        companyFilter: debouncedCompanyFilter,
-        sortOption,
-      });
+      await exportContactsToCsv(session, filterValues);
       toast.success('خروجی مخاطبین با موفقیت انجام شد!');
     } catch (error) {
       toast.error('خطا در خروجی مخاطبین');
     } finally {
       setIsExporting(false);
     }
-  }, [session, debouncedSearchTerm, selectedGroup, debouncedCompanyFilter, sortOption, toast]);
+  }, [session, filterValues, toast]);
 
   return (
     <div className="flex flex-col items-stretch justify-center p-0 sm:p-4 h-full w-full">
@@ -119,7 +127,7 @@ const Contacts = React.memo(() => {
               <ModernButton
                 variant="glass"
                 onClick={handleExportClick}
-                disabled={isExporting}
+                disabled={isExporting || !session?.user}
                 className="flex items-center gap-2 sm:gap-2 px-4 sm:px-6 py-3 sm:py-2 text-base sm:text-base flex-grow sm:flex-grow-0 font-persian backdrop-blur-md border border-white/20 hover:bg-white/10 dark:hover:bg-white/5"
               >
                 {isExporting ? (
@@ -187,10 +195,10 @@ const Contacts = React.memo(() => {
 
           <SuspenseWrapper>
             <ContactList
-              searchTerm={debouncedSearchTerm}
-              selectedGroup={selectedGroup}
-              companyFilter={debouncedCompanyFilter}
-              sortOption={sortOption}
+              searchTerm={filterValues.searchTerm}
+              selectedGroup={filterValues.selectedGroup}
+              companyFilter={filterValues.companyFilter}
+              sortOption={filterValues.sortOption}
             />
           </SuspenseWrapper>
         </ModernCardContent>
