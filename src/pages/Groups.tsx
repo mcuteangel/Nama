@@ -5,7 +5,7 @@ import {
   ModernCardHeader, 
   ModernCardTitle 
 } from "@/components/ui/modern-card";
-import { ModernButton } from "@/components/ui/modern-button";
+import { GlassButton } from "@/components/ui/glass-button";
 import GroupList from "@/components/groups/GroupList";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
@@ -26,14 +26,14 @@ const Groups = () => {
         </ModernCardHeader>
         <ModernCardContent className="space-y-6">
           <GroupList />
-          <ModernButton
+          <GlassButton
             onClick={() => navigate('/')}
             variant="outline"
             className="w-full hover-lift"
           >
             <ArrowLeft size={20} className="me-2" />
             بازگشت به مخاطبین
-          </ModernButton>
+          </GlassButton>
         </ModernCardContent>
       </ModernCard>
     </div>

@@ -9,7 +9,7 @@ import {
   ModernDropdownMenuItem,
   ModernDropdownMenuTrigger,
 } from "@/components/ui/modern-dropdown-menu";
-import { ModernButton } from "@/components/ui/modern-button";
+import { GlassButton } from "@/components/ui/glass-button";
 
 export function ThemeToggle() {
   const { setTheme } = useTheme();
@@ -18,11 +18,11 @@ export function ThemeToggle() {
   return (
     <ModernDropdownMenu>
       <ModernDropdownMenuTrigger asChild>
-        <ModernButton variant="ghost" size="icon" className="h-8 w-8">
+        <GlassButton variant="ghost" size="icon" className="h-8 w-8">
           <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
           <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
           <span className="sr-only">Toggle theme</span>
-        </ModernButton>
+        </GlassButton>
       </ModernDropdownMenuTrigger>
       <ModernDropdownMenuContent align="end" glassEffect="glassAdvanced" className="rounded-md p-1">
         <ModernDropdownMenuItem onClick={() => setTheme("light")}>

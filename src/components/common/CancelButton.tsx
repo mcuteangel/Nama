@@ -1,5 +1,5 @@
 import React from 'react';
-import { ModernButton } from '@/components/ui/modern-button';
+import { GlassButton } from "@/components/ui/glass-button";
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
@@ -22,7 +22,7 @@ const CancelButton: React.FC<CancelButtonProps> = ({ onClick, disabled, text }) 
   };
 
   return (
-    <ModernButton
+    <GlassButton
       type="button"
       variant="glass"
       effect="lift"
@@ -31,7 +31,7 @@ const CancelButton: React.FC<CancelButtonProps> = ({ onClick, disabled, text }) 
       disabled={disabled}
     >
       {text || t('common.cancel')}
-    </ModernButton>
+    </GlassButton>
   );
 };
 

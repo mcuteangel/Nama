@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { ModernButton } from '@/components/ui/modern-button';
+import { GlassButton } from "@/components/ui/glass-button";
 import { ModernCard, ModernCardContent, ModernCardDescription, ModernCardHeader, ModernCardTitle } from '@/components/ui/modern-card';
 import { 
   Activity,
@@ -235,14 +235,14 @@ export const PerformanceDashboard: React.FC = React.memo(() => {
               <Badge variant={overallScore >= 80 ? 'default' : overallScore >= 60 ? 'secondary' : 'destructive'}>
                 {t('performance.score', 'Score')}: {overallScore}/100
               </Badge>
-              <ModernButton variant="outline" size="sm" onClick={refreshMetrics} disabled={isLoading}>
+              <GlassButton variant="outline" size="sm" onClick={refreshMetrics} disabled={isLoading}>
                 <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
                 {t('performance.refresh', 'Refresh')}
-              </ModernButton>
-              <ModernButton variant="outline" size="sm" onClick={exportData}>
+              </GlassButton>
+              <GlassButton variant="outline" size="sm" onClick={exportData}>
                 <Download className="h-4 w-4 mr-2" />
                 {t('performance.export', 'Export')}
-              </ModernButton>
+              </GlassButton>
             </div>
           </div>
           <ModernCardDescription>

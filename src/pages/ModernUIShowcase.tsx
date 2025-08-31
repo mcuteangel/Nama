@@ -8,12 +8,10 @@ import {
   ModernCardFooter 
 } from '@/components/ui/modern-card';
 import { 
-  ModernButton, 
   GradientButton, 
   GlassButton, 
   NeomorphismButton,
-  FloatingActionButton 
-} from '@/components/ui/modern-button';
+  FloatingActionButton } from "@/components/ui/glass-button";
 import { ModernLoader, LoadingOverlay, Skeleton } from '@/components/ui/modern-loader';
 import { ModernGrid, MasonryGrid, ResponsiveGrid } from '@/components/ui/modern-grid';
 import { ModernProgress, CircularProgress, ProgressSteps } from '@/components/ui/modern-progress';
@@ -167,12 +165,12 @@ export default function ModernUIShowcase() {
               </div>
             </ModernCardContent>
             <ModernCardFooter>
-              <ModernButton onClick={handleProgressChange} disabled={progress === 100}>
+              <GlassButton onClick={handleProgressChange} disabled={progress === 100}>
                 افزایش پیشرفت
-              </ModernButton>
-              <ModernButton onClick={handleStepNext} variant="outline" disabled={currentStep === progressSteps.length - 1}>
+              </GlassButton>
+              <GlassButton onClick={handleStepNext} variant="outline" disabled={currentStep === progressSteps.length - 1}>
                 مرحله بعد
-              </ModernButton>
+              </GlassButton>
             </ModernCardFooter>
           </ModernCard>
 
@@ -292,9 +290,9 @@ function ButtonsDemo({ onToast }: { onToast: (type: 'success' | 'error' | 'warni
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <ModernButton onClick={() => onToast('success', 'دکمه معمولی کلیک شد!')}>
+        <GlassButton onClick={() => onToast('success', 'دکمه معمولی کلیک شد!')}>
           دکمه معمولی
-        </ModernButton>
+        </GlassButton>
         
         <GradientButton 
           gradientType="ocean"
@@ -305,7 +303,7 @@ function ButtonsDemo({ onToast }: { onToast: (type: 'success' | 'error' | 'warni
         
         <GradientButton 
           gradientType="sunset"
-          styleVariant="glass"
+          variant="glass-gradient-sunset"
           onClick={() => onToast('warning', 'دکمه گرادیانت شیشه‌ای کلیک شد!')}
         >
           گرادیانت شیشه‌ای
@@ -313,7 +311,7 @@ function ButtonsDemo({ onToast }: { onToast: (type: 'success' | 'error' | 'warni
         
         <GradientButton 
           gradientType="forest"
-          styleVariant="3d"
+          variant="3d-gradient-forest"
           onClick={() => onToast('error', 'دکمه گرادیانت سه بعدی کلیک شد!')}
         >
           گرادیانت سه بعدی
@@ -321,42 +319,42 @@ function ButtonsDemo({ onToast }: { onToast: (type: 'success' | 'error' | 'warni
       </div>
 
       <div className="flex justify-center space-x-4">
-        <ModernButton variant="outline" size="lg">
+        <GlassButton variant="outline" size="lg">
           اندازه بزرگ
-        </ModernButton>
-        <ModernButton size="sm">
+        </GlassButton>
+        <GlassButton size="sm">
           اندازه کوچک
-        </ModernButton>
-        <ModernButton variant="ghost" size="icon">
+        </GlassButton>
+        <GlassButton variant="ghost" size="icon">
           <Star size={18} />
-        </ModernButton>
+        </GlassButton>
       </div>
       
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <GradientButton 
           gradientType="primary"
-          styleVariant="glass"
+          variant="glass-gradient-primary"
         >
           شیشه‌ای اولیه
         </GradientButton>
         
         <GradientButton 
           gradientType="ocean"
-          styleVariant="glass"
+          variant="glass-gradient-ocean"
         >
           شیشه‌ای اقیانوس
         </GradientButton>
         
         <GradientButton 
           gradientType="sunset"
-          styleVariant="3d"
+          variant="3d-gradient-sunset"
         >
           سه بعدی غروب
         </GradientButton>
         
         <GradientButton 
           gradientType="success"
-          styleVariant="3d"
+          variant="3d-gradient-success"
         >
           سه بعدی موفقیت
         </GradientButton>
@@ -372,12 +370,12 @@ function LoadersDemo({ isLoading, setIsLoading }: {
   return (
     <div className="space-y-6">
       <div className="flex justify-center">
-        <ModernButton 
+        <GlassButton 
           onClick={() => setIsLoading(!isLoading)}
           variant="gradient-primary"
         >
           {isLoading ? 'توقف' : 'شروع'} بارگذاری
-        </ModernButton>
+        </GlassButton>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-center">

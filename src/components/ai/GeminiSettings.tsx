@@ -4,7 +4,7 @@ import React, { useEffect, useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { ModernButton } from '@/components/ui/modern-button';
+import { GlassButton } from "@/components/ui/glass-button";
 import { Label } from '@/components/ui/label';
 import { ModernInput } from '@/components/ui/modern-input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from '@/components/ui/form';
@@ -265,7 +265,7 @@ const GeminiSettings: React.FC = () => {
           <div className="text-sm text-destructive flex items-center justify-center gap-2 mt-2">
             <span>{submitErrorMessage}</span>
             {submitRetryCount > 0 && (
-              <ModernButton
+              <GlassButton
                 variant="ghost"
                 size="sm"
                 onClick={retrySubmit}
@@ -273,11 +273,11 @@ const GeminiSettings: React.FC = () => {
                 className="text-destructive hover:bg-destructive/10"
               >
                 {t('common.retry')} ({submitRetryCount} {t('common.of')} ۳)
-              </ModernButton>
+              </GlassButton>
             )}
           </div>
         )}
-        <ModernButton
+        <GlassButton
           type="submit"
           variant="gradient-primary"
           className="w-full px-6 py-2 rounded-lg font-semibold"
@@ -285,7 +285,7 @@ const GeminiSettings: React.FC = () => {
         >
           {isSubmitting && <LoadingSpinner size={16} className="me-2" />}
           {isSubmitting ? t('common.saving') : t('common.save')}
-        </ModernButton>
+        </GlassButton>
       </form>
     </Form>
   );

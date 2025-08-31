@@ -3,7 +3,7 @@ import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react";
 
 import { cn, applyGlassEffect, applyGradientEffect, applyNeomorphismEffect, applyHoverEffect } from "@/lib/utils";
 import { GlassEffect, GradientType, HoverEffect } from "@/types/global-style-types";
-import { ModernButton } from "@/components/ui/modern-button";
+import { GlassButton } from "@/components/ui/glass-button";
 
 const ModernPagination = ({ className, ...props }: React.ComponentProps<"nav">) => (
   <nav

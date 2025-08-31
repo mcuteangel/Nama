@@ -17,7 +17,7 @@ import { useErrorHandler } from "@/hooks/use-error-handler";
 import { ErrorManager } from "@/lib/error-manager";
 import { useTranslation } from "react-i18next";
 import { ModernSelect, ModernSelectContent, ModernSelectItem, ModernSelectTrigger, ModernSelectValue } from "@/components/ui/modern-select";
-import { ModernButton } from "@/components/ui/modern-button";
+import { GlassButton } from "@/components/ui/glass-button";
 
 interface UserFormProps {
   initialData?: {
@@ -233,7 +233,7 @@ const UserForm: React.FC<UserFormProps> = ({ initialData, onSuccess, onCancel })
             />
             <div className="flex justify-end gap-2 mt-6">
               <CancelButton onClick={onCancel} disabled={isLoading} />
-              <ModernButton
+              <GlassButton
                 type="submit"
                 variant="gradient-primary"
                 className="px-4 py-2 rounded-lg font-semibold"
@@ -241,7 +241,7 @@ const UserForm: React.FC<UserFormProps> = ({ initialData, onSuccess, onCancel })
               >
                 {isLoading && <LoadingSpinner size={16} className="me-2" />}
                 {isLoading ? (initialData ? t('common.saving') : t('common.creating')) : (initialData ? t('common.save') : t('common.create'))}
-              </ModernButton>
+              </GlassButton>
             </div>
           </form>
         </Form>

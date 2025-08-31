@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { ModernButton } from "@/components/ui/modern-button";
+import { GlassButton } from "@/components/ui/glass-button";
 import { Edit, Trash2, Users, PlusCircle, Tag } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/integrations/supabase/auth";
@@ -77,9 +77,9 @@ const GroupItem = ({ group, onGroupUpdated, onGroupDeleted }: { group: Group; on
       <div className="flex gap-2">
         <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
           <DialogTrigger asChild>
-            <ModernButton variant="ghost" size="icon" className="text-blue-600 hover:bg-blue-100 dark:text-blue-400 dark:hover:bg-gray-600/50 transition-all duration-200">
+            <GlassButton variant="ghost" size="icon" className="text-blue-600 hover:bg-blue-100 dark:text-blue-400 dark:hover:bg-gray-600/50 transition-all duration-200">
               <Edit size={20} />
-            </ModernButton>
+            </GlassButton>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px] p-0 border-none bg-transparent shadow-none">
             <GroupForm
@@ -96,9 +96,9 @@ const GroupItem = ({ group, onGroupUpdated, onGroupDeleted }: { group: Group; on
 
         <AlertDialog>
           <AlertDialogTrigger asChild>
-            <ModernButton variant="ghost" size="icon" className="text-red-600 hover:bg-red-100 dark:text-red-400 dark:hover:bg-gray-600/50 transition-all duration-200" disabled={isDeleting}>
+            <GlassButton variant="ghost" size="icon" className="text-red-600 hover:bg-red-100 dark:text-red-400 dark:hover:bg-gray-600/50 transition-all duration-200" disabled={isDeleting}>
               {isDeleting ? <LoadingSpinner size={20} /> : <Trash2 size={20} />}
-            </ModernButton>
+            </GlassButton>
           </AlertDialogTrigger>
           <AlertDialogContent className="glass rounded-xl p-6">
             <AlertDialogHeader>
@@ -186,14 +186,14 @@ const GroupList = () => {
     <div className="space-y-4">
       <Dialog open={isAddGroupDialogOpen} onOpenChange={setIsAddGroupDialogOpen}>
         <DialogTrigger asChild>
-          <ModernButton
+          <GlassButton
             className="w-full px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-md transition-all duration-300 transform hover:scale-105"
           >
             <span className="flex items-center gap-2">
               <PlusCircle size={20} className="me-2" />
               افزودن گروه جدید
             </span>
-          </ModernButton>
+          </GlassButton>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px] p-0 border-none bg-transparent shadow-none">
           <GroupForm

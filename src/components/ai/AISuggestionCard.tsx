@@ -6,7 +6,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescript
 import CancelButton from '../common/CancelButton';
 import LoadingSpinner from '../common/LoadingSpinner';
 import { ModernCard, ModernCardHeader, ModernCardTitle, ModernCardDescription, ModernCardContent } from "@/components/ui/modern-card";
-import { ModernButton } from "@/components/ui/modern-button";
+import { GlassButton } from "@/components/ui/glass-button";
 
 interface ExistingContactSummary {
   id: string;
@@ -140,7 +140,7 @@ const AISuggestionCard: React.FC<AISuggestionCardProps> = React.memo(({ suggesti
         )}
 
         <div className="flex gap-2 mt-4">
-          <ModernButton
+          <GlassButton
             onClick={handleProcess}
             disabled={isProcessing}
             variant="gradient-primary"
@@ -148,8 +148,8 @@ const AISuggestionCard: React.FC<AISuggestionCardProps> = React.memo(({ suggesti
           >
             {isProcessing && <LoadingSpinner size={16} className="me-2" />}
             {actionLabel}
-          </ModernButton>
-          <ModernButton
+          </GlassButton>
+          <GlassButton
             onClick={handleEdit}
             disabled={isProcessing}
             variant="outline"
@@ -157,17 +157,17 @@ const AISuggestionCard: React.FC<AISuggestionCardProps> = React.memo(({ suggesti
           >
             <Edit size={16} />
             {t('common.edit')}
-          </ModernButton>
+          </GlassButton>
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <ModernButton
+              <GlassButton
                 variant="destructive"
                 disabled={isProcessing}
                 className="flex items-center gap-2 px-6 py-2 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105"
               >
                 <XCircle size={16} />
                 {t('common.discard')}
-              </ModernButton>
+              </GlassButton>
             </AlertDialogTrigger>
             <AlertDialogContent className="glass rounded-xl p-6">
               <AlertDialogHeader>

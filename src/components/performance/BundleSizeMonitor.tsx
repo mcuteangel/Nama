@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { ModernButton } from '@/components/ui/modern-button';
+import { GlassButton } from "@/components/ui/glass-button";
 import { ModernCard, ModernCardContent, ModernCardDescription, ModernCardHeader, ModernCardTitle } from '@/components/ui/modern-card';
 import { Separator } from '@/components/ui/separator';
 import { 
@@ -202,10 +202,10 @@ export const BundleSizeMonitor: React.FC = React.memo(() => {
                   : t('bundle_monitor.status_warning', 'Needs Attention')
                 }
               </Badge>
-              <ModernButton variant="outline" size="sm" onClick={exportReport}>
+              <GlassButton variant="outline" size="sm" onClick={exportReport}>
                 <Download className="h-4 w-4 mr-2" />
                 {t('bundle_monitor.export', 'Export Report')}
-              </ModernButton>
+              </GlassButton>
             </div>
           </div>
           <ModernCardDescription>

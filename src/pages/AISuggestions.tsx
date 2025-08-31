@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { ModernCard, ModernCardContent, ModernCardDescription, ModernCardHeader, ModernCardTitle } from "@/components/ui/modern-card";
 import { ModernTextarea } from "@/components/ui/modern-textarea";
-import { ModernButton } from "@/components/ui/modern-button";
+import { GlassButton } from "@/components/ui/glass-button";
 import { Sparkles, UserCheck, Mic, StopCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useContactExtractor } from "@/hooks/use-contact-extractor";
@@ -260,7 +260,7 @@ const AISuggestions: React.FC = () => {
     return (
       <div className="text-center text-red-500 dark:text-red-400 p-4">
         <p>{t('ai_suggestions.extractor_error')}: {extractorError || speechError}</p>
-        <ModernButton onClick={() => window.location.reload()} className="mt-4">{t('common.reload_page')}</ModernButton>
+        <GlassButton onClick={() => window.location.reload()} className="mt-4">{t('common.reload_page')}</GlassButton>
       </div>
     );
   }
@@ -298,7 +298,7 @@ const AISuggestions: React.FC = () => {
                     disabled={isExtractorLoading || isProcessingSuggestions || isSavingOrUpdating}
                   />
                   {browserSupportsSpeechRecognition && (
-                    <ModernButton
+                    <GlassButton
                       type="button"
                       variant="ghost"
                       size="icon"
@@ -307,10 +307,10 @@ const AISuggestions: React.FC = () => {
                       disabled={isExtractorLoading || isProcessingSuggestions || isSavingOrUpdating}
                     >
                       {isListening ? <StopCircle size={20} className="animate-pulse text-red-500" /> : <Mic size={20} />}
-                    </ModernButton>
+                    </GlassButton>
                   )}
                 </div>
-                <ModernButton
+                <GlassButton
                   type="button"
                   onClick={handleExtractAndEnqueue}
                   disabled={!rawTextInput.trim() || isExtractorLoading || isProcessingSuggestions || isSavingOrUpdating}
@@ -318,7 +318,7 @@ const AISuggestions: React.FC = () => {
                 >
                   {(isExtractorLoading || isProcessingSuggestions || isSavingOrUpdating) && <LoadingSpinner size={16} className="me-2" />}
                   {isExtractorLoading || isProcessingSuggestions || isSavingOrUpdating ? t('ai_suggestions.processing_text') : t('ai_suggestions.extract_and_suggest_button')}
-                </ModernButton>
+                </GlassButton>
               </div>
 
               {(isLoadingSuggestions || isSavingOrUpdating) && (

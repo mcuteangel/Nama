@@ -1,6 +1,6 @@
 import React from 'react';
 import { ModernPopover, ModernPopoverContent, ModernPopoverTrigger } from '@/components/ui/modern-popover';
-import { ModernButton } from '@/components/ui/modern-button';
+import { GlassButton } from "@/components/ui/glass-button";
 import { cn } from '@/lib/utils';
 
 export const colors = [
@@ -33,7 +33,7 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ selectedColor, onSelectColor 
   return (
     <ModernPopover>
       <ModernPopoverTrigger asChild>
-        <ModernButton
+        <GlassButton
           variant="outline"
           className="w-full justify-start text-left font-normal mt-1"
           style={{ backgroundColor: selectedColor, color: '#fff' }}
@@ -45,7 +45,7 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ selectedColor, onSelectColor 
             />
             <span>{selectedColor}</span>
           </div>
-        </ModernButton>
+        </GlassButton>
       </ModernPopoverTrigger>
       <ModernPopoverContent className="w-auto p-0" glassEffect="glassAdvanced">
         <div className="grid grid-cols-5 gap-2 p-2">

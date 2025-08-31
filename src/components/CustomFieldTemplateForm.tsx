@@ -20,7 +20,7 @@ import CancelButton from './common/CancelButton';
 import LoadingSpinner from './common/LoadingSpinner';
 import { t } from 'i18next';
 import { ModernCard, ModernCardHeader, ModernCardTitle, ModernCardContent, ModernCardFooter } from '@/components/ui/modern-card';
-import { ModernButton } from '@/components/ui/modern-button';
+import { GlassButton } from "@/components/ui/glass-button";
 
 type TemplateType = 'text' | 'number' | 'date' | 'list';
 
@@ -154,7 +154,7 @@ const CustomFieldTemplateForm: React.FC<CustomFieldTemplateFormProps> = ({ initi
           <div className="text-sm text-destructive flex items-center justify-center gap-2 mt-2">
             <span>{errorMessage}</span>
             {retryCount > 0 && (
-              <ModernButton
+              <GlassButton
                 variant="glass"
                 size="sm"
                 onClick={retryLastOperation}
@@ -162,7 +162,7 @@ const CustomFieldTemplateForm: React.FC<CustomFieldTemplateFormProps> = ({ initi
                 className="text-destructive hover:bg-destructive/10"
               >
                 تلاش مجدد ({retryCount} از ۳)
-              </ModernButton>
+              </GlassButton>
             )}
           </div>
         )}
@@ -226,7 +226,7 @@ const CustomFieldTemplateForm: React.FC<CustomFieldTemplateFormProps> = ({ initi
                     className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
                     disabled={isSubmitting}
                   />
-                  <ModernButton
+                  <GlassButton
                     type="button"
                     variant="glass"
                     size="sm"
@@ -235,15 +235,15 @@ const CustomFieldTemplateForm: React.FC<CustomFieldTemplateFormProps> = ({ initi
                     disabled={isSubmitting}
                   >
                     <X size={16} />
-                  </ModernButton>
+                  </GlassButton>
                 </div>
               ))}
-              <ModernButton type="button" variant="glass" size="sm" onClick={addOption}
+              <GlassButton type="button" variant="glass" size="sm" onClick={addOption}
                 className="w-full flex items-center gap-2 px-3 py-2 rounded-lg font-medium"
                 disabled={isSubmitting}
               >
                 <Plus size={16} className="me-2" /> افزودن گزینه
-              </ModernButton>
+              </GlassButton>
               {form.formState.errors.options && (
                 <p className="text-sm text-red-500 font-medium mt-1">{(form.formState.errors.options as { message?: string })?.message}</p>
               )}
@@ -275,7 +275,7 @@ const CustomFieldTemplateForm: React.FC<CustomFieldTemplateFormProps> = ({ initi
 
           <ModernCardFooter className="flex justify-end gap-4 p-0 pt-4">
             <CancelButton onClick={onCancel} disabled={isSubmitting} />
-            <ModernButton
+            <GlassButton
               type="submit"
               variant="glass"
               className="px-4 py-2 rounded-lg font-medium"
@@ -283,7 +283,7 @@ const CustomFieldTemplateForm: React.FC<CustomFieldTemplateFormProps> = ({ initi
             >
               {isSubmitting && <LoadingSpinner size={16} className="me-2" />}
               {isSubmitting ? (initialData ? "در حال ویرایش..." : "در حال افزودن...") : (initialData ? "ویرایش" : "افزودن")}
-            </ModernButton>
+            </GlassButton>
           </ModernCardFooter>
         </form>
       </ModernCardContent>

@@ -1,4 +1,4 @@
-export type GlassEffect = "none" | "light" | "medium" | "strong";
+export type GlassEffect = "none" | "default" | "advanced" | "card" | "background" | "button";
 
 export type GradientType = 
   | "none" 

@@ -17,7 +17,7 @@ import LoadingSpinner from '../common/LoadingSpinner';
 import { EdgeFunctionDebugger } from '@/utils/edge-function-debugger';
 import { useDebugMode } from '@/hooks/use-debug-mode';
 import { ModernCard } from "@/components/ui/modern-card";
-import { ModernButton } from "@/components/ui/modern-button";
+import { GlassButton } from "@/components/ui/glass-button";
 
 interface UserProfile {
   id: string;
@@ -86,9 +86,9 @@ const UserItem = ({ user, onUserUpdated, onUserDeleted }: { user: UserProfile; o
       <div className="flex gap-2">
         <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
           <DialogTrigger asChild>
-            <ModernButton variant="ghost" size="icon" className="text-blue-600 hover:bg-blue-100 dark:text-blue-400 dark:hover:bg-gray-600/50 transition-all duration-200">
+            <GlassButton variant="ghost" size="icon" className="text-blue-600 hover:bg-blue-100 dark:text-blue-400 dark:hover:bg-gray-600/50 transition-all duration-200">
               <Edit size={20} />
-            </ModernButton>
+            </GlassButton>
           </DialogTrigger>
           <FormDialogWrapper 
             title={t('user_management.edit_user_title', 'Edit User')}
@@ -107,9 +107,9 @@ const UserItem = ({ user, onUserUpdated, onUserDeleted }: { user: UserProfile; o
 
         <AlertDialog>
           <AlertDialogTrigger asChild>
-            <ModernButton variant="ghost" size="icon" className="text-red-600 hover:bg-red-100 dark:text-red-400 dark:hover:bg-gray-600/50 transition-all duration-200" disabled={isDeleting}>
+            <GlassButton variant="ghost" size="icon" className="text-red-600 hover:bg-red-100 dark:text-red-400 dark:hover:bg-gray-600/50 transition-all duration-200" disabled={isDeleting}>
               {isDeleting ? <LoadingSpinner size={20} /> : <Trash2 size={20} />}
-            </ModernButton>
+            </GlassButton>
           </AlertDialogTrigger>
           <AlertDialogContent className="rounded-xl p-6 bg-white dark:bg-gray-800">
             <AlertDialogHeader>
@@ -231,19 +231,19 @@ const UserList: React.FC = () => {
     <div className="space-y-4">
       {/* Debug Button - Only show when debug mode is enabled */}
       {isDebugMode && (
-        <ModernButton
+        <GlassButton
           onClick={handleDebugConnection}
           variant="outline"
           className="w-full px-4 py-2 rounded-lg border-2 border-dashed border-orange-300 bg-orange-50 hover:bg-orange-100 text-orange-700 font-medium transition-all duration-300"
         >
           <Bug size={16} className="me-2" />
           {t('actions.test_connection')}
-        </ModernButton>
+        </GlassButton>
       )}
       
       <Dialog open={isAddUserDialogOpen} onOpenChange={setIsAddUserDialogOpen}>
         <DialogTrigger asChild>
-          <ModernButton
+          <GlassButton
             variant="gradient-primary"
             className="w-full px-6 py-2 rounded-lg font-semibold shadow-md transition-all duration-300 transform hover:scale-105"
           >
@@ -251,7 +251,7 @@ const UserList: React.FC = () => {
               <PlusCircle size={20} className="me-2" />
               {t('user_management.add_new_user')}
             </span>
-          </ModernButton>
+          </GlassButton>
         </DialogTrigger>
         <FormDialogWrapper 
           title={t('user_management.add_user_title', 'Add User')}

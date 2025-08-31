@@ -11,7 +11,7 @@ import { ContactCrudService } from '@/services/contact-crud-service';
 import EmptyState from './common/EmptyState';
 import LoadingSpinner from './common/LoadingSpinner';
 import { ModernCard, ModernCardHeader, ModernCardTitle, ModernCardDescription, ModernCardContent } from "@/components/ui/modern-card";
-import { ModernButton } from "@/components/ui/modern-button";
+import { GlassButton } from "@/components/ui/glass-button";
 
 interface DuplicateContact {
   id: string;
@@ -327,7 +327,7 @@ const DuplicateContactManagement: React.FC = () => {
           </ModernCardDescription>
         </ModernCardHeader>
         <ModernCardContent className="space-y-4">
-          <ModernButton
+          <GlassButton
             onClick={fetchAllContactsForDuplicates}
             disabled={isScanning}
             variant="gradient-sunset"
@@ -336,7 +336,7 @@ const DuplicateContactManagement: React.FC = () => {
             {isScanning && <LoadingSpinner size={16} className="me-2" />}
             <Merge size={16} className="me-2" />
             {t('ai_suggestions.scan_for_duplicates')}
-          </ModernButton>
+          </GlassButton>
 
           {duplicatePairs.length === 0 && !isScanning && (
             <EmptyState
@@ -367,22 +367,22 @@ const DuplicateContactManagement: React.FC = () => {
                     </div>
                   </div>
                   <div className="flex justify-end gap-2 mt-3">
-                    <ModernButton
+                    <GlassButton
                       variant="ghost"
                       size="icon"
                       onClick={() => handleMergeContacts(pair.mainContact, pair.duplicateContact)}
                       className="text-green-600 hover:bg-green-100 dark:text-green-400 dark:hover:bg-gray-600/50"
                     >
                       <Merge size={20} />
-                    </ModernButton>
-                    <ModernButton
+                    </GlassButton>
+                    <GlassButton
                       variant="ghost"
                       size="icon"
                       onClick={() => handleDiscardDuplicate(pair.duplicateContact.id)}
                       className="text-red-600 hover:bg-red-100 dark:text-red-400 dark:hover:bg-gray-600/50"
                     >
                       <XCircle size={20} />
-                    </ModernButton>
+                    </GlassButton>
                   </div>
                 </div>
               ))}

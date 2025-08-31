@@ -13,7 +13,7 @@ import { ErrorManager } from '@/lib/error-manager';
 import CancelButton from '../common/CancelButton';
 import LoadingSpinner from '../common/LoadingSpinner';
 import { ModernCard, ModernCardHeader, ModernCardTitle, ModernCardContent, ModernCardFooter } from "@/components/ui/modern-card";
-import { ModernButton } from "@/components/ui/modern-button";
+import { GlassButton } from "@/components/ui/glass-button";
 
 const formSchema = z.object({
   name: z.string().min(1, { message: 'نام گروه نمی‌تواند خالی باشد.' }),
@@ -129,7 +129,7 @@ const GroupForm: React.FC<GroupFormProps> = ({ initialData, onSuccess, onCancel 
           <div className="text-sm text-destructive flex items-center justify-center gap-2 mt-2">
             <span>{errorMessage}</span>
             {retryCount > 0 && (
-              <ModernButton
+              <GlassButton
                 variant="ghost"
                 size="sm"
                 onClick={retrySave}
@@ -137,7 +137,7 @@ const GroupForm: React.FC<GroupFormProps> = ({ initialData, onSuccess, onCancel 
                 className="text-destructive hover:bg-destructive/10"
               >
                 تلاش مجدد ({retryCount} از ۳)
-              </ModernButton>
+              </GlassButton>
             )}
           </div>
         )}
@@ -164,7 +164,7 @@ const GroupForm: React.FC<GroupFormProps> = ({ initialData, onSuccess, onCancel 
 
           <ModernCardFooter className="flex justify-end gap-4 p-0 pt-4">
             <CancelButton onClick={onCancel} disabled={isSaving} />
-            <ModernButton
+            <GlassButton
               type="submit"
               variant="gradient-primary"
               className="px-6 py-2 rounded-md font-semibold"
@@ -172,7 +172,7 @@ const GroupForm: React.FC<GroupFormProps> = ({ initialData, onSuccess, onCancel 
             >
               {isSaving && <LoadingSpinner size={16} className="me-2" />}
               {isSaving ? (initialData?.id ? "در حال ویرایش..." : "در حال افزودن...") : (initialData?.id ? "ویرایش" : "افزودن")}
-            </ModernButton>
+            </GlassButton>
           </ModernCardFooter>
         </form>
       </ModernCardContent>

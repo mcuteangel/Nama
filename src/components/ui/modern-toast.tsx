@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { X, CheckCircle, AlertCircle, AlertTriangle, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { ModernButton } from './modern-button';
+import { GlassButton } from "@/components/ui/glass-button";
 import { ToastContext, ToastState } from './toast-context';
 
 export interface ToastProps {
@@ -127,26 +127,26 @@ export function Toast({
       {/* اکشن */}
       {action && (
         <div className="flex-shrink-0">
-          <ModernButton
+          <GlassButton
             variant="ghost"
             size="sm"
             onClick={action.onClick}
             className="h-8 px-3 text-xs"
           >
             {action.label}
-          </ModernButton>
+          </GlassButton>
         </div>
       )}
 
       {/* دکمه بستن */}
-      <ModernButton
+      <GlassButton
         variant="ghost"
         size="icon"
         onClick={handleDismiss}
         className="h-6 w-6 flex-shrink-0"
       >
         <X className="h-4 w-4" />
-      </ModernButton>
+      </GlassButton>
 
       {/* Progress bar */}
       <div 

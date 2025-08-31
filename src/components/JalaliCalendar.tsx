@@ -7,7 +7,7 @@ import {
   ModernPopoverContent,
   ModernPopoverTrigger,
 } from '@/components/ui/modern-popover';
-import { ModernButton } from '@/components/ui/modern-button';
+import { GlassButton } from "@/components/ui/glass-button";
 import { cn, applyGlassEffect } from '@/lib/utils';
 import moment from 'moment-jalaali';
 import { useJalaliCalendar } from '@/hooks/use-jalali-calendar';
@@ -289,20 +289,20 @@ export function JalaliCalendar({
       {/* Calendar Type Toggle */}
       {showToggle && (
         <div className="flex justify-end mb-3">
-          <ModernButton
+          <GlassButton
             variant="outline"
             size="sm"
             onClick={toggleCalendarType}
             className="text-xs h-7 px-2"
           >
             {isJalali ? 'میلادی' : 'شمسی'}
-          </ModernButton>
+          </GlassButton>
         </div>
       )}
 
       {/* Header */}
       <div className={cn("flex items-center justify-between mb-4")}>
-        <ModernButton
+        <GlassButton
           variant="ghost"
           size="icon"
           onClick={isJalali ? goToNextMonth : goToPreviousMonth}
@@ -313,13 +313,13 @@ export function JalaliCalendar({
           ) : (
             <ChevronLeft className="h-4 w-4" />
           )}
-        </ModernButton>
+        </GlassButton>
         
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-1">
             <ModernPopover open={showMonthPicker} onOpenChange={setShowMonthPicker}>
               <ModernPopoverTrigger asChild>
-                <ModernButton 
+                <GlassButton 
                   variant="ghost" 
                   size="sm" 
                   className="h-7 px-2 text-sm"
@@ -330,7 +330,7 @@ export function JalaliCalendar({
                 >
                   {monthName}
                   <ChevronDown className="mr-1 h-3 w-3 opacity-50" />
-                </ModernButton>
+                </GlassButton>
               </ModernPopoverTrigger>
               <ModernPopoverContent className="w-48 p-2" align={isJalali ? 'end' : 'start'} glassEffect="glassAdvanced">
                 <div className="grid grid-cols-3 gap-1">
@@ -338,7 +338,7 @@ export function JalaliCalendar({
                     ? ['فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور', 'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند']
                     : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
                   ).map((m, i) => (
-                    <ModernButton
+                    <GlassButton
                       key={i}
                       variant={i === month ? 'default' : 'ghost'}
                       size="sm"
@@ -346,7 +346,7 @@ export function JalaliCalendar({
                       onClick={() => changeMonth(i)}
                     >
                       {m}
-                    </ModernButton>
+                    </GlassButton>
                   ))}
                 </div>
               </ModernPopoverContent>
@@ -357,7 +357,7 @@ export function JalaliCalendar({
               if (open) setYearPage(0); // Reset to current decade when opening
             }}>
               <ModernPopoverTrigger asChild>
-                <ModernButton 
+                <GlassButton 
                   variant="ghost" 
                   size="sm" 
                   className="h-7 px-2 text-sm"
@@ -368,11 +368,11 @@ export function JalaliCalendar({
                 >
                   {yearNumber}
                   <ChevronDown className="mr-1 h-3 w-3 opacity-50" />
-                </ModernButton>
+                </GlassButton>
               </ModernPopoverTrigger>
               <ModernPopoverContent className="w-64 p-3" align={isJalali ? 'end' : 'start'} glassEffect="glassAdvanced">
                 <div className="flex justify-between items-center mb-2">
-                  <ModernButton
+                  <GlassButton
                     variant="ghost"
                     size="icon"
                     className="h-7 w-7"
@@ -382,11 +382,11 @@ export function JalaliCalendar({
                     }}
                   >
                     <ChevronLeft className="h-4 w-4" />
-                  </ModernButton>
+                  </GlassButton>
                   <span className="text-sm font-medium">
                     {getCurrentDecade().start + 2} - {getCurrentDecade().end - 2} ({getCurrentDecade().end - getCurrentDecade().start - 3} سال)
                   </span>
-                  <ModernButton
+                  <GlassButton
                     variant="ghost"
                     size="icon"
                     className="h-7 w-7"
@@ -396,11 +396,11 @@ export function JalaliCalendar({
                     }}
                   >
                     <ChevronRight className="h-4 w-4" />
-                  </ModernButton>
+                  </GlassButton>
                 </div>
                 <div className="grid grid-cols-5 gap-1">
                   {getYearsInDecade().map(({ year, isCurrent, isInDecade }) => (
-                    <ModernButton
+                    <GlassButton
                       key={year}
                       variant={year === yearNumber ? 'default' : 'ghost'}
                       size="sm"
@@ -416,23 +416,23 @@ export function JalaliCalendar({
                       }}
                     >
                       {year}
-                    </ModernButton>
+                    </GlassButton>
                   ))}
                 </div>
               </ModernPopoverContent>
             </ModernPopover>
           </div>
-          <ModernButton
+          <GlassButton
             variant="outline"
             size="sm"
             onClick={goToToday}
             className="text-xs h-7 px-2"
           >
             {isJalali ? 'امروز' : 'Today'}
-          </ModernButton>
+          </GlassButton>
         </div>
         
-        <ModernButton
+        <GlassButton
           variant="ghost"
           size="icon"
           onClick={isJalali ? goToPreviousMonth : goToNextMonth}
@@ -443,7 +443,7 @@ export function JalaliCalendar({
           ) : (
             <ChevronRight className="h-4 w-4" />
           )}
-        </ModernButton>
+        </GlassButton>
       </div>
 
       {/* Days of week */}
@@ -470,7 +470,7 @@ export function JalaliCalendar({
       {/* Calendar grid */}
       <div className="grid grid-cols-7 gap-1">
         {monthDays.map((day, index) => (
-          <ModernButton
+          <GlassButton
             key={index}
             variant="ghost"
             size="sm"
@@ -488,7 +488,7 @@ export function JalaliCalendar({
             {day.isToday && !day.isSelected && (
               <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-primary"></span>
             )}
-          </ModernButton>
+          </GlassButton>
         ))}
       </div>
     </div>

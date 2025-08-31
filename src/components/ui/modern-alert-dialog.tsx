@@ -2,8 +2,8 @@ import * as React from "react";
 import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog";
 
 import { cn, applyGlassEffect, applyGradientEffect, applyNeomorphismEffect, applyAnimation } from "@/lib/utils";
-import { GlassEffect, GradientType, AnimationType } from "@/types/global-style-types";
-import { ModernButton, type ModernButtonProps } from "@/components/ui/modern-button";
+import { GlassEffect, GradientType } from "@/types/global-style-types";
+import { GlassButton, type GlassButtonProps } from "@/components/ui/glass-button";
 
 const ModernAlertDialog = AlertDialogPrimitive.Root;
 
@@ -15,12 +15,12 @@ const ModernAlertDialogOverlay = React.forwardRef<
   React.ElementRef<typeof AlertDialogPrimitive.Overlay>,
   React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Overlay> & {
     glassEffect?: GlassEffect;
-    animation?: AnimationType;
+    animation?: "fade-in-up" | "fade-in-down" | "fade-in-left" | "fade-in-right" | "scale-in" | "scale-out" | "floating" | "pulse-glow" | "none";
   }
 >(({ 
   className, 
-  glassEffect = "glassAdvanced",
-  animation = "fade-in",
+  glassEffect = "advanced",
+  animation = "fade-in" as "fade-in-up" | "fade-in-down" | "fade-in-left" | "fade-in-right" | "scale-in" | "scale-out" | "floating" | "pulse-glow" | "none",
   ...props 
 }, ref) => {
   const shouldApplyGlass = glassEffect !== "none";
@@ -46,14 +46,14 @@ const ModernAlertDialogContent = React.forwardRef<
     glassEffect?: GlassEffect;
     gradientType?: GradientType;
     neomorphism?: boolean;
-    animation?: AnimationType;
+    animation?: "fade-in-up" | "fade-in-down" | "fade-in-left" | "fade-in-right" | "scale-in" | "scale-out" | "floating" | "pulse-glow" | "none";
   }
 >(({ 
   className, 
-  glassEffect = "glassCard",
+  glassEffect = "card",
   gradientType = "none",
   neomorphism = false,
-  animation = "scale-in",
+  animation = "scale-in" as "fade-in-up" | "fade-in-down" | "fade-in-left" | "fade-in-right" | "scale-in" | "scale-out" | "floating" | "pulse-glow" | "none",
   ...props 
 }, ref) => {
   const shouldApplyGlass = glassEffect !== "none";
@@ -62,13 +62,13 @@ const ModernAlertDialogContent = React.forwardRef<
   
   return (
     <ModernAlertDialogPortal>
-      <ModernAlertDialogOverlay glassEffect={glassEffect} animation={animation} />
+      <ModernAlertDialogOverlay glassEffect={glassEffect} />
       <AlertDialogPrimitive.Content
         ref={ref}
         className={cn(
           "fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 sm:rounded-lg",
           shouldApplyGlass && applyGlassEffect(glassEffect),
-          shouldApplyNeomorphism && applyNeomorphismEffect(),
+          shouldApplyNeomorphism && applyNeomorphismEffect(undefined, false),
           shouldApplyGradient && applyGradientEffect(gradientType),
           applyAnimation(undefined, animation),
           className,
@@ -135,9 +135,9 @@ ModernAlertDialogDescription.displayName =
 
 const ModernAlertDialogAction = React.forwardRef<
   React.ElementRef<typeof AlertDialogPrimitive.Action>,
-  React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Action> & ModernButtonProps
+  React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Action> & GlassButtonProps
 >(({ className, ...props }, ref) => (
-  <ModernButton
+  <GlassButton
     ref={ref}
     className={cn(className)}
     {...props}
@@ -147,9 +147,9 @@ ModernAlertDialogAction.displayName = AlertDialogPrimitive.Action.displayName;
 
 const ModernAlertDialogCancel = React.forwardRef<
   React.ElementRef<typeof AlertDialogPrimitive.Cancel>,
-  React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Cancel> & ModernButtonProps
+  React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Cancel> & GlassButtonProps
 >(({ className, ...props }, ref) => (
-  <ModernButton
+  <GlassButton
     ref={ref}
     variant="outline"
     className={cn(className)}

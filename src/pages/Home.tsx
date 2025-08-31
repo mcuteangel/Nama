@@ -6,7 +6,7 @@ import {
   ModernCardDescription, 
   ModernCardHeader, 
   ModernCardTitle} from "@/components/ui/modern-card";
-import { GradientButton } from "@/components/ui/modern-button";
+import { GradientButton } from "@/components/ui/glass-button";
 import { GlassButton } from "@/components/ui/glass-button";
 import { useToast } from "@/components/ui/use-toast";
 import { JalaliCalendar } from "@/components/JalaliCalendar";

@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { useFormContext, useFieldArray } from 'react-hook-form';
 import { ModernInput } from '@/components/ui/modern-input';
 import { ModernSelect, ModernSelectContent, ModernSelectItem, ModernSelectTrigger, ModernSelectValue } from '@/components/ui/modern-select';
-import { ModernButton } from '@/components/ui/modern-button';
+import { GlassButton } from "@/components/ui/glass-button";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { Plus, X } from 'lucide-react';
 import { ContactFormValues } from '@/types/contact';
@@ -29,7 +29,7 @@ const ContactEmailAddresses: React.FC = React.memo(() => {
         <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 heading-3">
           {t('section_titles.email_addresses')}
         </h3>
-        <ModernButton
+        <GlassButton
           type="button"
           variant="gradient-sunset"
           effect="lift"
@@ -39,7 +39,7 @@ const ContactEmailAddresses: React.FC = React.memo(() => {
         >
           <Plus size={16} className="me-2" /> 
           {t('button_labels.add_email_address')}
-        </ModernButton>
+        </GlassButton>
       </div>
       
       <div className="space-y-4 p-4 rounded-xl glass">
@@ -97,7 +97,7 @@ const ContactEmailAddresses: React.FC = React.memo(() => {
               />
             </div>
             <div className="md:col-span-1 flex justify-center">
-              <ModernButton 
+              <GlassButton 
                 type="button" 
                 variant="ghost" 
                 size="icon" 
@@ -106,7 +106,7 @@ const ContactEmailAddresses: React.FC = React.memo(() => {
                 aria-label={t('accessibility.remove_email_address', 'Remove email address')}
               >
                 <X size={16} />
-              </ModernButton>
+              </GlassButton>
             </div>
           </div>
         ))}

@@ -1,7 +1,7 @@
 import React from 'react';
 import { ModernCard, ModernCardContent, ModernCardHeader, ModernCardTitle } from '@/components/ui/modern-card';
 import { Switch } from '@/components/ui/switch';
-import { ModernButton } from '@/components/ui/modern-button';
+import { GlassButton } from "@/components/ui/glass-button";
 import { Bug, Info, Zap, TestTube } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useDebugMode } from '@/hooks/use-debug-mode';
@@ -112,7 +112,7 @@ const DebugSettings: React.FC = () => {
             </h4>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <ModernButton
+              <GlassButton
                 onClick={handleTestConnection}
                 variant="outline"
                 size="sm"
@@ -120,9 +120,9 @@ const DebugSettings: React.FC = () => {
               >
                 <Bug size={14} className="me-2" />
                 تست Edge Function
-              </ModernButton>
+              </GlassButton>
               
-              <ModernButton
+              <GlassButton
                 onClick={handleClearCache}
                 variant="outline"
                 size="sm"
@@ -130,9 +130,9 @@ const DebugSettings: React.FC = () => {
               >
                 <Zap size={14} className="me-2" />
                 پاک کردن Cache
-              </ModernButton>
+              </GlassButton>
               
-              <ModernButton
+              <GlassButton
                 onClick={handleShowStorageInfo}
                 variant="outline"
                 size="sm"
@@ -140,7 +140,7 @@ const DebugSettings: React.FC = () => {
               >
                 <Info size={14} className="me-2" />
                 اطلاعات Storage
-              </ModernButton>
+              </GlassButton>
             </div>
             
             <div className="text-xs text-orange-700 dark:text-orange-300 mt-2">

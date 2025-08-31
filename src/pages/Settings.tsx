@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ModernCard, ModernCardContent, ModernCardDescription, ModernCardHeader, ModernCardTitle } from "@/components/ui/modern-card";
-import { ModernButton } from "@/components/ui/modern-button";
+import { GlassButton } from "@/components/ui/glass-button";
 import { Link } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
 import { ThemeToggle } from "@/components/settings";
@@ -99,11 +99,11 @@ const Settings = () => {
                 <RTLTestSetting />
               </ModernCard>
               <ModernCard variant="glass" className="p-4 rounded-lg shadow-sm">
-                <ModernButton asChild variant="gradient-primary" className="w-full">
+                <GlassButton asChild variant="gradient-primary" className="w-full">
                   <Link to="/modern-ui-showcase">
                     {t('settings.ui_showcase')}
                   </Link>
-                </ModernButton>
+                </GlassButton>
               </ModernCard>
             </div>
           </div>
@@ -114,7 +114,7 @@ const Settings = () => {
               <Download size={20} /> {t('settings.data_management')}
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <ModernButton
+              <GlassButton
                 onClick={handleExport}
                 disabled={isExporting}
                 className="flex items-center gap-2 px-6 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white font-semibold shadow-md transition-all duration-300 transform hover:scale-105"
@@ -122,7 +122,7 @@ const Settings = () => {
                 {isExporting && <LoadingSpinner size={16} className="me-2" />}
                 <Download size={20} />
                 {t('settings.export_contacts')}
-              </ModernButton>
+              </GlassButton>
               <ImportContactsDialog onImportSuccess={handleImportSuccess} />
             </div>
           </div>
@@ -135,14 +135,14 @@ const Settings = () => {
             <h3 className="text-2xl font-semibold text-gray-800 dark:text-gray-100 border-b pb-2 mb-4 flex items-center gap-2">
               <User size={20} /> {t('common.profile')}
             </h3>
-            <ModernButton
+            <GlassButton
               asChild
               className="w-full px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-md transition-all duration-300 transform hover:scale-105"
             >
               <Link to="/profile">
                 {t('settings.user_profile')}
               </Link>
-            </ModernButton>
+            </GlassButton>
           </div>
         </ModernCardContent>
       </ModernCard>

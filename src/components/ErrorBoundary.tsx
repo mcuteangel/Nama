@@ -2,7 +2,7 @@ import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
 import { ModernCard, ModernCardHeader, ModernCardTitle, ModernCardContent } from '@/components/ui/modern-card';
-import { ModernButton } from '@/components/ui/modern-button';
+import { GlassButton } from "@/components/ui/glass-button";
 
 interface Props {
   children: ReactNode;
@@ -87,20 +87,20 @@ const ErrorFallback: React.FC<ErrorFallbackProps> = ({ onRetry, error }) => {
         )}
         
         <div className="flex justify-center gap-2">
-          <ModernButton 
+          <GlassButton 
             onClick={onRetry} 
             variant="outline" 
             className="flex items-center gap-2"
           >
             <RefreshCw size={16} />
             {t('common.retry', 'Try Again')}
-          </ModernButton>
-          <ModernButton 
+          </GlassButton>
+          <GlassButton 
             onClick={() => window.location.reload()} 
             variant="default"
           >
             {t('common.reload_page', 'Reload Page')}
-          </ModernButton>
+          </GlassButton>
         </div>
       </ModernCardContent>
     </ModernCard>

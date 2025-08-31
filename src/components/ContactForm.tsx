@@ -10,7 +10,7 @@ import { CustomFieldTemplateService } from "@/services/custom-field-template-ser
 import { CustomFieldTemplate } from "@/domain/schemas/custom-field-template";
 import { ContactFormValues, contactFormSchema, CustomFieldFormData } from "../types/contact.ts";
 import { fetchWithCache } from "@/utils/cache-helpers";
-import { ModernButton } from "./ui/modern-button.tsx";
+import { GlassButton } from "./ui/glass-button";
 import { ModernProgress } from "./ui/modern-progress.tsx";
 import { ModernCard, ModernCardContent } from "@/components/ui/modern-card";
 import { useTranslation } from "react-i18next";
@@ -359,7 +359,7 @@ const ContactForm: React.FC<ContactFormProps> = React.memo(({ initialData, conta
             >
               <span id="form-error-message" className="text-center sm:text-start">{errorMessage}</span>
               {retryCount > 0 && (
-                <ModernButton
+                <GlassButton
                   variant="ghost"
                   size="sm"
                   onClick={retrySave}
@@ -369,7 +369,7 @@ const ContactForm: React.FC<ContactFormProps> = React.memo(({ initialData, conta
                   aria-label={t('accessibility.retry_save', 'Retry saving form')}
                 >
                   {t('common.retry')} ({retryCount} {t('common.of')} ۳)
-                </ModernButton>
+                </GlassButton>
               )}
             </div>
           )}

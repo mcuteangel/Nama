@@ -11,7 +11,7 @@ import { useGroups } from '@/hooks/use-groups';
 import EmptyState from '../common/EmptyState';
 import LoadingSpinner from '../common/LoadingSpinner';
 import { ModernCard, ModernCardHeader, ModernCardTitle, ModernCardDescription, ModernCardContent } from "@/components/ui/modern-card";
-import { ModernButton } from "@/components/ui/modern-button";
+import { GlassButton } from "@/components/ui/glass-button";
 
 interface ContactWithoutGroup {
   id: string;
@@ -177,7 +177,7 @@ const SmartGroupManagement: React.FC = () => {
           </ModernCardDescription>
         </ModernCardHeader>
         <ModernCardContent className="space-y-4">
-          <ModernButton
+          <GlassButton
             onClick={generateGroupSuggestions}
             disabled={isGeneratingSuggestions || contactsWithoutGroup.length === 0}
             variant="gradient-primary"
@@ -186,7 +186,7 @@ const SmartGroupManagement: React.FC = () => {
             {isGeneratingSuggestions && <LoadingSpinner size={16} className="me-2" />}
             <Sparkles size={16} className="me-2" />
             {t('ai_suggestions.generate_group_suggestions')}
-          </ModernButton>
+          </GlassButton>
 
           {contactsWithoutGroup.length === 0 && !isGeneratingSuggestions && (
             <EmptyState
@@ -211,22 +211,22 @@ const SmartGroupManagement: React.FC = () => {
                     </p>
                   </div>
                   <div className="flex gap-2">
-                    <ModernButton
+                    <GlassButton
                       variant="ghost"
                       size="icon"
                       onClick={() => handleApplySuggestion(suggestion)}
                       className="text-green-600 hover:bg-green-100 dark:text-green-400 dark:hover:bg-gray-600/50"
                     >
                       <CheckCircle size={20} />
-                    </ModernButton>
-                    <ModernButton
+                    </GlassButton>
+                    <GlassButton
                       variant="ghost"
                       size="icon"
                       onClick={() => handleDiscardSuggestion(suggestion.contact_id)}
                       className="text-red-600 hover:bg-red-100 dark:text-red-400 dark:hover:bg-gray-600/50"
                     >
                       <XCircle size={20} />
-                    </ModernButton>
+                    </GlassButton>
                   </div>
                 </div>
               ))}

@@ -3,21 +3,21 @@ import { Slot } from "@radix-ui/react-slot";
 import { type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
-import { ModernButton, type ModernButtonProps } from "./modern-button";
+import { GlassButton, type GlassButtonProps } from "./glass-button";
 import { buttonVariants } from "./button-variants";
 
-// Map legacy variants to modern variants
-const mapVariantToModern = (variant: string | null | undefined): ModernButtonProps['variant'] => {
-  const variantMap: Record<string, ModernButtonProps['variant']> = {
-    default: 'default',
-    destructive: 'destructive',
-    outline: 'outline',
-    secondary: 'secondary',
-    ghost: 'ghost',
-    link: 'link'
+// Map legacy variants to glass variants
+const mapVariantToGlass = (variant: string | null | undefined): GlassButtonProps['variant'] => {
+  const variantMap: Record<string, GlassButtonProps['variant']> = {
+    default: 'glass',
+    destructive: 'glass',
+    outline: 'glass',
+    secondary: 'glass',
+    ghost: 'glass',
+    link: 'glass'
   };
   
-  return variant ? variantMap[variant] || 'default' : 'default';
+  return variant ? variantMap[variant] || 'glass' : 'glass';
 };
 
 export interface ButtonProps
@@ -44,13 +44,13 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       );
     }
     
-    // Otherwise, use the modern button
-    const modernVariant = mapVariantToModern(variant);
+    // Otherwise, use the glass button
+    const glassVariant = mapVariantToGlass(variant);
     
     return (
-      <ModernButton
+      <GlassButton
         ref={ref}
-        variant={modernVariant}
+        variant={glassVariant}
         size={size}
         effect={hoverEffect}
         className={className}

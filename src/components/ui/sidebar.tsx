@@ -5,10 +5,10 @@ import { PanelLeft } from "lucide-react";
 
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
-import { ModernButton } from "@/components/ui/modern-button";
+import { GlassButton } from "@/components/ui/glass-button";
 import { ModernInput } from "@/components/ui/modern-input";
 import { Separator } from "@/components/ui/separator";
-import { ModernSheet, ModernSheetContent } from "@/components/ui/modern-sheet";
+import { Sheet, SheetContent } from "@/components/ui/modern-sheet";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Tooltip,
@@ -200,8 +200,8 @@ const Sidebar = React.forwardRef<
 
     if (isMobile) {
       return (
-        <ModernSheet open={openMobile} onOpenChange={setOpenMobile} {...props}>
-          <ModernSheetContent
+        <Sheet open={openMobile} onOpenChange={setOpenMobile} {...props}>
+          <SheetContent
             data-sidebar="sidebar"
             data-mobile="true"
             className="w-[--sidebar-width] bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden"
@@ -213,8 +213,8 @@ const Sidebar = React.forwardRef<
             side={side}
           >
             <div className="flex h-full w-full flex-col">{children}</div>
-          </ModernSheetContent>
-        </ModernSheet>
+          </SheetContent>
+        </Sheet>
       );
     }
 
@@ -266,13 +266,13 @@ const Sidebar = React.forwardRef<
 Sidebar.displayName = "Sidebar";
 
 const SidebarTrigger = React.forwardRef<
-  React.ElementRef<typeof ModernButton>,
-  React.ComponentProps<typeof ModernButton>
+  React.ElementRef<typeof GlassButton>,
+  React.ComponentProps<typeof GlassButton>
 >(({ className, onClick, ...props }, ref) => {
   const { toggleSidebar } = useSidebar();
 
   return (
-    <ModernButton
+    <GlassButton
       ref={ref}
       data-sidebar="trigger"
       variant="ghost"
@@ -286,7 +286,7 @@ const SidebarTrigger = React.forwardRef<
     >
       <PanelLeft />
       <span className="sr-only">Toggle Sidebar</span>
-    </ModernButton>
+    </GlassButton>
   );
 });
 SidebarTrigger.displayName = "SidebarTrigger";

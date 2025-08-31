@@ -3,7 +3,7 @@ import { useFormContext } from 'react-hook-form';
 import { ModernInput } from '@/components/ui/modern-input';
 import { ModernSelect, ModernSelectContent, ModernSelectItem, ModernSelectTrigger, ModernSelectValue } from '@/components/ui/modern-select';
 import { ModernPopover, ModernPopoverContent, ModernPopoverTrigger } from '@/components/ui/modern-popover';
-import { ModernButton } from '@/components/ui/modern-button';
+import { GlassButton } from "@/components/ui/glass-button";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { CalendarIcon } from 'lucide-react';
 import { format } from 'date-fns-jalali';
@@ -100,7 +100,7 @@ const ContactCustomFields: React.FC<ContactCustomFieldsProps> = React.memo(({
                       ) : template.type === 'date' ? (
                         <ModernPopover>
                           <ModernPopoverTrigger asChild>
-                            <ModernButton
+                            <GlassButton
                               variant={"glass"}
                               className={cn(
                                 "w-full justify-start text-left font-normal py-3 bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 hover:bg-white/40 dark:hover:bg-gray-700/40",
@@ -111,7 +111,7 @@ const ContactCustomFields: React.FC<ContactCustomFieldsProps> = React.memo(({
                                 <CalendarIcon className="ml-2 h-4 w-4" />
                                 {field.value ? format(new Date(field.value), "yyyy/MM/dd") : <span>{t('form_placeholders.select_birth_date')}</span>}
                               </span>
-                            </ModernButton>
+                            </GlassButton>
                           </ModernPopoverTrigger>
                           <ModernPopoverContent className="w-auto p-0" glassEffect="strong">
                             <JalaliCalendar

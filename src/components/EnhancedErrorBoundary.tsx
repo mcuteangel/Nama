@@ -1,6 +1,6 @@
 import React from 'react';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
-import { ModernButton } from '@/components/ui/modern-button';
+import { GlassButton } from "@/components/ui/glass-button";
 
 import { 
   ModernCard, 
@@ -157,17 +157,17 @@ function ErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
 
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-3">
-            <ModernButton 
+            <GlassButton 
               onClick={handleRetry} 
               className="flex-1"
               aria-label={t('error.retry_operation', 'Retry the operation that failed')}
             >
               <RefreshCw className="w-4 h-4 mr-2" />
               {t('error.try_again', 'Try Again')}
-            </ModernButton>
+            </GlassButton>
             
             {hasRouter && (
-              <ModernButton 
+              <GlassButton 
                 variant="outline" 
                 onClick={handleGoHome}
                 className="flex-1"
@@ -175,12 +175,12 @@ function ErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
               >
                 <Home className="w-4 h-4 mr-2" />
                 {t('error.go_home', 'Go Home')}
-              </ModernButton>
+              </GlassButton>
             )}
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3">
-            <ModernButton 
+            <GlassButton 
               variant="outline" 
               onClick={handleReload}
               className="flex-1"
@@ -188,9 +188,9 @@ function ErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
             >
               <RefreshCw className="w-4 h-4 mr-2" />
               {t('error.reload_page', 'Reload Page')}
-            </ModernButton>
+            </GlassButton>
             
-            <ModernButton 
+            <GlassButton 
               variant="ghost" 
               onClick={handleReportError}
               className="flex-1"
@@ -198,7 +198,7 @@ function ErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
             >
               <Mail className="w-4 h-4 mr-2" />
               {t('error.report_error', 'Report Error')}
-            </ModernButton>
+            </GlassButton>
           </div>
 
           {/* Help Text */}
@@ -239,10 +239,10 @@ function AsyncErrorFallback({ resetErrorBoundary }: FallbackProps) {
         {t('error.network_or_server_error', 'There was a problem loading the data. This could be due to a network or server issue.')}
       </p>
       <div className="space-y-2">
-        <ModernButton onClick={handleRetry}>
+        <GlassButton onClick={handleRetry}>
           <RefreshCw className="w-4 h-4 mr-2" />
           {t('error.try_again', 'Try Again')}
-        </ModernButton>
+        </GlassButton>
       </div>
     </div>
   );
@@ -268,7 +268,7 @@ function FormErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
           <p className="text-sm text-red-700 dark:text-red-300 mb-3">
             {error.message || t('error.form_validation_error', 'There was a problem with your form submission.')}
           </p>
-          <ModernButton
+          <GlassButton
             size="sm"
             variant="outline"
             onClick={resetErrorBoundary}
@@ -276,7 +276,7 @@ function FormErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
           >
             <RefreshCw className="w-3 h-3 mr-1" />
             {t('error.reset_form', 'Reset Form')}
-          </ModernButton>
+          </GlassButton>
         </div>
       </div>
     </div>

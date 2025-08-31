@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { ModernButton } from "@/components/ui/modern-button";
+import { GlassButton } from "@/components/ui/glass-button";
 import { Dialog } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Trash2, Edit, ClipboardList } from "lucide-react";
@@ -200,20 +200,20 @@ export function GlobalCustomFieldsManagement() {
                     )}
                   </div>
                   <div className="flex gap-2">
-                    <ModernButton
+                    <GlassButton
                       variant="glass"
                       size="sm"
                       onClick={() => handleEditClick(field as CustomFieldTemplate)}
                       className="text-blue-600 hover:bg-blue-100 dark:text-blue-400 dark:hover:bg-gray-600/50 transition-all duration-200"
                     >
                       <Edit size={16} />
-                    </ModernButton>
+                    </GlassButton>
 
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
-                        <ModernButton variant="glass" size="sm" className="text-red-600 hover:bg-red-100 dark:text-red-400 dark:hover:bg-gray-600/50 transition-all duration-200" disabled={isOperationLoading}>
+                        <GlassButton variant="glass" size="sm" className="text-red-600 hover:bg-red-100 dark:text-red-400 dark:hover:bg-gray-600/50 transition-all duration-200" disabled={isOperationLoading}>
                           {isOperationLoading ? <LoadingSpinner size={16} /> : <Trash2 size={16} />}
-                        </ModernButton>
+                        </GlassButton>
                       </AlertDialogTrigger>
                       <AlertDialogContent className="glass rounded-xl p-6">
                         <AlertDialogHeader>
@@ -224,7 +224,7 @@ export function GlobalCustomFieldsManagement() {
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                           <CancelButton onClick={() => {}} text="لغو" />
-                          <ModernButton 
+                          <GlassButton 
                             variant="glass"
                             onClick={() => handleDeleteField(field.id)} 
                             className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold" 
@@ -232,7 +232,7 @@ export function GlobalCustomFieldsManagement() {
                           >
                             {isOperationLoading && <LoadingSpinner size={16} className="me-2" />}
                             حذف
-                          </ModernButton>
+                          </GlassButton>
                         </AlertDialogFooter>
                       </AlertDialogContent>
                     </AlertDialog>

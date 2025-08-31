@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ModernButton } from "@/components/ui/modern-button";
+import { GlassButton } from "@/components/ui/glass-button";
 import { ModernCard } from "@/components/ui/modern-card";
 import { 
   ModernAlertDialog, 
@@ -239,17 +239,17 @@ export const ContactListItem = React.memo<ContactListItemProps>(({
         </div>
       </div>
       <div className="flex gap-1 ms-2">
-        <ModernButton 
+        <GlassButton 
           variant="ghost" 
           size="icon" 
           className="text-blue-600 hover:bg-blue-100 dark:text-blue-400 dark:hover:bg-gray-600/50 transition-all duration-200 h-8 w-8" 
           onClick={handleEditClick}
         >
           <Edit size={16} />
-        </ModernButton>
+        </GlassButton>
         <ModernAlertDialog>
           <ModernAlertDialogTrigger asChild>
-            <ModernButton 
+            <GlassButton 
               variant="ghost" 
               size="icon" 
               className="text-red-600 hover:bg-red-100 dark:text-red-400 dark:hover:bg-gray-600/50 transition-all duration-200 h-8 w-8" 
@@ -257,7 +257,7 @@ export const ContactListItem = React.memo<ContactListItemProps>(({
               disabled={isDeleting}
             >
               {isDeleting ? <LoadingSpinner size={16} /> : <Trash2 size={16} />}
-            </ModernButton>
+            </GlassButton>
           </ModernAlertDialogTrigger>
           <ModernAlertDialogContent className="glass rounded-xl p-6 border border-white/20 backdrop-blur-md">
             <ModernAlertDialogHeader>

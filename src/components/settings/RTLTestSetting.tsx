@@ -3,7 +3,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Label } from '@/components/ui/label';
-import { ModernButton } from '@/components/ui/modern-button';
+import { GlassButton } from "@/components/ui/glass-button";
 import { useNavigate } from 'react-router-dom';
 
 const RTLTestSetting: React.FC = () => {
@@ -24,14 +24,14 @@ const RTLTestSetting: React.FC = () => {
           {t('settings.rtl_components_test_description')}
         </p>
       </div>
-      <ModernButton
+      <GlassButton
         id="rtl-test"
         onClick={handleTestClick}
         variant="outline"
         className="px-4 py-2"
       >
         {t('settings.test_components')}
-      </ModernButton>
+      </GlassButton>
     </div>
   );
 };

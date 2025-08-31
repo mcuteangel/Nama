@@ -1,5 +1,5 @@
 import { ModernCard } from "@/components/ui/modern-card";
-import { ModernButton, GradientButton } from "@/components/ui/modern-button";
+import { GlassButton, GradientButton } from "@/components/ui/glass-button";
 import { ModernAvatar, ModernAvatarFallback, ModernAvatarImage } from "@/components/ui/modern-avatar";
 import { ModernBadge } from "@/components/ui/modern-badge";
 import { 
@@ -58,7 +58,7 @@ export const ContactHeader = ({ contact }: ContactHeaderProps) => {
     >
       <div className="flex flex-col md:flex-row items-center md:items-start gap-6 p-6">
         <ModernAvatar 
-          glassEffect="strong"
+          glassEffect="advanced"
           className="h-24 w-24 ring-4 ring-primary/30"
         >
           <ModernAvatarImage 
@@ -66,7 +66,7 @@ export const ContactHeader = ({ contact }: ContactHeaderProps) => {
             alt={`${contact.first_name} ${contact.last_name}`} 
           />
           <ModernAvatarFallback 
-            glassEffect="strong"
+            glassEffect="advanced"
             className="text-2xl font-bold"
           >
             {getAvatarInitials()}
@@ -81,7 +81,7 @@ export const ContactHeader = ({ contact }: ContactHeaderProps) => {
             {contact.position && (
               <ModernBadge 
                 variant="glass"
-                glassEffect="strong"
+                glassEffect="advanced"
                 className="text-sm"
               >
                 <Briefcase size={14} className="ml-1" />
@@ -91,7 +91,7 @@ export const ContactHeader = ({ contact }: ContactHeaderProps) => {
             {contact.company && (
               <ModernBadge 
                 variant="glass"
-                glassEffect="strong"
+                glassEffect="advanced"
                 className="text-sm"
               >
                 <Building size={14} className="ml-1" />
@@ -115,22 +115,22 @@ export const ContactHeader = ({ contact }: ContactHeaderProps) => {
         </div>
         
         <div className="flex gap-2">
-          <ModernButton
+          <GlassButton
             onClick={() => navigate(-1)}
             variant="glass"
             size="icon"
-            className="rounded-full"
+            className="rounded-full glass-advanced border border-white/30 hover:bg-white/20 dark:hover:bg-white/10 backdrop-blur-md"
           >
             <ArrowLeft size={20} />
-          </ModernButton>
-          <ModernButton
+          </GlassButton>
+          <GlassButton
             onClick={() => navigate(`/contacts/edit/${contact.id}`)}
             variant="glass"
-            className="rounded-full !bg-gradient-to-br !from-blue-500/20 !via-blue-600/15 !to-purple-600/20 !border !border-blue-400/30 dark:!from-blue-600/20 dark:!via-blue-700/15 dark:!to-purple-800/20 dark:!border-blue-500/30"
+            className="rounded-full glass-advanced border border-white/30 hover:bg-white/20 dark:hover:bg-white/10 backdrop-blur-md !bg-gradient-to-br !from-blue-500/20 !via-blue-600/15 !to-purple-600/20 !border !border-blue-400/30 dark:!from-blue-600/20 dark:!via-blue-700/15 dark:!to-purple-800/20 dark:!border-blue-500/30"
           >
             <Edit size={20} className="ml-1" />
             {t('contact_detail.edit')}
-          </ModernButton>
+          </GlassButton>
         </div>
       </div>
     </ModernCard>

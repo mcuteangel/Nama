@@ -10,7 +10,7 @@ import { ErrorManager } from '@/lib/error-manager';
 import LoadingMessage from '../common/LoadingMessage';
 import { colors } from '../common/ColorPicker'; // Import colors array
 import { useTranslation } from 'react-i18next';
-import { ModernButton } from "@/components/ui/modern-button";
+import { GlassButton } from "@/components/ui/glass-button";
 import { ModernCard } from "@/components/ui/modern-card";
 
 interface FetchColorsResult {
@@ -98,7 +98,7 @@ const AddGroupDialog: React.FC<AddGroupDialogProps> = ({ onGroupAdded, open, onO
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
-        <ModernButton
+        <GlassButton
           type="button"
           variant="gradient-primary"
           size="sm"
@@ -108,7 +108,7 @@ const AddGroupDialog: React.FC<AddGroupDialogProps> = ({ onGroupAdded, open, onO
             <Plus size={16} />
             {t('actions.add_new_group')}
           </span>
-        </ModernButton>
+        </GlassButton>
       </DialogTrigger>
       <FormDialogWrapper 
         title={t('group.add_title', 'Add Group')}
@@ -121,7 +121,7 @@ const AddGroupDialog: React.FC<AddGroupDialogProps> = ({ onGroupAdded, open, onO
         ) : fetchColorsError ? (
           <ModernCard className="w-full max-w-md rounded-xl p-6 text-center text-red-500 dark:text-red-400">
             <p>{fetchColorsError.message}</p>
-            <ModernButton onClick={() => onOpenChange(false)} className="mt-4">{t('actions.close')}</ModernButton>
+            <GlassButton onClick={() => onOpenChange(false)} className="mt-4">{t('actions.close')}</GlassButton>
           </ModernCard>
         ) : (
           <GroupForm

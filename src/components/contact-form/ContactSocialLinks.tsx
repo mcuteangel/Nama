@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { useFormContext, useFieldArray } from 'react-hook-form';
 import { ModernInput } from '@/components/ui/modern-input';
 import { ModernSelect, ModernSelectContent, ModernSelectItem, ModernSelectTrigger, ModernSelectValue } from '@/components/ui/modern-select';
-import { ModernButton } from '@/components/ui/modern-button';
+import { GlassButton } from "@/components/ui/glass-button";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { Plus, X } from 'lucide-react';
 import { ContactFormValues } from '@/types/contact';
@@ -32,7 +32,7 @@ const ContactSocialLinks: React.FC = React.memo(() => {
         <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 heading-3">
           {t('section_titles.social_links')}
         </h3>
-        <ModernButton
+        <GlassButton
           type="button"
           variant="gradient-forest"
           effect="lift"
@@ -42,7 +42,7 @@ const ContactSocialLinks: React.FC = React.memo(() => {
         >
           <Plus size={16} className="me-2" /> 
           {t('button_labels.add_social_link')}
-        </ModernButton>
+        </GlassButton>
       </div>
       
       <div className="space-y-4 p-4 rounded-xl glass">
@@ -100,7 +100,7 @@ const ContactSocialLinks: React.FC = React.memo(() => {
               />
             </div>
             <div className="md:col-span-1 flex justify-center">
-              <ModernButton 
+              <GlassButton 
                 type="button" 
                 variant="ghost" 
                 size="icon" 
@@ -109,7 +109,7 @@ const ContactSocialLinks: React.FC = React.memo(() => {
                 aria-label={t('accessibility.remove_social_link', 'Remove social link')}
               >
                 <X size={16} />
-              </ModernButton>
+              </GlassButton>
             </div>
           </div>
         ))}

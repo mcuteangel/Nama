@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ModernButton } from "@/components/ui/modern-button";
+import { GlassButton } from "@/components/ui/glass-button";
 import { LogOut, PlusCircle, Users, Home, Menu, Settings, User, BarChart2, ClipboardList, ShieldCheck, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { showError, showSuccess, showLoading, dismissToast } from "@/utils/toast";
@@ -66,7 +66,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isAdmin }) => {
             Nama Contacts
           </h2>
         )}
-        <ModernButton
+        <GlassButton
           variant="ghost"
           size="icon"
           onClick={() => setIsOpen(!isOpen)}
@@ -76,13 +76,13 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isAdmin }) => {
           )}
         >
           <Menu size={24} />
-        </ModernButton>
+        </GlassButton>
       </div>
       <nav className="flex flex-col gap-2 p-4 flex-grow">
         {navItems.map((item) => (
           <Tooltip key={item.path}>
             <TooltipTrigger asChild>
-              <ModernButton
+              <GlassButton
                 variant="ghost"
                 className={cn(
                   "w-full text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
@@ -96,7 +96,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isAdmin }) => {
                     {isOpen && <span className="whitespace-nowrap overflow-hidden">{item.name}</span>}
                   </div>
                 </Link>
-              </ModernButton>
+              </GlassButton>
             </TooltipTrigger>
             {!isOpen && <TooltipContent side="left">{item.name}</TooltipContent>}
           </Tooltip>
@@ -106,7 +106,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isAdmin }) => {
         {isOpen && (
           <Tooltip>
             <TooltipTrigger asChild>
-              <ModernButton
+              <GlassButton
                 variant="ghost"
                 onClick={handleLogout}
                 disabled={isLoggingOut}
@@ -119,7 +119,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isAdmin }) => {
                   {isLoggingOut ? <LoadingSpinner size={20} className="me-2" /> : <LogOut size={20} className="me-2" />}
                   {isOpen && <span className="whitespace-nowrap overflow-hidden">{t('common.logout')}</span>}
                 </div>
-              </ModernButton>
+              </GlassButton>
             </TooltipTrigger>
             {!isOpen && <TooltipContent side="left">{t('common.logout')}</TooltipContent>}
           </Tooltip>
@@ -127,7 +127,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isAdmin }) => {
         {!isOpen && (
           <Tooltip>
             <TooltipTrigger asChild>
-              <ModernButton
+              <GlassButton
                 variant="ghost"
                 size="icon"
                 onClick={handleLogout}
@@ -135,7 +135,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isAdmin }) => {
                 className="text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground mx-auto"
               >
                 {isLoggingOut ? <LoadingSpinner size={20} /> : <LogOut size={20} />}
-              </ModernButton>
+              </GlassButton>
             </TooltipTrigger>
             <TooltipContent side="left">{t('common.logout')}</TooltipContent>
           </Tooltip>

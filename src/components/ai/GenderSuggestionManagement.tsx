@@ -13,7 +13,7 @@ import CancelButton from '../common/CancelButton';
 import EmptyState from '../common/EmptyState';
 import LoadingSpinner from '../common/LoadingSpinner';
 import { ModernCard, ModernCardHeader, ModernCardTitle, ModernCardDescription, ModernCardContent } from "@/components/ui/modern-card";
-import { ModernButton } from "@/components/ui/modern-button";
+import { GlassButton } from "@/components/ui/glass-button";
 
 interface ContactForGenderSuggestion {
   id: string;
@@ -198,7 +198,7 @@ const GenderSuggestionManagement: React.FC = () => {
             </span>
           </div>
 
-          <ModernButton
+          <GlassButton
             onClick={handleGenerateSuggestions}
             disabled={isGenerating || ungenderedContacts.length === 0}
             variant="gradient-primary"
@@ -207,18 +207,18 @@ const GenderSuggestionManagement: React.FC = () => {
             {isGenerating && <LoadingSpinner size={16} className="me-2" />}
             <Sparkles size={16} className="me-2" />
             {t('ai_suggestions.generate_gender_suggestions')}
-          </ModernButton>
+          </GlassButton>
 
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <ModernButton
+              <GlassButton
                 variant="outline"
                 disabled={isGenerating || learnedNamesCount === 0}
                 className="w-full flex items-center gap-2 px-6 py-2 rounded-lg font-semibold shadow-sm transition-all duration-300"
               >
                 <LightbulbOff size={16} />
                 {t('ai_suggestions.clear_learned_preferences')}
-              </ModernButton>
+              </GlassButton>
             </AlertDialogTrigger>
             <AlertDialogContent className="glass rounded-xl p-6">
               <AlertDialogHeader>
@@ -263,22 +263,22 @@ const GenderSuggestionManagement: React.FC = () => {
                     </p>
                   </div>
                   <div className="flex gap-2">
-                    <ModernButton
+                    <GlassButton
                       variant="ghost"
                       size="icon"
                       onClick={() => handleAcceptSuggestion(suggestion)}
                       className="text-green-600 hover:bg-green-100 dark:text-green-400 dark:hover:bg-gray-600/50"
                     >
                       <CheckCircle size={20} />
-                    </ModernButton>
-                    <ModernButton
+                    </GlassButton>
+                    <GlassButton
                       variant="ghost"
                       size="icon"
                       onClick={() => handleDiscardSuggestion(suggestion.contactId)}
                       className="text-red-600 hover:bg-red-100 dark:text-red-400 dark:hover:bg-gray-600/50"
                     >
                       <XCircle size={20} />
-                    </ModernButton>
+                    </GlassButton>
                   </div>
                 </div>
               ))}

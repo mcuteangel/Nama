@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ModernButton } from '@/components/ui/modern-button';
+import { GlassButton } from "@/components/ui/glass-button";
 import { ModernLoader } from '@/components/ui/modern-loader';
 import CancelButton from '@/components/common/CancelButton';
 
@@ -26,7 +26,7 @@ const ContactFormActions: React.FC<ContactFormActionsProps> = React.memo(({ isSu
         disabled={isSubmitting} 
         text={buttonLabels.cancel} 
       />
-      <ModernButton 
+      <GlassButton 
         type="submit" 
         variant="gradient-primary"
         effect="lift"
@@ -35,7 +35,7 @@ const ContactFormActions: React.FC<ContactFormActionsProps> = React.memo(({ isSu
       >
         {isSubmitting && <ModernLoader variant="spinner" size="sm" className="me-2" />}
         {buttonLabels.submit}
-      </ModernButton>
+      </GlassButton>
     </div>
   );
 }, (prevProps, nextProps) => {

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { ModernButton } from '@/components/ui/modern-button';
+import { GlassButton } from '@/components/ui/glass-button';
 import { ModernLoader } from '@/components/ui/modern-loader';
 import { useTranslation } from 'react-i18next';
 import { useSession } from '@/integrations/supabase/auth';
@@ -135,22 +135,22 @@ const ContactAvatarUpload: React.FC<ContactAvatarUploadProps> = React.memo(({ in
           id="avatar-upload-input"
           disabled={disabled || isUploading}
         />
-        <ModernButton
+        <GlassButton
           type="button"
           onClick={() => fileInputRef.current?.click()}
           disabled={disabled || isUploading}
-          variant="gradient-primary"
+          variant="glass-gradient-primary"
           effect="lift"
           className="w-full sm:w-auto px-6 py-3 font-semibold shadow-lg hover:shadow-xl"
         >
           {isUploading && <ModernLoader variant="spinner" size="sm" className="me-2" />}
           <UploadCloud size={18} className="mr-2" />
           {isUploading ? t('actions.uploading') : t('actions.upload_image')}
-        </ModernButton>
+        </GlassButton>
         {avatarUrl && (
-          <ModernButton
+          <GlassButton
             type="button"
-            variant="gradient-danger"
+            variant="glass-gradient-danger"
             effect="lift"
             onClick={handleRemoveAvatar}
             disabled={disabled || isUploading}
@@ -159,7 +159,7 @@ const ContactAvatarUpload: React.FC<ContactAvatarUploadProps> = React.memo(({ in
             {isUploading && <ModernLoader variant="spinner" size="sm" className="me-2" />}
             <XCircle size={18} className="mr-2" />
             {t('actions.delete_image')}
-          </ModernButton>
+          </GlassButton>
         )}
       </div>
     </div>

@@ -5,7 +5,7 @@ import {
   ModernCardHeader, 
   ModernCardTitle 
 } from "@/components/ui/modern-card";
-import { GradientButton, ModernButton } from "@/components/ui/modern-button";
+import { GradientButton, GlassButton } from "@/components/ui/glass-button";
 import { ModernLoader } from "@/components/ui/modern-loader";
 import { useToast } from "@/components/ui/use-toast";
 import { ModernInput } from "@/components/ui/modern-input";
@@ -137,7 +137,7 @@ const Contacts = React.memo(() => {
                 <span className="hidden sm:inline">افزودن مخاطب جدید</span>
                 <span className="sm:hidden">جدید</span>
               </GradientButton>
-              <ModernButton
+              <GlassButton
                 variant="glass"
                 onClick={handleExportClick}
                 disabled={isExporting || !session?.user}
@@ -150,7 +150,7 @@ const Contacts = React.memo(() => {
                 )}
                 <span className="hidden sm:inline">خروجی</span>
                 <span className="sm:hidden">خروجی</span>
-              </ModernButton>
+              </GlassButton>
             </div>
           </div>
 
@@ -207,7 +207,7 @@ const Contacts = React.memo(() => {
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">نمایش:</label>
                 <div className="flex rounded-lg bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 p-1">
-                  <ModernButton
+                  <GlassButton
                     variant={displayMode === 'grid' ? "default" : "ghost"}
                     size="sm"
                     className={`flex-1 flex items-center justify-center gap-2 ${displayMode === 'grid' ? 'bg-blue-500 text-white' : 'text-gray-700 dark:text-gray-300'}`}
@@ -215,8 +215,8 @@ const Contacts = React.memo(() => {
                   >
                     <Grid size={16} />
                     <span className="hidden sm:inline">کارتی</span>
-                  </ModernButton>
-                  <ModernButton
+                  </GlassButton>
+                  <GlassButton
                     variant={displayMode === 'list' ? "default" : "ghost"}
                     size="sm"
                     className={`flex-1 flex items-center justify-center gap-2 ${displayMode === 'list' ? 'bg-blue-500 text-white' : 'text-gray-700 dark:text-gray-300'}`}
@@ -224,7 +224,7 @@ const Contacts = React.memo(() => {
                   >
                     <List size={16} />
                     <span className="hidden sm:inline">لیستی</span>
-                  </ModernButton>
+                  </GlassButton>
                 </div>
               </div>
             </div>

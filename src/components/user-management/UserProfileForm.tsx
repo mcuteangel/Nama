@@ -4,7 +4,7 @@ import React, { useEffect, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { ModernButton } from '@/components/ui/modern-button';
+import { GlassButton } from "@/components/ui/glass-button";
 import { Label } from '@/components/ui/label';
 import { ModernInput } from '@/components/ui/modern-input';
 import { ModernCard, ModernCardHeader, ModernCardTitle, ModernCardContent, ModernCardFooter } from '@/components/ui/modern-card';
@@ -161,7 +161,7 @@ const UserProfileForm: React.FC = () => {
           <div className="text-sm text-destructive flex items-center justify-center gap-2 mt-2">
             <span>{submitErrorMessage}</span>
             {submitRetryCount > 0 && (
-              <ModernButton
+              <GlassButton
                 variant="ghost"
                 size="sm"
                 onClick={retrySubmit}
@@ -169,7 +169,7 @@ const UserProfileForm: React.FC = () => {
                 className="text-destructive hover:bg-destructive/10"
               >
                 {t('actions.retry_count', { count: submitRetryCount })}
-              </ModernButton>
+              </GlassButton>
             )}
           </div>
         )}
@@ -214,14 +214,14 @@ const UserProfileForm: React.FC = () => {
           </div>
 
           <ModernCardFooter className="flex justify-end gap-4 p-0 pt-4">
-            <ModernButton
+            <GlassButton
               type="submit"
               className="px-6 py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white transition-colors"
               disabled={isSubmitting}
             >
               {isSubmitting && <LoadingSpinner size={16} className="me-2" />}
               {isSubmitting ? t('actions.saving_progress') : t('actions.save_changes')}
-            </ModernButton>
+            </GlassButton>
           </ModernCardFooter>
         </form>
       </ModernCardContent>

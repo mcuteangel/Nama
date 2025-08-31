@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { ModernButton } from "@/components/ui/modern-button";
+import { GlassButton } from "@/components/ui/glass-button";
 import { ModernLoader } from "@/components/ui/modern-loader";
 import { useToast } from "@/components/ui/use-toast";
 import { cn } from "@/lib/utils";
@@ -54,7 +54,7 @@ const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({ isAdmin }) =>
       "glass-advanced border-t text-foreground backdrop-blur-md"
     )}>
       {navItems.map((item) => (
-        <ModernButton
+        <GlassButton
           key={item.path}
           variant="ghost"
           className={cn(
@@ -70,9 +70,9 @@ const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({ isAdmin }) =>
               {item.name}
             </div>
           </Link>
-        </ModernButton>
+        </GlassButton>
       ))}
-      <ModernButton
+      <GlassButton
         variant="ghost"
         onClick={handleLogout}
         disabled={isLoggingOut}
@@ -82,7 +82,7 @@ const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({ isAdmin }) =>
           {isLoggingOut ? <ModernLoader variant="spinner" size="sm" className="mb-1" /> : <LogOut size={20} className="mb-1" />}
           {t('common.logout')}
         </div>
-      </ModernButton>
+      </GlassButton>
     </div>
   );
 };

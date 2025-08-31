@@ -1,6 +1,6 @@
 import React from 'react';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
-import { ModernButton } from '@/components/ui/modern-button';
+import { GlassButton } from "@/components/ui/glass-button";
 import { ModernCard, ModernCardContent, ModernCardDescription, ModernCardHeader, ModernCardTitle } from '@/components/ui/modern-card';
 import { AlertTriangle, RefreshCw, Database, Wifi } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -157,7 +157,7 @@ function AsyncErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
           
           {/* Action buttons */}
           <div className="flex flex-col gap-3">
-            <ModernButton 
+            <GlassButton 
               onClick={handleRetry} 
               disabled={isRetrying}
               className="w-full"
@@ -165,16 +165,16 @@ function AsyncErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
             >
               <RefreshCw className={`w-4 h-4 mr-2 ${isRetrying ? 'animate-spin' : ''}`} />
               {isRetrying ? t('error.retrying', 'Retrying...') : t('error.try_again', 'Try Again')}
-            </ModernButton>
+            </GlassButton>
             
             {retryCount >= 3 && (
-              <ModernButton 
+              <GlassButton 
                 variant="outline"
                 onClick={() => window.location.reload()}
                 className="w-full"
               >
                 {t('error.reload_page', 'Reload Page')}
-              </ModernButton>
+              </GlassButton>
             )}
           </div>
           

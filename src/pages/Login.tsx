@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import { useSession } from '@/integrations/supabase/auth';
 import { useTranslation } from 'react-i18next';
-import { ModernButton } from '@/components/ui/modern-button';
+import { GlassButton } from "@/components/ui/glass-button";
 import { ModernCard } from '@/components/ui/modern-card';
 import IranFlag from '@/assets/icons/flags/IranFlag';
 import UKFlag from '@/assets/icons/flags/UKFlag';
@@ -39,7 +39,7 @@ const Login = () => {
         </h2>
 
         <div className="flex justify-center gap-4 mb-6">
-          <ModernButton
+          <GlassButton
             variant="outline"
             size="lg"
             onClick={() => handleLanguageChange('fa')}
@@ -51,8 +51,8 @@ const Login = () => {
           >
             <IranFlag className="w-6 h-6" />
             <span className="font-semibold">{t('settings.persian')}</span>
-          </ModernButton>
-          <ModernButton
+          </GlassButton>
+          <GlassButton
             variant="outline"
             size="lg"
             onClick={() => handleLanguageChange('en')}
@@ -64,7 +64,7 @@ const Login = () => {
           >
             <UKFlag className="w-6 h-6" />
             <span className="font-semibold">{t('settings.english')}</span>
-          </ModernButton>
+          </GlassButton>
         </div>
 
         <Auth

@@ -14,7 +14,7 @@ import GroupForm from '@/components/groups/GroupForm';
 import FormDialogWrapper from '@/components/common/FormDialogWrapper';
 import { Dialog } from '@/components/ui/dialog';
 import LoadingMessage from '@/components/common/LoadingMessage';
-import { ModernButton } from '@/components/ui/modern-button';
+import { GlassButton } from "@/components/ui/glass-button";
 import { ModernCard } from '@/components/ui/modern-card';
 
 const ContactOtherDetails: React.FC = React.memo(() => {
@@ -101,7 +101,7 @@ const ContactOtherDetails: React.FC = React.memo(() => {
               ) : fetchColorsError ? (
                 <ModernCard variant="glass" className="w-full max-w-md rounded-xl p-6 text-center text-red-500 dark:text-red-400">
                   <p>{fetchColorsError.message}</p>
-                  <ModernButton onClick={() => setIsAddGroupDialogOpen(false)} className="mt-4">{t('common.close')}</ModernButton>
+                  <GlassButton onClick={() => setIsAddGroupDialogOpen(false)} className="mt-4">{t('common.close')}</GlassButton>
                 </ModernCard>
               ) : (
                 <GroupForm
