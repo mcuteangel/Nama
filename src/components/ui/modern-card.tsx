@@ -17,7 +17,7 @@ export interface ModernCardProps extends React.HTMLAttributes<HTMLDivElement> {
 export const ModernCard = React.forwardRef<HTMLDivElement, ModernCardProps>(
   ({ variant = 'glass', hover = 'lift', children, className, ...props }, ref) => {
     const variants = {
-      glass: 'glass-advanced',
+      glass: 'glass-advanced border border-white/30 dark:border-gray-600/30 backdrop-blur-lg shadow-2xl',
       neomorphism: 'neomorphism',
       'gradient-primary': 'bg-gradient-primary text-white',
       'gradient-ocean': 'bg-gradient-ocean text-white',
@@ -28,9 +28,9 @@ export const ModernCard = React.forwardRef<HTMLDivElement, ModernCardProps>(
     };
 
     const hoverEffects = {
-      lift: 'hover-lift',
-      glow: 'hover-glow',
-      scale: 'hover:scale-105',
+      lift: 'hover-lift transition-all duration-300',
+      glow: 'hover-glow transition-all duration-300',
+      scale: 'hover:scale-105 transition-all duration-300',
       none: ''
     };
 
@@ -38,7 +38,7 @@ export const ModernCard = React.forwardRef<HTMLDivElement, ModernCardProps>(
       <div
         ref={ref}
         className={cn(
-          'p-6 rounded-xl transition-all duration-300',
+          'p-6 rounded-2xl',
           variants[variant],
           hoverEffects[hover],
           'fade-in-up',
@@ -81,7 +81,7 @@ export const ModernCardTitle = React.forwardRef<HTMLHeadingElement, ModernCardTi
       <h3
         ref={ref}
         className={cn(
-          'heading-3 font-semibold',
+          'text-2xl font-bold text-gray-800 dark:text-gray-100',
           gradient && 'text-gradient',
           className
         )}
@@ -102,7 +102,7 @@ export interface ModernCardDescriptionProps extends React.HTMLAttributes<HTMLPar
 export const ModernCardDescription = React.forwardRef<HTMLParagraphElement, ModernCardDescriptionProps>(
   ({ children, className, ...props }, ref) => {
     return (
-      <p ref={ref} className={cn('text-muted-foreground body-regular', className)} {...props}>
+      <p ref={ref} className={cn('text-gray-600 dark:text-gray-300 body-regular', className)} {...props}>
         {children}
       </p>
     );
@@ -134,7 +134,7 @@ export interface ModernCardFooterProps extends React.HTMLAttributes<HTMLDivEleme
 export const ModernCardFooter = React.forwardRef<HTMLDivElement, ModernCardFooterProps>(
   ({ children, className, ...props }, ref) => {
     return (
-      <div ref={ref} className={cn('mt-6 flex items-center justify-between', className)} {...props}>
+      <div ref={ref} className={cn('mt-6 flex items-center justify-between gap-3', className)} {...props}>
         {children}
       </div>
     );
