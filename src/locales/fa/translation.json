@@ -43,7 +43,10 @@
     "description_placeholder": "توضیحات درباره این فیلد",
     "required_field": "فیلد الزامی",
     "editing": "در حال ویرایش...",
-    "adding": "در حال افزودن..."
+    "adding": "در حال افزودن...",
+    "gender": "جنسیت",
+    "birth_date": "تاریخ تولد",
+    "avatar_url": "آدرس تصویر پروفایل"
   },
   "contact": {
     "no_phone": "بدون شماره",
@@ -229,6 +232,7 @@
     "title": "تنظیمات",
     "description": "مدیریت تنظیمات برنامه و ترجیحات کاربری",
     "display_settings": "تنظیمات نمایش",
+    "display_settings_description": "شخصی‌سازی ظاهر و رفتار برنامه",
     "theme": "پوسته",
     "calendar_type": "نوع تقویم",
     "jalali": "شمسی",
@@ -237,12 +241,14 @@
     "persian": "فارسی",
     "english": "انگلیسی",
     "ai_settings": "تنظیمات هوش مصنوعی",
+    "ai_settings_description": "پیکربندی قابلیت‌های هوش مصنوعی و مدل‌های زبانی",
     "gemini_api_key": "کلید API Gemini",
     "enter_gemini_api_key": "کلید API Gemini خود را وارد کنید",
     "gemini_api_key_description": "برای استفاده از قابلیت‌های هوش مصنوعی، کلید API Gemini خود را وارد کنید. این کلید به صورت امن ذخیره می‌شود.",
     "gemini_model": "مدل Gemini",
     "select_gemini_model": "مدل Gemini را انتخاب کنید",
     "gemini_model_description": "مدل Gemini مورد استفاده برای پردازش‌های هوش مصنوعی.",
+    "gemini_settings": "تنظیمات Gemini",
     "error_saving_gemini_settings": "خطا در ذخیره تنظیمات Gemini.",
     "gemini_settings_saved_success": "تنظیمات Gemini با موفقیت ذخیره شد.",
     "loading_gemini_settings": "در حال بارگذاری تنظیمات Gemini...",
@@ -250,6 +256,7 @@
     "no_gemini_models_found": "هیچ مدل Gemini یافت نشد.",
     "error_loading_group_colors": "خطا در بارگذاری رنگ‌های گروه‌های موجود.",
     "data_management": "مدیریت داده",
+    "data_management_description": "وارد کردن و صادر کردن داده‌های مخاطبین",
     "export_contacts": "خروجی گرفتن از مخاطبین",
     "import_contacts": "ورودی گرفتن مخاطبین",
     "user_profile": "پروفایل کاربری",
@@ -259,6 +266,7 @@
     "accessibility": "دسترس‌پذیری",
     "accessibility_description": "فعال‌سازی قابلیت‌های دسترس‌پذیری مانند پشتیبانی از صفحه‌خوان و ناوبری با صفحه‌کلید",
     "component_testing": "تست کامپوننت‌ها",
+    "component_testing_description": "ابزارهای تست و نمایش کامپوننت‌های رابط کاربری",
     "rtl_components_test": "تست کامپوننت‌های RTL",
     "rtl_components_test_description": "تست کامپوننت‌های رابط کاربری در چیدمان راست به چپ",
     "test_components": "تست کامپوننت‌ها",
@@ -267,7 +275,9 @@
     "select_display_mode": "انتخاب حالت نمایش",
     "display_mode_grid": "نمایش کارتی",
     "display_mode_list": "نمایش لیستی",
-    "default_contact_display_mode_description": "حالت نمایش پیش‌فرض برای لیست مخاطبین را انتخاب کنید"
+    "default_contact_display_mode_description": "حالت نمایش پیش‌فرض برای لیست مخاطبین را انتخاب کنید",
+    "user_profile_description": "مدیریت اطلاعات حساب کاربری شما",
+    "toggle_theme": "تغییر پوسته"
   },
   "contact_detail": {
     "contact_details": "جزئیات مخاطب",
@@ -719,5 +729,20 @@
     "delete_confirm_title": "حذف قالب فیلد سفارشی؟",
     "delete_confirm_description": "این عمل قابل بازگشت نیست. این قالب برای همیشه حذف خواهد شد. (داده‌های موجود در مخاطبین تحت تأثیر قرار نمی‌گیرند)",
     "field_type": "نوع فیلد"
+  },
+  "import": {
+    "title": "وارد کردن مخاطبین",
+    "description": "مخاطبین را از یک فایل CSV وارد کنید",
+    "download_template": "دانلود قالب CSV",
+    "select_csv_file": "انتخاب فایل CSV",
+    "or_drag_and_drop": "یا فایل را اینجا بکشید",
+    "import_button": "وارد کردن مخاطبین",
+    "import_success": "{{count}} مخاطب با موفقیت وارد شد.",
+    "import_failed_unknown": "خطا در وارد کردن مخاطبین.",
+    "import_failed_generic": "خطا در وارد کردن فایل CSV.",
+    "invalid_file_type": "لطفاً یک فایل CSV انتخاب کنید.",
+    "no_file_selected": "لطفاً یک فایل انتخاب کنید.",
+    "file_read_error": "خطا در خواندن فایل.",
+    "template_download_success": "قالب CSV با موفقیت دانلود شد."
   }
 }

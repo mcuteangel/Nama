@@ -19,28 +19,34 @@ const TopCompaniesList: React.FC<TopCompaniesListProps> = ({ data }) => {
     <ModernCard variant="glass" className="rounded-xl p-4 col-span-1">
       <ModernCardHeader className="pb-2">
         <ModernCardTitle className="text-lg font-semibold flex items-center gap-2">
-          <Building size={20} className="text-indigo-500" />
+          <Building size={20} className="text-teal-500" />
           {t('statistics.top_companies')}
         </ModernCardTitle>
       </ModernCardHeader>
-      <ModernCardContent className="h-64 overflow-y-auto custom-scrollbar">
+      <ModernCardContent className="h-64 overflow-y-auto custom-scrollbar space-y-3">
         {data.length > 0 ? (
-          <ul className="space-y-3">
-            {data.map((item, index) => (
-              <li key={index} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg shadow-sm">
-                <p className="font-medium text-gray-800 dark:text-gray-100">{item.company}</p>
-                <span className="px-3 py-1 text-sm font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
-                  {item.count} {t('common.contacts')}
-                </span>
-              </li>
-            ))}
-          </ul>
+          data.map((company, index) => (
+            <div 
+              key={company.company} 
+              className="flex items-center justify-between p-3 rounded-lg bg-background/50 hover:bg-background/80 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary font-bold">
+                  {index + 1}
+                </div>
+                <span className="font-medium">{company.company}</span>
+              </div>
+              <span className="font-bold text-primary">{company.count}</span>
+            </div>
+          ))
         ) : (
-          <p className="text-center text-gray-500 dark:text-gray-400">{t('statistics.no_company_data')}</p>
+          <div className="h-full flex items-center justify-center">
+            <p className="text-gray-500 dark:text-gray-400">{t('statistics.no_company_data')}</p>
+          </div>
         )}
       </ModernCardContent>
     </ModernCard>
   );
 };
 
-export default TopCompaniesList;
+export default React.memo(TopCompaniesList);

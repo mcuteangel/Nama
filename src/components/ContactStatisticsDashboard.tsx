@@ -1,10 +1,11 @@
-import React, { useEffect, useState, useCallback, useMemo } from "react";
+import React, { useMemo } from "react";
+import { useTranslation } from "react-i18next";
+import { RefreshCw } from "lucide-react";
 
-import { useSession } from "@/integrations/supabase/auth";
-import { useErrorHandler } from "@/hooks/use-error-handler";
-import { ErrorManager } from "@/lib/error-manager";
+import { ModernCard, ModernCardContent, ModernCardHeader, ModernCardTitle } from "@/components/ui/modern-card";
+import { Button } from "@/components/ui/button";
 
-import { ModernCard, ModernCardContent, ModernCardHeader } from "@/components/ui/modern-card";
+import { useStatistics, StatisticsProvider } from "@/components/statistics/StatisticsContext";
 
 import TotalContactsCard from "@/components/statistics/TotalContactsCard";
 import ContactsByGenderChart from "@/components/statistics/ContactsByGenderChart";
@@ -15,60 +16,6 @@ import ContactsByCreationTimeChart from "@/components/statistics/ContactsByCreat
 import TopCompaniesList from "@/components/statistics/TopCompaniesList";
 import TopPositionsList from "@/components/statistics/TopPositionsList";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ContactStatisticsService } from "@/services/contact-statistics-service"; // Updated import
-
-import { useTranslation } from "react-i18next";
-import { fetchWithCache } from "@/utils/cache-helpers";
-
-interface GenderData {
-  gender: string;
-  count: number;
-}
-
-interface GroupData {
-  name: string;
-  color?: string;
-  count: number;
-}
-
-interface PreferredMethodData {
-  method: string;
-  count: number;
-}
-
-interface BirthdayContact {
-  id: string;
-  first_name: string;
-  last_name: string;
-  birthday: string;
-  days_until_birthday: number;
-}
-
-interface CreationTimeData {
-  month_year: string;
-  count: number;
-}
-
-interface CompanyData {
-  company: string;
-  count: number;
-}
-
-interface PositionData {
-  position: string;
-  count: number;
-}
-
-interface StatisticsData {
-  totalContacts: number | null;
-  genderData: GenderData[];
-  groupData: GroupData[];
-  preferredMethodData: PreferredMethodData[];
-  upcomingBirthdays: BirthdayContact[];
-  creationTimeData: CreationTimeData[];
-  topCompaniesData: CompanyData[];
-  topPositionsData: PositionData[];
-}
 
 /**
  * ContactStatisticsDashboard component for displaying contact analytics
@@ -91,125 +38,9 @@ interface StatisticsData {
  * 
  * @returns JSX element representing the statistics dashboard
  */
-const ContactStatisticsDashboard: React.FC = React.memo(() => {
-  const { session, isLoading: isSessionLoading } = useSession();
+const ContactStatisticsDashboardContent: React.FC = () => {
+  const { state, refreshData } = useStatistics();
   const { t } = useTranslation();
-
-  const [statistics, setStatistics] = useState<StatisticsData>({
-    totalContacts: null,
-    genderData: [],
-    groupData: [],
-    preferredMethodData: [],
-    upcomingBirthdays: [],
-    creationTimeData: [],
-    topCompaniesData: [],
-    topPositionsData: [],
-  });
-
-  const onSuccessStats = useCallback((result: { data: StatisticsData | null; error: string | null; fromCache: boolean }) => {
-    if (result && !result.fromCache) {
-      ErrorManager.notifyUser(t('statistics.stats_loaded_success'), 'success');
-    }
-  }, [t]);
-
-  const onErrorStats = useCallback((err: Error) => {
-    ErrorManager.logError(err, { component: 'ContactStatisticsDashboard', action: 'fetchStatistics' });
-  }, []);
-
-  const {
-    isLoading, // This isLoading is from useErrorHandler
-    executeAsync,
-  } = useErrorHandler<{ data: StatisticsData | null; error: string | null; fromCache: boolean }>(null, { // Explicitly define TResult here
-    maxRetries: 3,
-    retryDelay: 1000,
-    showToast: false, // Changed to false to manually control success toast
-    customErrorMessage: t('statistics.error_loading_stats'),
-    onSuccess: onSuccessStats,
-    onError: onErrorStats,
-  });
-
-  const fetchStatistics = useCallback(async () => {
-    if (isSessionLoading || !session?.user) {
-      setStatistics({
-        totalContacts: null,
-        genderData: [],
-        groupData: [],
-        preferredMethodData: [],
-        upcomingBirthdays: [],
-        creationTimeData: [],
-        topCompaniesData: [],
-        topPositionsData: [],
-      });
-      return;
-    }
-
-    // Prevent re-fetching if a fetch is already in progress
-    if (isLoading) {
-      return;
-    }
-
-    const userId = session.user.id;
-    const cacheKey = `statistics_dashboard_${userId}`;
-
-    await executeAsync(async () => {
-      const { data, fromCache } = await fetchWithCache<StatisticsData>(
-        cacheKey,
-        async () => {
-          const [
-            { data: totalData, error: totalError },
-            { data: genderStats, error: genderError },
-            { data: groupStats, error: groupError },
-            { data: methodStats, error: methodError },
-            { data: birthdaysData, error: birthdaysError },
-            { data: creationTimeStats, error: creationTimeError },
-            { data: companiesStats, error: companiesError },
-            { data: positionsStats, error: errorPositions },
-          ] = await Promise.all([
-            ContactStatisticsService.getTotalContacts(userId), // Updated service call
-            ContactStatisticsService.getContactsByGender(userId), // Updated service call
-            ContactStatisticsService.getContactsByGroup(userId), // Updated service call
-            ContactStatisticsService.getContactsByPreferredMethod(userId), // Updated service call
-            ContactStatisticsService.getUpcomingBirthdays(userId), // Updated service call
-            ContactStatisticsService.getContactsByCreationMonth(userId), // Updated service call
-            ContactStatisticsService.getTopCompanies(userId), // Updated service call
-            ContactStatisticsService.getTopPositions(userId), // Updated service call
-          ]);
-
-          if (totalError) throw new Error(totalError);
-          if (genderError) throw new Error(genderError);
-          if (groupError) throw new Error(groupError);
-          if (methodError) throw new Error(methodError);
-          if (birthdaysError) throw new Error(birthdaysError);
-          if (creationTimeError) throw new Error(creationTimeError);
-          if (companiesError) throw new Error(companiesError);
-          if (errorPositions) throw new Error(errorPositions);
-
-          return {
-            data: {
-              totalContacts: totalData,
-              genderData: genderStats || [],
-              groupData: groupStats || [],
-              preferredMethodData: methodStats || [],
-              upcomingBirthdays: birthdaysData || [],
-              creationTimeData: creationTimeStats || [],
-              topCompaniesData: companiesStats || [],
-              topPositionsData: positionsStats || [],
-            },
-            error: null,
-          };
-        }
-      );
-
-      if (data) {
-        setStatistics(data);
-      }
-      return { data, error: null, fromCache }; // Added error: null
-    });
-  }, [session, isSessionLoading, executeAsync, isLoading]); // Removed 't' from dependencies as it's not used in the callback
-
-  useEffect(() => {
-    fetchStatistics();
-  }, [fetchStatistics]);
 
   // Memoized skeleton component to prevent unnecessary re-renders
   const renderSkeleton = useMemo(() => [
@@ -287,29 +118,75 @@ const ContactStatisticsDashboard: React.FC = React.memo(() => {
 
   // Memoized dashboard components to prevent unnecessary re-renders
   const dashboardComponents = useMemo(() => [
-    <TotalContactsCard key="total" count={statistics.totalContacts} />,
-    <ContactsByGenderChart key="gender" data={statistics.genderData} />,
-    <ContactsByGroupChart key="group" data={statistics.groupData} />,
-    <ContactsByPreferredMethodChart key="method" data={statistics.preferredMethodData} />,
-    <UpcomingBirthdaysList key="birthdays" data={statistics.upcomingBirthdays} />,
-    <ContactsByCreationTimeChart key="creation" data={statistics.creationTimeData} />,
-    <TopCompaniesList key="companies" data={statistics.topCompaniesData} />,
-    <TopPositionsList key="positions" data={statistics.topPositionsData} />
-  ], [statistics]);
+    <TotalContactsCard key="total" count={state.data.totalContacts} />,
+    <ContactsByGenderChart key="gender" data={state.data.genderData} />,
+    <ContactsByGroupChart key="group" data={state.data.groupData} />,
+    <ContactsByPreferredMethodChart key="method" data={state.data.preferredMethodData} />,
+    <UpcomingBirthdaysList key="birthdays" data={state.data.upcomingBirthdays} />,
+    <ContactsByCreationTimeChart key="creation" data={state.data.creationTimeData} />,
+    <TopCompaniesList key="companies" data={state.data.topCompaniesData} />,
+    <TopPositionsList key="positions" data={state.data.topPositionsData} />
+  ], [state.data]);
 
-  if (isLoading || isSessionLoading) {
+  if (state.loading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
-        {renderSkeleton}
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <h1 className="text-3xl font-bold">{t('statistics.title')}</h1>
+          <Button variant="outline" size="sm" disabled>
+            <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+            {t('common.loading')}
+          </Button>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {renderSkeleton}
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {dashboardComponents}
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold">{t('statistics.title')}</h1>
+          <p className="text-muted-foreground">{t('statistics.description')}</p>
+        </div>
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={refreshData}
+          disabled={state.loading}
+        >
+          <RefreshCw className={`mr-2 h-4 w-4 ${state.loading ? 'animate-spin' : ''}`} />
+          {t('common.refresh')}
+        </Button>
+      </div>
+      
+      {state.error ? (
+        <ModernCard variant="glass" className="rounded-xl p-6">
+          <ModernCardHeader>
+            <ModernCardTitle className="text-red-500">{t('error.something_went_wrong')}</ModernCardTitle>
+          </ModernCardHeader>
+          <ModernCardContent>
+            <p className="text-muted-foreground mb-4">{state.error}</p>
+            <Button onClick={refreshData}>{t('common.retry')}</Button>
+          </ModernCardContent>
+        </ModernCard>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {dashboardComponents}
+        </div>
+      )}
     </div>
   );
-});
+};
+
+// Wrap the content component with the provider
+const ContactStatisticsDashboard: React.FC = () => (
+  <StatisticsProvider>
+    <ContactStatisticsDashboardContent />
+  </StatisticsProvider>
+);
 
 export default ContactStatisticsDashboard;

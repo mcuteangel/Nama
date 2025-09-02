@@ -2,7 +2,7 @@ import React from 'react';
 import { ModernCard, ModernCardContent, ModernCardHeader, ModernCardTitle } from '@/components/ui/modern-card';
 import { Switch } from '@/components/ui/switch';
 import { GlassButton } from "@/components/ui/glass-button";
-import { Bug, Info, Zap, TestTube } from 'lucide-react';
+import { Bug, Info, Zap, TestTube, Cpu } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useDebugMode } from '@/hooks/use-debug-mode';
 import { EdgeFunctionDebugger } from '@/utils/edge-function-debugger';
@@ -71,11 +71,32 @@ const DebugSettings: React.FC = () => {
     ErrorManager.notifyUser('اطلاعات Storage در Console نمایش داده شد', 'info');
   };
 
+  const debugTools = [
+    {
+      icon: <Bug size={14} />,
+      label: 'تست Edge Function',
+      action: handleTestConnection,
+      color: 'border-orange-200 hover:bg-orange-100'
+    },
+    {
+      icon: <Zap size={14} />,
+      label: 'پاک کردن Cache',
+      action: handleClearCache,
+      color: 'border-orange-200 hover:bg-orange-100'
+    },
+    {
+      icon: <Info size={14} />,
+      label: 'اطلاعات Storage',
+      action: handleShowStorageInfo,
+      color: 'border-orange-200 hover:bg-orange-100'
+    }
+  ];
+
   return (
     <ModernCard variant="glass" className="w-full rounded-xl p-6">
       <ModernCardHeader>
         <ModernCardTitle className="flex items-center gap-2 text-orange-600 dark:text-orange-400">
-          <Bug size={20} />
+          <Cpu size={20} />
           {t('settings.debug_mode', 'حالت دیباگ')}
           <span className="text-xs bg-orange-100 dark:bg-orange-900 px-2 py-1 rounded-full">
             DEV ONLY
@@ -111,36 +132,19 @@ const DebugSettings: React.FC = () => {
               ابزارهای تشخیص عیب
             </h4>
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <GlassButton
-                onClick={handleTestConnection}
-                variant="outline"
-                size="sm"
-                className="justify-start border-orange-200 hover:bg-orange-100"
-              >
-                <Bug size={14} className="me-2" />
-                تست Edge Function
-              </GlassButton>
-              
-              <GlassButton
-                onClick={handleClearCache}
-                variant="outline"
-                size="sm"
-                className="justify-start border-orange-200 hover:bg-orange-100"
-              >
-                <Zap size={14} className="me-2" />
-                پاک کردن Cache
-              </GlassButton>
-              
-              <GlassButton
-                onClick={handleShowStorageInfo}
-                variant="outline"
-                size="sm"
-                className="justify-start border-orange-200 hover:bg-orange-100"
-              >
-                <Info size={14} className="me-2" />
-                اطلاعات Storage
-              </GlassButton>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              {debugTools.map((tool, index) => (
+                <GlassButton
+                  key={index}
+                  onClick={tool.action}
+                  variant="outline"
+                  size="sm"
+                  className={`justify-start ${tool.color}`}
+                >
+                  {tool.icon}
+                  <span className="ms-2">{tool.label}</span>
+                </GlassButton>
+              ))}
             </div>
             
             <div className="text-xs text-orange-700 dark:text-orange-300 mt-2">

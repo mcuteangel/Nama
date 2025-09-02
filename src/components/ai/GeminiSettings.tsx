@@ -5,7 +5,6 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { GlassButton } from "@/components/ui/glass-button";
-import { Label } from '@/components/ui/label';
 import { ModernInput } from '@/components/ui/modern-input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from '@/components/ui/form';
 import { ModernSelect, ModernSelectContent, ModernSelectItem, ModernSelectTrigger, ModernSelectValue } from '@/components/ui/modern-select';
@@ -16,6 +15,7 @@ import { ErrorManager } from '@/lib/error-manager';
 import { SettingsService } from '@/services/settings-service';
 import { fetchWithCache, invalidateCache } from '@/utils/cache-helpers';
 import LoadingSpinner from '../common/LoadingSpinner';
+import { Key, Brain } from 'lucide-react';
 
 interface GeminiModel {
   name: string;
@@ -47,6 +47,51 @@ const GeminiSettings: React.FC = () => {
     ErrorManager.logError(err, { component: "GeminiSettings", action: "submitSettings" });
   }, []);
 
+  // Define these callbacks before they are used
+  const onSuccessFetchModels = useCallback((result: { data: GeminiModel[] | null; error: string | null; fromCache: boolean }) => {
+    if (result.data) {
+      setAvailableGeminiModels(result.data);
+    }
+  }, []);
+
+  const onErrorFetchModels = useCallback((err: Error) => {
+    ErrorManager.logError(err, { component: "GeminiSettings", action: "fetchModels" });
+    ErrorManager.notifyUser(t('settings.error_loading_gemini_models'), 'error');
+  }, [t]);
+
+  // Declare executeFetchModels before onSuccessSubmit to avoid dependency issues
+  const {
+    isLoading: loadingModels,
+    executeAsync: executeFetchModels,
+  } = useErrorHandler<{ data: GeminiModel[] | null; error: string | null; fromCache: boolean }>(null, {
+    showToast: false,
+    onSuccess: onSuccessFetchModels,
+    onError: onErrorFetchModels,
+  });
+
+  // Define onSuccessSubmit after executeFetchModels is declared
+  const onSuccessSubmit = useCallback(() => {
+    ErrorManager.notifyUser(t('settings.gemini_settings_saved_success'), 'success');
+    invalidateCache(`user_settings_${session?.user?.id}`);
+    executeFetchModels(async () => {
+      const cacheKey = `available_gemini_models_${session?.user?.id}`;
+      const { data, error, fromCache } = await fetchWithCache<GeminiModel[]>(
+        cacheKey,
+        async () => {
+          const res = await SettingsService.listGeminiModels();
+          if (res.error) {
+            throw new Error(res.error);
+          }
+          return { data: res.data, error: null };
+        }
+      );
+      if (error) {
+        throw new Error(error);
+      }
+      return { data, error: null, fromCache };
+    });
+  }, [session, t, executeFetchModels]);
+
   const {
     isLoading: isSubmitting,
     error: submitError,
@@ -59,7 +104,7 @@ const GeminiSettings: React.FC = () => {
     retryDelay: 1000,
     showToast: true,
     customErrorMessage: t('settings.error_saving_gemini_settings'),
-    onSuccess: () => { /* Defined later to avoid hoisting issues */ },
+    onSuccess: onSuccessSubmit, // Use the defined callback here
     onError: onErrorSubmit,
   });
 
@@ -84,53 +129,6 @@ const GeminiSettings: React.FC = () => {
     onSuccess: onSuccessFetchSettings,
     onError: onErrorFetchSettings,
   });
-
-  const onSuccessFetchModels = useCallback((result: { data: GeminiModel[] | null; error: string | null; fromCache: boolean }) => {
-    if (result.data) {
-      setAvailableGeminiModels(result.data);
-    }
-  }, []);
-
-  const onErrorFetchModels = useCallback((err: Error) => {
-    ErrorManager.logError(err, { component: "GeminiSettings", action: "fetchModels" });
-    ErrorManager.notifyUser(t('settings.error_loading_gemini_models'), 'error');
-  }, [t]);
-
-  const {
-    isLoading: loadingModels,
-    executeAsync: executeFetchModels,
-  } = useErrorHandler<{ data: GeminiModel[] | null; error: string | null; fromCache: boolean }>(null, {
-    showToast: false,
-    onSuccess: onSuccessFetchModels,
-    onError: onErrorFetchModels,
-  });
-
-  const onSuccessSubmit = useCallback(() => {
-    ErrorManager.notifyUser(t('settings.gemini_settings_saved_success'), 'success');
-    invalidateCache(`user_settings_${session?.user?.id}`);
-    executeFetchModels(async () => {
-      const cacheKey = `available_gemini_models_${session?.user?.id}`;
-      const { data, error, fromCache } = await fetchWithCache<GeminiModel[]>(
-        cacheKey,
-        async () => {
-          const res = await SettingsService.listGeminiModels();
-          if (res.error) {
-            throw new Error(res.error);
-          }
-          return { data: res.data, error: null };
-        }
-      );
-      if (error) {
-        throw new Error(error);
-      }
-      return { data, error: null, fromCache };
-    });
-  }, [session, t, executeFetchModels]);
-
-  useEffect(() => {
-    (executeSubmit as any).onSuccess = onSuccessSubmit;
-  }, [onSuccessSubmit, executeSubmit]);
-
 
   useEffect(() => {
     const fetchAllSettings = async () => {
@@ -202,71 +200,81 @@ const GeminiSettings: React.FC = () => {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <FormField
-          control={form.control}
-          name="geminiApiKey"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-gray-700 dark:text-gray-200">{t('settings.gemini_api_key')}</FormLabel>
-              <FormControl>
-                <ModernInput
-                  type="password"
-                  placeholder={t('settings.enter_gemini_api_key')}
-                  variant="glass"
-                  className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
-                  disabled={isSubmitting}
-                  {...field}
-                />
-              </FormControl>
-              <FormDescription className="text-xs text-gray-500 dark:text-gray-400">
-                {t('settings.gemini_api_key_description')}
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="geminiModel"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-gray-700 dark:text-gray-200">{t('settings.gemini_model')}</FormLabel>
-              <ModernSelect onValueChange={field.onChange} value={field.value} disabled={isSubmitting || loadingModels}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <div className="space-y-4">
+          <h4 className="text-lg font-semibold text-gray-800 dark:text-gray-200 flex items-center gap-2">
+            <Brain className="h-5 w-5 text-purple-500" />
+            {t('settings.gemini_settings')}
+          </h4>
+          
+          <FormField
+            control={form.control}
+            name="geminiApiKey"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-gray-700 dark:text-gray-200 flex items-center gap-2">
+                  <Key className="h-4 w-4" />
+                  {t('settings.gemini_api_key')}
+                </FormLabel>
                 <FormControl>
-                  <ModernSelectTrigger variant="glass" className="w-full">
-                    <ModernSelectValue placeholder={t('settings.select_gemini_model')} />
-                  </ModernSelectTrigger>
+                  <ModernInput
+                    type="password"
+                    placeholder={t('settings.enter_gemini_api_key')}
+                    variant="glass"
+                    className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
+                    disabled={isSubmitting}
+                    {...field}
+                  />
                 </FormControl>
-                <ModernSelectContent variant="glass">
-                  {loadingModels ? (
-                    <ModernSelectItem value="loading" disabled>{t('settings.loading_gemini_models')}</ModernSelectItem>
-                  ) : availableGeminiModels.length > 0 ? (
-                    availableGeminiModels.map((model) => (
-                      <ModernSelectItem key={model.name} value={model.name}>
-                        {model.displayName}
-                      </ModernSelectItem>
-                    ))
-                  ) : (
-                    <ModernSelectItem value="no-models" disabled>{t('settings.no_gemini_models_found')}</ModernSelectItem>
-                  )}
-                </ModernSelectContent>
-              </ModernSelect>
-              <FormDescription className="text-xs text-gray-500 dark:text-gray-400">
-                {t('settings.gemini_model_description')}
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+                <FormDescription className="text-xs text-gray-500 dark:text-gray-400">
+                  {t('settings.gemini_api_key_description')}
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="geminiModel"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-gray-700 dark:text-gray-200">{t('settings.gemini_model')}</FormLabel>
+                <ModernSelect onValueChange={field.onChange} value={field.value} disabled={isSubmitting || loadingModels}>
+                  <FormControl>
+                    <ModernSelectTrigger variant="glass" className="w-full">
+                      <ModernSelectValue placeholder={t('settings.select_gemini_model')} />
+                    </ModernSelectTrigger>
+                  </FormControl>
+                  <ModernSelectContent variant="glass">
+                    {loadingModels ? (
+                      <ModernSelectItem value="loading" disabled>{t('settings.loading_gemini_models')}</ModernSelectItem>
+                    ) : availableGeminiModels.length > 0 ? (
+                      availableGeminiModels.map((model) => (
+                        <ModernSelectItem key={model.name} value={model.name}>
+                          {model.displayName}
+                        </ModernSelectItem>
+                      ))
+                    ) : (
+                      <ModernSelectItem value="no-models" disabled>{t('settings.no_gemini_models_found')}</ModernSelectItem>
+                    )}
+                  </ModernSelectContent>
+                </ModernSelect>
+                <FormDescription className="text-xs text-gray-500 dark:text-gray-400">
+                  {t('settings.gemini_model_description')}
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
         {submitError && (
           <div className="text-sm text-destructive flex items-center justify-center gap-2 mt-2">
             <span>{submitErrorMessage}</span>
             {submitRetryCount > 0 && (
               <GlassButton
-                variant="ghost"
+                variant="outline"
                 size="sm"
                 onClick={retrySubmit}
                 disabled={isSubmitting}
@@ -279,8 +287,8 @@ const GeminiSettings: React.FC = () => {
         )}
         <GlassButton
           type="submit"
-          variant="gradient-primary"
-          className="w-full px-6 py-2 rounded-lg font-semibold"
+          variant="outline"
+          className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-semibold"
           disabled={isSubmitting}
         >
           {isSubmitting && <LoadingSpinner size={16} className="me-2" />}

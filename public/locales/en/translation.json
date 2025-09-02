@@ -83,7 +83,6 @@
     "title": "Performance Dashboard",
     "description": "Real-time Web Vitals and performance metrics monitoring",
     "score": "Score",
-    "refresh": "Refresh",
     "export": "Export",
     "overall_health": "Overall Performance Health",
     "last_updated": "Last updated",
@@ -142,6 +141,7 @@
     "update_contact": "Update Contact",
     "save_contact": "Save Contact",
     "retry": "Retry",
+    "refresh": "Refresh",
     "of": "of",
     "loading": "Loading...",
     "reload_page": "Reload Page",
@@ -272,8 +272,12 @@
     "no_company_data": "No company data found.",
     "top_positions": "Top Positions",
     "no_position_data": "No position data found.",
+    "no_gender_data": "No gender data found.",
     "stats_loaded_success": "Statistics loaded successfully.",
-    "error_loading_stats": "Error loading statistics."
+    "error_loading_stats": "Error loading statistics.",
+    "no_group_data": "No group data found.",
+    "no_preferred_method_data": "No preferred method data found.",
+    "no_creation_time_data": "No creation time data found."
   },
   "ai_suggestions": {
     "title": "AI Suggestions",

@@ -98,8 +98,24 @@ const ImportContactsDialog: React.FC<ImportContactsDialogProps> = ({ onImportSuc
 
   const handleDownloadTemplate = () => {
     const headers = [
-      "نام", "نام خانوادگی", "جنسیت", "سمت", "شرکت", "خیابان", "شهر", "استان", "کد پستی", "کشور", "یادداشت‌ها", "تاریخ تولد",
-      "شماره تلفن‌ها", "ایمیل‌ها", "لینک‌های اجتماعی", "گروه", "URL آواتار", "روش ارتباط ترجیحی"
+      t('contact_form.first_name'),
+      t('contact_form.last_name'),
+      t('contact_form.gender'),
+      t('contact_form.position'),
+      t('contact_form.company'),
+      t('contact_form.street'),
+      t('contact_form.city'),
+      t('contact_form.state'),
+      t('contact_form.zip_code'),
+      t('contact_form.country'),
+      t('contact_form.notes'),
+      t('contact_form.birth_date'),
+      t('contact_form.phone_numbers'),
+      t('contact_form.email_addresses'),
+      t('contact_form.social_links'),
+      t('contact_form.group'),
+      t('contact_form.avatar_url'),
+      t('contact_form.preferred_contact_method')
     ];
     const csvContent = `\uFEFF${headers.map(h => `"${h}"`).join(',')}\n`; // Add BOM for UTF-8
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -118,7 +134,7 @@ const ImportContactsDialog: React.FC<ImportContactsDialogProps> = ({ onImportSuc
       <DialogTrigger asChild>
         <GlassButton
           variant="outline"
-          className="flex items-center gap-2 px-6 py-2 rounded-lg font-semibold"
+          className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-semibold"
         >
           <UploadCloud size={20} />
           {t('settings.import_contacts')}
@@ -137,7 +153,7 @@ const ImportContactsDialog: React.FC<ImportContactsDialogProps> = ({ onImportSuc
           <GlassButton
             variant="outline"
             onClick={handleDownloadTemplate}
-            className="w-full flex items-center gap-2 px-6 py-2 rounded-lg font-semibold"
+            className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-semibold"
           >
             <FileText size={20} />
             {t('import.download_template')}
@@ -184,7 +200,7 @@ const ImportContactsDialog: React.FC<ImportContactsDialogProps> = ({ onImportSuc
             <GlassButton
               onClick={handleImportClick}
               disabled={!selectedFile || isImporting}
-              variant="gradient-primary"
+              variant="outline"
               className="px-6 py-2 rounded-lg font-semibold"
             >
               {isImporting && <LoadingSpinner size={16} className="me-2" />}

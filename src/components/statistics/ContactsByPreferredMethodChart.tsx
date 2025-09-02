@@ -1,8 +1,9 @@
-import React from 'react';
-import { PieChart } from "lucide-react";
-import { Pie, PieChart as RechartsPieChart, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
+import React, { useMemo } from 'react';
+import { MessageCircle } from "lucide-react";
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, TooltipProps } from 'recharts';
 import { useTranslation } from "react-i18next";
 import { ModernCard, ModernCardHeader, ModernCardTitle, ModernCardContent } from "@/components/ui/modern-card";
+import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
 
 interface PreferredMethodData {
   method: string;
@@ -13,28 +14,40 @@ interface ContactsByPreferredMethodChartProps {
   data: PreferredMethodData[];
 }
 
-const COLORS = ['#FFBB28', '#00C49F', '#0088FE', '#FF8042', '#AF19FF'];
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#AF19FF'];
 
 const ContactsByPreferredMethodChart: React.FC<ContactsByPreferredMethodChartProps> = ({ data }) => {
   const { t } = useTranslation();
 
-  const formattedData = data.map(item => ({
+  const formattedData = useMemo(() => data.map(item => ({
     name: t(`contact_method.${item.method}`),
     value: item.count,
-  }));
+  })), [data, t]);
+
+  const CustomTooltip: React.FC<TooltipProps<ValueType, NameType>> = ({ active, payload }) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-background border rounded-lg p-2 shadow-lg">
+          <p className="font-semibold">{`${payload[0].name}`}</p>
+          <p className="text-primary">{`${payload[0].value} ${t('common.contacts')}`}</p>
+        </div>
+      );
+    }
+    return null;
+  };
 
   return (
     <ModernCard variant="glass" className="rounded-xl p-4">
       <ModernCardHeader className="pb-2">
         <ModernCardTitle className="text-lg font-semibold flex items-center gap-2">
-          <PieChart size={20} className="text-yellow-500" />
+          <MessageCircle size={20} className="text-blue-500" />
           {t('statistics.contacts_by_preferred_method')}
         </ModernCardTitle>
       </ModernCardHeader>
       <ModernCardContent className="h-64 flex items-center justify-center">
         {formattedData.length > 0 ? (
-          <ResponsiveContainer width="100%" height={256}>
-            <RechartsPieChart>
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
               <Pie
                 data={formattedData}
                 cx="50%"
@@ -43,14 +56,15 @@ const ContactsByPreferredMethodChart: React.FC<ContactsByPreferredMethodChartPro
                 outerRadius={80}
                 fill="#8884d8"
                 dataKey="value"
+                label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
               >
                 {formattedData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>
-              <Tooltip formatter={(value) => [`${value} ${t('common.contacts')}`, '']} />
+              <Tooltip content={<CustomTooltip />} />
               <Legend />
-            </RechartsPieChart>
+            </PieChart>
           </ResponsiveContainer>
         ) : (
           <p className="text-gray-500 dark:text-gray-400">{t('statistics.no_preferred_method_data')}</p>
@@ -60,4 +74,4 @@ const ContactsByPreferredMethodChart: React.FC<ContactsByPreferredMethodChartPro
   );
 };
 
-export default ContactsByPreferredMethodChart;
+export default React.memo(ContactsByPreferredMethodChart);

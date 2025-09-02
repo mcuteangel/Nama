@@ -51,126 +51,128 @@ import { useSession } from './integrations/supabase/auth';
 import AccessibilityProvider from './components/AccessibilityProvider';
 import KeyboardNavigationHandler from './components/KeyboardNavigationHandler';
 
-function AppLayout() {
-  const location = useLocation();
-  const mobileBreakpoint = 768; // Tailwind's 'md' breakpoint
-  const { i18n } = useTranslation();
-  const { session } = useSession();
+function App() {
+  useTranslation();
 
-  const [isMobile, setIsMobile] = useState(() => window.innerWidth < mobileBreakpoint);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  function AppLayout() {
+    const location = useLocation();
+    const mobileBreakpoint = 768; // Tailwind's 'md' breakpoint
+    const { i18n } = useTranslation();
+    const { session } = useSession();
 
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < mobileBreakpoint);
-    };
+    const [isMobile, setIsMobile] = useState(() => window.innerWidth < mobileBreakpoint);
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+    useEffect(() => {
+      const handleResize = () => {
+        setIsMobile(window.innerWidth < mobileBreakpoint);
+      };
 
-  useEffect(() => {
-    const direction = i18n.dir();
-    document.documentElement.dir = direction;
-    document.body.dir = direction;
-  }, [i18n, i18n.language]);
+      window.addEventListener('resize', handleResize);
+      return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
-  useEffect(() => {
-    console.log("Current user role from session:", session?.user?.user_metadata?.role);
-  }, [session]);
+    useEffect(() => {
+      const direction = i18n.dir();
+      document.documentElement.dir = direction;
+      document.body.dir = direction;
+    }, [i18n, i18n.language]);
 
-  // Network status monitoring for React Query
-  useEffect(() => {
-    const handleOnline = () => {
-      console.log('App came online, resuming queries');
-      networkUtils.resumeQueries();
-    };
+    useEffect(() => {
+      console.log("Current user role from session:", session?.user?.user_metadata?.role);
+    }, [session]);
 
-    const handleOffline = () => {
-      console.log('App went offline');
-      networkUtils.pauseQueries();
-    };
+    // Network status monitoring for React Query
+    useEffect(() => {
+      const handleOnline = () => {
+        console.log('App came online, resuming queries');
+        networkUtils.resumeQueries();
+      };
 
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
+      const handleOffline = () => {
+        console.log('App went offline');
+        networkUtils.pauseQueries();
+      };
 
-    return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
-    };
-  }, []);
+      window.addEventListener('online', handleOnline);
+      window.addEventListener('offline', handleOffline);
 
-  // Route preloading on user interaction
-  useEffect(() => {
-    const preloadRoutes = () => {
-      // Preload commonly accessed routes
-      if (session) {
-        import('./pages/Contacts');
-        import('./pages/AddContact');
-        import('./pages/Groups');
-      }
-    };
+      return () => {
+        window.removeEventListener('online', handleOnline);
+        window.removeEventListener('offline', handleOffline);
+      };
+    }, []);
 
-    // Preload after initial render
-    const timer = setTimeout(preloadRoutes, 2000);
-    return () => clearTimeout(timer);
-  }, [session]);
+    // Route preloading on user interaction
+    useEffect(() => {
+      const preloadRoutes = () => {
+        // Preload commonly accessed routes
+        if (session) {
+          import('./pages/Contacts');
+          import('./pages/AddContact');
+          import('./pages/Groups');
+        }
+      };
 
-  const isAuthPage = location.pathname === '/login';
+      // Preload after initial render
+      const timer = setTimeout(preloadRoutes, 2000);
+      return () => clearTimeout(timer);
+    }, [session]);
 
-  const mainContentPaddingRight = !isAuthPage && !isMobile
-    ? (isSidebarOpen ? "pr-64" : "pr-20")
-    : "";
+    const isAuthPage = location.pathname === '/login';
 
-  const isAdmin = session?.user?.user_metadata?.role === 'admin';
+    const mainContentPaddingRight = !isAuthPage && !isMobile
+      ? (isSidebarOpen ? "pr-64" : "pr-20")
+      : "";
 
-  return (
-    <div className="flex flex-col min-h-screen bg-background">
-      {!isAuthPage && (
-        <>
-          {isMobile ? <MobileHeader /> : <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} isAdmin={isAdmin} />}
-          {isMobile && <BottomNavigationBar isAdmin={isAdmin} />}
-        </>
-      )}
-      <div className={cn(
-        "flex-grow",
-        !isAuthPage && (isMobile ? "pt-[64px] pb-16" : mainContentPaddingRight)
-      )}>
-        <main className="h-full w-full flex flex-col items-stretch justify-center p-0 sm:p-4" id="main-content" role="main">
-          <KeyboardNavigationHandler scope="global">
-            <AsyncErrorBoundary>
-              <SuspenseWrapper fallback={<LoadingMessage message="Loading page..." />}>
-                <Routes>
-                  <Route path="/login" element={<Login />} />
-                  {/* Protected Routes */}
-                  <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
-                  <Route path="/contacts" element={<ProtectedRoute><Contacts /></ProtectedRoute>} />
-                  <Route path="/add-contact" element={<ProtectedRoute><AddContact /></ProtectedRoute>} />
-                  <Route path="/contacts/:id" element={<ProtectedRoute><ContactDetail /></ProtectedRoute>} />
-                  <Route path="/contacts/edit/:id" element={<ProtectedRoute><EditContact /></ProtectedRoute>} />
-                  <Route path="/groups" element={<ProtectedRoute><Groups /></ProtectedRoute>} />
-                  <Route path="/custom-fields" element={<ProtectedRoute><CustomFields /></ProtectedRoute>} />
-                  <Route path="/profile" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
-                  <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
-                  <Route path="/statistics" element={<ProtectedRoute><Statistics /></ProtectedRoute>} />
-                  <Route path="/ai-suggestions" element={<ProtectedRoute><AISuggestions /></ProtectedRoute>} />
-                  <Route path="/rtl-test" element={<ProtectedRoute><RTLTestPage /></ProtectedRoute>} />
-                  <Route path="/modern-ui-showcase" element={<ProtectedRoute><ModernUIShowcase /></ProtectedRoute>} />
-                  {isAdmin && (
-                    <Route path="/user-management" element={<ProtectedRoute><UserManagement /></ProtectedRoute>} />
-                  )}
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </SuspenseWrapper>
-            </AsyncErrorBoundary>
-          </KeyboardNavigationHandler>
-        </main>
+    const isAdmin = session?.user?.user_metadata?.role === 'admin';
+
+    return (
+      <div className="flex flex-col min-h-screen bg-background">
+        {!isAuthPage && (
+          <>
+            {isMobile ? <MobileHeader /> : <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} isAdmin={isAdmin} />}
+            {isMobile && <BottomNavigationBar isAdmin={isAdmin} />}
+          </>
+        )}
+        <div className={cn(
+          "flex-grow",
+          !isAuthPage && (isMobile ? "pt-[64px] pb-16" : mainContentPaddingRight)
+        )}>
+          <main className="h-full w-full flex flex-col items-stretch justify-center p-0 sm:p-4" id="main-content" role="main">
+            <KeyboardNavigationHandler scope="global">
+              <AsyncErrorBoundary>
+                <SuspenseWrapper fallback={<LoadingMessage message="Loading page..." />}>
+                  <Routes>
+                    <Route path="/login" element={<Login />} />
+                    {/* Protected Routes */}
+                    <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+                    <Route path="/contacts" element={<ProtectedRoute><Contacts /></ProtectedRoute>} />
+                    <Route path="/add-contact" element={<ProtectedRoute><AddContact /></ProtectedRoute>} />
+                    <Route path="/contacts/:id" element={<ProtectedRoute><ContactDetail /></ProtectedRoute>} />
+                    <Route path="/contacts/edit/:id" element={<ProtectedRoute><EditContact /></ProtectedRoute>} />
+                    <Route path="/groups" element={<ProtectedRoute><Groups /></ProtectedRoute>} />
+                    <Route path="/custom-fields" element={<ProtectedRoute><CustomFields /></ProtectedRoute>} />
+                    <Route path="/profile" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
+                    <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+                    <Route path="/statistics" element={<ProtectedRoute><Statistics /></ProtectedRoute>} />
+                    <Route path="/ai-suggestions" element={<ProtectedRoute><AISuggestions /></ProtectedRoute>} />
+                    <Route path="/rtl-test" element={<ProtectedRoute><RTLTestPage /></ProtectedRoute>} />
+                    <Route path="/modern-ui-showcase" element={<ProtectedRoute><ModernUIShowcase /></ProtectedRoute>} />
+                    {isAdmin && (
+                      <Route path="/user-management" element={<ProtectedRoute><UserManagement /></ProtectedRoute>} />
+                    )}
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </SuspenseWrapper>
+              </AsyncErrorBoundary>
+            </KeyboardNavigationHandler>
+          </main>
+        </div>
       </div>
-    </div>
-  );
-}
+    );
+  }
 
-export default function App() {
   return (
     <AppErrorBoundary>
       <QueryClientProvider client={queryClient}>
@@ -207,3 +209,5 @@ export default function App() {
     </AppErrorBoundary>
   );
 }
+
+export default App;

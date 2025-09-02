@@ -1,8 +1,9 @@
-import React from 'react';
-import { PieChart } from "lucide-react";
-import { Pie, PieChart as RechartsPieChart, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
+import React, { useMemo } from 'react';
+import { PieChart as PieChartIcon } from "lucide-react";
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, TooltipProps } from 'recharts';
 import { useTranslation } from "react-i18next";
 import { ModernCard, ModernCardHeader, ModernCardTitle, ModernCardContent } from "@/components/ui/modern-card";
+import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
 
 interface GenderData {
   gender: string;
@@ -18,23 +19,35 @@ const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#AF19FF'];
 const ContactsByGenderChart: React.FC<ContactsByGenderChartProps> = ({ data }) => {
   const { t } = useTranslation();
 
-  const formattedData = data.map(item => ({
+  const formattedData = useMemo(() => data.map(item => ({
     name: t(`gender.${item.gender}`),
     value: item.count,
-  }));
+  })), [data, t]);
+
+  const CustomTooltip: React.FC<TooltipProps<ValueType, NameType>> = ({ active, payload }) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-background border rounded-lg p-2 shadow-lg">
+          <p className="font-semibold">{`${payload[0].name}`}</p>
+          <p className="text-primary">{`${payload[0].value} ${t('common.contacts')}`}</p>
+        </div>
+      );
+    }
+    return null;
+  };
 
   return (
     <ModernCard variant="glass" className="rounded-xl p-4">
       <ModernCardHeader className="pb-2">
         <ModernCardTitle className="text-lg font-semibold flex items-center gap-2">
-          <PieChart size={20} className="text-green-500" />
+          <PieChartIcon size={20} className="text-green-500" />
           {t('statistics.contacts_by_gender')}
         </ModernCardTitle>
       </ModernCardHeader>
       <ModernCardContent className="h-64 flex items-center justify-center">
         {formattedData.length > 0 ? (
-          <ResponsiveContainer width="100%" height={256}>
-            <RechartsPieChart>
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
               <Pie
                 data={formattedData}
                 cx="50%"
@@ -43,14 +56,15 @@ const ContactsByGenderChart: React.FC<ContactsByGenderChartProps> = ({ data }) =
                 outerRadius={80}
                 fill="#8884d8"
                 dataKey="value"
+                label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
               >
                 {formattedData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>
-              <Tooltip formatter={(value) => [`${value} ${t('common.contacts')}`, '']} />
+              <Tooltip content={<CustomTooltip />} />
               <Legend />
-            </RechartsPieChart>
+            </PieChart>
           </ResponsiveContainer>
         ) : (
           <p className="text-gray-500 dark:text-gray-400">{t('statistics.no_gender_data')}</p>
@@ -60,4 +74,4 @@ const ContactsByGenderChart: React.FC<ContactsByGenderChartProps> = ({ data }) =
   );
 };
 
-export default ContactsByGenderChart;
+export default React.memo(ContactsByGenderChart);

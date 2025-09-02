@@ -10,10 +10,9 @@ import { AccessibilitySetting, RTLTestSetting } from "@/components/settings";
 import ContactDisplaySetting from "@/components/settings/ContactDisplaySetting";
 import GeminiSettings from "@/components/ai/GeminiSettings";
 import DebugSettings from "@/components/settings/DebugSettings";
-import { Download, User, Settings as SettingsIcon, Sparkles } from "lucide-react";
+import { Download, User, Settings as SettingsIcon, Sparkles, Database, Palette, Accessibility, TestTube } from "lucide-react";
 import { exportContactsToCsv } from "@/utils/export-contacts";
 import { useSession } from "@/integrations/supabase/auth";
-import { Label } from "@/components/ui/label";
 import ImportContactsDialog from "@/components/ImportContactsDialog";
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 
@@ -40,6 +39,109 @@ const Settings = () => {
     // For now, the DataImportService already invalidates caches.
   };
 
+  // Settings sections configuration
+  const settingsSections = [
+    {
+      id: 'display',
+      title: t('settings.display_settings'),
+      icon: <Palette size={20} />,
+      description: t('settings.display_settings_description'),
+      component: (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <ModernCard variant="glass" className="p-4 rounded-lg shadow-sm">
+            <div className="flex items-center justify-between">
+              <span className="text-gray-700 dark:text-gray-200">{t('settings.theme')}</span>
+              <ThemeToggle />
+            </div>
+          </ModernCard>
+          <ModernCard variant="glass" className="p-4 rounded-lg shadow-sm">
+            <CalendarTypeSetting />
+          </ModernCard>
+          <ModernCard variant="glass" className="p-4 rounded-lg shadow-sm">
+            <LanguageSetting />
+          </ModernCard>
+          <ModernCard variant="glass" className="p-4 rounded-lg shadow-sm">
+            <AccessibilitySetting />
+          </ModernCard>
+          <ModernCard variant="glass" className="p-4 rounded-lg shadow-sm md:col-span-2">
+            <ContactDisplaySetting />
+          </ModernCard>
+        </div>
+      )
+    },
+    {
+      id: 'ai',
+      title: t('settings.ai_settings'),
+      icon: <Sparkles size={20} />,
+      description: t('settings.ai_settings_description'),
+      component: (
+        <ModernCard variant="glass" className="p-4 rounded-lg shadow-sm">
+          <GeminiSettings />
+        </ModernCard>
+      )
+    },
+    {
+      id: 'testing',
+      title: t('settings.component_testing'),
+      icon: <TestTube size={20} />,
+      description: t('settings.component_testing_description'),
+      component: (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <ModernCard variant="glass" className="p-4 rounded-lg shadow-sm">
+            <RTLTestSetting />
+          </ModernCard>
+          <ModernCard variant="glass" className="p-4 rounded-lg shadow-sm">
+            <GlassButton 
+              asChild 
+              variant="outline" 
+              className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-semibold"
+            >
+              <Link to="/modern-ui-showcase">
+                <SettingsIcon size={20} />
+                {t('settings.ui_showcase')}
+              </Link>
+            </GlassButton>
+          </ModernCard>
+        </div>
+      )
+    },
+    {
+      id: 'data',
+      title: t('settings.data_management'),
+      icon: <Database size={20} />,
+      description: t('settings.data_management_description'),
+      component: (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <ModernCard variant="glass" className="p-4 rounded-lg shadow-sm">
+            <div className="flex flex-col gap-2">
+              <h4 className="font-medium text-gray-800 dark:text-gray-200">
+                {t('settings.export_contacts')}
+              </h4>
+              <GlassButton
+                onClick={handleExport}
+                disabled={isExporting}
+                variant="outline"
+                className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-semibold"
+              >
+                {isExporting && <LoadingSpinner size={16} className="me-2" />}
+                <Download size={20} />
+                {t('settings.export_contacts')}
+              </GlassButton>
+            </div>
+          </ModernCard>
+          <ModernCard variant="glass" className="p-4 rounded-lg shadow-sm">
+            <div className="flex flex-col gap-2">
+              <h4 className="font-medium text-gray-800 dark:text-gray-200">
+                {t('settings.import_contacts')}
+              </h4>
+              <ImportContactsDialog onImportSuccess={handleImportSuccess} />
+            </div>
+          </ModernCard>
+        </div>
+      )
+    }
+  ];
+
   return (
     <div className="flex flex-col items-center justify-center p-4 h-full w-full">
       <ModernCard variant="glass" className="w-full max-w-3xl rounded-xl p-6">
@@ -52,80 +154,18 @@ const Settings = () => {
           </ModernCardDescription>
         </ModernCardHeader>
         <ModernCardContent className="space-y-8">
-          {/* Display Settings */}
-          <div className="space-y-4">
-            <h3 className="text-2xl font-semibold text-gray-800 dark:text-gray-100 border-b pb-2 mb-4 flex items-center gap-2">
-              <SettingsIcon size={20} /> {t('settings.display_settings')}
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <ModernCard variant="glass" className="p-4 rounded-lg shadow-sm">
-                <div className="flex items-center justify-between">
-                  <Label className="text-gray-700 dark:text-gray-200">{t('settings.theme')}</Label>
-                  <ThemeToggle />
-                </div>
-              </ModernCard>
-              <ModernCard variant="glass" className="p-4 rounded-lg shadow-sm">
-                <CalendarTypeSetting />
-              </ModernCard>
-              <ModernCard variant="glass" className="p-4 rounded-lg shadow-sm">
-                <LanguageSetting />
-              </ModernCard>
-              <ModernCard variant="glass" className="p-4 rounded-lg shadow-sm">
-                <AccessibilitySetting />
-              </ModernCard>
-              <ModernCard variant="glass" className="p-4 rounded-lg shadow-sm md:col-span-2">
-                <ContactDisplaySetting />
-              </ModernCard>
+          {/* Settings Sections */}
+          {settingsSections.map((section) => (
+            <div key={section.id} className="space-y-4">
+              <h3 className="text-2xl font-semibold text-gray-800 dark:text-gray-100 border-b pb-2 mb-4 flex items-center gap-2">
+                {section.icon} {section.title}
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400 mb-4">
+                {section.description}
+              </p>
+              {section.component}
             </div>
-          </div>
-
-          {/* AI Settings */}
-          <div className="space-y-4">
-            <h3 className="text-2xl font-semibold text-gray-800 dark:text-gray-100 border-b pb-2 mb-4 flex items-center gap-2">
-              <Sparkles size={20} /> {t('settings.ai_settings')}
-            </h3>
-            <ModernCard variant="glass" className="p-4 rounded-lg shadow-sm">
-              <GeminiSettings />
-            </ModernCard>
-          </div>
-
-          {/* Component Testing */}
-          <div className="space-y-4">
-            <h3 className="text-2xl font-semibold text-gray-800 dark:text-gray-100 border-b pb-2 mb-4 flex items-center gap-2">
-              <SettingsIcon size={20} /> {t('settings.component_testing')}
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <ModernCard variant="glass" className="p-4 rounded-lg shadow-sm">
-                <RTLTestSetting />
-              </ModernCard>
-              <ModernCard variant="glass" className="p-4 rounded-lg shadow-sm">
-                <GlassButton asChild variant="gradient-primary" className="w-full">
-                  <Link to="/modern-ui-showcase">
-                    {t('settings.ui_showcase')}
-                  </Link>
-                </GlassButton>
-              </ModernCard>
-            </div>
-          </div>
-
-          {/* Data Management */}
-          <div className="space-y-4">
-            <h3 className="text-2xl font-semibold text-gray-800 dark:text-gray-100 border-b pb-2 mb-4 flex items-center gap-2">
-              <Download size={20} /> {t('settings.data_management')}
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <GlassButton
-                onClick={handleExport}
-                disabled={isExporting}
-                className="flex items-center gap-2 px-6 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white font-semibold shadow-md transition-all duration-300 transform hover:scale-105"
-              >
-                {isExporting && <LoadingSpinner size={16} className="me-2" />}
-                <Download size={20} />
-                {t('settings.export_contacts')}
-              </GlassButton>
-              <ImportContactsDialog onImportSuccess={handleImportSuccess} />
-            </div>
-          </div>
+          ))}
 
           {/* Debug Settings - Only in Development */}
           <DebugSettings />
@@ -135,14 +175,21 @@ const Settings = () => {
             <h3 className="text-2xl font-semibold text-gray-800 dark:text-gray-100 border-b pb-2 mb-4 flex items-center gap-2">
               <User size={20} /> {t('common.profile')}
             </h3>
-            <GlassButton
-              asChild
-              className="w-full px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-md transition-all duration-300 transform hover:scale-105"
-            >
-              <Link to="/profile">
-                {t('settings.user_profile')}
-              </Link>
-            </GlassButton>
+            <p className="text-gray-600 dark:text-gray-400 mb-4">
+              {t('settings.user_profile_description')}
+            </p>
+            <ModernCard variant="glass" className="p-4 rounded-lg shadow-sm">
+              <GlassButton
+                asChild
+                variant="outline"
+                className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-semibold"
+              >
+                <Link to="/profile">
+                  <User size={20} />
+                  {t('settings.user_profile')}
+                </Link>
+              </GlassButton>
+            </ModernCard>
           </div>
         </ModernCardContent>
       </ModernCard>

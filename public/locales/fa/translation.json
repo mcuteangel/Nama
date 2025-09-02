@@ -95,7 +95,6 @@
     "title": "داشبورد عملکرد",
     "description": "مانیتورینگ بلادرنگ Web Vitals و معیارهای عملکرد",
     "score": "امتیاز",
-    "refresh": "بروزرسانی",
     "export": "خروجی",
     "overall_health": "سلامت کلی عملکرد",
     "last_updated": "آخرین بروزرسانی",
@@ -154,6 +153,7 @@
     "update_contact": "به‌روزرسانی مخاطب",
     "save_contact": "ذخیره مخاطب",
     "retry": "تلاش مجدد",
+    "refresh": "بروزرسانی",
     "of": "از",
     "loading": "در حال بارگذاری...",
     "reload_page": "بارگذاری مجدد صفحه",
@@ -284,8 +284,12 @@
     "no_company_data": "داده‌ای برای شرکت‌ها یافت نشد.",
     "top_positions": "سمت‌های برتر",
     "no_position_data": "داده‌ای برای سمت‌ها یافت نشد.",
+    "no_gender_data": "داده‌ای برای جنسیت یافت نشد.",
     "stats_loaded_success": "آمار با موفقیت بارگذاری شد.",
-    "error_loading_stats": "خطا در بارگذاری آمار."
+    "error_loading_stats": "خطا در بارگذاری آمار.",
+    "no_group_data": "داده‌ای برای گروه‌ها یافت نشد.",
+    "no_preferred_method_data": "داده‌ای برای روش ارتباط ترجیحی یافت نشد.",
+    "no_creation_time_data": "داده‌ای برای زمان ایجاد یافت نشد."
   },
   "ai_suggestions": {
     "title": "پیشنهادات هوش مصنوعی",

@@ -43,7 +43,10 @@
     "description_placeholder": "Description about this field",
     "required_field": "Required Field",
     "editing": "Editing...",
-    "adding": "Adding..."
+    "adding": "Adding...",
+    "gender": "Gender",
+    "birth_date": "Birth Date",
+    "avatar_url": "Avatar URL"
   },
   "contact": {
     "no_phone": "No phone number",
@@ -228,6 +231,7 @@
     "title": "Settings",
     "description": "Manage application settings and user preferences",
     "display_settings": "Display Settings",
+    "display_settings_description": "Customize the appearance and behavior of the application",
     "theme": "Theme",
     "calendar_type": "Calendar Type",
     "jalali": "Jalali",
@@ -236,12 +240,14 @@
     "persian": "Persian",
     "english": "English",
     "ai_settings": "AI Settings",
+    "ai_settings_description": "Configure AI capabilities and language models",
     "gemini_api_key": "Gemini API Key",
     "enter_gemini_api_key": "Enter your Gemini API Key",
     "gemini_api_key_description": "Enter your Gemini API key to use AI features. This key is stored securely.",
     "gemini_model": "Gemini Model",
     "select_gemini_model": "Select Gemini Model",
     "gemini_model_description": "The Gemini model used for AI processing.",
+    "gemini_settings": "Gemini Settings",
     "error_saving_gemini_settings": "Error saving Gemini settings.",
     "gemini_settings_saved_success": "Gemini settings saved successfully.",
     "loading_gemini_settings": "Loading Gemini settings...",
@@ -249,6 +255,7 @@
     "no_gemini_models_found": "No Gemini models found.",
     "error_loading_group_colors": "Error loading existing group colors.",
     "data_management": "Data Management",
+    "data_management_description": "Import and export contact data",
     "export_contacts": "Export Contacts",
     "import_contacts": "Import Contacts",
     "user_profile": "User Profile",
@@ -258,6 +265,7 @@
     "accessibility": "Accessibility",
     "accessibility_description": "Enable accessibility features like screen reader support and keyboard navigation",
     "component_testing": "Component Testing",
+    "component_testing_description": "Testing tools and UI component showcase",
     "rtl_components_test": "RTL Components Test",
     "rtl_components_test_description": "Test UI components in right-to-left layouts",
     "test_components": "Test Components",
@@ -266,7 +274,9 @@
     "select_display_mode": "Select Display Mode",
     "display_mode_grid": "Card View",
     "display_mode_list": "List View",
-    "default_contact_display_mode_description": "Select the default display mode for the contacts list"
+    "default_contact_display_mode_description": "Select the default display mode for the contacts list",
+    "user_profile_description": "Manage your account information",
+    "toggle_theme": "Toggle theme"
   },
   "contact_detail": {
     "contact_details": "Contact Details",
@@ -715,5 +725,20 @@
     "delete_confirm_title": "Delete Custom Field Template?",
     "delete_confirm_description": "This action cannot be undone. This template will be permanently deleted. (Existing data in contacts will not be affected)",
     "field_type": "Field Type"
+  },
+  "import": {
+    "title": "Import Contacts",
+    "description": "Import contacts from a CSV file",
+    "download_template": "Download CSV Template",
+    "select_csv_file": "Select CSV File",
+    "or_drag_and_drop": "or drag and drop file here",
+    "import_button": "Import Contacts",
+    "import_success": "Successfully imported {{count}} contacts.",
+    "import_failed_unknown": "Error importing contacts.",
+    "import_failed_generic": "Error importing CSV file.",
+    "invalid_file_type": "Please select a CSV file.",
+    "no_file_selected": "Please select a file.",
+    "file_read_error": "Error reading file.",
+    "template_download_success": "CSV template downloaded successfully."
   }
 }
