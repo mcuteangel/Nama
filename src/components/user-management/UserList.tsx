@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { Edit, Trash2, User as UserIcon, PlusCircle, Users, Bug } from "lucide-react";
-import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { UserManagementService } from "@/services/user-management-service";
 import { useErrorHandler } from "@/hooks/use-error-handler";
@@ -10,14 +9,14 @@ import { useTranslation } from "react-i18next";
 import { useSession } from "@/integrations/supabase/auth";
 import FormDialogWrapper from "../common/FormDialogWrapper";
 import LoadingMessage from "../common/LoadingMessage";
-import CancelButton from "../common/CancelButton";
 import { fetchWithCache, invalidateCache } from "@/utils/cache-helpers";
 import EmptyState from '../common/EmptyState';
 import LoadingSpinner from '../common/LoadingSpinner';
-import { EdgeFunctionDebugger } from '@/utils/edge-function-debugger';
-import { useDebugMode } from '@/hooks/use-debug-mode';
-import { ModernCard } from "@/components/ui/modern-card";
+import StandardizedDeleteDialog from "@/components/common/StandardizedDeleteDialog";
 import { GlassButton } from "@/components/ui/glass-button";
+import { ModernCard } from "@/components/ui/modern-card";
+import { useDebugMode } from '@/hooks/use-debug-mode';
+import { EdgeFunctionDebugger } from '@/utils/edge-function-debugger';
 
 interface UserProfile {
   id: string;
@@ -30,6 +29,7 @@ interface UserProfile {
 
 const UserItem = ({ user, onUserUpdated, onUserDeleted }: { user: UserProfile; onUserUpdated: () => void; onUserDeleted: () => void }) => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const { t } = useTranslation();
   const { session } = useSession();
 
@@ -105,28 +105,25 @@ const UserItem = ({ user, onUserUpdated, onUserDeleted }: { user: UserProfile; o
           </FormDialogWrapper>
         </Dialog>
 
-        <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <GlassButton variant="ghost" size="icon" className="text-red-600 hover:bg-red-100 dark:text-red-400 dark:hover:bg-gray-600/50 transition-all duration-200" disabled={isDeleting}>
-              {isDeleting ? <LoadingSpinner size={20} /> : <Trash2 size={20} />}
-            </GlassButton>
-          </AlertDialogTrigger>
-          <AlertDialogContent className="rounded-xl p-6 bg-white dark:bg-gray-800">
-            <AlertDialogHeader>
-              <AlertDialogTitle className="text-gray-800 dark:text-gray-100">{t('user_management.confirm_delete_title')}</AlertDialogTitle>
-              <AlertDialogDescription className="text-gray-600 dark:text-gray-300">
-                {t('user_management.confirm_delete_description', { email: user.email })}
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <CancelButton onClick={() => {}} text={t('common.cancel')} />
-              <AlertDialogAction onClick={handleDelete} className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold" disabled={isDeleting}>
-                {isDeleting && <LoadingSpinner size={16} className="me-2" />}
-                {t('common.delete')}
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+        <GlassButton 
+          variant="ghost" 
+          size="icon" 
+          className="text-red-600 hover:bg-red-100 dark:text-red-400 dark:hover:bg-gray-600/50 transition-all duration-200"
+          onClick={() => setIsDeleteDialogOpen(true)}
+          disabled={isDeleting}
+        >
+          {isDeleting ? <LoadingSpinner size={20} /> : <Trash2 size={20} />}
+        </GlassButton>
+
+        {/* Standardized Delete Dialog */}
+        <StandardizedDeleteDialog
+          open={isDeleteDialogOpen}
+          onOpenChange={setIsDeleteDialogOpen}
+          onConfirm={handleDelete}
+          title={t('user_management.confirm_delete_title')}
+          description={t('user_management.confirm_delete_description', { email: user.email })}
+          isDeleting={isDeleting}
+        />
       </div>
     </ModernCard>
   );
@@ -288,3 +285,9 @@ const UserList: React.FC = () => {
 };
 
 export default UserList;
+
+
+
+
+
+

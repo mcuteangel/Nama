@@ -29,18 +29,8 @@ import AddGroupDialog from "./AddGroupDialog";
 import EmptyState from "../common/EmptyState";
 import LoadingSpinner from "../common/LoadingSpinner";
 import LoadingMessage from "../common/LoadingMessage";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
 import { useDialogFocus } from "@/hooks/use-dialog-focus";
+import StandardizedDeleteDialog from "@/components/common/StandardizedDeleteDialog";
 
 interface Group {
   id: string;
@@ -171,6 +161,7 @@ const GroupsManagement = () => {
       return Promise.reject(error);
     } finally {
       setIsDeleting(null);
+      setDeleteDialogOpen(false);
     }
   }, [session, refreshGroups, t]);
 
@@ -371,54 +362,20 @@ const GroupsManagement = () => {
                       {t('actions.edit')}
                     </GlassButton>
                     
-                    <AlertDialog open={deleteDialogOpen && selectedGroup?.id === group.id} onOpenChange={setDeleteDialogOpen}>
-                      <AlertDialogTrigger asChild>
-                        <button
-                          className="flex-1 flex items-center justify-center gap-2 text-red-600 dark:text-red-400 hover:bg-red-100/30 dark:hover:bg-red-400/20 transition-all duration-300 hover-lift py-2.5 px-4 rounded-lg border border-white/30 dark:border-gray-600/30 text-sm font-medium"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setSelectedGroup({ id: group.id, name: group.name });
-                            setDeleteDialogOpen(true);
-                            storeTriggerElement();
-                          }}
-                        >
-                          <Trash2 size={18} />
-                          {t('actions.delete')}
-                        </button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle className="text-gray-800 dark:text-gray-100 text-xl">
-                            {t('groups.delete_confirm_title')}
-                          </AlertDialogTitle>
-                          <AlertDialogDescription className="text-gray-600 dark:text-gray-300">
-                            {t('groups.delete_confirm_description')}
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter className="gap-3">
-                          <AlertDialogCancel 
-                            onClick={() => setDeleteDialogOpen(false)}
-                            className="px-6 py-2 font-medium glass-advanced border border-white/20 hover:bg-white/10 dark:hover:bg-white/5 backdrop-blur-md"
-                          >
-                            {t('actions.cancel')}
-                          </AlertDialogCancel>
-                          <AlertDialogAction 
-                            onClick={() => {
-                              if (selectedGroup) {
-                                handleDeleteGroup(selectedGroup.id, selectedGroup.name)
-                                  .then(() => setDeleteDialogOpen(false))
-                                  .catch(() => {});
-                              }
-                            }}
-                            disabled={isDeleting === group.id}
-                            className="bg-red-600 hover:bg-red-700 text-white"
-                          >
-                            {isDeleting === group.id && <LoadingSpinner size={18} className="mr-2" />}
-                            {t('actions.delete')}
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
+                    <GlassButton
+                      variant="glass"
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedGroup({ id: group.id, name: group.name });
+                        setDeleteDialogOpen(true);
+                        storeTriggerElement();
+                      }}
+                      className="flex-1 flex items-center justify-center gap-2 text-red-600 dark:text-red-400 hover:bg-red-100/30 dark:hover:bg-red-400/20 transition-all duration-300 hover-lift py-2.5 px-4 rounded-lg border border-white/30 dark:border-gray-600/30 text-sm font-medium"
+                    >
+                      <Trash2 size={18} />
+                      {t('actions.delete')}
+                    </GlassButton>
                   </div>
                 </ModernCard>
               ))}
@@ -426,6 +383,22 @@ const GroupsManagement = () => {
           )}
         </ModernCardContent>
       </ModernCard>
+
+      {/* Standardized Delete Dialog */}
+      {selectedGroup && (
+        <StandardizedDeleteDialog
+          open={deleteDialogOpen}
+          onOpenChange={setDeleteDialogOpen}
+          onConfirm={() => {
+            if (selectedGroup) {
+              handleDeleteGroup(selectedGroup.id, selectedGroup.name);
+            }
+          }}
+          title={t('groups.delete_confirm_title')}
+          description={t('groups.delete_confirm_description')}
+          isDeleting={isDeleting === selectedGroup?.id}
+        />
+      )}
 
       {/* Add/Edit Group Dialog */}
       <AddGroupDialog

@@ -101,9 +101,9 @@ const ContactCustomFields: React.FC<ContactCustomFieldsProps> = React.memo(({
                         <ModernPopover>
                           <ModernPopoverTrigger asChild>
                             <GlassButton
-                              variant={"glass"}
+                              variant="glass"
                               className={cn(
-                                "w-full justify-start text-left font-normal py-3 bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 hover:bg-white/40 dark:hover:bg-gray-700/40",
+                                "w-full justify-start text-left font-normal bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100",
                                 !field.value && "text-muted-foreground"
                               )}
                             >
@@ -113,7 +113,7 @@ const ContactCustomFields: React.FC<ContactCustomFieldsProps> = React.memo(({
                               </span>
                             </GlassButton>
                           </ModernPopoverTrigger>
-                          <ModernPopoverContent className="w-auto p-0" glassEffect="strong">
+                          <ModernPopoverContent className="w-auto p-0" glassEffect="card">
                             <JalaliCalendar
                               selected={field.value ? new Date(field.value) : undefined}
                               onSelect={(date) => field.onChange(date ? date.toISOString() : "")}

@@ -47,7 +47,7 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ selectedColor, onSelectColor 
           </div>
         </GlassButton>
       </ModernPopoverTrigger>
-      <ModernPopoverContent className="w-auto p-0" glassEffect="glassAdvanced">
+      <ModernPopoverContent className="w-auto p-0" glassEffect="advanced">
         <div className="grid grid-cols-5 gap-2 p-2">
           {colors.map((color) => (
             <div
