@@ -14,26 +14,28 @@ import { ErrorManager } from "@/lib/error-manager";
 import EmptyState from '../common/EmptyState';
 import LoadingSpinner from '../common/LoadingSpinner';
 import { ModernCard } from "@/components/ui/modern-card";
+import { useTranslation } from "react-i18next";
 
 interface Group {
   id: string;
   name: string;
   color?: string;
-  created_at: string;
+  created_at?: string;
 }
 
 const GroupItem = ({ group, onGroupUpdated, onGroupDeleted }: { group: Group; onGroupUpdated: () => void; onGroupDeleted: () => void }) => {
+  const { t } = useTranslation();
   const { session } = useSession();
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = async () => {
     if (!session?.user) {
-      showError("برای حذف گروه باید وارد شوید.");
+      showError(t('groups.delete_auth_required'));
       return;
     }
     setIsDeleting(true);
-    const toastId = showLoading("در حال حذف گروه...");
+    const toastId = showLoading(t('groups.deleting_group'));
     try {
       const { error } = await supabase
         .from("groups")
@@ -42,12 +44,12 @@ const GroupItem = ({ group, onGroupUpdated, onGroupDeleted }: { group: Group; on
         .eq("user_id", session.user.id);
 
       if (error) throw error;
-      showSuccess("گروه با موفقیت حذف شد.");
+      showSuccess(t('groups.delete_success'));
       invalidateCache(`user_groups_${session.user.id}`);
       onGroupDeleted();
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error deleting group:", error);
-      showError(`خطا در حذف گروه: ${error.message || "خطای ناشناخته"}`);
+      showError(`${t('groups.delete_error')}: ${(error as Error).message || t('errors.unknown')}`);
     } finally {
       dismissToast(toastId);
       setIsDeleting(false);
@@ -55,30 +57,45 @@ const GroupItem = ({ group, onGroupUpdated, onGroupDeleted }: { group: Group; on
   };
 
   return (
-    <ModernCard variant="glass" hover="lift" className="flex items-center justify-between p-4 rounded-lg">
-      <div className="flex items-center gap-4">
+    <ModernCard 
+      variant="glass" 
+      hover="lift" 
+      className="flex flex-col p-5 rounded-2xl shadow-lg border border-white/30 dark:border-gray-600/30 backdrop-blur-lg"
+    >
+      <div className="flex items-start gap-4 mb-4">
         <div 
-          className="w-10 h-10 rounded-full flex items-center justify-center border border-white/50 dark:border-gray-600/50" 
+          className="w-14 h-14 rounded-full flex items-center justify-center border-2 border-white/50 dark:border-gray-400/50 shadow-lg glass-advanced" 
           style={{ backgroundColor: group.color || "#cccccc" }}
         >
-          <Users size={20} className="text-white" />
+          <Users size={24} className="text-white drop-shadow-md" />
         </div>
-        <div>
-          <p className="font-semibold text-lg text-gray-800 dark:text-gray-100">
+        <div className="flex-1">
+          <h3 className="font-bold text-xl text-gray-800 dark:text-gray-100 mb-1 drop-shadow-sm">
             {group.name}
-          </p>
+          </h3>
           {group.color && (
-            <p className="text-sm text-gray-600 dark:text-gray-300">
-              رنگ: {group.color}
-            </p>
+            <div className="flex items-center gap-2 mt-2">
+              <span className="text-sm text-gray-700 dark:text-gray-300">{t('groups.color')}:</span>
+              <span 
+                className="px-3 py-1 rounded-full text-white text-sm font-medium shadow-lg glass-advanced"
+                style={{ backgroundColor: group.color }}
+              >
+                {group.color}
+              </span>
+            </div>
           )}
         </div>
       </div>
-      <div className="flex gap-2">
+      <div className="flex gap-3 mt-auto pt-4 border-t border-white/20 dark:border-gray-700/50">
         <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
           <DialogTrigger asChild>
-            <GlassButton variant="ghost" size="icon" className="text-blue-600 hover:bg-blue-100 dark:text-blue-400 dark:hover:bg-gray-600/50 transition-all duration-200">
-              <Edit size={20} />
+            <GlassButton 
+              variant="glass" 
+              size="sm" 
+              className="flex-1 flex items-center justify-center gap-2 text-blue-600 dark:text-blue-400 hover:bg-blue-100/30 dark:hover:bg-blue-400/20 transition-all duration-300 hover-lift py-2.5 border border-white/30 dark:border-gray-600/30"
+            >
+              <Edit size={18} />
+              {t('actions.edit')}
             </GlassButton>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px] p-0 border-none bg-transparent shadow-none">
@@ -96,22 +113,32 @@ const GroupItem = ({ group, onGroupUpdated, onGroupDeleted }: { group: Group; on
 
         <AlertDialog>
           <AlertDialogTrigger asChild>
-            <GlassButton variant="ghost" size="icon" className="text-red-600 hover:bg-red-100 dark:text-red-400 dark:hover:bg-gray-600/50 transition-all duration-200" disabled={isDeleting}>
-              {isDeleting ? <LoadingSpinner size={20} /> : <Trash2 size={20} />}
+            <GlassButton 
+              variant="glass" 
+              size="sm" 
+              className="flex-1 flex items-center justify-center gap-2 text-red-600 dark:text-red-400 hover:bg-red-100/30 dark:hover:bg-red-400/20 transition-all duration-300 hover-lift py-2.5 border border-white/30 dark:border-gray-600/30" 
+              disabled={isDeleting}
+            >
+              {isDeleting ? <LoadingSpinner size={18} /> : <Trash2 size={18} />}
+              {t('actions.delete')}
             </GlassButton>
           </AlertDialogTrigger>
-          <AlertDialogContent className="glass rounded-xl p-6">
+          <AlertDialogContent className="glass rounded-2xl p-6 shadow-2xl border border-white/30 dark:border-gray-600/30 backdrop-blur-lg">
             <AlertDialogHeader>
-              <AlertDialogTitle className="text-gray-800 dark:text-gray-100">آیا از حذف این گروه مطمئن هستید؟</AlertDialogTitle>
+              <AlertDialogTitle className="text-gray-800 dark:text-gray-100 text-xl">{t('groups.delete_confirm_title')}</AlertDialogTitle>
               <AlertDialogDescription className="text-gray-600 dark:text-gray-300">
-                این عمل قابل بازگشت نیست. این گروه برای همیشه حذف خواهد شد.
+                {t('groups.delete_confirm_description')}
               </AlertDialogDescription>
             </AlertDialogHeader>
-            <AlertDialogFooter>
-              <CancelButton onClick={() => {}} text="لغو" />
-              <AlertDialogAction onClick={handleDelete} className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold" disabled={isDeleting}>
-                {isDeleting && <LoadingSpinner size={16} className="me-2" />}
-                حذف
+            <AlertDialogFooter className="gap-3">
+              <CancelButton onClick={() => {}} text={t('actions.cancel')} />
+              <AlertDialogAction 
+                onClick={handleDelete} 
+                className="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-semibold hover-lift transition-all duration-300 shadow-md hover:shadow-lg"
+                disabled={isDeleting}
+              >
+                {isDeleting && <LoadingSpinner size={18} className="me-2" />}
+                {t('actions.delete')}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
@@ -122,6 +149,7 @@ const GroupItem = ({ group, onGroupUpdated, onGroupDeleted }: { group: Group; on
 };
 
 const GroupList = () => {
+  const { t } = useTranslation();
   const { session, isLoading: isSessionLoading } = useSession();
   const [groups, setGroups] = useState<Group[]>([]);
   const [loadingGroups, setLoadingGroups] = useState(true);
@@ -138,7 +166,7 @@ const GroupList = () => {
 
     setLoadingGroups(true);
     const cacheKey = `user_groups_${session.user.id}`;
-    const toastId = showLoading("در حال بارگذاری گروه‌ها...");
+    const toastId = showLoading(t('groups.loading'));
 
     try {
       const { data, error, fromCache } = await fetchWithCache<Group[]>(
@@ -162,39 +190,39 @@ const GroupList = () => {
 
       setGroups(data as Group[]);
       if (!fromCache) {
-        showSuccess("گروه‌ها با موفقیت بارگذاری شدند.");
+        showSuccess(t('groups.load_success'));
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error fetching groups:", error);
-      showError(`خطا در بارگذاری گروه‌ها: ${ErrorManager.getErrorMessage(error) || "خطای ناشناخته"}`);
+      showError(`${t('groups.load_error')}: ${ErrorManager.getErrorMessage(error) || t('errors.unknown')}`);
       setGroups([]);
     } finally {
       dismissToast(toastId);
       setLoadingGroups(false);
     }
-  }, [session, isSessionLoading]);
+  }, [session, isSessionLoading, t]);
 
   useEffect(() => {
     fetchGroups();
   }, [fetchGroups]);
 
   if (loadingGroups) {
-    return <LoadingMessage message="در حال بارگذاری گروه‌ها..." />;
+    return <LoadingMessage message={t('groups.loading')} />;
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
+      <div className="flex justify-center">
+        <GlassButton
+          onClick={() => setIsAddGroupDialogOpen(true)}
+          className="flex items-center justify-center gap-3 px-6 py-4 rounded-2xl bg-gradient-primary text-white font-bold shadow-xl transition-all duration-300 transform hover-lift text-lg border border-white/30 dark:border-gray-600/30 glass-advanced"
+        >
+          <PlusCircle size={24} />
+          {t('groups.add_new')}
+        </GlassButton>
+      </div>
+
       <Dialog open={isAddGroupDialogOpen} onOpenChange={setIsAddGroupDialogOpen}>
-        <DialogTrigger asChild>
-          <GlassButton
-            className="w-full px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-md transition-all duration-300 transform hover:scale-105"
-          >
-            <span className="flex items-center gap-2">
-              <PlusCircle size={20} className="me-2" />
-              افزودن گروه جدید
-            </span>
-          </GlassButton>
-        </DialogTrigger>
         <DialogContent className="sm:max-w-[425px] p-0 border-none bg-transparent shadow-none">
           <GroupForm
             onSuccess={() => {
@@ -210,25 +238,26 @@ const GroupList = () => {
       {groups.length === 0 ? (
         <EmptyState
           icon={Tag}
-          title="هیچ گروهی یافت نشد."
-          description="برای سازماندهی مخاطبین خود، یک گروه جدید اضافه کنید."
+          title={t('groups.empty_title')}
+          description={t('groups.empty_description')}
         />
       ) : (
-        groups.map((group) => (
-          <GroupItem
-            key={group.id}
-            group={group}
-            onGroupUpdated={fetchGroups}
-            onGroupDeleted={fetchGroups}
-          />
-        ))
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {groups.map((group) => (
+            <GroupItem
+              key={group.id}
+              group={group}
+              onGroupUpdated={fetchGroups}
+              onGroupDeleted={fetchGroups}
+            />
+          ))}
+        </div>
       )}
     </div>
   );
 };
 
 export default GroupList;
-
 
 
 

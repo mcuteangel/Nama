@@ -10,7 +10,7 @@ import { ErrorManager } from '@/lib/error-manager';
 import LoadingMessage from '../common/LoadingMessage';
 import { colors } from '../common/ColorPicker'; // Import colors array
 import { useTranslation } from 'react-i18next';
-import { GlassButton } from "@/components/ui/glass-button";
+import { GlassButton, GradientGlassButton } from "@/components/ui/glass-button";
 import { ModernCard } from "@/components/ui/modern-card";
 
 interface FetchColorsResult {
@@ -98,21 +98,17 @@ const AddGroupDialog: React.FC<AddGroupDialogProps> = ({ onGroupAdded, open, onO
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
-        <GlassButton
+        <GradientGlassButton
           type="button"
-          variant="gradient-primary"
-          size="sm"
-          className="flex items-center gap-1 px-3 py-1 rounded-lg font-semibold shadow-md transition-all duration-300 transform hover:scale-105"
+          className="flex items-center justify-center gap-2 px-4 py-2 rounded-xl font-semibold shadow-lg hover-lift"
         >
-          <span className="flex items-center gap-1">
-            <Plus size={16} />
-            {t('actions.add_new_group')}
-          </span>
-        </GlassButton>
+          <Plus size={18} />
+          {t('actions.add_new_group')}
+        </GradientGlassButton>
       </DialogTrigger>
       <FormDialogWrapper 
-        title={t('group.add_title', 'Add Group')}
-        description={t('group.add_description', 'Form for creating a new contact group')}
+        title={t('groups.add_title')}
+        description={t('groups.add_description', 'Form for creating a new contact group')}
       >
         {isFetchingColors ? (
           <ModernCard className="w-full max-w-md rounded-xl p-6">

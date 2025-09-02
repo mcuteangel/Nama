@@ -134,6 +134,9 @@ export const AccessibilityProvider: React.FC<AccessibilityProviderProps> = ({
     const handleKeyDown = (event: KeyboardEvent) => {
       if (!settings.keyboardNavigation) return;
       
+      // Safety check for event.key
+      if (!event.key) return;
+      
       const key = event.key.toLowerCase();
       const modifiers = [];
       

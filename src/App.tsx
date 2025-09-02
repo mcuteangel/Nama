@@ -185,7 +185,10 @@ export default function App() {
                     className: 'text-sm',
                   }}
                 />
-                <BrowserRouter>
+                <BrowserRouter future={{
+                  v7_startTransition: true,
+                  v7_relativeSplatPath: true
+                }}>
                   <TooltipProvider>
                     <AppLayout />
                   </TooltipProvider>

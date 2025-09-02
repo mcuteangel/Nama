@@ -18,9 +18,9 @@ import { useSession } from '@/integrations/supabase/auth';
 import { useNavigate } from 'react-router-dom';
 import CancelButton from './common/CancelButton';
 import LoadingSpinner from './common/LoadingSpinner';
-import { t } from 'i18next';
 import { ModernCard, ModernCardHeader, ModernCardTitle, ModernCardContent, ModernCardFooter } from '@/components/ui/modern-card';
 import { GlassButton } from "@/components/ui/glass-button";
+import { useTranslation } from 'react-i18next'; // Added import
 
 type TemplateType = 'text' | 'number' | 'date' | 'list';
 
@@ -31,6 +31,7 @@ interface CustomFieldTemplateFormProps {
 }
 
 const CustomFieldTemplateForm: React.FC<CustomFieldTemplateFormProps> = ({ initialData, onSuccess, onCancel }) => {
+  const { t } = useTranslation(); // Added hook
   const { session } = useSession();
   const navigate = useNavigate();
 
@@ -38,7 +39,7 @@ const CustomFieldTemplateForm: React.FC<CustomFieldTemplateFormProps> = ({ initi
     console.log("CustomFieldTemplateForm: useErrorHandler onSuccess triggered.");
     ErrorManager.notifyUser(initialData ? t('system_messages.template_edit_success') : t('system_messages.template_create_success'), 'success');
     onSuccess?.();
-  }, [initialData, onSuccess]);
+  }, [initialData, onSuccess, t]);
 
   const onErrorCallback = useCallback((err: Error) => {
     console.error("CustomFieldTemplateForm: useErrorHandler onError triggered.", err);
@@ -93,7 +94,7 @@ const CustomFieldTemplateForm: React.FC<CustomFieldTemplateFormProps> = ({ initi
   const onSubmit = async (data: CreateCustomFieldTemplateInput) => {
     console.log("CustomFieldTemplateForm: onSubmit triggered. Data:", data);
     if (!session?.user) {
-      ErrorManager.notifyUser('برای افزودن/ویرایش قالب فیلد سفارشی باید وارد شوید.', 'error');
+      ErrorManager.notifyUser(t('errors.auth_loading_profile'), 'error');
       navigate('/login');
       return;
     }
@@ -148,7 +149,7 @@ const CustomFieldTemplateForm: React.FC<CustomFieldTemplateFormProps> = ({ initi
     <ModernCard variant="glass" className="w-full max-w-md rounded-xl p-6">
       <ModernCardHeader className="text-center">
         <ModernCardTitle className="text-2xl font-bold">
-          {initialData ? "ویرایش قالب فیلد سفارشی" : "افزودن قالب فیلد سفارشی جدید"}
+          {initialData ? t('custom_field_template.edit_title') : t('custom_field_template.add_title')}
         </ModernCardTitle>
         {error && (
           <div className="text-sm text-destructive flex items-center justify-center gap-2 mt-2">
@@ -161,7 +162,7 @@ const CustomFieldTemplateForm: React.FC<CustomFieldTemplateFormProps> = ({ initi
                 disabled={isSubmitting}
                 className="text-destructive hover:bg-destructive/10"
               >
-                تلاش مجدد ({retryCount} از ۳)
+                {t('actions.retry_count', { count: retryCount })}
               </GlassButton>
             )}
           </div>
@@ -170,11 +171,11 @@ const CustomFieldTemplateForm: React.FC<CustomFieldTemplateFormProps> = ({ initi
       <ModernCardContent>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <div>
-            <Label htmlFor="field-name" className="text-gray-700 dark:text-gray-200">نام فیلد</Label>
+            <Label htmlFor="field-name" className="text-gray-700 dark:text-gray-200">{t('contact_form.field_name')}</Label>
             <ModernInput
               id="field-name"
               {...form.register("name")}
-              placeholder="مثال: تاریخ تولد"
+              placeholder={t('contact_form.field_name_placeholder')}
               variant="glass"
               className="mt-1 block w-full bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
               disabled={isSubmitting}
@@ -185,7 +186,7 @@ const CustomFieldTemplateForm: React.FC<CustomFieldTemplateFormProps> = ({ initi
           </div>
 
           <div>
-            <Label htmlFor="field-type" className="text-gray-700 dark:text-gray-200">نوع فیلد</Label>
+            <Label htmlFor="field-type" className="text-gray-700 dark:text-gray-200">{t('contact_form.field_type')}</Label>
             <ModernSelect
               value={values.type || "text"}
               onValueChange={(value) => {
@@ -199,13 +200,13 @@ const CustomFieldTemplateForm: React.FC<CustomFieldTemplateFormProps> = ({ initi
               disabled={isSubmitting}
             >
               <ModernSelectTrigger variant="glass" className="w-full">
-                <ModernSelectValue placeholder="انتخاب نوع" />
+                <ModernSelectValue placeholder={t('contact_form.select_field_type')} />
               </ModernSelectTrigger>
               <ModernSelectContent variant="glass">
-                <ModernSelectItem value="text">متن</ModernSelectItem>
-                <ModernSelectItem value="number">عدد</ModernSelectItem>
-                <ModernSelectItem value="date">تاریخ</ModernSelectItem>
-                <ModernSelectItem value="list">لیست</ModernSelectItem>
+                <ModernSelectItem value="text">{t('contact_form.text')}</ModernSelectItem>
+                <ModernSelectItem value="number">{t('contact_form.number')}</ModernSelectItem>
+                <ModernSelectItem value="date">{t('contact_form.date')}</ModernSelectItem>
+                <ModernSelectItem value="list">{t('contact_form.list')}</ModernSelectItem>
               </ModernSelectContent>
             </ModernSelect>
             {form.formState.errors.type && (
@@ -215,13 +216,13 @@ const CustomFieldTemplateForm: React.FC<CustomFieldTemplateFormProps> = ({ initi
 
           {(values.type === 'list') && (
             <div className="flex flex-col gap-2">
-              <Label className="text-gray-700 dark:text-gray-200">گزینه‌های لیست</Label>
+              <Label className="text-gray-700 dark:text-gray-200">{t('contact_form.list_options')}</Label>
               {(values.options || []).map((option, index) => (
                 <div key={index} className="flex gap-2">
                   <ModernInput
                     value={option}
                     onChange={(e) => setOptionAt(index, e.target.value)}
-                    placeholder="گزینه"
+                    placeholder={t('contact_form.option')}
                     variant="glass"
                     className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
                     disabled={isSubmitting}
@@ -242,7 +243,7 @@ const CustomFieldTemplateForm: React.FC<CustomFieldTemplateFormProps> = ({ initi
                 className="w-full flex items-center gap-2 px-3 py-2 rounded-lg font-medium"
                 disabled={isSubmitting}
               >
-                <Plus size={16} className="me-2" /> افزودن گزینه
+                <Plus size={16} className="me-2" /> {t('contact_form.add_option')}
               </GlassButton>
               {form.formState.errors.options && (
                 <p className="text-sm text-red-500 font-medium mt-1">{(form.formState.errors.options as { message?: string })?.message}</p>
@@ -251,11 +252,11 @@ const CustomFieldTemplateForm: React.FC<CustomFieldTemplateFormProps> = ({ initi
           )}
 
           <div className="flex flex-col gap-2">
-            <Label htmlFor="field-description" className="text-gray-700 dark:text-gray-200">توضیحات (اختیاری)</Label>
+            <Label htmlFor="field-description" className="text-gray-700 dark:text-gray-200">{t('contact_form.description_optional')}</Label>
             <ModernTextarea
               id="field-description"
               {...form.register("description")}
-              placeholder="توضیحات درباره این فیلد"
+              placeholder={t('contact_form.description_placeholder')}
               variant="glass"
               className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
               disabled={isSubmitting}
@@ -270,7 +271,7 @@ const CustomFieldTemplateForm: React.FC<CustomFieldTemplateFormProps> = ({ initi
               className="h-4 w-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
               disabled={isSubmitting}
             />
-            <Label htmlFor="field-required" className="text-gray-700 dark:text-gray-200">فیلد الزامی</Label>
+            <Label htmlFor="field-required" className="text-gray-700 dark:text-gray-200">{t('contact_form.required_field')}</Label>
           </div>
 
           <ModernCardFooter className="flex justify-end gap-4 p-0 pt-4">
@@ -282,7 +283,7 @@ const CustomFieldTemplateForm: React.FC<CustomFieldTemplateFormProps> = ({ initi
               disabled={isSubmitting}
             >
               {isSubmitting && <LoadingSpinner size={16} className="me-2" />}
-              {isSubmitting ? (initialData ? "در حال ویرایش..." : "در حال افزودن...") : (initialData ? "ویرایش" : "افزودن")}
+              {isSubmitting ? (initialData ? t('contact_form.editing') : t('contact_form.adding')) : (initialData ? t('common.save') : t('common.create'))}
             </GlassButton>
           </ModernCardFooter>
         </form>

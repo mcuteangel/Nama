@@ -13,10 +13,11 @@ import { ErrorManager } from '@/lib/error-manager';
 import CancelButton from '../common/CancelButton';
 import LoadingSpinner from '../common/LoadingSpinner';
 import { ModernCard, ModernCardHeader, ModernCardTitle, ModernCardContent, ModernCardFooter } from "@/components/ui/modern-card";
-import { GlassButton } from "@/components/ui/glass-button";
+import { GlassButton, GradientGlassButton } from "@/components/ui/glass-button";
+import { useTranslation } from 'react-i18next';
 
 const formSchema = z.object({
-  name: z.string().min(1, { message: 'نام گروه نمی‌تواند خالی باشد.' }),
+  name: z.string().min(1, { message: 'group.name_required' }), // Will be translated in UI
   color: z.string().optional(),
 });
 
@@ -33,6 +34,7 @@ interface GroupFormProps {
 }
 
 const GroupForm: React.FC<GroupFormProps> = ({ initialData, onSuccess, onCancel }) => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { session } = useSession();
 
@@ -54,12 +56,12 @@ const GroupForm: React.FC<GroupFormProps> = ({ initialData, onSuccess, onCancel 
   const selectedColor = watch('color');
 
   const onSuccessCallback = useCallback((result: { id: string } | undefined) => { // result will be the data from executeSave
-    ErrorManager.notifyUser(initialData?.id ? 'گروه با موفقیت ویرایش شد.' : 'گروه با موفقیت اضافه شد.', 'success');
+    ErrorManager.notifyUser(initialData?.id ? t('groups.edit_success') : t('groups.add_success'), 'success');
     onSuccess?.(result?.id); // Pass the new group's ID
-  }, [initialData?.id, onSuccess]);
+  }, [initialData?.id, onSuccess, t]);
 
-  const onErrorCallback = useCallback((err) => {
-    ErrorManager.logError(err, { component: "GroupForm", action: initialData?.id ? "updateGroup" : "addGroup" });
+  const onErrorCallback = useCallback((err: unknown) => {
+    ErrorManager.logError(err as Error, { component: "GroupForm", action: initialData?.id ? "updateGroup" : "addGroup" });
   }, [initialData?.id]);
 
   const {
@@ -73,7 +75,7 @@ const GroupForm: React.FC<GroupFormProps> = ({ initialData, onSuccess, onCancel 
     maxRetries: 3,
     retryDelay: 1000,
     showToast: true,
-    customErrorMessage: initialData?.id ? "خطایی در ویرایش گروه رخ داد" : "خطایی در افزودن گروه رخ داد",
+    customErrorMessage: initialData?.id ? t('groups.edit_error') : t('groups.add_error'),
     onSuccess: onSuccessCallback,
     onError: onErrorCallback,
   });
@@ -89,7 +91,7 @@ const GroupForm: React.FC<GroupFormProps> = ({ initialData, onSuccess, onCancel 
 
   const onSubmit = async (values: GroupFormValues) => {
     if (!session?.user) {
-      ErrorManager.notifyUser('برای افزودن/ویرایش گروه باید وارد شوید.', 'error');
+      ErrorManager.notifyUser(t('common.auth_required'), 'error');
       navigate('/login');
       return;
     }
@@ -123,7 +125,7 @@ const GroupForm: React.FC<GroupFormProps> = ({ initialData, onSuccess, onCancel 
     <ModernCard variant="glass" className="w-full max-w-md rounded-xl p-6">
       <ModernCardHeader className="text-center">
         <ModernCardTitle className="text-2xl font-bold">
-          {initialData?.id ? "ویرایش گروه" : "افزودن گروه جدید"}
+          {initialData?.id ? t('groups.edit_title') : t('groups.add_title')}
         </ModernCardTitle>
         {error && (
           <div className="text-sm text-destructive flex items-center justify-center gap-2 mt-2">
@@ -136,7 +138,7 @@ const GroupForm: React.FC<GroupFormProps> = ({ initialData, onSuccess, onCancel 
                 disabled={isSaving}
                 className="text-destructive hover:bg-destructive/10"
               >
-                تلاش مجدد ({retryCount} از ۳)
+                {t('actions.retry_count', { count: retryCount })}
               </GlassButton>
             )}
           </div>
@@ -145,34 +147,34 @@ const GroupForm: React.FC<GroupFormProps> = ({ initialData, onSuccess, onCancel 
       <ModernCardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div>
-            <Label htmlFor="name" className="text-gray-700 dark:text-gray-300">نام گروه</Label>
+            <Label htmlFor="name" className="text-gray-700 dark:text-gray-300">{t('groups.name_label')}</Label>
             <ModernInput
               id="name"
               {...register('name')}
               variant="glass"
-              className="mt-1 block w-full bg-white/50 dark:bg-gray-800/50 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-gray-100"
+              className="mt-1 block w-full bg-white/50 dark:bg-gray-800/50 border border-gray-300 dark:border-gray-700 rounded-xl shadow-sm focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-gray-100"
               disabled={isSaving}
+              placeholder={t('groups.name_placeholder')}
             />
-            {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>}
+            {errors.name && <p className="text-red-500 text-sm mt-1">{t(errors.name.message as string)}</p>}
           </div>
 
           <div>
-            <Label htmlFor="color" className="text-gray-700 dark:text-gray-300">رنگ گروه</Label>
+            <Label htmlFor="color" className="text-gray-700 dark:text-gray-300">{t('groups.color_label')}</Label>
             <ColorPicker selectedColor={selectedColor || '#60A5FA'} onSelectColor={(color) => setValue('color', color)} />
             {errors.color && <p className="text-red-500 text-sm mt-1">{errors.color.message}</p>}
           </div>
 
-          <ModernCardFooter className="flex justify-end gap-4 p-0 pt-4">
+          <ModernCardFooter className="flex flex-col sm:flex-row justify-end gap-4 p-0 pt-4">
             <CancelButton onClick={onCancel} disabled={isSaving} />
-            <GlassButton
+            <GradientGlassButton
               type="submit"
-              variant="gradient-primary"
-              className="px-6 py-2 rounded-md font-semibold"
+              className="px-6 py-2 rounded-xl font-semibold w-full sm:w-auto"
               disabled={isSaving}
             >
               {isSaving && <LoadingSpinner size={16} className="me-2" />}
-              {isSaving ? (initialData?.id ? "در حال ویرایش..." : "در حال افزودن...") : (initialData?.id ? "ویرایش" : "افزودن")}
-            </GlassButton>
+              {isSaving ? (initialData?.id ? t('groups.editing') : t('groups.adding')) : (initialData?.id ? t('actions.save_changes') : t('actions.add_new_group'))}
+            </GradientGlassButton>
           </ModernCardFooter>
         </form>
       </ModernCardContent>

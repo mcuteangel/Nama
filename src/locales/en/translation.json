@@ -27,7 +27,23 @@
     "phone": "Phone",
     "sms": "SMS",
     "notes": "Notes",
-    "notes_placeholder": "Additional notes"
+    "notes_placeholder": "Additional notes",
+    "field_name": "Field Name",
+    "field_name_placeholder": "e.g., Birth Date",
+    "field_type": "Field Type",
+    "select_field_type": "Select Field Type",
+    "text": "Text",
+    "number": "Number",
+    "date": "Date",
+    "list": "List",
+    "list_options": "List Options",
+    "option": "Option",
+    "add_option": "Add Option",
+    "description_optional": "Description (Optional)",
+    "description_placeholder": "Description about this field",
+    "required_field": "Required Field",
+    "editing": "Editing...",
+    "adding": "Adding..."
   },
   "contact": {
     "no_phone": "No phone number",
@@ -35,6 +51,41 @@
     "delete_error": "Error deleting contact",
     "delete_confirm_title": "Are you sure you want to delete this contact?",
     "delete_confirm_message": "This action cannot be undone. This contact will be permanently deleted."
+  },
+  "groups": {
+    "title": "Group Management",
+    "description": "Create, edit, and delete contact groups",
+    "add_new": "Add New Group",
+    "existing_groups": "Existing Groups",
+    "groups_list_description": "List of all your groups",
+    "color": "Color",
+    "empty_title": "No groups found.",
+    "empty_description": "Add a new group to organize your contacts.",
+    "loading": "Loading groups...",
+    "load_success": "Groups loaded successfully.",
+    "load_error": "Error loading groups",
+    "delete_auth_required": "You must be logged in to delete a group.",
+    "deleting_group": "Deleting group...",
+    "delete_success": "Group deleted successfully.",
+    "delete_error": "Error deleting group",
+    "delete_confirm_title": "Are you sure you want to delete this group?",
+    "delete_confirm_description": "This action cannot be undone. This group will be permanently deleted.",
+    "smart_suggestions_title": "Smart Group Suggestions",
+    "smart_suggestions_description": "Automatic suggestions for grouping contacts",
+    "suggested_group": "Suggested Group",
+    "name_required": "Group name cannot be empty.",
+    "edit_success": "Group edited successfully.",
+    "add_success": "Group added successfully.",
+    "edit_error": "Error editing group",
+    "add_error": "Error adding group",
+    "edit_title": "Edit Group",
+    "add_title": "Add New Group",
+    "add_description": "Form for creating a new contact group",
+    "name_label": "Group Name",
+    "color_label": "Group Color",
+    "name_placeholder": "Enter group name",
+    "editing": "Editing...",
+    "adding": "Adding..."
   },
   "bundle_monitor": {
     "title": "Bundle Size Monitor",
@@ -160,7 +211,8 @@
     "content1": "Content 1",
     "content2": "Content 2",
     "on": "On",
-    "off": "Off"
+    "off": "Off",
+    "back": "Back"
   },
   "login": {
     "title": "Login to Nama Contacts",
@@ -311,6 +363,7 @@
     "error_processing_contact": "Error processing contact.",
     "error_fetching_suggestions": "Error fetching suggestions.",
     "no_suggestions_found": "No new suggestions found.",
+    "no_suggestions_description": "There are currently no AI suggestions available. Try extracting contact information from text or check back later for new suggestions.",
     "new_contact_suggestion": "New Contact Suggestion",
     "update_contact_suggestion": "Update Existing Contact Suggestion",
     "found_existing_contact": "Found existing contact: {{name}}",
@@ -470,7 +523,11 @@
     "uploading": "Uploading...",
     "deleting_image": "Deleting image...",
     "saving_progress": "Saving...",
-    "test_connection": "🔍 Test Edge Function Connection"
+    "test_connection": "🔍 Test Edge Function Connection",
+    "edit": "Edit",
+    "delete": "Delete",
+    "back": "Back",
+    "cancel": "Cancel"
   },
   "system_messages": {
     "preparing_group_form": "Preparing group form...",
@@ -495,6 +552,12 @@
     "auth_checking": "Checking authentication status...",
     "loading_custom_field_templates": "Loading custom field templates..."
   },
+  "custom_field_template": {
+    "add_title": "Add Custom Field Template",
+    "add_description": "Form for creating a new custom field template",
+    "edit_title": "Edit Custom Field Template",
+    "edit_description": "Form for editing a custom field template"
+  },
   "form_labels": {
     "first_name": "First Name",
     "last_name": "Last Name",
@@ -508,7 +571,9 @@
     "social_network_type": "Social Network Type",
     "url_address": "URL Address",
     "profile_user": "User Profile",
-    "user_email": "Email"
+    "user_email": "Email",
+    "position": "Position/Expertise",
+    "company": "Company"
   },
   "form_placeholders": {
     "enter_name": "Enter your name",
@@ -523,7 +588,11 @@
     "field_value": "{{name}} value",
     "no_options_found": "No options found",
     "select_field": "Select {{name}}",
-    "unknown_field_type_placeholder": "Unknown field type"
+    "unknown_field_type_placeholder": "Unknown field type",
+    "first_name": "First Name*",
+    "last_name": "Last Name*",
+    "position": "Position/Expertise",
+    "company": "Company"
   },
   "section_titles": {
     "custom_fields": "Custom Fields",
@@ -549,7 +618,22 @@
     "add_contact_description": "Add new contact information and details",
     "updating_contact": "Updating contact...",
     "creating_contact": "Creating contact...",
-    "form_error": "Form error: {{message}}"
+    "form_error": "Form error: {{message}}",
+    "contact_information": "Contact Information",
+    "focused": "Focused",
+    "navigation": "Navigation",
+    "main_content": "Main content",
+    "search": "Search",
+    "menu": "Menu",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "loading": "Loading",
+    "error": "Error",
+    "success": "Success",
+    "skip_to_content": "Skip to main content",
+    "skip_to_navigation": "Skip to navigation"
   },
   "theme_options": {
     "light": "Light",
@@ -558,5 +642,55 @@
   },
   "email_change_notice": {
     "message": "Email can be changed through account settings."
+  },
+  "shortcuts": {
+    "add_contact": "Add New Contact",
+    "close_help": "Close Help",
+    "close_modal": "Close Modal/Dialog",
+    "contact_delete": "Delete Contact",
+    "contact_edit": "Edit Contact",
+    "contact_opened": "Contact Opened",
+    "contacts": "Go to Contacts",
+    "delete_contact": "Delete Contact",
+    "edit_contact": "Edit Contact",
+    "form_saved": "Form Saved",
+    "groups": "Go to Groups",
+    "help": "Show Keyboard Shortcuts",
+    "help_opened": "Keyboard Shortcuts Help Opened",
+    "home": "Go to Home",
+    "main_content": "Skip to Main Content",
+    "main_content_focused": "Main Content Focused",
+    "modal_closed": "Modal Closed",
+    "navigated_add_contact": "Navigated to Add Contact",
+    "navigated_contacts": "Navigated to Contacts",
+    "navigated_groups": "Navigated to Groups",
+    "navigated_home": "Navigated to Home",
+    "navigated_settings": "Navigated to Settings",
+    "navigated_statistics": "Navigated to Statistics",
+    "new_contact": "New Contact",
+    "new_contact_created": "Creating New Contact",
+    "new_contact_not_available": "New Contact Only Available in Contacts Section",
+    "next_element": "Focus Next Element",
+    "no_contact_selected": "No Contact Selected",
+    "no_contact_selected_delete": "No Contact Selected for Deletion",
+    "open_contact": "Open Contact",
+    "previous_element": "Focus Previous Element",
+    "save": "Save Form",
+    "save_not_available": "Save Not Available",
+    "search": "Focus Search",
+    "search_focused": "Search Focused",
+    "search_not_available": "Search Not Available on This Page",
+    "settings": "Go to Settings",
+    "statistics": "Go to Statistics",
+    "tip": "Tip",
+    "title": "Keyboard Shortcuts",
+    "category_navigation": "Navigation",
+    "category_actions": "Actions",
+    "category_accessibility": "Accessibility",
+    "category_search": "Search"
+  },
+  "contacts": {
+    "add_new_contact": "Add New Contact",
+    "add_contact_description": "Add new contact information and details"
   }
 }

@@ -6,18 +6,20 @@ import { ModernInput } from "@/components/ui/modern-input";
 import { 
   Form, 
   FormControl, 
-  FormDescription, 
   FormField, 
   FormItem, 
   FormLabel, 
   FormMessage 
 } from "@/components/ui/form";
+import { ModernCard, ModernCardHeader, ModernCardTitle, ModernCardContent } from "@/components/ui/modern-card";
 import { UserManagementService } from "@/services/user-management-service";
 import { useErrorHandler } from "@/hooks/use-error-handler";
 import { ErrorManager } from "@/lib/error-manager";
 import { useTranslation } from "react-i18next";
 import { ModernSelect, ModernSelectContent, ModernSelectItem, ModernSelectTrigger, ModernSelectValue } from "@/components/ui/modern-select";
 import { GlassButton } from "@/components/ui/glass-button";
+import CancelButton from "@/components/common/CancelButton";
+import LoadingSpinner from "@/components/common/LoadingSpinner";
 
 interface UserFormProps {
   initialData?: {

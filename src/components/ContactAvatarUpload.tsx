@@ -115,7 +115,7 @@ const ContactAvatarUpload: React.FC<ContactAvatarUploadProps> = React.memo(({ in
     } finally {
       setIsUploading(false);
     }
-  }, [session, avatarUrl, toast, onAvatarChange]);
+  }, [session, avatarUrl, toast, onAvatarChange, t]);
 
   return (
     <div className="flex flex-col items-center gap-4 mb-6 p-6 rounded-xl glass">

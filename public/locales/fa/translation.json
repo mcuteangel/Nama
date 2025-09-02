@@ -27,7 +27,23 @@
     "phone": "تلفن",
     "sms": "پیامک",
     "notes": "یادداشت‌ها",
-    "notes_placeholder": "یادداشت‌های اضافی"
+    "notes_placeholder": "یادداشت‌های اضافی",
+    "field_name": "نام فیلد",
+    "field_name_placeholder": "مثال: تاریخ تولد",
+    "field_type": "نوع فیلد",
+    "select_field_type": "انتخاب نوع فیلد",
+    "text": "متن",
+    "number": "عدد",
+    "date": "تاریخ",
+    "list": "لیست",
+    "list_options": "گزینه‌های لیست",
+    "option": "گزینه",
+    "add_option": "افزودن گزینه",
+    "description_optional": "توضیحات (اختیاری)",
+    "description_placeholder": "توضیحات درباره این فیلد",
+    "required_field": "فیلد الزامی",
+    "editing": "در حال ویرایش...",
+    "adding": "در حال افزودن..."
   },
   "contact": {
     "no_phone": "بدون شماره",
@@ -234,7 +250,11 @@
     "error_loading_users": "خطا در بارگذاری کاربران.",
     "no_users_found": "هیچ کاربری یافت نشد.",
     "no_users_found_description": "اولین کاربر خود را برای شروع مدیریت کاربران اضافه کنید.",
-    "users_loaded_success": "کاربران با موفقیت بارگذاری شدند."
+    "users_loaded_success": "کاربران با موفقیت بارگذاری شدند.",
+    "edit_user_title": "ویرایش کاربر",
+    "edit_user_description": "فرم برای ویرایش اطلاعات کاربر",
+    "add_user_title": "افزودن کاربر",
+    "add_user_description": "فرم برای افزودن کاربر جدید"
   },
   "statistics": {
     "title": "آمار مخاطبین",
@@ -272,6 +292,7 @@
     "error_processing_contact": "خطا در پردازش مخاطب.",
     "error_fetching_suggestions": "خطا در دریافت پیشنهادات.",
     "no_suggestions_found": "هیچ پیشنهاد جدیدی یافت نشد.",
+    "no_suggestions_description": "در حال حاضر هیچ پیشنهاد هوش مصنوعی‌ای موجود نیست. سعی کنید اطلاعات تماس را از متن استخراج کنید یا بعداً برای پیشنهادات جدید برگردید.",
     "new_contact_suggestion": "پیشنهاد مخاطب جدید",
     "update_contact_suggestion": "پیشنهاد به‌روزرسانی مخاطب",
     "found_existing_contact": "مخاطب موجود یافت شد: {{name}}",
@@ -456,6 +477,12 @@
     "auth_checking": "در حال بررسی وضعیت احراز هویت...",
     "loading_custom_field_templates": "در حال بارگذاری قالب‌های فیلد سفارشی..."
   },
+  "custom_field_template": {
+    "add_title": "افزودن قالب فیلد سفارشی",
+    "add_description": "فرم برای ایجاد قالب فیلد سفارشی جدید",
+    "edit_title": "ویرایش قالب فیلد سفارشی",
+    "edit_description": "فرم برای ویرایش قالب فیلد سفارشی"
+  },
   "form_labels": {
     "first_name": "نام",
     "last_name": "نام خانوادگی",
@@ -468,8 +495,10 @@
     "extension_optional": "داخلی (اختیاری)",
     "social_network_type": "نوع شبکه اجتماعی",
     "url_address": "آدرس URL",
-    "profile_user": "پروفایل کاربری",
-    "user_email": "ایمیل"
+    "profile_user": "پروفایل کاربر",
+    "user_email": "ایمیل",
+    "position": "سمت/تخصص",
+    "company": "شرکت"
   },
   "form_placeholders": {
     "enter_name": "نام خود را وارد کنید",
@@ -484,7 +513,11 @@
     "field_value": "مقدار {{name}}",
     "no_options_found": "گزینه‌ای یافت نشد",
     "select_field": "انتخاب {{name}}",
-    "unknown_field_type_placeholder": "نوع فیلد نامشخص"
+    "unknown_field_type_placeholder": "نوع فیلد نامشخص",
+    "first_name": "نام*",
+    "last_name": "نام خانوادگی*",
+    "position": "سمت/تخصص",
+    "company": "شرکت"
   },
   "section_titles": {
     "custom_fields": "فیلدهای سفارشی",
@@ -510,7 +543,22 @@
     "add_contact_description": "افزودن اطلاعات و جزئیات مخاطب جدید",
     "updating_contact": "در حال به‌روزرسانی مخاطب...",
     "creating_contact": "در حال ایجاد مخاطب...",
-    "form_error": "خطای فرم: {{message}}"
+    "form_error": "خطای فرم: {{message}}",
+    "contact_information": "اطلاعات تماس",
+    "focused": "فوکوس شده",
+    "navigation": "ناوبری",
+    "main_content": "محتوای اصلی",
+    "search": "جستجو",
+    "menu": "منو",
+    "close": "بستن",
+    "back": "بازگشت",
+    "next": "بعدی",
+    "previous": "قبلی",
+    "loading": "در حال بارگذاری",
+    "error": "خطا",
+    "success": "موفقیت",
+    "skip_to_content": "رفتن به محتوای اصلی",
+    "skip_to_navigation": "رفتن به ناوبری"
   },
   "theme_options": {
     "light": "روشن",
@@ -519,5 +567,55 @@
   },
   "email_change_notice": {
     "message": "ایمیل از طریق تنظیمات حساب کاربری قابل تغییر است."
+  },
+  "shortcuts": {
+    "add_contact": "افزودن مخاطب جدید",
+    "close_help": "بستن راهنما",
+    "close_modal": "بستن مودال/دیالوگ",
+    "contact_delete": "حذف مخاطب",
+    "contact_edit": "ویرایش مخاطب",
+    "contact_opened": "مخاطب باز شد",
+    "contacts": "رفتن به مخاطبین",
+    "delete_contact": "حذف مخاطب",
+    "edit_contact": "ویرایش مخاطب",
+    "form_saved": "فرم ذخیره شد",
+    "groups": "رفتن به گروه‌ها",
+    "help": "نمایش میانبرهای صفحه‌کلید",
+    "help_opened": "راهنمای میانبرهای صفحه‌کلید باز شد",
+    "home": "رفتن به خانه",
+    "main_content": "رفتن به محتوای اصلی",
+    "main_content_focused": "محتوای اصلی فوکوس شد",
+    "modal_closed": "مودال بسته شد",
+    "navigated_add_contact": "به افزودن مخاطب هدایت شد",
+    "navigated_contacts": "به مخاطبین هدایت شد",
+    "navigated_groups": "به گروه‌ها هدایت شد",
+    "navigated_home": "به خانه هدایت شد",
+    "navigated_settings": "به تنظیمات هدایت شد",
+    "navigated_statistics": "به آمار هدایت شد",
+    "new_contact": "مخاطب جدید",
+    "new_contact_created": "در حال ایجاد مخاطب جدید",
+    "new_contact_not_available": "مخاطب جدید فقط در بخش مخاطبین موجود است",
+    "next_element": "فوکوس روی عنصر بعدی",
+    "no_contact_selected": "مخاطبی انتخاب نشده است",
+    "no_contact_selected_delete": "مخاطبی برای حذف انتخاب نشده است",
+    "open_contact": "باز کردن مخاطب",
+    "previous_element": "فوکوس روی عنصر قبلی",
+    "save": "ذخیره فرم",
+    "save_not_available": "ذخیره در دسترس نیست",
+    "search": "فوکوس روی جستجو",
+    "search_focused": "جستجو فوکوس شد",
+    "search_not_available": "جستجو در این صفحه در دسترس نیست",
+    "settings": "رفتن به تنظیمات",
+    "statistics": "رفتن به آمار",
+    "tip": "نکته",
+    "title": "میانبرهای صفحه‌کلید",
+    "category_navigation": "ناوبری",
+    "category_actions": "عملیات",
+    "category_accessibility": "دسترس‌پذیری",
+    "category_search": "جستجو"
+  },
+  "contacts": {
+    "add_new_contact": "افزودن مخاطب جدید",
+    "add_contact_description": "افزودن اطلاعات و جزئیات مخاطب جدید"
   }
 }

@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 interface CancelButtonProps {
-  onClick?: () => void;
+  onClick?: (e?: React.MouseEvent<HTMLButtonElement>) => void;
   disabled?: boolean;
   text?: string;
 }
@@ -13,9 +13,9 @@ const CancelButton: React.FC<CancelButtonProps> = ({ onClick, disabled, text }) 
   const { t } = useTranslation();
   const navigate = useNavigate();
 
-  const handleClick = () => {
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (onClick) {
-      onClick();
+      onClick(e);
     } else {
       navigate(-1);
     }

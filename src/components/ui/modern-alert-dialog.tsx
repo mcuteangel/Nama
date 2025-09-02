@@ -33,6 +33,8 @@ const ModernAlertDialogOverlay = React.forwardRef<
         applyAnimation(undefined, animation),
         className,
       )}
+      // Ensure proper accessibility handling
+      aria-hidden="true"
       {...props}
       ref={ref}
     />
@@ -47,6 +49,8 @@ const ModernAlertDialogContent = React.forwardRef<
     gradientType?: GradientType;
     neomorphism?: boolean;
     animation?: "fade-in-up" | "fade-in-down" | "fade-in-left" | "fade-in-right" | "scale-in" | "scale-out" | "floating" | "pulse-glow" | "none";
+    onOpenAutoFocus?: (event: Event) => void;
+    onCloseAutoFocus?: (event: Event) => void;
   }
 >(({ 
   className, 
@@ -54,6 +58,8 @@ const ModernAlertDialogContent = React.forwardRef<
   gradientType = "none",
   neomorphism = false,
   animation = "scale-in" as "fade-in-up" | "fade-in-down" | "fade-in-left" | "fade-in-right" | "scale-in" | "scale-out" | "floating" | "pulse-glow" | "none",
+  onOpenAutoFocus,
+  onCloseAutoFocus,
   ...props 
 }, ref) => {
   const shouldApplyGlass = glassEffect !== "none";
@@ -73,6 +79,11 @@ const ModernAlertDialogContent = React.forwardRef<
           applyAnimation(undefined, animation),
           className,
         )}
+        // Add proper focus management attributes
+        aria-modal="true"
+        role="dialog"
+        onOpenAutoFocus={onOpenAutoFocus}
+        onCloseAutoFocus={onCloseAutoFocus}
         {...props}
       />
     </ModernAlertDialogPortal>

@@ -27,7 +27,23 @@
     "phone": "Phone",
     "sms": "SMS",
     "notes": "Notes",
-    "notes_placeholder": "Additional notes"
+    "notes_placeholder": "Additional notes",
+    "field_name": "Field Name",
+    "field_name_placeholder": "e.g., Birth Date",
+    "field_type": "Field Type",
+    "select_field_type": "Select Field Type",
+    "text": "Text",
+    "number": "Number",
+    "date": "Date",
+    "list": "List",
+    "list_options": "List Options",
+    "option": "Option",
+    "add_option": "Add Option",
+    "description_optional": "Description (Optional)",
+    "description_placeholder": "Description about this field",
+    "required_field": "Required Field",
+    "editing": "Editing...",
+    "adding": "Adding..."
   },
   "contact": {
     "no_phone": "No phone number",
@@ -233,7 +249,12 @@
     "admin_access_required": "You do not have admin access to view this page.",
     "error_loading_users": "Error loading users.",
     "no_users_found": "No users found.",
-    "no_users_found_description": "Add your first user to get started with user management."
+    "no_users_found_description": "Add your first user to get started with user management.",
+    "edit_user_title": "Edit User",
+    "edit_user_description": "Form for editing user information",
+    "add_user_title": "Add User",
+    "add_user_description": "Form for adding a new user",
+    "users_loaded_success": "Users loaded successfully."
   },
   "statistics": {
     "title": "Contact Statistics",
@@ -271,6 +292,7 @@
     "error_processing_contact": "Error processing contact.",
     "error_fetching_suggestions": "Error fetching suggestions.",
     "no_suggestions_found": "No new suggestions found.",
+    "no_suggestions_description": "There are currently no AI suggestions available. Try extracting contact information from text or check back later for new suggestions.",
     "new_contact_suggestion": "New Contact Suggestion",
     "update_contact_suggestion": "Update Existing Contact Suggestion",
     "found_existing_contact": "Found existing contact: {{name}}",
@@ -468,7 +490,9 @@
     "social_network_type": "Social Network Type",
     "url_address": "URL Address",
     "profile_user": "User Profile",
-    "user_email": "Email"
+    "user_email": "Email",
+    "position": "Position/Expertise",
+    "company": "Company"
   },
   "form_placeholders": {
     "enter_name": "Enter your name",
@@ -483,7 +507,11 @@
     "field_value": "{{name}} value",
     "no_options_found": "No options found",
     "select_field": "Select {{name}}",
-    "unknown_field_type_placeholder": "Unknown field type"
+    "unknown_field_type_placeholder": "Unknown field type",
+    "first_name": "First Name*",
+    "last_name": "Last Name*",
+    "position": "Position/Expertise",
+    "company": "Company"
   },
   "section_titles": {
     "custom_fields": "Custom Fields",
@@ -502,6 +530,12 @@
     "add_first_contact": "Add your first contact to get started.",
     "no_custom_field_templates": "No custom field templates defined."
   },
+  "custom_field_template": {
+    "add_title": "Add Custom Field Template",
+    "add_description": "Form for creating a new custom field template",
+    "edit_title": "Edit Custom Field Template",
+    "edit_description": "Form for editing a custom field template"
+  },
   "accessibility": {
     "edit_contact_form": "Edit Contact Form",
     "add_contact_form": "Add Contact Form",
@@ -509,7 +543,22 @@
     "add_contact_description": "Add new contact information and details",
     "updating_contact": "Updating contact...",
     "creating_contact": "Creating contact...",
-    "form_error": "Form error: {{message}}"
+    "form_error": "Form error: {{message}}",
+    "contact_information": "Contact Information",
+    "focused": "Focused",
+    "navigation": "Navigation",
+    "main_content": "Main content",
+    "search": "Search",
+    "menu": "Menu",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "loading": "Loading",
+    "error": "Error",
+    "success": "Success",
+    "skip_to_content": "Skip to main content",
+    "skip_to_navigation": "Skip to navigation"
   },
   "theme_options": {
     "light": "Light",
@@ -518,5 +567,55 @@
   },
   "email_change_notice": {
     "message": "Email can be changed through account settings."
+  },
+  "shortcuts": {
+    "add_contact": "Add New Contact",
+    "close_help": "Close Help",
+    "close_modal": "Close Modal/Dialog",
+    "contact_delete": "Delete Contact",
+    "contact_edit": "Edit Contact",
+    "contact_opened": "Contact Opened",
+    "contacts": "Go to Contacts",
+    "delete_contact": "Delete Contact",
+    "edit_contact": "Edit Contact",
+    "form_saved": "Form Saved",
+    "groups": "Go to Groups",
+    "help": "Show Keyboard Shortcuts",
+    "help_opened": "Keyboard Shortcuts Help Opened",
+    "home": "Go to Home",
+    "main_content": "Skip to Main Content",
+    "main_content_focused": "Main Content Focused",
+    "modal_closed": "Modal Closed",
+    "navigated_add_contact": "Navigated to Add Contact",
+    "navigated_contacts": "Navigated to Contacts",
+    "navigated_groups": "Navigated to Groups",
+    "navigated_home": "Navigated to Home",
+    "navigated_settings": "Navigated to Settings",
+    "navigated_statistics": "Navigated to Statistics",
+    "new_contact": "New Contact",
+    "new_contact_created": "Creating New Contact",
+    "new_contact_not_available": "New Contact Only Available in Contacts Section",
+    "next_element": "Focus Next Element",
+    "no_contact_selected": "No Contact Selected",
+    "no_contact_selected_delete": "No Contact Selected for Deletion",
+    "open_contact": "Open Contact",
+    "previous_element": "Focus Previous Element",
+    "save": "Save Form",
+    "save_not_available": "Save Not Available",
+    "search": "Focus Search",
+    "search_focused": "Search Focused",
+    "search_not_available": "Search Not Available on This Page",
+    "settings": "Go to Settings",
+    "statistics": "Go to Statistics",
+    "tip": "Tip",
+    "title": "Keyboard Shortcuts",
+    "category_navigation": "Navigation",
+    "category_actions": "Actions",
+    "category_accessibility": "Accessibility",
+    "category_search": "Search"
+  },
+  "contacts": {
+    "add_new_contact": "Add New Contact",
+    "add_contact_description": "Add new contact information and details"
   }
 }

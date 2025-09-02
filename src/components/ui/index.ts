@@ -6,7 +6,6 @@ export * from './modern-grid';
 export {
   Toast as ModernToast,
   ToastProvider as ModernToastProvider,
-  useToast as useModernToast,
   type ToastProps as ModernToastProps
 } from './modern-toast';
 export * from './modern-progress';

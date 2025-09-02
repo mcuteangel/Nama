@@ -68,34 +68,38 @@ export interface GradientGlassButtonProps extends GlassButtonProps {
 /**
  * GradientGlassButton - A glass button with gradient effect
  */
-export function GradientGlassButton({ 
-  gradientType = 'primary', 
-  children, 
-  className, 
-  ...props 
-}: GradientGlassButtonProps) {
-  // Construct the variant based on gradient type
-  const gradientVariant = `glass-gradient-${gradientType}` as 
-    | 'glass-gradient-primary' 
-    | 'glass-gradient-ocean' 
-    | 'glass-gradient-sunset' 
-    | 'glass-gradient-success' 
-    | 'glass-gradient-warning' 
-    | 'glass-gradient-danger' 
-    | 'glass-gradient-info' 
-    | 'glass-gradient-forest';
-  
-  return (
-    <GlassButton
-      variant={gradientVariant}
-      effect="scale"
-      className={cn('font-semibold', className)}
-      {...props}
-    >
-      {children}
-    </GlassButton>
-  );
-}
+export const GradientGlassButton = React.forwardRef<HTMLButtonElement, GradientGlassButtonProps>(
+  ({ 
+    gradientType = 'primary', 
+    children, 
+    className, 
+    ...props 
+  }: GradientGlassButtonProps, ref) => {
+    // Construct the variant based on gradient type
+    const gradientVariant = `glass-gradient-${gradientType}` as 
+      | 'glass-gradient-primary' 
+      | 'glass-gradient-ocean' 
+      | 'glass-gradient-sunset' 
+      | 'glass-gradient-success' 
+      | 'glass-gradient-warning' 
+      | 'glass-gradient-danger' 
+      | 'glass-gradient-info' 
+      | 'glass-gradient-forest';
+    
+    return (
+      <GlassButton
+        ref={ref}
+        variant={gradientVariant}
+        effect="scale"
+        className={cn('font-semibold', className)}
+        {...props}
+      >
+        {children}
+      </GlassButton>
+    );
+  }
+);
+GradientGlassButton.displayName = 'GradientGlassButton';
 
 export { GlassButton };
 

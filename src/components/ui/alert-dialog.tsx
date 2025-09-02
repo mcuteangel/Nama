@@ -13,10 +13,7 @@ import {
   ModernAlertDialogTitle, 
   ModernAlertDialogDescription, 
   ModernAlertDialogAction, 
-  ModernAlertDialogCancel,
-  type ModernAlertDialogContentProps,
-  type ModernAlertDialogActionProps,
-  type ModernAlertDialogCancelProps
+  ModernAlertDialogCancel
 } from "@/components/ui/modern-alert-dialog";
 
 const AlertDialog = ModernAlertDialog;
@@ -27,9 +24,11 @@ const AlertDialogOverlay = ModernAlertDialogOverlay;
 
 const AlertDialogTrigger = ModernAlertDialogTrigger;
 
+type AlertDialogContentProps = React.ComponentPropsWithoutRef<typeof ModernAlertDialogContent>;
+
 const AlertDialogContent = React.forwardRef<
   React.ElementRef<typeof AlertDialogPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Content> & ModernAlertDialogContentProps
+  AlertDialogContentProps
 >(({ className, ...props }, ref) => (
   <ModernAlertDialogContent
     ref={ref}
@@ -97,7 +96,7 @@ AlertDialogDescription.displayName =
 
 const AlertDialogAction = React.forwardRef<
   React.ElementRef<typeof AlertDialogPrimitive.Action>,
-  React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Action> & ModernAlertDialogActionProps
+  React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Action>
 >(({ className, ...props }, ref) => (
   <ModernAlertDialogAction
     ref={ref}
@@ -109,7 +108,7 @@ AlertDialogAction.displayName = AlertDialogPrimitive.Action.displayName;
 
 const AlertDialogCancel = React.forwardRef<
   React.ElementRef<typeof AlertDialogPrimitive.Cancel>,
-  React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Cancel> & ModernAlertDialogCancelProps
+  React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Cancel>
 >(({ className, ...props }, ref) => (
   <ModernAlertDialogCancel
     ref={ref}

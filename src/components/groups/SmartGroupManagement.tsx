@@ -11,7 +11,7 @@ import { useGroups } from '@/hooks/use-groups';
 import EmptyState from '../common/EmptyState';
 import LoadingSpinner from '../common/LoadingSpinner';
 import { ModernCard, ModernCardHeader, ModernCardTitle, ModernCardDescription, ModernCardContent } from "@/components/ui/modern-card";
-import { GlassButton } from "@/components/ui/glass-button";
+import { GlassButton, GradientGlassButton } from "@/components/ui/glass-button";
 
 interface ContactWithoutGroup {
   id: string;
@@ -151,8 +151,6 @@ const SmartGroupManagement: React.FC = () => {
     } catch (err: unknown) {
       ErrorManager.logError(err, { component: 'SmartGroupManagement', action: 'applyGroupSuggestion', suggestion });
       ErrorManager.notifyUser(`${t('ai_suggestions.error_applying_group_suggestion')}: ${ErrorManager.getErrorMessage(err)}`, 'error');
-    } finally {
-      // dismissToast(toastId);
     }
   }, [session, t, fetchContactsWithoutGroup]);
 
@@ -167,7 +165,7 @@ const SmartGroupManagement: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <ModernCard variant="glass" className="rounded-xl p-4">
+      <ModernCard variant="glass" className="rounded-xl p-4 fade-in-up">
         <ModernCardHeader className="pb-2">
           <ModernCardTitle className="text-xl font-bold flex items-center gap-2">
             <Users size={20} className="text-purple-500" /> {t('ai_suggestions.smart_group_management_title')}
@@ -177,16 +175,15 @@ const SmartGroupManagement: React.FC = () => {
           </ModernCardDescription>
         </ModernCardHeader>
         <ModernCardContent className="space-y-4">
-          <GlassButton
+          <GradientGlassButton
             onClick={generateGroupSuggestions}
             disabled={isGeneratingSuggestions || contactsWithoutGroup.length === 0}
-            variant="gradient-primary"
-            className="w-full flex items-center gap-2 px-6 py-2 rounded-lg font-semibold shadow-md transition-all duration-300 transform hover:scale-105"
+            className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold shadow-lg hover-lift"
           >
-            {isGeneratingSuggestions && <LoadingSpinner size={16} className="me-2" />}
-            <Sparkles size={16} className="me-2" />
+            {isGeneratingSuggestions && <LoadingSpinner size={20} />}
+            <Sparkles size={20} />
             {t('ai_suggestions.generate_group_suggestions')}
-          </GlassButton>
+          </GradientGlassButton>
 
           {contactsWithoutGroup.length === 0 && !isGeneratingSuggestions && (
             <EmptyState
@@ -200,12 +197,15 @@ const SmartGroupManagement: React.FC = () => {
             <div className="space-y-3 pt-4 border-t border-gray-200 dark:border-gray-700">
               <h4 className="text-lg font-semibold text-gray-800 dark:text-gray-100">{t('ai_suggestions.pending_group_suggestions')}</h4>
               {groupSuggestions.map((suggestion, index) => (
-                <div key={index} className="flex items-center justify-between p-3 glass rounded-lg shadow-sm">
+                <div key={index} className="flex items-center justify-between p-4 glass rounded-xl shadow-sm hover-lift">
                   <div>
                     <p className="font-medium text-gray-800 dark:text-gray-100">{suggestion.contact_name}</p>
-                    <p className="text-sm text-gray-600 dark:text-gray-300 flex items-center gap-1">
+                    <p className="text-sm text-gray-600 dark:text-gray-300 flex items-center gap-1 mt-1">
                       {t('ai_suggestions.suggested_group')}:
-                      <span className="px-2 py-0.5 rounded-full text-xs font-medium text-white" style={{ backgroundColor: suggestion.suggested_group_color || '#cccccc' }}>
+                      <span 
+                        className="px-3 py-1 rounded-full text-xs font-medium text-white inline-flex items-center"
+                        style={{ backgroundColor: suggestion.suggested_group_color || '#cccccc' }}
+                      >
                         {suggestion.suggested_group_name}
                       </span>
                     </p>
@@ -215,7 +215,7 @@ const SmartGroupManagement: React.FC = () => {
                       variant="ghost"
                       size="icon"
                       onClick={() => handleApplySuggestion(suggestion)}
-                      className="text-green-600 hover:bg-green-100 dark:text-green-400 dark:hover:bg-gray-600/50"
+                      className="text-green-600 hover:bg-green-100 dark:text-green-400 dark:hover:bg-gray-600/50 hover-lift"
                     >
                       <CheckCircle size={20} />
                     </GlassButton>
@@ -223,7 +223,7 @@ const SmartGroupManagement: React.FC = () => {
                       variant="ghost"
                       size="icon"
                       onClick={() => handleDiscardSuggestion(suggestion.contact_id)}
-                      className="text-red-600 hover:bg-red-100 dark:text-red-400 dark:hover:bg-gray-600/50"
+                      className="text-red-600 hover:bg-red-100 dark:text-red-400 dark:hover:bg-gray-600/50 hover-lift"
                     >
                       <XCircle size={20} />
                     </GlassButton>

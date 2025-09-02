@@ -1,5 +1,5 @@
 import { ModernCard } from "@/components/ui/modern-card";
-import { GlassButton, GradientButton } from "@/components/ui/glass-button";
+import { GlassButton } from "@/components/ui/glass-button";
 import { ModernAvatar, ModernAvatarFallback, ModernAvatarImage } from "@/components/ui/modern-avatar";
 import { ModernBadge } from "@/components/ui/modern-badge";
 import { 
