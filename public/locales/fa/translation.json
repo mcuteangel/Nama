@@ -1,4 +1,16 @@
 {
+  "groups": {
+    "no_results": "نتیجه‌ای یافت نشد",
+    "no_groups_match": "هیچ گروهی با عبارت '{{query}}' یافت نشد",
+    "manage_your_contact_groups": "مدیریت گروه‌های مخاطبین شما",
+    "search_groups": "جستجو در گروه‌ها",
+    "your_groups": "گروه‌های شما",
+    "no_groups_title": "هنوز گروهی وجود ندارد",
+    "no_groups_description": "شما هنوز هیچ گروهی نساخته‌اید. گروه‌ها به شما کمک می‌کنند مخاطبین خود را بهتر سازماندهی کنید.",
+    "create_first_group": "ساخت اولین گروه",
+    "loading_groups": "در حال بارگیری گروه‌ها...",
+    "clear_search": "پاک کردن جستجو"
+  },
   "contact_form": {
     "group": "گروه",
     "select_group": "انتخاب گروه",

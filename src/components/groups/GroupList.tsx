@@ -1,20 +1,20 @@
 import { useEffect, useState, useCallback } from "react";
-import { GlassButton } from "@/components/ui/glass-button";
-import { Edit, Trash2, Users, PlusCircle, Tag } from "lucide-react";
+import { GlassButton, GradientGlassButton } from "@/components/ui/glass-button";
+import { Edit, Trash2, Users, PlusCircle, Tag, Search, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/integrations/supabase/auth";
 import { showSuccess, showError, showLoading, dismissToast } from "@/utils/toast";
 import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import GroupForm from "./GroupForm";
 import { invalidateCache, fetchWithCache } from "@/utils/cache-helpers";
 import LoadingMessage from "../common/LoadingMessage";
-import CancelButton from "../common/CancelButton";
 import { ErrorManager } from "@/lib/error-manager";
 import EmptyState from '../common/EmptyState';
 import LoadingSpinner from '../common/LoadingSpinner';
 import { ModernCard } from "@/components/ui/modern-card";
 import { useTranslation } from "react-i18next";
+import { Input } from "@/components/ui/input";
 
 interface Group {
   id: string;
@@ -28,6 +28,7 @@ const GroupItem = ({ group, onGroupUpdated, onGroupDeleted }: { group: Group; on
   const { session } = useSession();
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
   const handleDelete = async () => {
     if (!session?.user) {
@@ -58,44 +59,57 @@ const GroupItem = ({ group, onGroupUpdated, onGroupDeleted }: { group: Group; on
 
   return (
     <ModernCard 
-      variant="glass" 
-      hover="lift" 
-      className="flex flex-col p-5 rounded-2xl shadow-lg border border-white/30 dark:border-gray-600/30 backdrop-blur-lg"
+      variant="glass"
+      className="relative group overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/10 dark:hover:shadow-blue-900/20"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
-      <div className="flex items-start gap-4 mb-4">
-        <div 
-          className="w-14 h-14 rounded-full flex items-center justify-center border-2 border-white/50 dark:border-gray-400/50 shadow-lg glass-advanced" 
-          style={{ backgroundColor: group.color || "#cccccc" }}
-        >
-          <Users size={24} className="text-white drop-shadow-md" />
-        </div>
-        <div className="flex-1">
-          <h3 className="font-bold text-xl text-gray-800 dark:text-gray-100 mb-1 drop-shadow-sm">
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-indigo-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+      <div className="relative z-10 flex flex-col h-full p-6">
+        <div className="flex items-start gap-5">
+          <div 
+            className="flex-shrink-0 w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg transition-transform duration-300 group-hover:scale-110"
+            style={{ 
+              backgroundColor: group.color || '#60A5FA',
+              boxShadow: `0 8px 32px ${(group.color || '#60A5FA')}40`
+            }}
+          >
+            <Users size={28} className="text-white/90 drop-shadow-md" />
+          </div>
+          <div className="flex-1 min-w-0">
+          <h3 className="font-bold text-xl text-gray-800 dark:text-white mb-2 truncate">
             {group.name}
           </h3>
           {group.color && (
-            <div className="flex items-center gap-2 mt-2">
-              <span className="text-sm text-gray-700 dark:text-gray-300">{t('groups.color')}:</span>
+            <div className="flex items-center gap-2">
               <span 
-                className="px-3 py-1 rounded-full text-white text-sm font-medium shadow-lg glass-advanced"
-                style={{ backgroundColor: group.color }}
+                className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium text-white/90"
+                style={{ 
+                  backgroundColor: `${group.color}30`,
+                  border: `1px solid ${group.color}50`,
+                  backdropFilter: 'blur(4px)'
+                }}
               >
-                {group.color}
+                <span 
+                  className="w-2.5 h-2.5 rounded-full mr-2" 
+                  style={{ backgroundColor: group.color }}
+                />
+                {group.color.toUpperCase()}
               </span>
             </div>
           )}
         </div>
       </div>
-      <div className="flex gap-3 mt-auto pt-4 border-t border-white/20 dark:border-gray-700/50">
+      <div className={`flex gap-3 mt-6 pt-4 border-t border-white/10 dark:border-gray-700/30 transition-all duration-300 ${isHovered ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
         <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
           <DialogTrigger asChild>
             <GlassButton 
-              variant="glass" 
+              variant="ghost" 
               size="sm" 
-              className="flex-1 flex items-center justify-center gap-2 text-blue-600 dark:text-blue-400 hover:bg-blue-100/30 dark:hover:bg-blue-400/20 transition-all duration-300 hover-lift py-2.5 border border-white/30 dark:border-gray-600/30"
+              className="flex-1 flex items-center justify-center gap-2 text-blue-600 dark:text-blue-400 hover:bg-blue-500/10 dark:hover:bg-blue-400/10 transition-all duration-300 hover-lift py-2.5"
             >
-              <Edit size={18} />
-              {t('actions.edit')}
+              <Edit size={18} className="opacity-80" />
+              <span className="font-medium">{t('actions.edit')}</span>
             </GlassButton>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px] p-0 border-none bg-transparent shadow-none">
@@ -131,7 +145,6 @@ const GroupItem = ({ group, onGroupUpdated, onGroupDeleted }: { group: Group; on
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter className="gap-3">
-              <CancelButton onClick={() => {}} text={t('actions.cancel')} />
               <AlertDialogAction 
                 onClick={handleDelete} 
                 className="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-semibold hover-lift transition-all duration-300 shadow-md hover:shadow-lg"
@@ -152,19 +165,25 @@ const GroupList = () => {
   const { t } = useTranslation();
   const { session, isLoading: isSessionLoading } = useSession();
   const [groups, setGroups] = useState<Group[]>([]);
-  const [loadingGroups, setLoadingGroups] = useState(true);
-  const [isAddGroupDialogOpen, setIsAddGroupDialogOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isCreatingGroup, setIsCreatingGroup] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const filteredGroups = groups.filter(group => 
+    group.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const fetchGroups = useCallback(async () => {
     if (isSessionLoading) return;
 
     if (!session?.user) {
       setGroups([]);
-      setLoadingGroups(false);
+      setIsLoading(false);
       return;
     }
 
-    setLoadingGroups(true);
+    setIsLoading(true);
     const cacheKey = `user_groups_${session.user.id}`;
     const toastId = showLoading(t('groups.loading'));
 
@@ -198,7 +217,7 @@ const GroupList = () => {
       setGroups([]);
     } finally {
       dismissToast(toastId);
-      setLoadingGroups(false);
+      setIsLoading(false);
     }
   }, [session, isSessionLoading, t]);
 
@@ -206,44 +225,120 @@ const GroupList = () => {
     fetchGroups();
   }, [fetchGroups]);
 
-  if (loadingGroups) {
-    return <LoadingMessage message={t('groups.loading')} />;
+  if (isLoading) {
+    return (
+      <div className="py-12">
+        <LoadingMessage message={t('groups.loading_groups')} />
+      </div>
+    );
+  }
+
+  if (groups.length === 0) {
+    return (
+      <EmptyState
+        icon={<Users size={56} className="text-blue-500/80 dark:text-blue-400/90" />}
+        title={t('groups.no_groups_title')}
+        description={t('groups.no_groups_description')}
+        action={
+          <GradientGlassButton
+            onClick={() => setIsCreatingGroup(true)}
+            className="mt-6 px-6 py-3 text-base"
+          >
+            <PlusCircle className="w-5 h-5 mr-2" />
+            {t('groups.create_first_group')}
+          </GradientGlassButton>
+        }
+      />
+    );
   }
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-center">
-        <GlassButton
-          onClick={() => setIsAddGroupDialogOpen(true)}
-          className="flex items-center justify-center gap-3 px-6 py-4 rounded-2xl bg-gradient-primary text-white font-bold shadow-xl transition-all duration-300 transform hover-lift text-lg border border-white/30 dark:border-gray-600/30 glass-advanced"
-        >
-          <PlusCircle size={24} />
-          {t('groups.add_new')}
-        </GlassButton>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+            {t('groups.your_groups')}
+          </h2>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            {t('groups.manage_your_contact_groups')}
+          </p>
+        </div>
+        
+        <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+          <div className="relative flex-1 sm:w-64">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Input
+              type="text"
+              placeholder={t('groups.search_groups')}
+              className="pl-10 pr-8 py-2 h-auto bg-white/50 dark:bg-gray-700/50 border-white/30 dark:border-gray-600/50"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            {searchQuery && (
+              <button 
+                onClick={() => setSearchQuery('')}
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+              >
+                <X size={18} />
+              </button>
+            )}
+          </div>
+          
+          <GradientGlassButton
+            onClick={() => setIsCreatingGroup(true)}
+            className="flex-shrink-0 px-5 py-2.5"
+          >
+            <PlusCircle size={18} className="mr-2" />
+            {t('groups.add_group')}
+          </GradientGlassButton>
+        </div>
       </div>
 
-      <Dialog open={isAddGroupDialogOpen} onOpenChange={setIsAddGroupDialogOpen}>
-        <DialogContent className="sm:max-w-[425px] p-0 border-none bg-transparent shadow-none">
-          <GroupForm
-            onSuccess={() => {
-              setIsAddGroupDialogOpen(false);
-              invalidateCache(`user_groups_${session?.user?.id}`);
-              fetchGroups();
-            }}
-            onCancel={() => setIsAddGroupDialogOpen(false)}
-          />
+      <Dialog open={isCreatingGroup} onOpenChange={setIsCreatingGroup}>
+        <DialogContent className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg rounded-2xl border border-white/30 dark:border-gray-700/50 shadow-2xl p-0 overflow-hidden max-w-md">
+          <div className="p-6">
+            <DialogHeader>
+              <DialogTitle className="text-2xl font-bold text-gray-900 dark:text-white">
+                {t('groups.add_group')}
+              </DialogTitle>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                {t('groups.new_group_description')}
+              </p>
+            </DialogHeader>
+            <div className="mt-6">
+              <GroupForm
+                onSuccess={() => {
+                  setIsCreatingGroup(false);
+                  fetchGroups();
+                }}
+                onCancel={() => setIsCreatingGroup(false)}
+              />
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
 
-      {groups.length === 0 ? (
-        <EmptyState
-          icon={Tag}
-          title={t('groups.empty_title')}
-          description={t('groups.empty_description')}
-        />
+      {filteredGroups.length === 0 ? (
+        <div className="py-12 text-center">
+          <div className="max-w-md mx-auto p-6 bg-white/30 dark:bg-gray-800/30 rounded-2xl border border-dashed border-white/50 dark:border-gray-700/50">
+            <Search size={48} className="mx-auto text-gray-400 mb-4" />
+            <h3 className="text-lg font-medium text-gray-800 dark:text-white mb-1">
+              {t('groups.no_results')}
+            </h3>
+            <p className="text-gray-500 dark:text-gray-400 text-sm">
+              {t('groups.no_groups_match', { query: searchQuery })}
+            </p>
+            <GradientGlassButton 
+              onClick={() => setSearchQuery('')}
+              className="mt-4 px-5 py-2.5 text-sm"
+            >
+              {t('actions.clear_search')}
+            </GradientGlassButton>
+          </div>
+        </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {groups.map((group) => (
+          {filteredGroups.map((group) => (
             <GroupItem
               key={group.id}
               group={group}

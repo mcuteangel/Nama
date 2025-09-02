@@ -27,7 +27,6 @@ import { useTranslation } from "react-i18next";
 import GroupForm from "./GroupForm";
 import AddGroupDialog from "./AddGroupDialog";
 import EmptyState from "../common/EmptyState";
-import LoadingSpinner from "../common/LoadingSpinner";
 import LoadingMessage from "../common/LoadingMessage";
 import { useDialogFocus } from "@/hooks/use-dialog-focus";
 import StandardizedDeleteDialog from "@/components/common/StandardizedDeleteDialog";
@@ -191,15 +190,15 @@ const GroupsManagement = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 p-4 md:p-6 lg:p-8 space-y-8">
       {/* Header Section */}
-      <ModernCard variant="glass" className="fade-in-up rounded-2xl shadow-xl">
+      <ModernCard variant="glass" className="fade-in-up rounded-3xl shadow-2xl border-2 border-white/30 dark:border-gray-600/30 backdrop-blur-xl bg-white/40 dark:bg-gray-800/60 overflow-hidden transition-all duration-500 hover:shadow-3xl hover:border-white/50 dark:hover:border-gray-500/50">
         <ModernCardHeader className="text-center pb-6">
           <div className="flex justify-between items-center mb-4">
             <GlassButton
               onClick={() => window.history.back()}
               variant="glass"
-              className="flex items-center gap-2 px-4 py-2 rounded-xl font-semibold border border-white/30 dark:border-gray-600/30 hover:bg-white/10 dark:hover:bg-gray-700/30 transition-all duration-300 hover-lift"
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold border-2 border-white/30 dark:border-gray-600/30 bg-white/10 dark:bg-gray-800/50 hover:bg-white/20 dark:hover:bg-gray-700/50 transition-all duration-300 hover-lift hover:shadow-lg hover:shadow-black/10"
             >
               {i18n.dir(i18n.language) === 'rtl' ? (
                 <>
@@ -230,7 +229,7 @@ const GroupsManagement = () => {
                 setEditingGroup(null);
                 setIsAddDialogOpen(true);
               }}
-              className="flex items-center justify-center gap-2 px-6 py-4 rounded-2xl font-bold shadow-xl text-lg w-full sm:w-auto"
+              className="flex items-center gap-2 px-8 py-4 rounded-2xl font-bold text-lg w-full sm:w-auto border-2 border-white/40 dark:border-gray-600/40 bg-gradient-to-r from-purple-500 to-indigo-600 text-white hover:shadow-xl hover:shadow-purple-500/20 hover:-translate-y-0.5 transition-all duration-300 transform hover:scale-[1.02]"
             >
               <Plus size={24} />
               {t('groups.add_new')}
@@ -241,7 +240,7 @@ const GroupsManagement = () => {
 
       {/* Smart Group Suggestions */}
       {contactsWithoutGroup.length > 0 && groupSuggestions.length > 0 && (
-        <ModernCard variant="glass" className="fade-in-up rounded-2xl shadow-xl">
+        <ModernCard variant="glass" className="fade-in-up rounded-3xl shadow-2xl border-2 border-white/30 dark:border-gray-600/30 backdrop-blur-xl bg-white/40 dark:bg-gray-800/60 overflow-hidden transition-all duration-500 hover:shadow-3xl hover:border-white/50 dark:hover:border-gray-500/50">
           <ModernCardHeader className="pb-4">
             <ModernCardTitle className="text-xl font-bold flex items-center gap-2">
               <Sparkles size={24} className="text-yellow-500" />
@@ -256,7 +255,7 @@ const GroupsManagement = () => {
               {groupSuggestions.map((suggestion) => (
                 <div 
                   key={`${suggestion.contact_id}-${suggestion.suggested_group_id}`} 
-                  className="flex items-center justify-between p-5 glass rounded-2xl shadow-lg hover-lift border border-white/30 dark:border-gray-600/30 backdrop-blur-lg"
+                  className="flex items-center justify-between p-5 rounded-2xl shadow-lg hover-lift border border-white/30 dark:border-gray-600/30 backdrop-blur-lg glass-advanced"
                 >
                   <div className="flex-1">
                     <p className="font-bold text-gray-800 dark:text-gray-100 text-lg">
@@ -265,7 +264,7 @@ const GroupsManagement = () => {
                     <p className="text-gray-600 dark:text-gray-300 flex items-center gap-2 mt-2">
                       {t('groups.suggested_group')}:
                       <span 
-                        className="px-3 py-1.5 rounded-full text-white font-medium shadow-inner inline-flex items-center"
+                        className="px-3 py-1.5 rounded-full text-white font-medium shadow-inner inline-flex items-center glass-advanced"
                         style={{ backgroundColor: suggestion.suggested_group_color || '#cccccc' }}
                       >
                         {suggestion.suggested_group_name}
@@ -277,7 +276,7 @@ const GroupsManagement = () => {
                       variant="ghost"
                       size="icon"
                       onClick={() => handleApplySuggestion(suggestion)}
-                      className="text-green-600 hover:bg-green-100 dark:text-green-400 dark:hover:bg-gray-700 hover-lift w-12 h-12"
+                      className="text-green-600 hover:bg-green-100 dark:text-green-400 dark:hover:bg-gray-700 hover-lift w-12 h-12 border border-white/30 dark:border-gray-600/30"
                     >
                       <CheckCircle size={24} />
                     </GlassButton>
@@ -285,7 +284,7 @@ const GroupsManagement = () => {
                       variant="ghost"
                       size="icon"
                       onClick={() => handleDiscardSuggestion(suggestion.contact_id)}
-                      className="text-red-600 hover:bg-red-100 dark:text-red-400 dark:hover:bg-gray-700 hover-lift w-12 h-12"
+                      className="text-red-600 hover:bg-red-100 dark:text-red-400 dark:hover:bg-gray-700 hover-lift w-12 h-12 border border-white/30 dark:border-gray-600/30"
                     >
                       <XCircle size={24} />
                     </GlassButton>
@@ -298,7 +297,7 @@ const GroupsManagement = () => {
       )}
 
       {/* Groups List */}
-      <ModernCard variant="glass" className="fade-in-up rounded-2xl shadow-xl">
+      <ModernCard variant="glass" className="fade-in-up rounded-3xl shadow-2xl border-2 border-white/30 dark:border-gray-600/30 backdrop-blur-xl bg-white/40 dark:bg-gray-800/60 overflow-hidden transition-all duration-500 hover:shadow-3xl hover:border-white/50 dark:hover:border-gray-500/50">
         <ModernCardHeader className="pb-4">
           <ModernCardTitle className="text-xl font-bold flex items-center gap-2">
             <Users size={24} className="text-blue-500" />
@@ -322,12 +321,12 @@ const GroupsManagement = () => {
                   key={group.id} 
                   variant="glass" 
                   hover="lift" 
-                  className="flex flex-col p-5 rounded-2xl shadow-lg border border-white/30 dark:border-gray-600/30 backdrop-blur-lg"
+                  className="flex flex-col p-6 rounded-2xl shadow-lg border-2 border-white/30 dark:border-gray-600/30 backdrop-blur-lg bg-white/30 dark:bg-gray-800/40 hover:bg-white/40 dark:hover:bg-gray-700/50 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-xl"
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center gap-3">
                       <div 
-                        className="w-14 h-14 rounded-full flex items-center justify-center border-2 border-white/50 dark:border-gray-400/50 shadow-lg glass-advanced" 
+                        className="w-16 h-16 rounded-full flex items-center justify-center border-2 border-white/50 dark:border-gray-400/50 shadow-xl backdrop-blur-md bg-white/30 dark:bg-gray-800/40 transform transition-transform duration-300 group-hover:scale-110" 
                         style={{ backgroundColor: group.color || "#cccccc" }}
                       >
                         <Users size={24} className="text-white drop-shadow-md" />
@@ -356,7 +355,7 @@ const GroupsManagement = () => {
                       variant="glass"
                       size="sm"
                       onClick={() => handleEditGroup(group)}
-                      className="flex-1 flex items-center justify-center gap-2 text-blue-600 dark:text-blue-400 hover:bg-blue-100/30 dark:hover:bg-blue-400/20 transition-all duration-300 hover-lift py-2.5 border border-white/30 dark:border-gray-600/30"
+                      className="flex-1 flex items-center justify-center gap-2 text-blue-600 dark:text-blue-300 hover:bg-blue-100/40 dark:hover:bg-blue-900/30 transition-all duration-300 hover-lift py-2.5 border-2 border-blue-200/50 dark:border-blue-800/50 rounded-xl hover:shadow-md hover:shadow-blue-200/30 dark:hover:shadow-blue-900/20"
                     >
                       <Edit size={18} />
                       {t('actions.edit')}
@@ -371,7 +370,7 @@ const GroupsManagement = () => {
                         setDeleteDialogOpen(true);
                         storeTriggerElement();
                       }}
-                      className="flex-1 flex items-center justify-center gap-2 text-red-600 dark:text-red-400 hover:bg-red-100/30 dark:hover:bg-red-400/20 transition-all duration-300 hover-lift py-2.5 px-4 rounded-lg border border-white/30 dark:border-gray-600/30 text-sm font-medium"
+                      className="flex-1 flex items-center justify-center gap-2 text-red-600 dark:text-red-400 hover:bg-red-100/40 dark:hover:bg-red-900/30 transition-all duration-300 hover-lift py-2.5 px-4 rounded-xl border-2 border-red-200/50 dark:border-red-800/50 hover:shadow-md hover:shadow-red-200/30 dark:hover:shadow-red-900/20 text-sm font-medium"
                     >
                       <Trash2 size={18} />
                       {t('actions.delete')}

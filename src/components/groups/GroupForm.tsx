@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { ModernInput } from '@/components/ui/modern-input';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
-import ColorPicker, { colors } from '../common/ColorPicker';
+import ColorPicker from '../common/ColorPicker';
 import { useSession } from '@/integrations/supabase/auth';
 import { useErrorHandler } from '@/hooks/use-error-handler';
 import { ErrorManager } from '@/lib/error-manager';
@@ -15,6 +15,7 @@ import LoadingSpinner from '../common/LoadingSpinner';
 import { ModernCard, ModernCardHeader, ModernCardTitle, ModernCardContent, ModernCardFooter } from "@/components/ui/modern-card";
 import { GlassButton, GradientGlassButton } from "@/components/ui/glass-button";
 import { useTranslation } from 'react-i18next';
+import { Plus } from 'lucide-react';
 
 const formSchema = z.object({
   name: z.string().min(1, { message: 'group.name_required' }), // Will be translated in UI
@@ -39,25 +40,16 @@ const GroupForm: React.FC<GroupFormProps> = ({ initialData, onSuccess, onCancel 
   const { session } = useSession();
 
   // Assign the result of useForm to a variable named 'form'
-  const form = useForm<GroupFormValues>({
+  const { register, handleSubmit, setValue, watch, formState: { errors, isSubmitting } } = useForm<GroupFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: initialData || { name: '', color: '#60A5FA' },
   });
 
-  // Destructure properties from the 'form' variable
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    watch,
-    formState: { errors, isSubmitting },
-  } = form;
-
   const selectedColor = watch('color');
 
-  const onSuccessCallback = useCallback((result: { id: string } | undefined) => { // result will be the data from executeSave
+  const onSuccessCallback = useCallback((result: { id: string } | undefined) => {
     ErrorManager.notifyUser(initialData?.id ? t('groups.edit_success') : t('groups.add_success'), 'success');
-    onSuccess?.(result?.id); // Pass the new group's ID
+    onSuccess?.(result?.id);
   }, [initialData?.id, onSuccess, t]);
 
   const onErrorCallback = useCallback((err: unknown) => {
@@ -71,7 +63,7 @@ const GroupForm: React.FC<GroupFormProps> = ({ initialData, onSuccess, onCancel 
     retry: retrySave,
     executeAsync: executeSave,
     retryCount,
-  } = useErrorHandler(null, {
+  } = useErrorHandler<{id: string} | undefined>(null, {
     maxRetries: 3,
     retryDelay: 1000,
     showToast: true,
@@ -82,12 +74,11 @@ const GroupForm: React.FC<GroupFormProps> = ({ initialData, onSuccess, onCancel 
 
   useEffect(() => {
     if (initialData) {
-      form.reset({
-        name: initialData.name,
-        color: initialData.color || '#60A5FA',
-      });
+      // Using setValue directly instead of form.reset for better type safety
+      setValue('name', initialData.name);
+      setValue('color', initialData.color || '#60A5FA');
     }
-  }, [initialData, form]);
+  }, [initialData, setValue]);
 
   const onSubmit = async (values: GroupFormValues) => {
     if (!session?.user) {
@@ -97,7 +88,7 @@ const GroupForm: React.FC<GroupFormProps> = ({ initialData, onSuccess, onCancel 
     }
     const userId = session.user.id;
 
-    await executeSave(async () => {
+    await executeSave(async (): Promise<{id: string} | undefined> => {
       let res;
       if (initialData?.id) {
         res = await supabase
@@ -122,63 +113,92 @@ const GroupForm: React.FC<GroupFormProps> = ({ initialData, onSuccess, onCancel 
   };
 
   return (
-    <ModernCard variant="glass" className="w-full max-w-md rounded-xl p-6">
-      <ModernCardHeader className="text-center">
-        <ModernCardTitle className="text-2xl font-bold">
-          {initialData?.id ? t('groups.edit_title') : t('groups.add_title')}
-        </ModernCardTitle>
-        {error && (
-          <div className="text-sm text-destructive flex items-center justify-center gap-2 mt-2">
-            <span>{errorMessage}</span>
-            {retryCount > 0 && (
-              <GlassButton
-                variant="ghost"
-                size="sm"
-                onClick={retrySave}
-                disabled={isSaving}
-                className="text-destructive hover:bg-destructive/10"
-              >
-                {t('actions.retry_count', { count: retryCount })}
-              </GlassButton>
-            )}
-          </div>
-        )}
-      </ModernCardHeader>
-      <ModernCardContent>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <div>
-            <Label htmlFor="name" className="text-gray-700 dark:text-gray-300">{t('groups.name_label')}</Label>
-            <ModernInput
-              id="name"
-              {...register('name')}
-              variant="glass"
-              className="mt-1 block w-full bg-white/50 dark:bg-gray-800/50 border border-gray-300 dark:border-gray-700 rounded-xl shadow-sm focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-gray-100"
-              disabled={isSaving}
-              placeholder={t('groups.name_placeholder')}
-            />
-            {errors.name && <p className="text-red-500 text-sm mt-1">{t(errors.name.message as string)}</p>}
+    <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-md mx-auto">
+      <ModernCard variant="glass" className="rounded-3xl shadow-2xl border-2 border-white/30 dark:border-gray-600/30 backdrop-blur-xl bg-white/40 dark:bg-gray-800/60 overflow-hidden transition-all duration-300 hover:shadow-3xl hover:border-white/50 dark:hover:border-gray-500/50">
+        <ModernCardHeader className="pb-4 border-b border-white/20 dark:border-gray-700/50">
+          <ModernCardTitle className="text-2xl font-bold text-gray-800 dark:text-white">
+            {initialData?.id ? t('groups.edit_title') : t('groups.add_title')}
+          </ModernCardTitle>
+          {error && (
+            <div className="mt-2 text-sm text-red-500 dark:text-red-400 flex items-center justify-center gap-2">
+              <span>{errorMessage}</span>
+              {retryCount > 0 && (
+                <GlassButton
+                  variant="ghost"
+                  size="sm"
+                  onClick={retrySave}
+                  disabled={isSaving}
+                  className="text-red-500 hover:bg-red-100/30 dark:hover:bg-red-900/20 px-2 py-1 rounded-md text-xs"
+                >
+                  {t('actions.retry_count', { count: retryCount })}
+                </GlassButton>
+              )}
+            </div>
+          )}
+        </ModernCardHeader>
+        
+        <ModernCardContent className="p-6 space-y-6">
+          <div className="space-y-3">
+            <Label htmlFor="name" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              {t('groups.group_name')}
+            </Label>
+            <div className="relative">
+              <ModernInput
+                id="name"
+                disabled={isSubmitting}
+                placeholder={t('groups.group_name_placeholder')}
+                className="w-full px-4 py-3 rounded-xl border-2 border-white/30 dark:border-gray-600/50 bg-white/50 dark:bg-gray-700/50 text-gray-800 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                {...register('name')}
+              />
+              {errors.name && (
+                <p className="mt-1 text-sm text-red-500 dark:text-red-400">
+                  {t(errors.name.message as string)}
+                </p>
+              )}
+            </div>
           </div>
 
-          <div>
-            <Label htmlFor="color" className="text-gray-700 dark:text-gray-300">{t('groups.color_label')}</Label>
-            <ColorPicker selectedColor={selectedColor || '#60A5FA'} onSelectColor={(color) => setValue('color', color)} />
-            {errors.color && <p className="text-red-500 text-sm mt-1">{errors.color.message}</p>}
+          <div className="space-y-3">
+            <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              {t('groups.group_color')}
+            </Label>
+            <div className="p-4 rounded-2xl bg-white/30 dark:bg-gray-700/30 backdrop-blur-sm border border-white/30 dark:border-gray-600/30">
+              <ColorPicker
+                selectedColor={selectedColor || '#60A5FA'}
+                onSelectColor={(color: string) => setValue('color', color)}
+              />
+            </div>
           </div>
-
-          <ModernCardFooter className="flex flex-col sm:flex-row justify-end gap-4 p-0 pt-4">
-            <CancelButton onClick={onCancel} disabled={isSaving} />
+        </ModernCardContent>
+        
+        <ModernCardFooter className="px-6 py-4 bg-white/30 dark:bg-gray-800/40 border-t border-white/20 dark:border-gray-700/50 rounded-b-3xl">
+          <div className="flex justify-end gap-3 w-full">
+            <div className="px-5 py-2.5">
+              <CancelButton
+                onClick={onCancel}
+                disabled={isSubmitting}
+              />
+            </div>
             <GradientGlassButton
               type="submit"
-              className="px-6 py-2 rounded-xl font-semibold w-full sm:w-auto"
-              disabled={isSaving}
+              disabled={isSubmitting}
+              className="px-6 py-2.5 rounded-xl font-bold bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white shadow-lg hover:shadow-blue-500/30 transition-all duration-300 transform hover:-translate-y-0.5"
             >
-              {isSaving && <LoadingSpinner size={16} className="me-2" />}
-              {isSaving ? (initialData?.id ? t('groups.editing') : t('groups.adding')) : (initialData?.id ? t('actions.save_changes') : t('actions.add_new_group'))}
+              {isSubmitting ? (
+                <LoadingSpinner className="w-5 h-5 text-white" />
+              ) : initialData?.id ? (
+                t('actions.save_changes')
+              ) : (
+                <span className="flex items-center gap-2">
+                  <Plus size={18} />
+                  {t('actions.create')}
+                </span>
+              )}
             </GradientGlassButton>
-          </ModernCardFooter>
-        </form>
-      </ModernCardContent>
-    </ModernCard>
+          </div>
+        </ModernCardFooter>
+      </ModernCard>
+    </form>
   );
 };
 

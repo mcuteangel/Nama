@@ -1,14 +1,13 @@
 import React, { useState, useCallback, useEffect } from "react";
-import { Dialog, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Plus } from "lucide-react";
 import GroupForm from "./GroupForm";
-import FormDialogWrapper from "../common/FormDialogWrapper";
 import { useSession } from '@/integrations/supabase/auth';
 import { supabase } from '@/integrations/supabase/client';
 import { useErrorHandler } from '@/hooks/use-error-handler';
 import { ErrorManager } from '@/lib/error-manager';
 import LoadingMessage from '../common/LoadingMessage';
-import { colors } from '../common/ColorPicker'; // Import colors array
+import { colors } from '../common/ColorPicker';
 import { useTranslation } from 'react-i18next';
 import { GlassButton, GradientGlassButton } from "@/components/ui/glass-button";
 import { ModernCard } from "@/components/ui/modern-card";
@@ -28,7 +27,7 @@ const AddGroupDialog: React.FC<AddGroupDialogProps> = ({ onGroupAdded, open, onO
   const { t } = useTranslation();
   const { session, isLoading: isSessionLoading } = useSession();
   const [, setExistingGroupColors] = useState<string[]>([]);
-  const [initialColor, setInitialColor] = useState<string>('#60A5FA'); // Default color
+  const [initialColor, setInitialColor] = useState<string>('#60A5FA');
 
   const findUniqueColor = useCallback((usedColors: string[]): string => {
     for (const color of colors) {
@@ -95,6 +94,37 @@ const AddGroupDialog: React.FC<AddGroupDialogProps> = ({ onGroupAdded, open, onO
     onOpenChange(false); // Close dialog on cancel
   };
 
+  if (isSessionLoading) {
+    return <LoadingMessage message={t('common.loading')} />;
+  }
+
+  if (!session) {
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogTrigger asChild>
+          <GradientGlassButton className="px-6 py-3 rounded-xl font-bold bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white shadow-lg hover:shadow-blue-500/30 transition-all duration-300 transform hover:-translate-y-0.5 flex items-center">
+            <Plus className="h-5 w-5 mr-2" />
+            {t('groups.add_group')}
+          </GradientGlassButton>
+        </DialogTrigger>
+        <DialogContent className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg rounded-2xl border border-white/30 dark:border-gray-700/50 shadow-2xl p-0 overflow-hidden">
+          <div className="p-6">
+            <DialogHeader>
+              <DialogTitle className="text-2xl font-bold text-gray-900 dark:text-white">
+                {t('groups.add_group')}
+              </DialogTitle>
+            </DialogHeader>
+            <div className="mt-4">
+              <p className="text-gray-600 dark:text-gray-300">
+                {t('groups.login_required')}
+              </p>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
@@ -106,27 +136,33 @@ const AddGroupDialog: React.FC<AddGroupDialogProps> = ({ onGroupAdded, open, onO
           {t('actions.add_new_group')}
         </GradientGlassButton>
       </DialogTrigger>
-      <FormDialogWrapper 
-        title={t('groups.add_title')}
-        description={t('groups.add_description', 'Form for creating a new contact group')}
-      >
-        {isFetchingColors ? (
-          <ModernCard className="w-full max-w-md rounded-xl p-6">
-            <LoadingMessage message={t('system_messages.preparing_group_form')} />
-          </ModernCard>
-        ) : fetchColorsError ? (
-          <ModernCard className="w-full max-w-md rounded-xl p-6 text-center text-red-500 dark:text-red-400">
-            <p>{fetchColorsError.message}</p>
-            <GlassButton onClick={() => onOpenChange(false)} className="mt-4">{t('actions.close')}</GlassButton>
-          </ModernCard>
-        ) : (
-          <GroupForm
-            onSuccess={handleSuccess}
-            onCancel={handleCancel}
-            initialData={{ name: '', color: initialColor }} // Pass initial color
-          />
-        )}
-      </FormDialogWrapper>
+      <DialogContent className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg rounded-2xl border border-white/30 dark:border-gray-700/50 shadow-2xl p-0 overflow-hidden">
+        <div className="p-6">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold text-gray-900 dark:text-white">
+              {t('groups.add_title')}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="mt-4">
+            {isFetchingColors ? (
+              <ModernCard className="w-full max-w-md rounded-xl p-6">
+                <LoadingMessage message={t('system_messages.preparing_group_form')} />
+              </ModernCard>
+            ) : fetchColorsError ? (
+              <ModernCard className="w-full max-w-md rounded-xl p-6 text-center text-red-500 dark:text-red-400">
+                <p>{fetchColorsError.message}</p>
+                <GlassButton onClick={() => onOpenChange(false)} className="mt-4">{t('actions.close')}</GlassButton>
+              </ModernCard>
+            ) : (
+              <GroupForm
+                onSuccess={handleSuccess}
+                onCancel={handleCancel}
+                initialData={{ name: '', color: initialColor }} // Pass initial color
+              />
+            )}
+          </div>
+        </div>
+      </DialogContent>
     </Dialog>
   );
 };
