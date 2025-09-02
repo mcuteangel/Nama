@@ -513,7 +513,11 @@
     "profile_load_error": "خطا در بارگذاری پروفایل: {{message}}",
     "update_profile_error": "خطایی در به‌روزرسانی پروفایل رخ داد",
     "unknown": "خطای ناشناخته",
-    "loading_ungrouped_contacts": "خطا در بارگذاری مخاطبین بدون گروه"
+    "loading_ungrouped_contacts": "خطا در بارگذاری مخاطبین بدون گروه",
+    "load_custom_fields_failed": "خطا در بارگذاری قالب‌های فیلد سفارشی",
+    "delete_custom_field_failed": "خطا در حذف قالب فیلد سفارشی",
+    "create_custom_field_template_error": "خطا در ایجاد قالب فیلد سفارشی",
+    "edit_custom_field_template_error": "خطا در به‌روزرسانی قالب فیلد سفارشی"
   },
   "actions": {
     "add_new_group": "افزودن گروه جدید",
@@ -560,7 +564,13 @@
     "add_title": "افزودن قالب فیلد سفارشی",
     "add_description": "فرم برای ایجاد قالب فیلد سفارشی جدید",
     "edit_title": "ویرایش قالب فیلد سفارشی",
-    "edit_description": "فرم برای ویرایش قالب فیلد سفارشی"
+    "edit_description": "فرم برای ویرایش قالب فیلد سفارشی",
+    "create_success": "قالب فیلد سفارشی با موفقیت ایجاد شد",
+    "create_success_description": "قالب فیلد سفارشی جدید به مجموعه شما اضافه شد.",
+    "update_success": "قالب فیلد سفارشی با موفقیت به‌روزرسانی شد",
+    "update_success_description": "تغییرات شما ذخیره شد.",
+    "delete_success": "قالب فیلد سفارشی با موفقیت حذف شد",
+    "delete_success_description": "قالب فیلد سفارشی حذف شد."
   },
   "form_labels": {
     "first_name": "نام",
@@ -696,5 +706,18 @@
   "contacts": {
     "add_new_contact": "افزودن مخاطب جدید",
     "add_contact_description": "افزودن اطلاعات و جزئیات مخاطب جدید"
+  },
+  "custom_field_management": {
+    "title": "مدیریت فیلدهای سفارشی",
+    "description": "مدیریت قالب‌های فیلد سفارشی برای مخاطبین شما",
+    "add_field": "افزودن فیلد سفارشی",
+    "search_placeholder": "جستجوی فیلدها...",
+    "filter_all": "همه انواع",
+    "empty_title": "فیلد سفارشی یافت نشد",
+    "empty_description": "قالب‌های فیلد سفارشی ایجاد کنید تا داده‌های ساختاریافته به مخاطبین خود اضافه کنید.",
+    "add_first_field": "افزودن اولین فیلد",
+    "delete_confirm_title": "حذف قالب فیلد سفارشی؟",
+    "delete_confirm_description": "این عمل قابل بازگشت نیست. این قالب برای همیشه حذف خواهد شد. (داده‌های موجود در مخاطبین تحت تأثیر قرار نمی‌گیرند)",
+    "field_type": "نوع فیلد"
   }
 }

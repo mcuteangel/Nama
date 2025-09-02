@@ -509,7 +509,11 @@
     "server_processing_error": "Error processing server request",
     "invalid_response_format": "Invalid server response format",
     "profile_load_error": "Error loading profile: {{message}}",
-    "update_profile_error": "An error occurred while updating profile"
+    "update_profile_error": "An error occurred while updating profile",
+    "load_custom_fields_failed": "Failed to load custom field templates",
+    "delete_custom_field_failed": "Failed to delete custom field template",
+    "create_custom_field_template_error": "Error creating custom field template",
+    "edit_custom_field_template_error": "Error updating custom field template"
   },
   "actions": {
     "add_new_group": "Add New Group",
@@ -556,7 +560,13 @@
     "add_title": "Add Custom Field Template",
     "add_description": "Form for creating a new custom field template",
     "edit_title": "Edit Custom Field Template",
-    "edit_description": "Form for editing a custom field template"
+    "edit_description": "Form for editing a custom field template",
+    "create_success": "Custom field template created successfully",
+    "create_success_description": "The new custom field template has been added to your collection.",
+    "update_success": "Custom field template updated successfully",
+    "update_success_description": "Your changes have been saved.",
+    "delete_success": "Custom field template deleted successfully",
+    "delete_success_description": "The custom field template has been removed."
   },
   "form_labels": {
     "first_name": "First Name",
@@ -692,5 +702,18 @@
   "contacts": {
     "add_new_contact": "Add New Contact",
     "add_contact_description": "Add new contact information and details"
+  },
+  "custom_field_management": {
+    "title": "Custom Field Management",
+    "description": "Manage custom field templates for your contacts",
+    "add_field": "Add Custom Field",
+    "search_placeholder": "Search fields...",
+    "filter_all": "All Types",
+    "empty_title": "No custom fields found",
+    "empty_description": "Create custom field templates to add structured data to your contacts.",
+    "add_first_field": "Add Your First Field",
+    "delete_confirm_title": "Delete Custom Field Template?",
+    "delete_confirm_description": "This action cannot be undone. This template will be permanently deleted. (Existing data in contacts will not be affected)",
+    "field_type": "Field Type"
   }
 }

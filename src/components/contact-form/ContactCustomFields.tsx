@@ -5,11 +5,12 @@ import { ModernSelect, ModernSelectContent, ModernSelectItem, ModernSelectTrigge
 import { ModernPopover, ModernPopoverContent, ModernPopoverTrigger } from '@/components/ui/modern-popover';
 import { GlassButton } from "@/components/ui/glass-button";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
-import { CalendarIcon } from 'lucide-react';
+import { CalendarIcon, Plus } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { format } from 'date-fns-jalali';
 import { JalaliCalendar } from '@/components/JalaliCalendar';
 import { cn } from '@/lib/utils';
-import AddCustomFieldTemplateDialog from '@/components/AddCustomFieldTemplateDialog';
+import { CustomFieldForm } from '@/components/custom-fields';
 import { CustomFieldTemplate } from '@/domain/schemas/custom-field-template';
 import { ContactFormValues } from '@/types/contact';
 import { useTranslation } from 'react-i18next';
@@ -48,7 +49,24 @@ const ContactCustomFields: React.FC<ContactCustomFieldsProps> = React.memo(({
         <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 heading-3">
           {t('section_titles.custom_fields')}
         </h3>
-        <AddCustomFieldTemplateDialog onTemplateAdded={fetchTemplates} />
+        <Dialog>
+          <DialogTrigger asChild>
+            <GlassButton
+              variant="glass"
+              size="sm"
+              className="flex items-center gap-1 px-3 py-1 rounded-lg font-medium"
+            >
+              <Plus size={16} />
+              {t('actions.add_new_field')}
+            </GlassButton>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[500px] p-0 border-none bg-transparent shadow-none">
+            <DialogHeader className="sr-only">
+              <DialogTitle>{t('custom_field_template.add_title')}</DialogTitle>
+            </DialogHeader>
+            <CustomFieldForm onSuccess={fetchTemplates} onCancel={() => {}} />
+          </DialogContent>
+        </Dialog>
       </div>
       
       {loadingTemplates ? (
