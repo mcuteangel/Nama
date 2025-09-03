@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Sparkles, User, CheckCircle, XCircle, LightbulbOff, Brain, Heart } from "lucide-react";
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { Sparkles, User, CheckCircle, XCircle, LightbulbOff, Brain, Heart, TrendingUp } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useSession } from "@/integrations/supabase/auth";
 import { useErrorHandler } from "@/hooks/use-error-handler";
@@ -29,7 +29,7 @@ interface GenderSuggestionDisplay {
   suggestedGender: 'male' | 'female' | 'not_specified';
 }
 
-const GenderSuggestionManagement: React.FC = () => {
+const GenderSuggestionManagement: React.FC = React.memo(() => {
   const { t } = useTranslation();
   const { session, isLoading: isSessionLoading } = useSession();
 
@@ -37,6 +37,16 @@ const GenderSuggestionManagement: React.FC = () => {
   const [genderSuggestions, setGenderSuggestions] = useState<GenderSuggestionDisplay[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [learnedNamesCount, setLearnedNamesCount] = useState(0);
+  const [hoveredSuggestion, setHoveredSuggestion] = useState<string | null>(null);
+
+  // محاسبات آماری با useMemo برای عملکرد بهتر
+  const stats = useMemo(() => ({
+    totalContacts: ungenderedContacts.length,
+    totalSuggestions: genderSuggestions.length,
+    maleSuggestions: genderSuggestions.filter(s => s.suggestedGender === 'male').length,
+    femaleSuggestions: genderSuggestions.filter(s => s.suggestedGender === 'female').length,
+    successRate: genderSuggestions.length > 0 ? Math.round((genderSuggestions.length / ungenderedContacts.length) * 100) : 0,
+  }), [ungenderedContacts.length, genderSuggestions]);
 
   const updateLearnedNamesCount = useCallback(() => {
     const preferences = getLearnedGenderPreferences();
@@ -181,6 +191,21 @@ const GenderSuggestionManagement: React.FC = () => {
       variant="success"
       compact
     >
+      {/* آمار سریع */}
+      {stats.totalContacts > 0 && (
+        <div className="grid grid-cols-2 gap-2 mb-4 p-3 bg-gradient-to-r from-pink-50/60 to-rose-50/60 dark:from-pink-900/30 dark:to-rose-900/30 rounded-lg border border-pink-200/30 dark:border-pink-700/30">
+          <div className="text-center">
+            <div className="text-lg font-bold text-pink-600 dark:text-pink-400">{stats.totalContacts}</div>
+            <div className="text-xs text-pink-500 dark:text-pink-300">{t('ai_suggestions.ungendered_contacts', 'بدون جنسیت')}</div>
+          </div>
+          <div className="text-center">
+            <div className="text-lg font-bold text-rose-600 dark:text-rose-400">{stats.successRate}%</div>
+            <div className="text-xs text-rose-500 dark:text-rose-300">{t('ai_suggestions.match_rate', 'نرخ تطابق')}</div>
+          </div>
+        </div>
+      )}
+
+      {/* یادگیری ماشین */}
       <div className="bg-gradient-to-r from-indigo-50/30 to-purple-50/30 dark:from-indigo-900/20 dark:to-purple-900/20 p-3 rounded-lg border border-white/30 backdrop-blur-sm shadow-sm mb-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -202,6 +227,7 @@ const GenderSuggestionManagement: React.FC = () => {
           disabled={isGenerating || ungenderedContacts.length === 0}
           variant="gradient-primary"
           className="flex items-center justify-center gap-2 px-3 py-2 rounded-lg font-medium text-sm"
+          aria-label={t('ai_suggestions.generate_gender_suggestions')}
         >
           {isGenerating ? (
             <LoadingSpinner size={14} />
@@ -218,6 +244,7 @@ const GenderSuggestionManagement: React.FC = () => {
               disabled={isGenerating || learnedNamesCount === 0}
               size="sm"
               className="flex items-center gap-2 px-3 py-2 rounded-lg font-medium text-sm"
+              aria-label={t('ai_suggestions.clear_learned_preferences')}
             >
               <LightbulbOff size={12} />
               {t('ai_suggestions.clear_learned_preferences')}
@@ -250,29 +277,43 @@ const GenderSuggestionManagement: React.FC = () => {
 
       {genderSuggestions.length > 0 && (
         <div className="space-y-2 pt-3 border-t border-gray-200 dark:border-gray-700">
-          <h4 className="text-sm font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
-            <Sparkles size={16} className="text-yellow-500" />
-            <span className="bg-gradient-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent">
-              {t('ai_suggestions.pending_gender_suggestions')}
-            </span>
-            <span className="bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-200 px-2 py-1 rounded-full text-xs font-semibold">
-              {genderSuggestions.length}
-            </span>
-          </h4>
-          <div className="grid gap-2">
+          <div className="flex items-center justify-between">
+            <h4 className="text-sm font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
+              <Sparkles size={16} className="text-yellow-500" />
+              <span className="bg-gradient-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent">
+                {t('ai_suggestions.pending_gender_suggestions')}
+              </span>
+              <span className="bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-200 px-2 py-1 rounded-full text-xs font-semibold">
+                {genderSuggestions.length}
+              </span>
+            </h4>
+            <div className="flex items-center gap-1 text-xs text-gray-500">
+              <TrendingUp size={12} />
+              {stats.maleSuggestions}M / {stats.femaleSuggestions}F
+            </div>
+          </div>
+          <div className="grid gap-2 max-h-80 overflow-y-auto">
             {genderSuggestions.map((suggestion, index) => (
               <div
                 key={suggestion.contactId}
-                className="bg-gradient-to-r from-white/20 via-gray-50/30 to-slate-50/30 dark:from-gray-800/20 dark:via-gray-700/30 dark:to-gray-600/30 p-2 rounded-lg border border-white/30 backdrop-blur-sm shadow-sm"
+                className={`bg-gradient-to-r from-white/20 via-gray-50/30 to-slate-50/30 dark:from-gray-800/20 dark:via-gray-700/30 dark:to-gray-600/30 p-2 rounded-lg border border-white/30 backdrop-blur-sm shadow-sm transition-all duration-300 ${
+                  hoveredSuggestion === suggestion.contactId ? 'scale-105 shadow-lg' : ''
+                }`}
+                onMouseEnter={() => setHoveredSuggestion(suggestion.contactId)}
+                onMouseLeave={() => setHoveredSuggestion(null)}
+                role="region"
+                aria-labelledby={`gender-suggestion-${index}`}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
-                    <p className="font-medium text-sm text-gray-800 dark:text-gray-100 mb-1">{suggestion.contactName}</p>
+                    <p className="font-medium text-sm text-gray-800 dark:text-gray-100 mb-1" id={`gender-suggestion-${index}`}>
+                      {suggestion.contactName}
+                    </p>
                     <div className="flex items-center gap-2">
                       <span className="text-xs font-medium text-gray-600 dark:text-gray-300">
                         {t('ai_suggestions.suggested_gender')}:
                       </span>
-                      <span className={`px-2 py-1 rounded-full text-xs font-bold ${
+                      <span className={`px-2 py-1 rounded-full text-xs font-bold flex items-center gap-1 ${
                         suggestion.suggestedGender === 'male'
                           ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white'
                           : suggestion.suggestedGender === 'female'
@@ -291,7 +332,8 @@ const GenderSuggestionManagement: React.FC = () => {
                       variant="ghost"
                       size="sm"
                       onClick={() => handleAcceptSuggestion(suggestion)}
-                      className="w-7 h-7 rounded-full bg-green-100/50 hover:bg-green-200/70 dark:bg-green-900/30 dark:hover:bg-green-800/50 text-green-600 hover:text-green-700"
+                      className="w-7 h-7 rounded-full bg-green-100/50 hover:bg-green-200/70 dark:bg-green-900/30 dark:hover:bg-green-800/50 text-green-600 hover:text-green-700 transition-all duration-200"
+                      aria-label={t('ai_suggestions.accept_gender_suggestion')}
                     >
                       <CheckCircle size={14} />
                     </GlassButton>
@@ -299,7 +341,8 @@ const GenderSuggestionManagement: React.FC = () => {
                       variant="ghost"
                       size="sm"
                       onClick={() => handleDiscardSuggestion(suggestion.contactId)}
-                      className="w-7 h-7 rounded-full bg-red-100/50 hover:bg-red-200/70 dark:bg-red-900/30 dark:hover:bg-red-800/50 text-red-600 hover:text-red-700"
+                      className="w-7 h-7 rounded-full bg-red-100/50 hover:bg-red-200/70 dark:bg-red-900/30 dark:hover:bg-red-800/50 text-red-600 hover:text-red-700 transition-all duration-200"
+                      aria-label={t('common.discard')}
                     >
                       <XCircle size={14} />
                     </GlassButton>
@@ -312,6 +355,8 @@ const GenderSuggestionManagement: React.FC = () => {
       )}
     </AIBaseCard>
   );
-};
+});
+
+GenderSuggestionManagement.displayName = 'GenderSuggestionManagement';
 
 export default GenderSuggestionManagement;

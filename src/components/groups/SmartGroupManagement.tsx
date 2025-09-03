@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Users, CheckCircle, XCircle, Sparkles } from "lucide-react";
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { Users, CheckCircle, XCircle, Sparkles, TrendingUp, Target } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useSession } from "@/integrations/supabase/auth";
 import { useErrorHandler } from "@/hooks/use-error-handler";
@@ -31,7 +31,7 @@ interface GroupSuggestion {
   suggested_group_color?: string;
 }
 
-const SmartGroupManagement: React.FC = () => {
+const SmartGroupManagement: React.FC = React.memo(() => {
   const { t } = useTranslation();
   const { session, isLoading: isSessionLoading } = useSession();
   const { groups, fetchGroups } = useGroups();
@@ -39,6 +39,15 @@ const SmartGroupManagement: React.FC = () => {
   const [contactsWithoutGroup, setContactsWithoutGroup] = useState<ContactWithoutGroup[]>([]);
   const [groupSuggestions, setGroupSuggestions] = useState<GroupSuggestion[]>([]);
   const [isGeneratingSuggestions, setIsGeneratingSuggestions] = useState(false);
+  const [hoveredSuggestion, setHoveredSuggestion] = useState<string | null>(null);
+
+  // محاسبات آماری با useMemo برای عملکرد بهتر
+  const stats = useMemo(() => ({
+    totalContacts: contactsWithoutGroup.length,
+    totalSuggestions: groupSuggestions.length,
+    uniqueGroups: new Set(groupSuggestions.map(s => s.suggested_group_id)).size,
+    successRate: groupSuggestions.length > 0 ? Math.round((groupSuggestions.length / contactsWithoutGroup.length) * 100) : 0,
+  }), [contactsWithoutGroup.length, groupSuggestions]);
 
   const onSuccessFetchContacts = useCallback((result: { data: ContactWithoutGroup[] | null; error: string | null; fromCache: boolean }) => {
     if (result.data) {
@@ -171,11 +180,26 @@ const SmartGroupManagement: React.FC = () => {
       variant="secondary"
       compact
     >
+      {/* آمار سریع */}
+      {stats.totalContacts > 0 && (
+        <div className="grid grid-cols-2 gap-2 mb-4 p-3 bg-gradient-to-r from-purple-50/60 to-blue-50/60 dark:from-purple-900/30 dark:to-blue-900/30 rounded-lg border border-purple-200/30 dark:border-purple-700/30">
+          <div className="text-center">
+            <div className="text-lg font-bold text-purple-600 dark:text-purple-400">{stats.totalContacts}</div>
+            <div className="text-xs text-purple-500 dark:text-purple-300">{t('ai_suggestions.ungrouped_contacts', 'بدون گروه')}</div>
+          </div>
+          <div className="text-center">
+            <div className="text-lg font-bold text-blue-600 dark:text-blue-400">{stats.successRate}%</div>
+            <div className="text-xs text-blue-500 dark:text-blue-300">{t('ai_suggestions.match_rate', 'نرخ تطابق')}</div>
+          </div>
+        </div>
+      )}
+
       <GlassButton
         onClick={generateGroupSuggestions}
         disabled={isGeneratingSuggestions || contactsWithoutGroup.length === 0}
         variant="gradient-primary"
         className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg font-medium text-sm"
+        aria-label={t('ai_suggestions.generate_group_suggestions')}
       >
         {isGeneratingSuggestions ? (
           <LoadingSpinner size={14} />
@@ -195,31 +219,45 @@ const SmartGroupManagement: React.FC = () => {
 
       {groupSuggestions.length > 0 && (
         <div className="space-y-2 pt-3 border-t border-gray-200 dark:border-gray-700">
-          <h4 className="text-sm font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
-            <Sparkles size={16} className="text-yellow-500" />
-            <span className="bg-gradient-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent">
-              {t('ai_suggestions.pending_group_suggestions')}
-            </span>
-            <span className="bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-200 px-2 py-1 rounded-full text-xs font-semibold">
-              {groupSuggestions.length}
-            </span>
-          </h4>
-          <div className="grid gap-2">
+          <div className="flex items-center justify-between">
+            <h4 className="text-sm font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
+              <Sparkles size={16} className="text-yellow-500" />
+              <span className="bg-gradient-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent">
+                {t('ai_suggestions.pending_group_suggestions')}
+              </span>
+              <span className="bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-200 px-2 py-1 rounded-full text-xs font-semibold">
+                {groupSuggestions.length}
+              </span>
+            </h4>
+            <div className="flex items-center gap-1 text-xs text-gray-500">
+              <Target size={12} />
+              {stats.uniqueGroups} {t('ai_suggestions.unique_groups', 'گروه منحصر')}
+            </div>
+          </div>
+          <div className="grid gap-2 max-h-80 overflow-y-auto">
             {groupSuggestions.map((suggestion, index) => (
               <div
                 key={index}
-                className="bg-gradient-to-r from-white/20 via-gray-50/30 to-slate-50/30 dark:from-gray-800/20 dark:via-gray-700/30 dark:to-gray-600/30 p-2 rounded-lg border border-white/30 backdrop-blur-sm shadow-sm"
+                className={`bg-gradient-to-r from-white/20 via-gray-50/30 to-slate-50/30 dark:from-gray-800/20 dark:via-gray-700/30 dark:to-gray-600/30 p-2 rounded-lg border border-white/30 backdrop-blur-sm shadow-sm transition-all duration-300 ${
+                  hoveredSuggestion === suggestion.contact_id ? 'scale-105 shadow-lg' : ''
+                }`}
+                onMouseEnter={() => setHoveredSuggestion(suggestion.contact_id)}
+                onMouseLeave={() => setHoveredSuggestion(null)}
+                role="region"
+                aria-labelledby={`group-suggestion-${index}`}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
-                    <p className="font-medium text-sm text-gray-800 dark:text-gray-100 mb-1">{suggestion.contact_name}</p>
+                    <p className="font-medium text-sm text-gray-800 dark:text-gray-100 mb-1" id={`group-suggestion-${index}`}>
+                      {suggestion.contact_name}
+                    </p>
                     <div className="flex items-center gap-2">
                       <span className="text-xs font-medium text-gray-600 dark:text-gray-300">
                         {t('ai_suggestions.suggested_group')}:
                       </span>
                       <span
-                        className="px-2 py-1 rounded-full text-xs font-medium text-white inline-flex items-center"
-                        style={{ backgroundColor: suggestion.suggested_group_color || '#cccccc' }}
+                        className="px-2 py-1 rounded-full text-xs font-medium text-white inline-flex items-center shadow-sm"
+                        style={{ backgroundColor: suggestion.suggested_group_color || '#6366f1' }}
                       >
                         {suggestion.suggested_group_name}
                       </span>
@@ -230,7 +268,8 @@ const SmartGroupManagement: React.FC = () => {
                       variant="ghost"
                       size="sm"
                       onClick={() => handleApplySuggestion(suggestion)}
-                      className="w-7 h-7 rounded-full bg-green-100/50 hover:bg-green-200/70 dark:bg-green-900/30 dark:hover:bg-green-800/50 text-green-600 hover:text-green-700"
+                      className="w-7 h-7 rounded-full bg-green-100/50 hover:bg-green-200/70 dark:bg-green-900/30 dark:hover:bg-green-800/50 text-green-600 hover:text-green-700 transition-all duration-200"
+                      aria-label={t('ai_suggestions.apply_suggestion')}
                     >
                       <CheckCircle size={14} />
                     </GlassButton>
@@ -238,7 +277,8 @@ const SmartGroupManagement: React.FC = () => {
                       variant="ghost"
                       size="sm"
                       onClick={() => handleDiscardSuggestion(suggestion.contact_id)}
-                      className="w-7 h-7 rounded-full bg-red-100/50 hover:bg-red-200/70 dark:bg-red-900/30 dark:hover:bg-red-800/50 text-red-600 hover:text-red-700"
+                      className="w-7 h-7 rounded-full bg-red-100/50 hover:bg-red-200/70 dark:bg-red-900/30 dark:hover:bg-red-800/50 text-red-600 hover:text-red-700 transition-all duration-200"
+                      aria-label={t('common.discard')}
                     >
                       <XCircle size={14} />
                     </GlassButton>
@@ -251,6 +291,8 @@ const SmartGroupManagement: React.FC = () => {
       )}
     </AIBaseCard>
   );
-};
+});
+
+SmartGroupManagement.displayName = 'SmartGroupManagement';
 
 export default SmartGroupManagement;

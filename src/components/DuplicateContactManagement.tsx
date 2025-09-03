@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Copy, Merge, XCircle, Info } from "lucide-react";
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { Copy, Merge, XCircle, Info, AlertTriangle } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useSession } from "@/integrations/supabase/auth";
 import { useErrorHandler } from "@/hooks/use-error-handler";
@@ -59,12 +59,26 @@ interface DuplicatePair {
   reason: string;
 }
 
-const DuplicateContactManagement: React.FC = () => {
+const DuplicateContactManagement: React.FC = React.memo(() => {
   const { t } = useTranslation();
   const { session, isLoading: isSessionLoading } = useSession();
 
   const [duplicatePairs, setDuplicatePairs] = useState<DuplicatePair[]>([]);
   const [isScanning, setIsScanning] = useState(false);
+  const [hoveredPair, setHoveredPair] = useState<string | null>(null);
+
+  // محاسبه آمار با useMemo برای عملکرد بهتر
+  const stats = useMemo(() => ({
+    total: duplicatePairs.length,
+    highConfidence: duplicatePairs.filter(p =>
+      p.reason.includes('name') && (p.reason.includes('email') || p.reason.includes('phone'))
+    ).length,
+    mediumConfidence: duplicatePairs.filter(p =>
+      p.reason.includes('email') || p.reason.includes('phone')
+    ).length - duplicatePairs.filter(p =>
+      p.reason.includes('name') && (p.reason.includes('email') || p.reason.includes('phone'))
+    ).length,
+  }), [duplicatePairs]);
 
   const findDuplicates = useCallback((contacts: DuplicateContact[]) => {
     const duplicates: DuplicatePair[] = [];
@@ -321,11 +335,30 @@ const DuplicateContactManagement: React.FC = () => {
       variant="warning"
       compact
     >
+      {/* آمار سریع */}
+      {stats.total > 0 && (
+        <div className="grid grid-cols-3 gap-2 mb-4 p-3 bg-gradient-to-r from-orange-50/60 to-red-50/60 dark:from-orange-900/30 dark:to-red-900/30 rounded-lg border border-orange-200/30 dark:border-orange-700/30">
+          <div className="text-center">
+            <div className="text-lg font-bold text-orange-600 dark:text-orange-400">{stats.total}</div>
+            <div className="text-xs text-orange-500 dark:text-orange-300">{t('common.total', 'کل')}</div>
+          </div>
+          <div className="text-center">
+            <div className="text-lg font-bold text-red-600 dark:text-red-400">{stats.highConfidence}</div>
+            <div className="text-xs text-red-500 dark:text-red-300">{t('ai_suggestions.high_confidence', 'بالا')}</div>
+          </div>
+          <div className="text-center">
+            <div className="text-lg font-bold text-yellow-600 dark:text-yellow-400">{stats.mediumConfidence}</div>
+            <div className="text-xs text-yellow-500 dark:text-yellow-300">{t('ai_suggestions.medium_confidence', 'متوسط')}</div>
+          </div>
+        </div>
+      )}
+
       <GlassButton
         onClick={fetchAllContactsForDuplicates}
         disabled={isScanning}
         variant="gradient-primary"
         className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg font-medium text-sm"
+        aria-label={t('ai_suggestions.scan_for_duplicates')}
       >
         {isScanning ? (
           <LoadingSpinner size={14} />
@@ -346,23 +379,29 @@ const DuplicateContactManagement: React.FC = () => {
       {duplicatePairs.length > 0 && (
         <div className="space-y-2 pt-3 border-t border-gray-200 dark:border-gray-700">
           <h4 className="text-sm font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
-            <Info size={16} className="text-blue-500" />
-            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <AlertTriangle size={16} className="text-orange-500" />
+            <span className="bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
               {t('ai_suggestions.pending_duplicate_suggestions')}
             </span>
             <span className="bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-200 px-2 py-1 rounded-full text-xs font-semibold">
               {duplicatePairs.length}
             </span>
           </h4>
-          <div className="grid gap-2">
+          <div className="grid gap-2 max-h-96 overflow-y-auto">
             {duplicatePairs.map((pair, index) => (
               <div
                 key={index}
-                className="bg-gradient-to-r from-white/20 via-gray-50/30 to-slate-50/30 dark:from-gray-800/20 dark:via-gray-700/30 dark:to-gray-600/30 p-2 rounded-lg border border-white/30 backdrop-blur-sm shadow-sm"
+                className={`bg-gradient-to-r from-white/20 via-gray-50/30 to-slate-50/30 dark:from-gray-800/20 dark:via-gray-700/30 dark:to-gray-600/30 p-2 rounded-lg border border-white/30 backdrop-blur-sm shadow-sm transition-all duration-300 ${
+                  hoveredPair === pair.mainContact.id ? 'scale-105 shadow-lg' : ''
+                }`}
+                onMouseEnter={() => setHoveredPair(pair.mainContact.id)}
+                onMouseLeave={() => setHoveredPair(null)}
+                role="region"
+                aria-labelledby={`duplicate-${index}`}
               >
                 <div className="flex items-center gap-2 text-xs text-gray-700 dark:text-gray-200 mb-2">
                   <Info size={12} className="text-blue-500" />
-                  {t('ai_suggestions.duplicate_reason')}: {pair.reason}
+                  <span id={`duplicate-${index}`}>{t('ai_suggestions.duplicate_reason')}: {pair.reason}</span>
                 </div>
                 <div className="grid grid-cols-1 gap-2">
                   <div className="p-2 border rounded-md bg-gray-50 dark:bg-gray-700">
@@ -393,7 +432,8 @@ const DuplicateContactManagement: React.FC = () => {
                     variant="ghost"
                     size="sm"
                     onClick={() => handleMergeContacts(pair.mainContact, pair.duplicateContact)}
-                    className="w-7 h-7 rounded-full bg-green-100/50 hover:bg-green-200/70 dark:bg-green-900/30 dark:hover:bg-green-800/50 text-green-600 hover:text-green-700"
+                    className="w-7 h-7 rounded-full bg-green-100/50 hover:bg-green-200/70 dark:bg-green-900/30 dark:hover:bg-green-800/50 text-green-600 hover:text-green-700 transition-all duration-200"
+                    aria-label={t('ai_suggestions.merge_contacts')}
                   >
                     <Merge size={14} />
                   </GlassButton>
@@ -401,7 +441,8 @@ const DuplicateContactManagement: React.FC = () => {
                     variant="ghost"
                     size="sm"
                     onClick={() => handleDiscardDuplicate(pair.duplicateContact.id)}
-                    className="w-7 h-7 rounded-full bg-red-100/50 hover:bg-red-200/70 dark:bg-red-900/30 dark:hover:bg-red-800/50 text-red-600 hover:text-red-700"
+                    className="w-7 h-7 rounded-full bg-red-100/50 hover:bg-red-200/70 dark:bg-red-900/30 dark:hover:bg-red-800/50 text-red-600 hover:text-red-700 transition-all duration-200"
+                    aria-label={t('common.discard')}
                   >
                     <XCircle size={14} />
                   </GlassButton>
@@ -413,6 +454,8 @@ const DuplicateContactManagement: React.FC = () => {
       )}
     </AIBaseCard>
   );
-};
+});
+
+DuplicateContactManagement.displayName = 'DuplicateContactManagement';
 
 export default DuplicateContactManagement;
