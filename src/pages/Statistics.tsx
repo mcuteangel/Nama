@@ -1,26 +1,321 @@
-import { ModernCard, ModernCardContent, ModernCardDescription, ModernCardHeader, ModernCardTitle } from "@/components/ui/modern-card";
-import ContactStatisticsDashboard from "@/components/ContactStatisticsDashboard";
+import React, { Suspense } from "react";
 import { useTranslation } from "react-i18next";
+import { BarChart3, TrendingUp, RefreshCw, Download, Sparkles } from "lucide-react";
 
-const Statistics = () => {
+import { ModernCard, ModernCardContent, ModernCardDescription, ModernCardHeader, ModernCardTitle } from "@/components/ui/modern-card";
+import { ModernTabs, ModernTabsList, ModernTabsTrigger, ModernTabsContent } from "@/components/ui/modern-tabs";
+import { ModernGrid, GridItem } from "@/components/ui/modern-grid";
+import { GlassButton } from "@/components/ui/glass-button";
+import { ModernLoader } from "@/components/ui/modern-loader";
+import { ModernProgress } from "@/components/ui/modern-progress";
+import { ModernBadge } from "@/components/ui/modern-badge";
+import { EmptyState } from "@/components/common/EmptyState";
+
+import { StatisticsProvider } from "@/components/statistics/StatisticsContext";
+import { useStatistics } from "@/components/statistics/useStatistics";
+import StatisticsCompactStats from "@/components/statistics/StatisticsCompactStats";
+import TotalContactsCard from "@/components/statistics/TotalContactsCard";
+import ContactsByGenderChart from "@/components/statistics/ContactsByGenderChart";
+import ContactsByGroupChart from "@/components/statistics/ContactsByGroupChart";
+import ContactsByPreferredMethodChart from "@/components/statistics/ContactsByPreferredMethodChart";
+import UpcomingBirthdaysList from "@/components/statistics/UpcomingBirthdaysList";
+import ContactsByCreationTimeChart from "@/components/statistics/ContactsByCreationTimeChart";
+import TopCompaniesList from "@/components/statistics/TopCompaniesList";
+import TopPositionsList from "@/components/statistics/TopPositionsList";
+
+/**
+ * Enhanced Statistics Dashboard Content Component
+ * Features modern design with improved UX and visual hierarchy
+ */
+const StatisticsContent: React.FC = () => {
+  const { state, refreshData } = useStatistics();
   const { t } = useTranslation();
 
+  // Loading state with modern loader
+  if (state.loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50/80 via-purple-50/80 to-pink-50/80 dark:from-gray-900/90 dark:via-purple-900/30 dark:to-pink-900/30 p-6">
+        <div className="max-w-7xl mx-auto space-y-8">
+          {/* Header with loading animation */}
+          <div className="text-center py-12 relative">
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 via-purple-600/10 to-pink-600/10 rounded-3xl blur-3xl"></div>
+            <div className="relative">
+              <div className="flex justify-center mb-6">
+                <div className="relative">
+                  <BarChart3 size={72} className="text-blue-600 animate-pulse" />
+                  <Sparkles size={28} className="absolute -top-3 -right-3 text-yellow-500 animate-bounce" />
+                </div>
+              </div>
+              <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-4">
+                {t('statistics.title')}
+              </h1>
+              <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto mb-8">
+                {t('statistics.description')}
+              </p>
+              <ModernProgress value={75} variant="gradient" animated={true} className="max-w-md mx-auto" />
+              <p className="text-sm text-muted-foreground mt-4 flex items-center justify-center gap-2">
+                <ModernLoader variant="dots" size="sm" color="primary" />
+                {t('common.loading')}
+              </p>
+            </div>
+          </div>
+
+          {/* Loading skeleton grid */}
+          <ModernGrid variant="dynamic" gap="lg" className="opacity-50">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <GridItem key={i}>
+                <ModernCard variant="glass" className="h-64 animate-pulse">
+                  <div className="h-full bg-gradient-to-br from-muted/50 to-muted/20 rounded-xl" />
+                </ModernCard>
+              </GridItem>
+            ))}
+          </ModernGrid>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (state.error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-red-50/80 via-pink-50/80 to-orange-50/80 dark:from-gray-900/90 dark:via-red-900/30 dark:to-pink-900/30 p-6">
+        <div className="max-w-4xl mx-auto">
+          <EmptyState
+            icon={BarChart3}
+            title={t('error.something_went_wrong')}
+            description={state.error}
+            className="min-h-[60vh] bg-gradient-to-br from-red-50/50 to-red-100/30 dark:from-red-950/20 dark:to-red-900/10 border-red-200/50 dark:border-red-800/50"
+          >
+            <GlassButton
+              variant="glass"
+              effect="lift"
+              onClick={refreshData}
+              className="mt-6 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white"
+            >
+              <RefreshCw size={16} className="mr-2" />
+              {t('common.retry')}
+            </GlassButton>
+          </EmptyState>
+        </div>
+      </div>
+    );
+  }
+
+  // Main content
   return (
-    <div className="flex flex-col items-center justify-center p-4 h-full w-full">
-      <ModernCard variant="glass" className="w-full max-w-4xl rounded-xl p-6">
-        <ModernCardHeader className="text-center">
-          <ModernCardTitle className="text-4xl font-bold text-gray-800 dark:text-gray-100 mb-2">
-            {t('statistics.title')}
-          </ModernCardTitle>
-          <ModernCardDescription className="text-lg text-gray-600 dark:text-gray-300">
-            {t('statistics.description')}
-          </ModernCardDescription>
-        </ModernCardHeader>
-        <ModernCardContent className="space-y-6">
-          <ContactStatisticsDashboard />
-        </ModernCardContent>
-      </ModernCard>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50/80 via-purple-50/80 to-pink-50/80 dark:from-gray-900/90 dark:via-purple-900/30 dark:to-pink-900/30 p-6">
+      <div className="max-w-7xl mx-auto space-y-8">
+        
+        {/* Enhanced Header */}
+        <div className="text-center py-12 relative">
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 via-purple-600/10 to-pink-600/10 rounded-3xl blur-3xl"></div>
+          <div className="relative">
+            <div className="flex justify-center mb-6">
+              <div className="relative">
+                <BarChart3 size={72} className="text-blue-600" />
+                <Sparkles size={28} className="absolute -top-3 -right-3 text-yellow-500 animate-pulse" />
+              </div>
+            </div>
+            <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-4">
+              {t('statistics.title')}
+            </h1>
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto mb-8">
+              {t('statistics.description')}
+            </p>
+            
+            {/* Action buttons */}
+            <div className="flex items-center justify-center gap-4">
+              <GlassButton
+                variant="glass"
+                effect="lift"
+                onClick={refreshData}
+                className="bg-white/20 hover:bg-white/30 backdrop-blur-md border border-white/30"
+              >
+                <RefreshCw size={16} className="mr-2" />
+                {t('common.refresh')}
+              </GlassButton>
+              
+              <ModernBadge 
+                variant="gradient" 
+                gradientType="success" 
+                effect="glow"
+                className="px-4 py-2"
+              >
+                <TrendingUp size={14} className="mr-1" />
+                {t('statistics.live_data')}
+              </ModernBadge>
+            </div>
+          </div>
+        </div>
+
+        {/* Compact Stats Overview */}
+        <div className="px-4">
+          <StatisticsCompactStats data={state.data} />
+        </div>
+
+        {/* Main Statistics Content */}
+        <ModernCard variant="glass" hover="lift" className="backdrop-blur-xl border border-white/30">
+          <ModernCardContent className="p-8">
+            <ModernTabs defaultValue="overview" className="w-full">
+              <ModernTabsList 
+                className="grid w-full grid-cols-4 mb-8 bg-white/10 dark:bg-gray-800/10 backdrop-blur-xl rounded-2xl p-2 border border-white/20"
+                glassEffect="medium"
+                hoverEffect="lift"
+              >
+                <ModernTabsTrigger
+                  value="overview"
+                  className="flex items-center gap-2 rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-600 data-[state=active]:text-white transition-all duration-300"
+                  hoverEffect="scale"
+                >
+                  <TrendingUp size={16} />
+                  <span className="hidden sm:inline">{t('statistics.overview')}</span>
+                </ModernTabsTrigger>
+                <ModernTabsTrigger
+                  value="distribution"
+                  className="flex items-center gap-2 rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-green-500 data-[state=active]:to-blue-600 data-[state=active]:text-white transition-all duration-300"
+                  hoverEffect="scale"
+                >
+                  <BarChart3 size={16} />
+                  <span className="hidden sm:inline">{t('statistics.distribution')}</span>
+                </ModernTabsTrigger>
+                <ModernTabsTrigger
+                  value="timeline"
+                  className="flex items-center gap-2 rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300"
+                  hoverEffect="scale"
+                >
+                  <BarChart3 size={16} />
+                  <span className="hidden sm:inline">{t('statistics.timeline')}</span>
+                </ModernTabsTrigger>
+                <ModernTabsTrigger
+                  value="reports"
+                  className="flex items-center gap-2 rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-red-600 data-[state=active]:text-white transition-all duration-300"
+                  hoverEffect="scale"
+                >
+                  <Download size={16} />
+                  <span className="hidden sm:inline">{t('statistics.reports')}</span>
+                </ModernTabsTrigger>
+              </ModernTabsList>
+
+              {/* Overview Tab */}
+              <ModernTabsContent value="overview" className="space-y-8">
+                <ModernGrid variant="dynamic" gap="lg" minWidth="320px">
+                  <GridItem>
+                    <div className="animate-in fade-in slide-in-from-left-4" style={{ animationDelay: '100ms' }}>
+                      <Suspense fallback={<ModernLoader variant="spinner" size="lg" />}>
+                        <TotalContactsCard count={state.data.totalContacts} />
+                      </Suspense>
+                    </div>
+                  </GridItem>
+                  <GridItem>
+                    <div className="animate-in fade-in slide-in-from-right-4" style={{ animationDelay: '200ms' }}>
+                      <Suspense fallback={<ModernLoader variant="spinner" size="lg" />}>
+                        <ContactsByCreationTimeChart data={state.data.creationTimeData} />
+                      </Suspense>
+                    </div>
+                  </GridItem>
+                  <GridItem>
+                    <div className="animate-in fade-in slide-in-from-bottom-4" style={{ animationDelay: '300ms' }}>
+                      <Suspense fallback={<ModernLoader variant="spinner" size="lg" />}>
+                        <UpcomingBirthdaysList data={state.data.upcomingBirthdays} />
+                      </Suspense>
+                    </div>
+                  </GridItem>
+                </ModernGrid>
+              </ModernTabsContent>
+
+              {/* Distribution Tab */}
+              <ModernTabsContent value="distribution" className="space-y-8">
+                <ModernGrid variant="dynamic" gap="lg" minWidth="320px">
+                  <GridItem>
+                    <div className="animate-in fade-in slide-in-from-left-4" style={{ animationDelay: '100ms' }}>
+                      <Suspense fallback={<ModernLoader variant="spinner" size="lg" />}>
+                        <ContactsByGenderChart data={state.data.genderData} />
+                      </Suspense>
+                    </div>
+                  </GridItem>
+                  <GridItem>
+                    <div className="animate-in fade-in slide-in-from-right-4" style={{ animationDelay: '200ms' }}>
+                      <Suspense fallback={<ModernLoader variant="spinner" size="lg" />}>
+                        <ContactsByGroupChart data={state.data.groupData} />
+                      </Suspense>
+                    </div>
+                  </GridItem>
+                  <GridItem>
+                    <div className="animate-in fade-in slide-in-from-bottom-4" style={{ animationDelay: '300ms' }}>
+                      <Suspense fallback={<ModernLoader variant="spinner" size="lg" />}>
+                        <ContactsByPreferredMethodChart data={state.data.preferredMethodData} />
+                      </Suspense>
+                    </div>
+                  </GridItem>
+                </ModernGrid>
+              </ModernTabsContent>
+
+              {/* Timeline Tab */}
+              <ModernTabsContent value="timeline" className="space-y-8">
+                <ModernGrid variant="dynamic" gap="lg" minWidth="400px">
+                  <GridItem colSpan={2}>
+                    <div className="animate-in fade-in slide-in-from-left-4" style={{ animationDelay: '100ms' }}>
+                      <Suspense fallback={<ModernLoader variant="spinner" size="lg" />}>
+                        <ContactsByCreationTimeChart data={state.data.creationTimeData} />
+                      </Suspense>
+                    </div>
+                  </GridItem>
+                  <GridItem>
+                    <div className="animate-in fade-in slide-in-from-right-4" style={{ animationDelay: '200ms' }}>
+                      <Suspense fallback={<ModernLoader variant="spinner" size="lg" />}>
+                        <UpcomingBirthdaysList data={state.data.upcomingBirthdays} />
+                      </Suspense>
+                    </div>
+                  </GridItem>
+                </ModernGrid>
+              </ModernTabsContent>
+
+              {/* Reports Tab */}
+              <ModernTabsContent value="reports" className="space-y-8">
+                <ModernGrid variant="dynamic" gap="lg" minWidth="320px">
+                  <GridItem>
+                    <div className="animate-in fade-in slide-in-from-left-4" style={{ animationDelay: '100ms' }}>
+                      <Suspense fallback={<ModernLoader variant="spinner" size="lg" />}>
+                        <TopCompaniesList data={state.data.topCompaniesData} />
+                      </Suspense>
+                    </div>
+                  </GridItem>
+                  <GridItem>
+                    <div className="animate-in fade-in slide-in-from-right-4" style={{ animationDelay: '200ms' }}>
+                      <Suspense fallback={<ModernLoader variant="spinner" size="lg" />}>
+                        <TopPositionsList data={state.data.topPositionsData} />
+                      </Suspense>
+                    </div>
+                  </GridItem>
+                </ModernGrid>
+              </ModernTabsContent>
+            </ModernTabs>
+          </ModernCardContent>
+        </ModernCard>
+
+        {/* Footer with AI branding */}
+        <div className="text-center py-8">
+          <div className="inline-flex items-center gap-2 bg-white/20 dark:bg-gray-800/20 backdrop-blur-xl px-6 py-3 rounded-full shadow-lg border border-white/20">
+            <Sparkles size={16} className="text-yellow-500" />
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              {t('statistics.powered_by_ai', 'قدرت گرفته از هوش مصنوعی پیشرفته')}
+            </span>
+          </div>
+        </div>
+      </div>
     </div>
+  );
+};
+
+/**
+ * Main Statistics Page Component
+ * Wraps content with StatisticsProvider for data management
+ */
+const Statistics: React.FC = () => {
+  return (
+    <StatisticsProvider>
+      <StatisticsContent />
+    </StatisticsProvider>
   );
 };
 
