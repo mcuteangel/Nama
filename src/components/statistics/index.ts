@@ -1,5 +1,6 @@
 // Export all statistics components and types
-export { useStatistics, StatisticsProvider } from './StatisticsContext';
+export { useStatistics } from './useStatistics';
+export { StatisticsProvider } from './StatisticsContext';
 
 // Types
 export type {

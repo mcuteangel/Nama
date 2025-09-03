@@ -7,6 +7,7 @@ interface ContactsByPreferredMethodChartProps {
   data: PreferredMethodData[];
 }
 
+// Chart component for displaying contacts by preferred method
 const ContactsByPreferredMethodChart: React.FC<ContactsByPreferredMethodChartProps> = ({ data }) => {
   return (
     <BasePieChart

@@ -5,8 +5,16 @@ import { ModernCard, ModernCardHeader, ModernCardTitle, ModernCardContent } from
 import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
 import { LucideIcon } from 'lucide-react';
 
+interface BaseBarChartDataItem {
+  [key: string]: string | number | undefined;
+  name: string;
+  count: number;
+  value?: number;
+  color?: string;
+}
+
 interface BaseBarChartProps {
-  data: any[];
+  data: BaseBarChartDataItem[];
   title: string;
   icon: LucideIcon;
   iconColor: string;
@@ -34,10 +42,10 @@ const BaseBarChart: React.FC<BaseBarChartProps> = ({
 }) => {
   const { t } = useTranslation();
 
-  const formattedData = useMemo(() => data.map((item: any) => ({
-    name: translationPrefix ? t(`${translationPrefix}.${item[nameKey]}`) : item[nameKey],
+  const formattedData = useMemo(() => data.map((item: BaseBarChartDataItem) => ({
+    name: translationPrefix ? t(`${translationPrefix}.${item[nameKey]}`) : item[nameKey] as string,
     count: item[valueKey] || item.value,
-    color: item[colorKey] || COLORS[0]
+    color: (item[colorKey] || COLORS[0]) as string
   })), [data, t, translationPrefix, nameKey, valueKey, colorKey]);
 
   const CustomTooltip: React.FC<TooltipProps<ValueType, NameType>> = ({ active, payload }) => {
@@ -85,7 +93,7 @@ const BaseBarChart: React.FC<BaseBarChartProps> = ({
                 }}
               >
                 <defs>
-                  {formattedData.map((entry: any, index: number) => (
+                  {formattedData.map((entry, index: number) => (
                     <linearGradient key={`bar-gradient-${index}`} id={`bar-gradient-${index}`} x1="0%" y1="0%" x2="0%" y2="100%">
                       <stop offset="0%" stopColor={entry.color} stopOpacity={0.8} />
                       <stop offset="100%" stopColor={entry.color} stopOpacity={0.4} />
@@ -126,7 +134,7 @@ const BaseBarChart: React.FC<BaseBarChartProps> = ({
                   animationBegin={0}
                   animationDuration={1000}
                 >
-                  {formattedData.map((entry: any, index: number) => (
+                  {formattedData.map((entry, index: number) => (
                     <Cell
                       key={`cell-${index}`}
                       fill={`url(#bar-gradient-${index})`}

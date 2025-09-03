@@ -10,7 +10,7 @@ interface ContactsByCreationTimeChartProps {
 }
 
 const ContactsByCreationTimeChart: React.FC<ContactsByCreationTimeChartProps> = ({ data }) => {
-  const { t, i18n } = useTranslation();
+  const { i18n } = useTranslation();
 
   // Determine calendar type based on current language
   const isJalali = i18n.language === 'fa';

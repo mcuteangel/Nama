@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Users, CheckCircle, XCircle, Sparkles, TrendingUp, Target } from "lucide-react";
+import { Users, CheckCircle, XCircle, Sparkles, Target } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useSession } from "@/integrations/supabase/auth";
 import { useErrorHandler } from "@/hooks/use-error-handler";

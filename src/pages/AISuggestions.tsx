@@ -2,7 +2,7 @@ import React, { useState, useCallback, useEffect, useMemo, useRef } from "react"
 import { ModernTextarea } from "@/components/ui/modern-textarea";
 import { GlassButton } from "@/components/ui/glass-button";
 import { ModernTabs, ModernTabsList, ModernTabsTrigger, ModernTabsContent } from "@/components/ui/modern-tabs";
-import { Sparkles, UserCheck, Mic, StopCircle, Search, Brain, Zap, Settings, Users, Shield, FileText, Wrench, Copy, Heart, CheckSquare, Square, CheckCircle, XCircle, FolderOpen } from "lucide-react";
+import { Sparkles, Mic, StopCircle, Search, Brain, Settings, Users, Wrench, Copy, Heart, CheckSquare, Square, CheckCircle, XCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useContactExtractor } from "@/hooks/use-contact-extractor";
 import { ErrorManager } from "@/lib/error-manager";
@@ -22,7 +22,6 @@ import DuplicateContactManagement from "@/components/DuplicateContactManagement"
 import GenderSuggestionManagement from "@/components/ai/GenderSuggestionManagement";
 import GeminiSettings from "@/components/ai/GeminiSettings";
 import { useSpeechToText } from "@/hooks/use-speech-to-text";
-import EmptyState from '@/components/common/EmptyState';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import DashboardLayout from '@/components/ai/DashboardLayout';
 import CompactStats from '@/components/ai/CompactStats';
@@ -308,13 +307,6 @@ const AISuggestions: React.FC = () => {
   }, [navigate]);
 
   // Batch operations functions
-  const handleSelectAll = useCallback(() => {
-    if (selectedSuggestions.size === filteredSuggestions.length) {
-      setSelectedSuggestions(new Set());
-    } else {
-      setSelectedSuggestions(new Set(filteredSuggestions.map(s => s.id)));
-    }
-  }, [selectedSuggestions.size, filteredSuggestions]);
 
   const handleSelectSuggestion = useCallback((suggestionId: string) => {
     setSelectedSuggestions(prev => {

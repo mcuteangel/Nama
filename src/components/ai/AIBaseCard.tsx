@@ -1,6 +1,5 @@
 import React from 'react';
 import { ModernCard, ModernCardHeader, ModernCardTitle, ModernCardDescription, ModernCardContent } from "@/components/ui/modern-card";
-import { GlassButton } from "@/components/ui/glass-button";
 import { useTranslation } from "react-i18next";
 
 interface AIBaseCardProps {

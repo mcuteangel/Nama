@@ -1,12 +1,18 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, TooltipProps } from 'recharts';
 import { useTranslation } from "react-i18next";
 import { ModernCard, ModernCardHeader, ModernCardTitle, ModernCardContent } from "@/components/ui/modern-card";
 import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
-import { LucideIcon } from 'lucide-react';
+import { LucideIcon, HelpCircle, Download } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { Tooltip as UITooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+
+interface ChartDataItem {
+  [key: string]: string | number;
+}
 
 interface BasePieChartProps {
-  data: any[];
+  data: ChartDataItem[];
   title: string;
   icon: LucideIcon;
   iconColor: string;
@@ -31,8 +37,26 @@ const BasePieChart: React.FC<BasePieChartProps> = ({
   valueKey = 'count'
 }) => {
   const { t } = useTranslation();
+  const [showTooltip, setShowTooltip] = useState(false);
 
-  const formattedData = useMemo(() => data.map((item: any) => ({
+  const exportToCSV = () => {
+    const csvContent = [
+      [t('common.category'), t('common.count'), t('common.percentage')],
+      ...data.map(item => [
+        translationPrefix ? t(`${translationPrefix}.${item[nameKey]}`) : item[nameKey],
+        item[valueKey],
+        `${((item[valueKey] as number / data.reduce((sum, d) => sum + (d[valueKey] as number), 0)) * 100).toFixed(1)}%`
+      ])
+    ].map(row => row.join(',')).join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `${title.replace(/\s+/g, '_')}.csv`;
+    link.click();
+  };
+
+  const formattedData = useMemo(() => data.map((item: ChartDataItem) => ({
     name: translationPrefix ? t(`${translationPrefix}.${item[nameKey]}`) : item[nameKey],
     value: item[valueKey] || item.value,
   })), [data, t, translationPrefix, nameKey, valueKey]);
@@ -57,15 +81,47 @@ const BasePieChart: React.FC<BasePieChartProps> = ({
       aria-labelledby={`chart-title-${title.replace(/\s+/g, '-').toLowerCase()}`}
     >
       <ModernCardHeader className="pb-4">
-        <ModernCardTitle
-          id={`chart-title-${title.replace(/\s+/g, '-').toLowerCase()}`}
-          className="text-xl font-bold flex items-center gap-3 bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent"
-        >
-          <div className={`p-2 rounded-xl bg-gradient-to-br ${iconColor.replace('text-', 'from-').replace('-500', '-400')} ${iconColor.replace('text-', 'to-').replace('-500', '-600')} shadow-lg`}>
-            <Icon size={24} className="text-white" aria-hidden="true" />
+        <div className="flex items-center justify-between">
+          <ModernCardTitle
+            id={`chart-title-${title.replace(/\s+/g, '-').toLowerCase()}`}
+            className="text-xl font-bold flex items-center gap-3 bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent"
+          >
+            <div className={`p-2 rounded-xl bg-gradient-to-br ${iconColor.replace('text-', 'from-').replace('-500', '-400')} ${iconColor.replace('text-', 'to-').replace('-500', '-600')} shadow-lg`}>
+              <Icon size={24} className="text-white" aria-hidden="true" />
+            </div>
+            {t(title)}
+          </ModernCardTitle>
+          <div className="flex items-center gap-2">
+            <TooltipProvider>
+              <UITooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 w-8 p-0 hover:bg-muted/50"
+                    onClick={() => setShowTooltip(!showTooltip)}
+                  >
+                    <HelpCircle size={16} className="text-muted-foreground" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="top" className="max-w-xs">
+                  <p className="text-sm">{t('statistics.chart_help', 'این نمودار توزیع داده‌ها را به صورت دایره‌ای نمایش می‌دهد. هر بخش نشان‌دهنده نسبت یک دسته است.')}</p>
+                </TooltipContent>
+              </UITooltip>
+            </TooltipProvider>
+            {data.length > 0 && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 w-8 p-0 hover:bg-muted/50"
+                onClick={exportToCSV}
+                title={t('common.export_csv', 'خروجی CSV')}
+              >
+                <Download size={16} className="text-muted-foreground" />
+              </Button>
+            )}
           </div>
-          {t(title)}
-        </ModernCardTitle>
+        </div>
       </ModernCardHeader>
       <ModernCardContent className="h-72 flex items-center justify-center relative">
         {formattedData.length > 0 ? (
@@ -74,7 +130,7 @@ const BasePieChart: React.FC<BasePieChartProps> = ({
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <defs>
-                  {formattedData.map((entry: any, index: number) => (
+                  {formattedData.map((_entry, index: number) => (
                     <linearGradient key={`gradient-${index}`} id={`gradient-${index}`} x1="0%" y1="0%" x2="100%" y2="100%">
                       <stop offset="0%" stopColor={COLORS[index % COLORS.length]} stopOpacity={0.8} />
                       <stop offset="100%" stopColor={COLORS[index % COLORS.length]} stopOpacity={0.4} />
@@ -95,7 +151,7 @@ const BasePieChart: React.FC<BasePieChartProps> = ({
                   animationBegin={0}
                   animationDuration={800}
                 >
-                  {formattedData.map((entry: any, index: number) => (
+                  {formattedData.map((entry, index: number) => (
                     <Cell
                       key={`cell-${index}`}
                       fill={`url(#gradient-${index})`}

@@ -1,12 +1,18 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, TooltipProps } from 'recharts';
 import { useTranslation } from "react-i18next";
 import { ModernCard, ModernCardHeader, ModernCardTitle, ModernCardContent } from "@/components/ui/modern-card";
 import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
 import { LucideIcon } from 'lucide-react';
 
+interface ChartDataPoint {
+  name: string | number;
+  count: number;
+  [key: string]: string | number | boolean | null | undefined;
+}
+
 interface BaseLineChartProps {
-  data: any[];
+  data: ChartDataPoint[];
   title: string;
   icon: LucideIcon;
   iconColor: string;

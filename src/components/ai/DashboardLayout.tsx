@@ -1,7 +1,6 @@
 import React from 'react';
 import { Brain, Sparkles } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { ModernCard, ModernCardContent } from "@/components/ui/modern-card";
 
 interface DashboardLayoutProps {
   title: string;
@@ -10,6 +9,7 @@ interface DashboardLayoutProps {
   headerStats?: React.ReactNode;
   children: React.ReactNode;
   className?: string;
+  showFooter?: boolean;
 }
 
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({
@@ -18,9 +18,10 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   icon,
   headerStats,
   children,
-  className = ''
+  className = '',
+  showFooter = true
 }) => {
-  const { t } = useTranslation();
+  useTranslation();
 
   return (
     <div className={`min-h-screen bg-gradient-to-br from-blue-50/80 via-purple-50/80 to-pink-50/80 dark:from-gray-900/90 dark:via-purple-900/30 dark:to-pink-900/30 p-4 backdrop-blur-sm ${className}`}>
@@ -59,15 +60,17 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
           {children}
         </div>
 
-        {/* Footer */}
-        <div className="text-center py-6">
-          <div className="inline-flex items-center gap-2 bg-white/20 dark:bg-gray-800/20 backdrop-blur-xl px-4 py-2 rounded-full shadow-lg border border-white/20">
-            <Brain size={16} className="text-blue-500" />
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-              قدرت گرفته از هوش مصنوعی پیشرفته
-            </span>
+        {/* Footer - Only show if showFooter is true */}
+        {showFooter && (
+          <div className="text-center py-6">
+            <div className="inline-flex items-center gap-2 bg-white/20 dark:bg-gray-800/20 backdrop-blur-xl px-4 py-2 rounded-full shadow-lg border border-white/20">
+              <Brain size={16} className="text-blue-500" />
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                قدرت گرفته از هوش مصنوعی پیشرفته
+              </span>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

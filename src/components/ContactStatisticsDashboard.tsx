@@ -1,12 +1,16 @@
 import React, { useMemo, Suspense, lazy } from "react";
 import { useTranslation } from "react-i18next";
-import { RefreshCw } from "lucide-react";
+import { RefreshCw, BarChart3, PieChart, TrendingUp, Calendar, Award } from "lucide-react";
 
 import { ModernCard, ModernCardContent, ModernCardHeader, ModernCardTitle } from "@/components/ui/modern-card";
 import { Button } from "@/components/ui/button";
+import { ModernTabs, ModernTabsList, ModernTabsTrigger, ModernTabsContent } from "@/components/ui/modern-tabs";
 
-import { useStatistics, StatisticsProvider } from "@/components/statistics/StatisticsContext";
+import { StatisticsProvider } from "@/components/statistics/StatisticsContext";
+import { useStatistics } from "@/components/statistics/useStatistics";
 import { Skeleton } from "@/components/ui/skeleton";
+import DashboardLayout from '@/components/ai/DashboardLayout';
+import StatisticsCompactStats from "@/components/statistics/StatisticsCompactStats";
 
 // Lazy load components for better performance
 const TotalContactsCard = lazy(() => import("@/components/statistics/TotalContactsCard"));
@@ -18,25 +22,27 @@ const ContactsByCreationTimeChart = lazy(() => import("@/components/statistics/C
 const TopCompaniesList = lazy(() => import("@/components/statistics/TopCompaniesList"));
 const TopPositionsList = lazy(() => import("@/components/statistics/TopPositionsList"));
 
+
 /**
  * ContactStatisticsDashboard component for displaying contact analytics
- * 
+ *
  * This component provides comprehensive statistics about contacts including:
  * - Total contacts count
  * - Gender distribution
- * - Group distribution  
+ * - Group distribution
  * - Preferred contact method distribution
  * - Upcoming birthdays
  * - Contact creation timeline
  * - Top companies and positions
- * 
+ *
  * Features:
  * - Performance optimized with React.memo and useMemo
  * - Cached data fetching to reduce API calls
  * - Error handling and retry functionality
  * - Responsive skeleton loading states
  * - Internationalization support
- * 
+ * - Modern UI with glass effects and animations
+ *
  * @returns JSX element representing the statistics dashboard
  */
 const ContactStatisticsDashboardContent: React.FC = () => {
@@ -147,46 +153,129 @@ const ContactStatisticsDashboardContent: React.FC = () => {
 
   if (state.loading) {
     return (
-      <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold">{t('statistics.title')}</h1>
-          <Button variant="outline" size="sm" disabled>
-            <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-            {t('common.loading')}
-          </Button>
-        </div>
+      <DashboardLayout
+        title={t('statistics.title', 'آمار و تحلیل‌ها')}
+        description={t('statistics.description', 'نمای کلی از مخاطبین و فعالیت‌های شما')}
+        icon={<BarChart3 size={64} className="text-blue-600" />}
+        showFooter={false}
+      >
+        <StatisticsCompactStats data={{
+          totalContacts: 0,
+          genderData: [],
+          groupData: [],
+          preferredMethodData: [],
+          upcomingBirthdays: [],
+          creationTimeData: [],
+          topCompaniesData: [],
+          topPositionsData: []
+        }} />
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {renderSkeleton}
         </div>
-      </div>
+      </DashboardLayout>
     );
   }
 
   return (
-    <div className="space-y-8">
-      <div className="flex justify-between items-center">
-        <div className="space-y-2">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-foreground via-foreground/90 to-foreground/80 bg-clip-text text-transparent">
-            {t('statistics.title')}
-          </h1>
-          <p className="text-muted-foreground text-lg">{t('statistics.description')}</p>
-        </div>
-        <Button
-          variant="outline"
-          size="lg"
-          onClick={refreshData}
-          disabled={state.loading}
-          className="transition-all duration-300 hover:shadow-lg hover:shadow-primary/20 hover:scale-105 bg-gradient-to-r from-background to-background/80 border-border/50"
-        >
-          <RefreshCw className={`mr-2 h-5 w-5 ${state.loading ? 'animate-spin' : ''}`} />
-          {t('common.refresh')}
-        </Button>
-      </div>
-      
-      {state.error ? (
+    <DashboardLayout
+      title={t('statistics.title', 'آمار و تحلیل‌ها')}
+      description={t('statistics.description', 'نمای کلی از مخاطبین و فعالیت‌های شما')}
+      icon={<BarChart3 size={64} className="text-blue-600" />}
+      headerStats={<StatisticsCompactStats data={state.data} />}
+      showFooter={false}
+    >
+      <ModernTabs defaultValue="overview" className="w-full">
+        <ModernTabsList className="grid w-full grid-cols-4 mb-8 bg-white/10 dark:bg-gray-800/10 backdrop-blur-xl rounded-2xl p-2 border border-white/20">
+          <ModernTabsTrigger
+            value="overview"
+            className="flex items-center gap-2 rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-600 data-[state=active]:text-white transition-all duration-300"
+          >
+            <TrendingUp size={16} />
+            <span className="hidden sm:inline">{t('statistics.overview', 'نمای کلی')}</span>
+          </ModernTabsTrigger>
+          <ModernTabsTrigger
+            value="distribution"
+            className="flex items-center gap-2 rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-green-500 data-[state=active]:to-blue-600 data-[state=active]:text-white transition-all duration-300"
+          >
+            <PieChart size={16} />
+            <span className="hidden sm:inline">{t('statistics.distribution', 'توزیع')}</span>
+          </ModernTabsTrigger>
+          <ModernTabsTrigger
+            value="timeline"
+            className="flex items-center gap-2 rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300"
+          >
+            <Calendar size={16} />
+            <span className="hidden sm:inline">{t('statistics.timeline', 'زمان‌بندی')}</span>
+          </ModernTabsTrigger>
+          <ModernTabsTrigger
+            value="top"
+            className="flex items-center gap-2 rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-red-600 data-[state=active]:text-white transition-all duration-300"
+          >
+            <Award size={16} />
+            <span className="hidden sm:inline">{t('statistics.top', 'برترین‌ها')}</span>
+          </ModernTabsTrigger>
+        </ModernTabsList>
+
+        {/* Overview Tab */}
+        <ModernTabsContent value="overview" className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="animate-in fade-in slide-in-from-left-4" style={{ animationDelay: '100ms' }}>
+              {dashboardComponents[0]}
+            </div>
+            <div className="animate-in fade-in slide-in-from-right-4" style={{ animationDelay: '200ms' }}>
+              {dashboardComponents[5]}
+            </div>
+            <div className="animate-in fade-in slide-in-from-bottom-4" style={{ animationDelay: '300ms' }}>
+              {dashboardComponents[4]}
+            </div>
+          </div>
+        </ModernTabsContent>
+
+        {/* Distribution Tab */}
+        <ModernTabsContent value="distribution" className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="animate-in fade-in slide-in-from-left-4" style={{ animationDelay: '100ms' }}>
+              {dashboardComponents[1]}
+            </div>
+            <div className="animate-in fade-in slide-in-from-right-4" style={{ animationDelay: '200ms' }}>
+              {dashboardComponents[2]}
+            </div>
+            <div className="animate-in fade-in slide-in-from-bottom-4" style={{ animationDelay: '300ms' }}>
+              {dashboardComponents[3]}
+            </div>
+          </div>
+        </ModernTabsContent>
+
+        {/* Timeline Tab */}
+        <ModernTabsContent value="timeline" className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="animate-in fade-in slide-in-from-left-4" style={{ animationDelay: '100ms' }}>
+              {dashboardComponents[5]}
+            </div>
+            <div className="animate-in fade-in slide-in-from-right-4" style={{ animationDelay: '200ms' }}>
+              {dashboardComponents[4]}
+            </div>
+          </div>
+        </ModernTabsContent>
+
+        {/* Top Tab */}
+        <ModernTabsContent value="top" className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="animate-in fade-in slide-in-from-left-4" style={{ animationDelay: '100ms' }}>
+              {dashboardComponents[6]}
+            </div>
+            <div className="animate-in fade-in slide-in-from-right-4" style={{ animationDelay: '200ms' }}>
+              {dashboardComponents[7]}
+            </div>
+          </div>
+        </ModernTabsContent>
+      </ModernTabs>
+
+      {/* Error State */}
+      {state.error && (
         <ModernCard
           variant="glass"
-          className="rounded-2xl p-8 bg-gradient-to-br from-red-50/50 to-red-100/30 dark:from-red-950/20 dark:to-red-900/10 border border-red-200/50 dark:border-red-800/50"
+          className="rounded-2xl p-8 bg-gradient-to-br from-red-50/50 to-red-100/30 dark:from-red-950/20 dark:to-red-900/10 border border-red-200/50 dark:border-red-800/50 animate-in fade-in slide-in-from-bottom-4"
         >
           <ModernCardHeader>
             <ModernCardTitle className="text-red-600 dark:text-red-400 text-xl">
@@ -199,16 +288,13 @@ const ContactStatisticsDashboardContent: React.FC = () => {
               onClick={refreshData}
               className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white shadow-lg hover:shadow-xl transition-all duration-300"
             >
+              <RefreshCw className={`mr-2 h-5 w-5`} />
               {t('common.retry')}
             </Button>
           </ModernCardContent>
         </ModernCard>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-          {dashboardComponents}
-        </div>
       )}
-    </div>
+    </DashboardLayout>
   );
 };
 

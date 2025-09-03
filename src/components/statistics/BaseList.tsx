@@ -3,27 +3,33 @@ import { useTranslation } from "react-i18next";
 import { ModernCard, ModernCardHeader, ModernCardTitle, ModernCardContent } from "@/components/ui/modern-card";
 import { LucideIcon } from 'lucide-react';
 
-interface BaseListProps {
-  data: any[];
+// Define a base interface for the items
+interface BaseItem {
+  id?: string | number;
+  [key: string]: string | number | boolean | undefined;
+}
+
+interface BaseListProps<T extends BaseItem = BaseItem> {
+  data: T[];
   title: string;
   icon: LucideIcon;
   iconColor: string;
   emptyMessageKey: string;
-  nameKey?: string;
-  countKey?: string;
+  nameKey?: keyof T;
+  countKey?: keyof T;
   className?: string;
 }
 
-const BaseList: React.FC<BaseListProps> = ({
+const BaseList = <T extends BaseItem>({
   data,
   title,
   icon: Icon,
   iconColor,
   emptyMessageKey,
-  nameKey = 'name',
-  countKey = 'count',
+  nameKey = 'name' as keyof T,
+  countKey = 'count' as keyof T,
   className = ""
-}) => {
+}: BaseListProps<T>) => {
   const { t } = useTranslation();
 
   return (
@@ -49,9 +55,9 @@ const BaseList: React.FC<BaseListProps> = ({
           <>
             <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5 rounded-xl pointer-events-none" />
             <div className="relative space-y-3">
-              {data.map((item: any, index: number) => (
+              {data.map((item, index) => (
                 <div
-                  key={item.id || item[nameKey] || index}
+                  key={item.id || String(item[nameKey]) || index}
                   className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-background/80 to-background/60 hover:from-background hover:to-background/80 transition-all duration-300 hover:shadow-md hover:shadow-primary/10 hover:scale-[1.02] border border-border/30"
                   role="listitem"
                 >
@@ -59,10 +65,10 @@ const BaseList: React.FC<BaseListProps> = ({
                     <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 text-primary font-bold shadow-sm">
                       {index + 1}
                     </div>
-                    <span className="font-semibold text-foreground">{item[nameKey]}</span>
+                    <span className="font-semibold text-foreground">{String(item[nameKey])}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="font-bold text-primary text-lg">{item[countKey]}</span>
+                    <span className="font-bold text-primary text-lg">{String(item[countKey])}</span>
                     <div className="w-2 h-2 rounded-full bg-primary/60 animate-pulse" />
                   </div>
                 </div>

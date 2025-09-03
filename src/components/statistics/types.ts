@@ -2,9 +2,11 @@
 export interface GenderData {
   gender: string;
   count: number;
+  [key: string]: string | number;
 }
 
 export interface GroupData {
+  [key: string]: string | number | undefined;
   name: string;
   color?: string;
   count: number;
@@ -13,6 +15,7 @@ export interface GroupData {
 export interface PreferredMethodData {
   method: string;
   count: number;
+  [key: string]: string | number;
 }
 
 export interface BirthdayContact {
@@ -31,11 +34,13 @@ export interface CreationTimeData {
 export interface CompanyData {
   company: string;
   count: number;
+  [key: string]: string | number | undefined;
 }
 
 export interface PositionData {
   position: string;
   count: number;
+  [key: string]: string | number | undefined;
 }
 
 export interface ChartDataItem {
@@ -50,4 +55,15 @@ export interface ListDataItem {
   name: string;
   count: number;
   color?: string;
+}
+
+export interface StatisticsData {
+  totalContacts: number | null;
+  genderData: GenderData[];
+  groupData: GroupData[];
+  preferredMethodData: PreferredMethodData[];
+  upcomingBirthdays: BirthdayContact[];
+  creationTimeData: CreationTimeData[];
+  topCompaniesData: CompanyData[];
+  topPositionsData: PositionData[];
 }

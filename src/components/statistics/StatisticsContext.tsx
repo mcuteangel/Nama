@@ -1,112 +1,13 @@
-import React, { createContext, useContext, useReducer, useEffect, useCallback } from 'react';
+import React, { useReducer, useEffect, useCallback } from 'react';
 import { useSession } from "@/integrations/supabase/auth";
 import { ContactStatisticsService } from "@/services/contact-statistics-service";
 import { fetchWithCache } from "@/utils/cache-helpers";
 import { ErrorManager } from "@/lib/error-manager";
 import { useTranslation } from "react-i18next";
-
-// Types
-interface GenderData {
-  gender: string;
-  count: number;
-}
-
-interface GroupData {
-  name: string;
-  color?: string;
-  count: number;
-}
-
-interface PreferredMethodData {
-  method: string;
-  count: number;
-}
-
-interface BirthdayContact {
-  id: string;
-  first_name: string;
-  last_name: string;
-  birthday: string;
-  days_until_birthday: number;
-}
-
-interface CreationTimeData {
-  month_year: string;
-  count: number;
-}
-
-interface CompanyData {
-  company: string;
-  count: number;
-}
-
-interface PositionData {
-  position: string;
-  count: number;
-}
-
-export interface StatisticsData {
-  totalContacts: number | null;
-  genderData: GenderData[];
-  groupData: GroupData[];
-  preferredMethodData: PreferredMethodData[];
-  upcomingBirthdays: BirthdayContact[];
-  creationTimeData: CreationTimeData[];
-  topCompaniesData: CompanyData[];
-  topPositionsData: PositionData[];
-}
-
-// Action types
-type StatisticsAction =
-  | { type: 'SET_LOADING'; payload: boolean }
-  | { type: 'SET_DATA'; payload: StatisticsData }
-  | { type: 'SET_ERROR'; payload: string | null }
-  | { type: 'RESET' };
-
-// Initial state
-const initialState: {
-  data: StatisticsData;
-  loading: boolean;
-  error: string | null;
-} = {
-  data: {
-    totalContacts: null,
-    genderData: [],
-    groupData: [],
-    preferredMethodData: [],
-    upcomingBirthdays: [],
-    creationTimeData: [],
-    topCompaniesData: [],
-    topPositionsData: [],
-  },
-  loading: false,
-  error: null,
-};
-
-// Reducer
-function statisticsReducer(state: typeof initialState, action: StatisticsAction): typeof initialState {
-  switch (action.type) {
-    case 'SET_LOADING':
-      return { ...state, loading: action.payload };
-    case 'SET_DATA':
-      return { ...state, data: action.payload, loading: false, error: null };
-    case 'SET_ERROR':
-      return { ...state, loading: false, error: action.payload };
-    case 'RESET':
-      return initialState;
-    default:
-      return state;
-  }
-}
-
-// Context
-interface StatisticsContextType {
-  state: typeof initialState;
-  fetchData: () => Promise<void>;
-  refreshData: () => Promise<void>;
-}
-
-const StatisticsContext = createContext<StatisticsContextType | undefined>(undefined);
+import {
+  StatisticsData
+} from "./types";
+import { StatisticsContext, statisticsReducer, initialState } from './StatisticsContextOnly';
 
 // Provider component
 export const StatisticsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -149,14 +50,27 @@ export const StatisticsProvider: React.FC<{ children: React.ReactNode }> = ({ ch
             ContactStatisticsService.getTopPositions(userId),
           ]);
 
-          if (totalError) throw new Error(totalError);
-          if (genderError) throw new Error(genderError);
-          if (groupError) throw new Error(groupError);
-          if (methodError) throw new Error(methodError);
-          if (birthdaysError) throw new Error(birthdaysError);
-          if (creationTimeError) throw new Error(creationTimeError);
-          if (companiesError) throw new Error(companiesError);
-          if (errorPositions) throw new Error(errorPositions);
+          // Log individual errors but continue with available data
+          const errors: string[] = [];
+          if (totalError) errors.push(`Total Contacts: ${totalError}`);
+          if (genderError) errors.push(`Gender Stats: ${genderError}`);
+          if (groupError) errors.push(`Group Stats: ${groupError}`);
+          if (methodError) errors.push(`Method Stats: ${methodError}`);
+          if (birthdaysError) errors.push(`Birthdays: ${birthdaysError}`);
+          if (creationTimeError) errors.push(`Creation Time: ${creationTimeError}`);
+          if (companiesError) errors.push(`Companies: ${companiesError}`);
+          if (errorPositions) errors.push(`Positions: ${errorPositions}`);
+
+          // If critical data (total contacts) failed, throw error
+          if (totalError) {
+            throw new Error(`Failed to load total contacts: ${totalError}`);
+          }
+
+          // Log non-critical errors
+          if (errors.length > 1) { // More than just total contacts error
+            console.warn('Some statistics failed to load:', errors.slice(1));
+            ErrorManager.logError(new Error('Partial statistics failure: ' + errors.slice(1).join('; ')), { component: 'StatisticsContext', action: 'fetchData' });
+          }
 
           return {
             data: {
@@ -180,10 +94,10 @@ export const StatisticsProvider: React.FC<{ children: React.ReactNode }> = ({ ch
           ErrorManager.notifyUser(t('statistics.stats_loaded_success'), 'success');
         }
       }
-    } catch (error: any) {
-      const errorMessage = error.message || t('statistics.error_loading_stats');
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : t('statistics.error_loading_stats');
       dispatch({ type: 'SET_ERROR', payload: errorMessage });
-      ErrorManager.logError(error, { component: 'StatisticsContext', action: 'fetchData' });
+      ErrorManager.logError(error instanceof Error ? error : new Error(String(error)), { component: 'StatisticsContext', action: 'fetchData' });
       ErrorManager.notifyUser(errorMessage, 'error');
     }
   }, [session, isSessionLoading, t]);
@@ -206,13 +120,4 @@ export const StatisticsProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       {children}
     </StatisticsContext.Provider>
   );
-};
-
-// Hook to use the context
-export const useStatistics = () => {
-  const context = useContext(StatisticsContext);
-  if (context === undefined) {
-    throw new Error('useStatistics must be used within a StatisticsProvider');
-  }
-  return context;
 };
