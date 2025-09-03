@@ -11,6 +11,7 @@ interface AIBaseCardProps {
   actions?: React.ReactNode;
   className?: string;
   compact?: boolean;
+  simple?: boolean; // Add simple mode for settings page
 }
 
 const AIBaseCard: React.FC<AIBaseCardProps> = ({
@@ -21,11 +22,16 @@ const AIBaseCard: React.FC<AIBaseCardProps> = ({
   children,
   actions,
   className = '',
-  compact = false
+  compact = false,
+  simple = false // Default to false for backward compatibility
 }) => {
   const { t } = useTranslation();
 
   const getVariantStyles = () => {
+    if (simple) {
+      return "border border-gray-200 dark:border-gray-700";
+    }
+    
     const baseStyles = "rounded-xl shadow-lg backdrop-blur-xl border transition-all duration-300 hover:shadow-xl";
 
     switch (variant) {
@@ -45,6 +51,10 @@ const AIBaseCard: React.FC<AIBaseCardProps> = ({
   };
 
   const getIconColor = () => {
+    if (simple) {
+      return 'text-gray-500 dark:text-gray-400';
+    }
+    
     switch (variant) {
       case 'primary': return 'text-blue-400';
       case 'secondary': return 'text-gray-400';
@@ -54,6 +64,42 @@ const AIBaseCard: React.FC<AIBaseCardProps> = ({
       default: return 'text-blue-400';
     }
   };
+
+  if (simple) {
+    return (
+      <div className={`rounded-lg ${getVariantStyles()} ${compact ? 'p-3' : 'p-4'} ${className}`}>
+        {(title || description || icon) && (
+          <div className={`${compact ? 'pb-2' : 'pb-3'}`}>
+            {(title || icon) && (
+              <div className={`flex items-center gap-2 ${compact ? 'text-sm' : 'text-base'} font-semibold`}>
+                {icon && (
+                  <div className={getIconColor()}>
+                    {icon}
+                  </div>
+                )}
+                <span className="text-gray-800 dark:text-gray-200">
+                  {title}
+                </span>
+              </div>
+            )}
+            {description && (
+              <p className={`${compact ? 'text-xs' : 'text-sm'} text-gray-600 dark:text-gray-400 mt-1`}>
+                {description}
+              </p>
+            )}
+          </div>
+        )}
+        <div className={compact ? 'space-y-2' : 'space-y-3'}>
+          {children}
+          {actions && (
+            <div className={`flex ${compact ? 'gap-1' : 'gap-2'} pt-2`}>
+              {actions}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <ModernCard

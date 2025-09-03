@@ -13,7 +13,7 @@ import { ErrorManager } from '@/lib/error-manager';
 import { SettingsService } from '@/services/settings-service';
 import { fetchWithCache, invalidateCache } from '@/utils/cache-helpers';
 import LoadingSpinner from '../common/LoadingSpinner';
-import { Key, Brain, Shield, CheckCircle, AlertTriangle, Zap } from 'lucide-react';
+import { Key, Brain, Shield, CheckCircle, AlertTriangle, Zap, Info } from 'lucide-react';
 import AIBaseCard from './AIBaseCard';
 
 interface GeminiModel {
@@ -206,8 +206,9 @@ const GeminiSettings: React.FC = React.memo(() => {
       icon={<Brain size={20} />}
       variant="primary"
       compact
+      simple
     >
-      {/* آمار وضعیت */}
+      {/* Status Stats */}
       <div className="grid grid-cols-2 gap-2 mb-4 p-3 bg-gradient-to-r from-green-50/60 to-blue-50/60 dark:from-green-900/30 dark:to-blue-900/30 rounded-lg border border-green-200/30 dark:border-green-700/30">
         <div className="text-center">
           <div className="flex items-center justify-center gap-1 mb-1">
@@ -299,13 +300,15 @@ const GeminiSettings: React.FC = React.memo(() => {
                         <ModernSelectItem value="loading" disabled>{t('settings.loading_gemini_models')}</ModernSelectItem>
                       ) : availableGeminiModels.length > 0 ? (
                         availableGeminiModels.map((model) => (
-                          <ModernSelectItem key={model.name} value={model.name}>
+                          <ModernSelectItem 
+                            key={model.name} 
+                            value={model.name}
+                            title={model.description} // Show description as tooltip
+                          >
                             <div className="flex items-center gap-2">
                               <Zap size={12} className="text-blue-500" />
-                              <div>
-                                <div className="font-medium">{model.displayName}</div>
-                                <div className="text-xs text-gray-500">{model.description}</div>
-                              </div>
+                              <div className="font-medium">{model.displayName}</div>
+                              <Info size={12} className="text-gray-400 ml-auto" />
                             </div>
                           </ModernSelectItem>
                         ))
@@ -314,6 +317,18 @@ const GeminiSettings: React.FC = React.memo(() => {
                       )}
                     </ModernSelectContent>
                   </ModernSelect>
+                  
+                  {/* Show selected model description outside the dropdown */}
+                  {availableGeminiModels.length > 0 && (
+                    <div className="mt-2 p-2 bg-blue-50 dark:bg-blue-900/20 rounded text-xs text-gray-600 dark:text-gray-300">
+                      <div className="font-medium mb-1">
+                        {t('settings.selected_model_info')}:
+                      </div>
+                      {availableGeminiModels.find(m => m.name === form.watch('geminiModel'))?.description || 
+                       availableGeminiModels[0].description}
+                    </div>
+                  )}
+                  
                   <FormDescription id="model-description" className="text-xs text-gray-500 dark:text-gray-400">
                     {t('settings.gemini_model_description')}
                   </FormDescription>
