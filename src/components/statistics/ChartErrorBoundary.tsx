@@ -80,10 +80,10 @@ const ChartErrorFallback: React.FC<FallbackProps> = ({ title, icon: Icon, iconCo
           </div>
           <div className="space-y-2">
             <p className="text-lg font-semibold text-foreground">
-              {t('statistics.chart_error', 'خطا در نمایش نمودار')}
+              {t('statistics.chart_error')}
             </p>
             <p className="text-sm text-muted-foreground max-w-xs">
-              {t('statistics.chart_error_description', 'متأسفانه در نمایش این نمودار مشکلی پیش آمده است.')}
+              {t('statistics.chart_error_description')}
             </p>
             {error && (
               <details className="text-left mt-2">

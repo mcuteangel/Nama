@@ -212,7 +212,7 @@ function ErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
 }
 
 // Async Error Fallback for React Query and other async operations
-function AsyncErrorFallback({ resetErrorBoundary }: FallbackProps) {
+function AsyncErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
   const { t } = useTranslation();
   const { announce } = useSafeAccessibility();
 
@@ -227,6 +227,11 @@ function AsyncErrorFallback({ resetErrorBoundary }: FallbackProps) {
     resetErrorBoundary();
   };
 
+  const copyErrorToClipboard = () => {
+    const errorText = `${error.message}\n\n${error.stack || ''}`;
+    navigator.clipboard.writeText(errorText);
+  };
+
   return (
     <div className="flex flex-col items-center justify-center p-8 text-center">
       <div className="mb-4 flex items-center justify-center w-12 h-12 bg-orange-100 dark:bg-orange-900/20 rounded-full">
@@ -238,6 +243,32 @@ function AsyncErrorFallback({ resetErrorBoundary }: FallbackProps) {
       <p className="text-gray-600 dark:text-gray-400 mb-4 max-w-md">
         {t('error.network_or_server_error', 'There was a problem loading the data. This could be due to a network or server issue.')}
       </p>
+      
+      {/* Error Details */}
+      <details className="mb-4 w-full max-w-md">
+        <summary className="cursor-pointer text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">
+          {t('error.technical_details', 'Technical Details')}
+        </summary>
+        <div className="mt-2 p-3 bg-gray-100 dark:bg-gray-800 rounded text-left overflow-auto max-h-40">
+          <pre className="text-xs text-gray-800 dark:text-gray-200 whitespace-pre-wrap">
+            {error.message}
+            {error.stack && (
+              <>
+                <br />
+                <br />
+                {error.stack}
+              </>
+            )}
+          </pre>
+          <button 
+            onClick={copyErrorToClipboard}
+            className="mt-2 text-xs text-blue-600 dark:text-blue-400 hover:underline"
+          >
+            {t('error.copy_to_clipboard', 'Copy to clipboard')}
+          </button>
+        </div>
+      </details>
+      
       <div className="space-y-2">
         <GlassButton onClick={handleRetry}>
           <RefreshCw className="w-4 h-4 mr-2" />

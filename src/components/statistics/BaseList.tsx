@@ -1,7 +1,11 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { useTranslation } from "react-i18next";
 import { ModernCard, ModernCardHeader, ModernCardTitle, ModernCardContent } from "@/components/ui/modern-card";
 import { LucideIcon } from 'lucide-react';
+import EnhancedExportOptions from './EnhancedExportOptions';
+import * as XLSX from 'xlsx';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 
 // Define a base interface for the items
 interface BaseItem {
@@ -31,6 +35,59 @@ const BaseList = <T extends BaseItem>({
   className = ""
 }: BaseListProps<T>) => {
   const { t } = useTranslation();
+  const listRef = useRef<HTMLDivElement>(null);
+
+  const exportToCSV = () => {
+    const csvContent = [
+      [t('common.category'), t('common.count')],
+      ...data.map(item => [
+        String(item[nameKey]),
+        String(item[countKey])
+      ])
+    ].map(row => row.join(',')).join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `${title.replace(/\s+/g, '_')}.csv`;
+    link.click();
+  };
+
+  const exportToExcel = () => {
+    const excelData = data.map(item => ({
+      [t('common.category')]: String(item[nameKey]),
+      [t('common.count')]: String(item[countKey])
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(excelData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, title.substring(0, 31)); // Excel sheet name limit is 31 chars
+    XLSX.writeFile(workbook, `${title.replace(/\s+/g, '_')}.xlsx`);
+  };
+
+  const exportToPDF = async () => {
+    if (listRef.current) {
+      const canvas = await html2canvas(listRef.current);
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'px',
+        format: [canvas.width, canvas.height]
+      });
+      pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+      pdf.save(`${title.replace(/\s+/g, '_')}.pdf`);
+    }
+  };
+
+  const exportToPNG = async () => {
+    if (listRef.current) {
+      const canvas = await html2canvas(listRef.current);
+      const link = document.createElement('a');
+      link.download = `${title.replace(/\s+/g, '_')}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
+  };
 
   return (
     <ModernCard
@@ -40,17 +97,31 @@ const BaseList = <T extends BaseItem>({
       aria-labelledby={`list-title-${title.replace(/\s+/g, '-').toLowerCase()}`}
     >
       <ModernCardHeader className="pb-4">
-        <ModernCardTitle
-          id={`list-title-${title.replace(/\s+/g, '-').toLowerCase()}`}
-          className="text-xl font-bold flex items-center gap-3 bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent"
-        >
-          <div className={`p-2 rounded-xl bg-gradient-to-br ${iconColor.replace('text-', 'from-').replace('-500', '-400')} ${iconColor.replace('text-', 'to-').replace('-500', '-600')} shadow-lg`}>
-            <Icon size={24} className="text-white" aria-hidden="true" />
+        <div className="flex items-center justify-between">
+          <ModernCardTitle
+            id={`list-title-${title.replace(/\s+/g, '-').toLowerCase()}`}
+            className="text-xl font-bold flex items-center gap-3 bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent"
+          >
+            <div className={`p-2 rounded-xl bg-gradient-to-br ${iconColor.replace('text-', 'from-').replace('-500', '-400')} ${iconColor.replace('text-', 'to-').replace('-500', '-600')} shadow-lg`}>
+              <Icon size={24} className="text-white" aria-hidden="true" />
+            </div>
+            {t(title)}
+          </ModernCardTitle>
+          <div className="flex items-center gap-2">
+            {data.length > 0 && (
+              <EnhancedExportOptions
+                data={data}
+                title={t(title)}
+                onExportCSV={exportToCSV}
+                onExportExcel={exportToExcel}
+                onExportPDF={exportToPDF}
+                onExportPNG={exportToPNG}
+              />
+            )}
           </div>
-          {t(title)}
-        </ModernCardTitle>
+        </div>
       </ModernCardHeader>
-      <ModernCardContent className="h-72 overflow-y-auto custom-scrollbar space-y-3 relative">
+      <ModernCardContent ref={listRef} className="h-72 overflow-y-auto custom-scrollbar space-y-3 relative">
         {data.length > 0 ? (
           <>
             <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5 rounded-xl pointer-events-none" />

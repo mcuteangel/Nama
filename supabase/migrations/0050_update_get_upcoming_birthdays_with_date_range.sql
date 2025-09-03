@@ -1,0 +1,41 @@
+-- Update get_upcoming_birthdays function to accept date range parameters
+CREATE OR REPLACE FUNCTION public.get_upcoming_birthdays(
+    user_id_param uuid,
+    start_date_param date DEFAULT NULL,
+    end_date_param date DEFAULT NULL
+)
+RETURNS TABLE(id uuid, first_name text, last_name text, birthday date, days_until_birthday integer)
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = 'public', pg_temp
+AS $function$
+DECLARE
+    current_month INTEGER;
+    current_day INTEGER;
+BEGIN
+    -- Get current month and day in Gregorian calendar
+    SELECT EXTRACT(MONTH FROM NOW()), EXTRACT(DAY FROM NOW()) INTO current_month, current_day;
+
+    RETURN QUERY
+    SELECT
+        c.id,
+        c.first_name,
+        c.last_name,
+        c.birthday,
+        CASE
+            WHEN (EXTRACT(MONTH FROM c.birthday) > current_month) OR (EXTRACT(MONTH FROM c.birthday) = current_month AND EXTRACT(DAY FROM c.birthday) >= current_day)
+            THEN (EXTRACT(DOY FROM MAKE_DATE(EXTRACT(YEAR FROM NOW())::INTEGER, EXTRACT(MONTH FROM c.birthday)::INTEGER, EXTRACT(DAY FROM c.birthday)::INTEGER)) - EXTRACT(DOY FROM NOW()))
+            ELSE (EXTRACT(DOY FROM MAKE_DATE((EXTRACT(YEAR FROM NOW()) + 1)::INTEGER, EXTRACT(MONTH FROM c.birthday)::INTEGER, EXTRACT(DAY FROM c.birthday)::INTEGER)) - EXTRACT(DOY FROM NOW()))
+        END AS days_until_birthday
+    FROM
+        public.contacts c
+    WHERE
+        c.user_id = user_id_param 
+        AND c.birthday IS NOT NULL
+        AND (start_date_param IS NULL OR c.created_at >= start_date_param)
+        AND (end_date_param IS NULL OR c.created_at <= end_date_param)
+    ORDER BY
+        days_until_birthday ASC
+    LIMIT 10;
+END;
+$function$;

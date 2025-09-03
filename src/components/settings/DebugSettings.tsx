@@ -4,7 +4,7 @@ import { Wrench, Cpu } from 'lucide-react';
 import SettingsCard from './SettingsCard';
 
 const DebugSettings: React.FC = () => {
-  const { t } = useTranslation();
+  useTranslation();
 
   // Only show in development
   if (process.env.NODE_ENV !== 'development') {

@@ -1,6 +1,6 @@
-import React, { Suspense } from "react";
+import React, { Suspense, useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { BarChart3, TrendingUp, RefreshCw, Download, Sparkles } from "lucide-react";
+import { BarChart3, TrendingUp, RefreshCw, Download, Sparkles, Calendar, Home } from "lucide-react";
 
 import { ModernCard, ModernCardContent, ModernCardDescription, ModernCardHeader, ModernCardTitle } from "@/components/ui/modern-card";
 import { ModernTabs, ModernTabsList, ModernTabsTrigger, ModernTabsContent } from "@/components/ui/modern-tabs";
@@ -22,14 +22,18 @@ import UpcomingBirthdaysList from "@/components/statistics/UpcomingBirthdaysList
 import ContactsByCreationTimeChart from "@/components/statistics/ContactsByCreationTimeChart";
 import TopCompaniesList from "@/components/statistics/TopCompaniesList";
 import TopPositionsList from "@/components/statistics/TopPositionsList";
+import StatisticsDateFilter from "@/components/statistics/StatisticsDateFilter";
+import ComparativeStatistics from "@/components/statistics/ComparativeStatistics";
+import AdaptiveChart from "@/components/statistics/AdaptiveChart";
 
 /**
  * Enhanced Statistics Dashboard Content Component
  * Features modern design with improved UX and visual hierarchy
  */
 const StatisticsContent: React.FC = () => {
-  const { state, refreshData } = useStatistics();
+  const { state, refreshData, setDateRange, fetchComparisonData } = useStatistics();
   const { t } = useTranslation();
+  const [showComparison, setShowComparison] = useState(false);
 
   // Loading state with modern loader
   if (state.loading) {
@@ -53,10 +57,10 @@ const StatisticsContent: React.FC = () => {
                 {t('statistics.description')}
               </p>
               <ModernProgress value={75} variant="gradient" animated={true} className="max-w-md mx-auto" />
-              <p className="text-sm text-muted-foreground mt-4 flex items-center justify-center gap-2">
+              <div className="text-sm text-muted-foreground mt-4 flex items-center justify-center gap-2">
                 <ModernLoader variant="dots" size="sm" color="primary" />
                 {t('common.loading')}
-              </p>
+              </div>
             </div>
           </div>
 
@@ -75,26 +79,61 @@ const StatisticsContent: React.FC = () => {
     );
   }
 
-  // Error state
+  // Error state with enhanced error boundary
   if (state.error) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-red-50/80 via-pink-50/80 to-orange-50/80 dark:from-gray-900/90 dark:via-red-900/30 dark:to-pink-900/30 p-6">
         <div className="max-w-4xl mx-auto">
           <EmptyState
             icon={BarChart3}
-            title={t('error.something_went_wrong')}
-            description={state.error}
+            title={t('statistics.error_boundary.title', t('error.something_went_wrong'))}
+            description={t('statistics.error_boundary.description')}
             className="min-h-[60vh] bg-gradient-to-br from-red-50/50 to-red-100/30 dark:from-red-950/20 dark:to-red-900/10 border-red-200/50 dark:border-red-800/50"
           >
-            <GlassButton
-              variant="glass"
-              effect="lift"
-              onClick={refreshData}
-              className="mt-6 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white"
-            >
-              <RefreshCw size={16} className="mr-2" />
-              {t('common.retry')}
-            </GlassButton>
+            <div className="flex flex-col sm:flex-row gap-3 mt-6">
+              <GlassButton
+                variant="glass"
+                effect="lift"
+                onClick={refreshData}
+                className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white"
+              >
+                <RefreshCw size={16} className="mr-2" />
+                {t('statistics.error_boundary.retry', t('common.retry'))}
+              </GlassButton>
+              <GlassButton
+                variant="outline"
+                effect="lift"
+                onClick={() => window.location.href = '/'}
+                className="border-red-300 text-red-700 hover:bg-red-50 dark:border-red-700 dark:text-red-300 dark:hover:bg-red-950/50"
+              >
+                <Home size={16} className="mr-2" />
+                {t('statistics.error_boundary.go_home', t('error.go_home'))}
+              </GlassButton>
+              <GlassButton
+                variant="ghost"
+                effect="lift"
+                onClick={() => window.location.reload()}
+                className="text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/50"
+              >
+                <RefreshCw size={16} className="mr-2" />
+                {t('statistics.error_boundary.reload_page', t('error.reload_page'))}
+              </GlassButton>
+            </div>
+            <details className="mt-4 text-left bg-red-50 dark:bg-red-950/20 rounded-lg p-4 max-w-2xl mx-auto">
+              <summary className="cursor-pointer font-medium text-red-700 dark:text-red-300">
+                {t('statistics.error_boundary.technical_details', t('error.technical_details'))}
+              </summary>
+              <div className="mt-2 space-y-2 text-xs">
+                <div>
+                  <strong className="text-red-800 dark:text-red-200">
+                    {t('statistics.error_boundary.message', t('error.message'))}:
+                  </strong>
+                  <pre className="mt-1 p-2 bg-red-100 dark:bg-red-900/30 rounded text-red-800 dark:text-red-200 whitespace-pre-wrap">
+                    {state.error}
+                  </pre>
+                </div>
+              </div>
+            </details>
           </EmptyState>
         </div>
       </div>
@@ -148,6 +187,36 @@ const StatisticsContent: React.FC = () => {
           </div>
         </div>
 
+        {/* Date Filter */}
+        <StatisticsDateFilter 
+          onDateRangeChange={setDateRange}
+          onComparePeriod={(startDate, endDate) => {
+            fetchComparisonData(startDate, endDate);
+            setShowComparison(true);
+          }}
+        />
+
+        {/* Comparative Statistics */}
+        {showComparison && state.comparisonData.previousData && (
+          <div className="mb-8">
+            <ComparativeStatistics
+              title="statistics.comparative_analysis"
+              data={[
+                {
+                  label: t('statistics.total_contacts'),
+                  current: state.data.totalContacts || 0,
+                  previous: state.comparisonData.previousData.totalContacts || 0
+                },
+                {
+                  label: t('statistics.active_groups'),
+                  current: state.data.groupData?.length || 0,
+                  previous: state.comparisonData.previousData.groupData?.length || 0
+                }
+              ]}
+            />
+          </div>
+        )}
+
         {/* Compact Stats Overview */}
         <div className="px-4">
           <StatisticsCompactStats data={state.data} />
@@ -159,7 +228,7 @@ const StatisticsContent: React.FC = () => {
             <ModernTabs defaultValue="overview" className="w-full">
               <ModernTabsList 
                 className="grid w-full grid-cols-4 mb-8 bg-white/10 dark:bg-gray-800/10 backdrop-blur-xl rounded-2xl p-2 border border-white/20"
-                glassEffect="medium"
+                glassEffect="default"
                 hoverEffect="lift"
               >
                 <ModernTabsTrigger
@@ -209,7 +278,15 @@ const StatisticsContent: React.FC = () => {
                   <GridItem>
                     <div className="animate-in fade-in slide-in-from-right-4" style={{ animationDelay: '200ms' }}>
                       <Suspense fallback={<ModernLoader variant="spinner" size="lg" />}>
-                        <ContactsByCreationTimeChart data={state.data.creationTimeData} />
+                        <AdaptiveChart
+                          data={state.data.creationTimeData}
+                          title="statistics.contacts_by_creation_time"
+                          icon={Calendar}
+                          iconColor="text-indigo-500"
+                          emptyMessageKey="statistics.no_creation_time_data"
+                          nameKey="month_year"
+                          valueKey="count"
+                        />
                       </Suspense>
                     </div>
                   </GridItem>
@@ -229,21 +306,46 @@ const StatisticsContent: React.FC = () => {
                   <GridItem>
                     <div className="animate-in fade-in slide-in-from-left-4" style={{ animationDelay: '100ms' }}>
                       <Suspense fallback={<ModernLoader variant="spinner" size="lg" />}>
-                        <ContactsByGenderChart data={state.data.genderData} />
+                        <AdaptiveChart
+                          data={state.data.genderData}
+                          title="statistics.contacts_by_gender"
+                          icon={BarChart3}
+                          iconColor="text-green-500"
+                          emptyMessageKey="statistics.no_gender_data"
+                          nameKey="gender"
+                          valueKey="count"
+                        />
                       </Suspense>
                     </div>
                   </GridItem>
                   <GridItem>
                     <div className="animate-in fade-in slide-in-from-right-4" style={{ animationDelay: '200ms' }}>
                       <Suspense fallback={<ModernLoader variant="spinner" size="lg" />}>
-                        <ContactsByGroupChart data={state.data.groupData} />
+                        <AdaptiveChart
+                          data={state.data.groupData}
+                          title="statistics.contacts_by_group"
+                          icon={BarChart3}
+                          iconColor="text-purple-500"
+                          emptyMessageKey="statistics.no_group_data"
+                          nameKey="name"
+                          valueKey="count"
+                          colorKey="color"
+                        />
                       </Suspense>
                     </div>
                   </GridItem>
                   <GridItem>
                     <div className="animate-in fade-in slide-in-from-bottom-4" style={{ animationDelay: '300ms' }}>
                       <Suspense fallback={<ModernLoader variant="spinner" size="lg" />}>
-                        <ContactsByPreferredMethodChart data={state.data.preferredMethodData} />
+                        <AdaptiveChart
+                          data={state.data.preferredMethodData}
+                          title="statistics.contacts_by_preferred_method"
+                          icon={BarChart3}
+                          iconColor="text-orange-500"
+                          emptyMessageKey="statistics.no_preferred_method_data"
+                          nameKey="method"
+                          valueKey="count"
+                        />
                       </Suspense>
                     </div>
                   </GridItem>

@@ -25,11 +25,15 @@ export const StatisticsProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     
     try {
       const userId = session.user.id;
-      const cacheKey = `statistics_dashboard_${userId}`;
+      const cacheKey = `statistics_dashboard_${userId}${state.dateRange.startDate ? `_from_${state.dateRange.startDate}_to_${state.dateRange.endDate}` : ''}`;
 
       const { data, fromCache } = await fetchWithCache<StatisticsData>(
         cacheKey,
         async () => {
+          // Add date range parameters to all service calls
+          const startDate = state.dateRange.startDate;
+          const endDate = state.dateRange.endDate;
+          
           const [
             { data: totalData, error: totalError },
             { data: genderStats, error: genderError },
@@ -40,14 +44,14 @@ export const StatisticsProvider: React.FC<{ children: React.ReactNode }> = ({ ch
             { data: companiesStats, error: companiesError },
             { data: positionsStats, error: errorPositions },
           ] = await Promise.all([
-            ContactStatisticsService.getTotalContacts(userId),
-            ContactStatisticsService.getContactsByGender(userId),
-            ContactStatisticsService.getContactsByGroup(userId),
-            ContactStatisticsService.getContactsByPreferredMethod(userId),
-            ContactStatisticsService.getUpcomingBirthdays(userId),
-            ContactStatisticsService.getContactsByCreationMonth(userId),
-            ContactStatisticsService.getTopCompanies(userId),
-            ContactStatisticsService.getTopPositions(userId),
+            ContactStatisticsService.getTotalContacts(userId, startDate, endDate),
+            ContactStatisticsService.getContactsByGender(userId, startDate, endDate),
+            ContactStatisticsService.getContactsByGroup(userId, startDate, endDate),
+            ContactStatisticsService.getContactsByPreferredMethod(userId, startDate, endDate),
+            ContactStatisticsService.getUpcomingBirthdays(userId, startDate, endDate),
+            ContactStatisticsService.getContactsByCreationMonth(userId, startDate, endDate),
+            ContactStatisticsService.getTopCompanies(userId, 5, startDate, endDate),
+            ContactStatisticsService.getTopPositions(userId, 5, startDate, endDate),
           ]);
 
           // Log individual errors but continue with available data
@@ -100,23 +104,83 @@ export const StatisticsProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       ErrorManager.logError(error instanceof Error ? error : new Error(String(error)), { component: 'StatisticsContext', action: 'fetchData' });
       ErrorManager.notifyUser(errorMessage, 'error');
     }
-  }, [session, isSessionLoading, t]);
+  }, [session, isSessionLoading, t, state.dateRange]);
 
   const refreshData = useCallback(async () => {
     if (session?.user) {
       const userId = session.user.id;
-      const cacheKey = `statistics_dashboard_${userId}`;
+      const cacheKey = `statistics_dashboard_${userId}${state.dateRange.startDate ? `_from_${state.dateRange.startDate}_to_${state.dateRange.endDate}` : ''}`;
       localStorage.removeItem(cacheKey);
       await fetchData();
     }
-  }, [fetchData, session]);
+  }, [fetchData, session, state.dateRange]);
+
+  const setDateRange = useCallback((startDate: string | null, endDate: string | null) => {
+    dispatch({ type: 'SET_DATE_RANGE', payload: { startDate, endDate } });
+  }, []);
+
+  const fetchComparisonData = useCallback(async (startDate: string, endDate: string) => {
+    if (isSessionLoading || !session?.user) {
+      return;
+    }
+
+    try {
+      const userId = session.user.id;
+      
+      const { data: previousData } = await fetchWithCache<StatisticsData>(
+        `statistics_comparison_${userId}_from_${startDate}_to_${endDate}`,
+        async () => {
+          const [
+            { data: totalData },
+            { data: genderStats },
+            { data: groupStats },
+            { data: methodStats },
+            { data: birthdaysData },
+            { data: creationTimeStats },
+            { data: companiesStats },
+            { data: positionsStats },
+          ] = await Promise.all([
+            ContactStatisticsService.getTotalContacts(userId, startDate, endDate),
+            ContactStatisticsService.getContactsByGender(userId, startDate, endDate),
+            ContactStatisticsService.getContactsByGroup(userId, startDate, endDate),
+            ContactStatisticsService.getContactsByPreferredMethod(userId, startDate, endDate),
+            ContactStatisticsService.getUpcomingBirthdays(userId, startDate, endDate),
+            ContactStatisticsService.getContactsByCreationMonth(userId, startDate, endDate),
+            ContactStatisticsService.getTopCompanies(userId, 5, startDate, endDate),
+            ContactStatisticsService.getTopPositions(userId, 5, startDate, endDate),
+          ]);
+
+          return {
+            data: {
+              totalContacts: totalData,
+              genderData: genderStats || [],
+              groupData: groupStats || [],
+              preferredMethodData: methodStats || [],
+              upcomingBirthdays: birthdaysData || [],
+              creationTimeData: creationTimeStats || [],
+              topCompaniesData: companiesStats || [],
+              topPositionsData: positionsStats || [],
+            },
+            error: null,
+          };
+        }
+      );
+
+      if (previousData) {
+        dispatch({ type: 'SET_COMPARISON_DATA', payload: { previousData } });
+      }
+    } catch (error) {
+      console.error('Failed to fetch comparison data:', error);
+      ErrorManager.logError(error instanceof Error ? error : new Error(String(error)), { component: 'StatisticsContext', action: 'fetchComparisonData' });
+    }
+  }, [session, isSessionLoading]);
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
 
   return (
-    <StatisticsContext.Provider value={{ state, fetchData, refreshData }}>
+    <StatisticsContext.Provider value={{ state, fetchData, refreshData, setDateRange, fetchComparisonData }}>
       {children}
     </StatisticsContext.Provider>
   );

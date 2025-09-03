@@ -5,13 +5,17 @@ export type StatisticsAction =
   | { type: 'SET_LOADING'; payload: boolean }
   | { type: 'SET_DATA'; payload: StatisticsData }
   | { type: 'SET_ERROR'; payload: string | null }
-  | { type: 'RESET' };
+  | { type: 'RESET' }
+  | { type: 'SET_DATE_RANGE'; payload: { startDate: string | null; endDate: string | null } }
+  | { type: 'SET_COMPARISON_DATA'; payload: { previousData: StatisticsData | null } };
 
 // Initial state
 export const initialState: {
   data: StatisticsData;
   loading: boolean;
   error: string | null;
+  dateRange: { startDate: string | null; endDate: string | null };
+  comparisonData: { previousData: StatisticsData | null };
 } = {
   data: {
     totalContacts: null,
@@ -25,6 +29,8 @@ export const initialState: {
   },
   loading: false,
   error: null,
+  dateRange: { startDate: null, endDate: null },
+  comparisonData: { previousData: null },
 };
 
 // Reducer
@@ -38,6 +44,10 @@ export function statisticsReducer(state: typeof initialState, action: Statistics
       return { ...state, loading: false, error: action.payload };
     case 'RESET':
       return initialState;
+    case 'SET_DATE_RANGE':
+      return { ...state, dateRange: action.payload };
+    case 'SET_COMPARISON_DATA':
+      return { ...state, comparisonData: action.payload };
     default:
       return state;
   }
@@ -48,6 +58,8 @@ export interface StatisticsContextType {
   state: typeof initialState;
   fetchData: () => Promise<void>;
   refreshData: () => Promise<void>;
+  setDateRange: (startDate: string | null, endDate: string | null) => void;
+  fetchComparisonData: (startDate: string, endDate: string) => Promise<void>;
 }
 
 export const StatisticsContext = createContext<StatisticsContextType | undefined>(undefined);

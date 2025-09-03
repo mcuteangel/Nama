@@ -1,11 +1,15 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useRef } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, TooltipProps } from 'recharts';
 import { useTranslation } from "react-i18next";
 import { ModernCard, ModernCardHeader, ModernCardTitle, ModernCardContent } from "@/components/ui/modern-card";
 import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
-import { LucideIcon, HelpCircle, Download } from 'lucide-react';
+import { LucideIcon, HelpCircle } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Tooltip as UITooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import EnhancedExportOptions from './EnhancedExportOptions';
+import * as XLSX from 'xlsx';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 
 interface ChartDataItem {
   [key: string]: string | number;
@@ -38,6 +42,7 @@ const BasePieChart: React.FC<BasePieChartProps> = ({
 }) => {
   const { t } = useTranslation();
   const [showTooltip, setShowTooltip] = useState(false);
+  const chartRef = useRef<HTMLDivElement>(null);
 
   const exportToCSV = () => {
     const csvContent = [
@@ -54,6 +59,43 @@ const BasePieChart: React.FC<BasePieChartProps> = ({
     link.href = URL.createObjectURL(blob);
     link.download = `${title.replace(/\s+/g, '_')}.csv`;
     link.click();
+  };
+
+  const exportToExcel = () => {
+    const excelData = data.map(item => ({
+      [t('common.category')]: translationPrefix ? t(`${translationPrefix}.${item[nameKey]}`) : item[nameKey],
+      [t('common.count')]: item[valueKey],
+      [t('common.percentage')]: `${((item[valueKey] as number / data.reduce((sum, d) => sum + (d[valueKey] as number), 0)) * 100).toFixed(1)}%`
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(excelData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, title.substring(0, 31)); // Excel sheet name limit is 31 chars
+    XLSX.writeFile(workbook, `${title.replace(/\s+/g, '_')}.xlsx`);
+  };
+
+  const exportToPDF = async () => {
+    if (chartRef.current) {
+      const canvas = await html2canvas(chartRef.current);
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF({
+        orientation: 'landscape',
+        unit: 'px',
+        format: [canvas.width, canvas.height]
+      });
+      pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+      pdf.save(`${title.replace(/\s+/g, '_')}.pdf`);
+    }
+  };
+
+  const exportToPNG = async () => {
+    if (chartRef.current) {
+      const canvas = await html2canvas(chartRef.current);
+      const link = document.createElement('a');
+      link.download = `${title.replace(/\s+/g, '_')}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
   };
 
   const formattedData = useMemo(() => data.map((item: ChartDataItem) => ({
@@ -110,20 +152,19 @@ const BasePieChart: React.FC<BasePieChartProps> = ({
               </UITooltip>
             </TooltipProvider>
             {data.length > 0 && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-8 w-8 p-0 hover:bg-muted/50"
-                onClick={exportToCSV}
-                title={t('common.export_csv', 'خروجی CSV')}
-              >
-                <Download size={16} className="text-muted-foreground" />
-              </Button>
+              <EnhancedExportOptions
+                data={data}
+                title={t(title)}
+                onExportCSV={exportToCSV}
+                onExportExcel={exportToExcel}
+                onExportPDF={exportToPDF}
+                onExportPNG={exportToPNG}
+              />
             )}
           </div>
         </div>
       </ModernCardHeader>
-      <ModernCardContent className="h-72 flex items-center justify-center relative">
+      <ModernCardContent ref={chartRef} className="h-72 flex items-center justify-center relative">
         {formattedData.length > 0 ? (
           <>
             <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5 rounded-xl" />
