@@ -1,8 +1,8 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect, useMemo } from "react";
 import { ModernCard, ModernCardContent, ModernCardDescription, ModernCardHeader, ModernCardTitle } from "@/components/ui/modern-card";
 import { ModernTextarea } from "@/components/ui/modern-textarea";
 import { GlassButton } from "@/components/ui/glass-button";
-import { Sparkles, UserCheck, Mic, StopCircle } from "lucide-react";
+import { Sparkles, UserCheck, Mic, StopCircle, TrendingUp, PlusCircle, RefreshCw, Search } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useContactExtractor } from "@/hooks/use-contact-extractor";
 import { ErrorManager } from "@/lib/error-manager";
@@ -37,6 +37,7 @@ const AISuggestions: React.FC = () => {
   const [rawTextInput, setRawTextInput] = useState('');
   const [pendingSuggestions, setPendingSuggestions] = useState<AISuggestionDisplay[]>([]);
   const [isProcessingSuggestions, setIsProcessingSuggestions] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const { enqueueContactExtraction, isLoading: isExtractorLoading, error: extractorError } = useContactExtractor();
   const {
@@ -47,6 +48,31 @@ const AISuggestions: React.FC = () => {
     browserSupportsSpeechRecognition,
     error: speechError,
   } = useSpeechToText();
+
+  // Calculate statistics
+  const stats = useMemo(() => {
+    const newContacts = pendingSuggestions.filter(s => s.type === 'new').length;
+    const updates = pendingSuggestions.filter(s => s.type === 'update').length;
+    return { newContacts, updates, total: pendingSuggestions.length };
+  }, [pendingSuggestions]);
+
+  // Filter suggestions based on search query
+  const filteredSuggestions = useMemo(() => {
+    if (!searchQuery.trim()) return pendingSuggestions;
+
+    return pendingSuggestions.filter(suggestion => {
+      const query = searchQuery.toLowerCase();
+      const { extractedData } = suggestion;
+      return (
+        extractedData.firstName?.toLowerCase().includes(query) ||
+        extractedData.lastName?.toLowerCase().includes(query) ||
+        extractedData.company?.toLowerCase().includes(query) ||
+        extractedData.position?.toLowerCase().includes(query) ||
+        extractedData.emailAddresses.some(email => email.email_address.toLowerCase().includes(query)) ||
+        extractedData.phoneNumbers.some(phone => phone.phone_number.includes(query))
+      );
+    });
+  }, [pendingSuggestions, searchQuery]);
 
   // Update rawTextInput with transcript when listening
   useEffect(() => {
@@ -267,14 +293,50 @@ const AISuggestions: React.FC = () => {
 
   return (
     <div className="flex flex-col items-center justify-center p-4 h-full w-full">
-      <ModernCard variant="glass" className="w-full max-w-4xl rounded-xl p-6">
-        <ModernCardHeader className="text-center">
-          <ModernCardTitle className="text-4xl font-bold text-gray-800 dark:text-gray-100 mb-2">
+      <ModernCard variant="glass" className="w-full max-w-6xl rounded-xl p-6">
+        <ModernCardHeader className="text-center relative">
+          <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-4">
+            <Sparkles size={32} className="text-yellow-400 animate-bounce" />
+          </div>
+          <ModernCardTitle className="text-5xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-4 animate-in fade-in slide-in-from-top-4">
             {t('ai_suggestions.title')}
           </ModernCardTitle>
-          <ModernCardDescription className="text-lg text-gray-600 dark:text-gray-300">
+          <ModernCardDescription className="text-xl text-gray-600 dark:text-gray-300 mb-6">
             {t('ai_suggestions.description')}
           </ModernCardDescription>
+
+          {/* Statistics Section */}
+          {stats.total > 0 && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              <div className="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 p-4 rounded-xl border border-blue-200 dark:border-blue-700">
+                <div className="flex items-center gap-3">
+                  <PlusCircle size={24} className="text-blue-600 animate-pulse" />
+                  <div>
+                    <p className="text-2xl font-bold text-blue-800 dark:text-blue-200">{stats.newContacts}</p>
+                    <p className="text-sm text-blue-600 dark:text-blue-400">{t('ai_suggestions.new_contacts')}</p>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-gradient-to-r from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 p-4 rounded-xl border border-green-200 dark:border-green-700">
+                <div className="flex items-center gap-3">
+                  <RefreshCw size={24} className="text-green-600 animate-spin" />
+                  <div>
+                    <p className="text-2xl font-bold text-green-800 dark:text-green-200">{stats.updates}</p>
+                    <p className="text-sm text-green-600 dark:text-green-400">{t('ai_suggestions.updates')}</p>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 p-4 rounded-xl border border-purple-200 dark:border-purple-700">
+                <div className="flex items-center gap-3">
+                  <TrendingUp size={24} className="text-purple-600 animate-bounce" />
+                  <div>
+                    <p className="text-2xl font-bold text-purple-800 dark:text-purple-200">{stats.total}</p>
+                    <p className="text-sm text-purple-600 dark:text-purple-400">{t('ai_suggestions.total_suggestions')}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </ModernCardHeader>
         <ModernCardContent className="space-y-6">
           <Tabs defaultValue="extract-info" className="w-full">
@@ -326,29 +388,87 @@ const AISuggestions: React.FC = () => {
               )}
 
               {pendingSuggestions.length > 0 && (
-                <div className="space-y-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                  <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 flex items-center gap-2">
-                    <UserCheck size={20} className="text-green-500" /> {t('ai_suggestions.suggestions_section_title')}
-                  </h3>
-                  {pendingSuggestions.map((suggestion) => (
-                    <AISuggestionCard
-                      key={suggestion.id}
-                      suggestion={suggestion}
-                      onProcess={handleProcessSuggestion}
-                      onDiscard={handleDiscardSuggestion}
-                      onEdit={handleEditSuggestion}
-                      isProcessing={isSavingOrUpdating}
-                    />
-                  ))}
+                <div className="space-y-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 flex items-center gap-3">
+                      <UserCheck size={24} className="text-green-500 animate-pulse" />
+                      <span className="bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
+                        {t('ai_suggestions.suggestions_section_title')}
+                      </span>
+                      <span className="bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-200 px-3 py-1 rounded-full text-sm font-semibold">
+                        {filteredSuggestions.length} {t('ai_suggestions.items')}
+                      </span>
+                    </h3>
+
+                    {/* Search Bar */}
+                    <div className="relative w-full sm:w-80">
+                      <Search size={20} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                      <input
+                        type="text"
+                        placeholder={t('ai_suggestions.search_suggestions')}
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="w-full pl-10 pr-4 py-2 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid gap-6 md:gap-8">
+                    {filteredSuggestions.map((suggestion, index) => (
+                      <div
+                        key={suggestion.id}
+                        className="animate-in fade-in slide-in-from-bottom-4"
+                        style={{ animationDelay: `${index * 100}ms` }}
+                      >
+                        <AISuggestionCard
+                          suggestion={suggestion}
+                          onProcess={handleProcessSuggestion}
+                          onDiscard={handleDiscardSuggestion}
+                          onEdit={handleEditSuggestion}
+                          isProcessing={isSavingOrUpdating}
+                        />
+                      </div>
+                    ))}
+                  </div>
+
+                  {filteredSuggestions.length === 0 && searchQuery && (
+                    <div className="text-center py-8">
+                      <Search size={48} className="mx-auto text-gray-400 mb-4" />
+                      <p className="text-gray-600 dark:text-gray-400 text-lg">
+                        {t('ai_suggestions.no_search_results')}
+                      </p>
+                      <p className="text-gray-500 dark:text-gray-500 text-sm mt-2">
+                        {t('ai_suggestions.try_different_search')}
+                      </p>
+                    </div>
+                  )}
                 </div>
               )}
 
               {pendingSuggestions.length === 0 && !isLoadingSuggestions && !isProcessingSuggestions && !isSavingOrUpdating && (
-                <EmptyState
-                  icon={Sparkles}
-                  title={t('ai_suggestions.no_suggestions_found')}
-                  description={t('ai_suggestions.no_suggestions_description')}
-                />
+                <div className="text-center py-12 px-6">
+                  <div className="relative mb-6">
+                    <Sparkles size={64} className="mx-auto text-blue-400 animate-pulse" />
+                    <div className="absolute -top-2 -right-2">
+                      <div className="w-6 h-6 bg-yellow-400 rounded-full animate-ping"></div>
+                      <div className="w-6 h-6 bg-yellow-400 rounded-full absolute top-0 left-0 animate-pulse"></div>
+                    </div>
+                  </div>
+                  <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-3">
+                    {t('ai_suggestions.no_suggestions_found')}
+                  </h3>
+                  <p className="text-lg text-gray-600 dark:text-gray-300 mb-6 max-w-md mx-auto">
+                    {t('ai_suggestions.no_suggestions_description')}
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                    <div className="text-sm text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 px-4 py-2 rounded-lg">
+                      💡 {t('ai_suggestions.try_pasting_text')}
+                    </div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 px-4 py-2 rounded-lg">
+                      🎤 {t('ai_suggestions.try_voice_input')}
+                    </div>
+                  </div>
+                </div>
               )}
             </TabsContent>
             <TabsContent value="smart-management" className="space-y-6 pt-4">

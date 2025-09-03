@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Sparkles, User, CheckCircle, XCircle, LightbulbOff, Brain } from "lucide-react";
+import { Sparkles, User, CheckCircle, XCircle, LightbulbOff, Brain, Heart, Zap } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useSession } from "@/integrations/supabase/auth";
 import { useErrorHandler } from "@/hooks/use-error-handler";
@@ -178,34 +178,46 @@ const GenderSuggestionManagement: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <ModernCard variant="glass" className="rounded-xl p-4">
-        <ModernCardHeader className="pb-2">
-          <ModernCardTitle className="text-xl font-bold flex items-center gap-2">
-            <User size={20} className="text-pink-500" /> {t('ai_suggestions.gender_suggestion_title')}
+      <ModernCard variant="glass" className="rounded-xl p-6 shadow-lg">
+        <ModernCardHeader className="text-center relative pb-4">
+          <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-3">
+            <Heart size={24} className="text-pink-400 animate-bounce" />
+          </div>
+          <ModernCardTitle className="text-2xl font-bold bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent mb-2">
+            <User size={24} className="inline text-pink-500 mr-2 animate-pulse" />
+            {t('ai_suggestions.gender_suggestion_title')}
           </ModernCardTitle>
-          <ModernCardDescription>
-            {t('ai_suggestions.gender_suggestion_description_local')}
+          <ModernCardDescription className="text-lg text-gray-600 dark:text-gray-300">
+            پیشنهاد هوشمند جنسیت بر اساس نام ✨
           </ModernCardDescription>
         </ModernCardHeader>
-        <ModernCardContent className="space-y-4">
-          <div className="flex items-center justify-between p-3 glass rounded-lg shadow-sm">
-            <div className="flex items-center gap-2">
-              <Brain size={20} className="text-indigo-500" />
-              <p className="font-medium text-gray-800 dark:text-gray-100">{t('ai_suggestions.learned_names_count')}</p>
+        <ModernCardContent className="space-y-6">
+          <div className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 p-4 rounded-xl border border-indigo-200 dark:border-indigo-800">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Brain size={24} className="text-indigo-500 animate-pulse" />
+                <div>
+                  <p className="font-semibold text-indigo-800 dark:text-indigo-200">{t('ai_suggestions.learned_names_count')}</p>
+                  <p className="text-sm text-indigo-600 dark:text-indigo-400">آموزش دیده از داده‌های شما</p>
+                </div>
+              </div>
+              <span className="px-4 py-2 text-lg font-bold rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-lg">
+                {learnedNamesCount} {t('common.names')}
+              </span>
             </div>
-            <span className="px-3 py-1 text-sm font-semibold rounded-full bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200">
-              {learnedNamesCount} {t('common.names')}
-            </span>
           </div>
 
           <GlassButton
             onClick={handleGenerateSuggestions}
             disabled={isGenerating || ungenderedContacts.length === 0}
             variant="gradient-primary"
-            className="w-full flex items-center gap-2 px-6 py-2 rounded-lg font-semibold shadow-md transition-all duration-300 transform hover:scale-105"
+            className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold shadow-lg transition-all duration-300 transform hover:scale-105 bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600"
           >
-            {isGenerating && <LoadingSpinner size={16} className="me-2" />}
-            <Sparkles size={16} className="me-2" />
+            {isGenerating ? (
+              <LoadingSpinner size={18} className="me-2" />
+            ) : (
+              <Sparkles size={18} className="me-2 animate-bounce" />
+            )}
             {t('ai_suggestions.generate_gender_suggestions')}
           </GlassButton>
 
@@ -245,43 +257,66 @@ const GenderSuggestionManagement: React.FC = () => {
           )}
 
           {genderSuggestions.length > 0 && (
-            <div className="space-y-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-              <h4 className="text-lg font-semibold text-gray-800 dark:text-gray-100">{t('ai_suggestions.pending_gender_suggestions')}</h4>
-              {genderSuggestions.map((suggestion) => (
-                <div key={suggestion.contactId} className="flex items-center justify-between p-3 glass rounded-lg shadow-sm">
-                  <div>
-                    <p className="font-medium text-gray-800 dark:text-gray-100">{suggestion.contactName}</p>
-                    <p className="text-sm text-gray-600 dark:text-gray-300">
-                      {t('ai_suggestions.suggested_gender')}:
-                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium ms-1 ${
-                        suggestion.suggestedGender === 'male' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
-                        suggestion.suggestedGender === 'female' ? 'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200' :
-                        'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
-                      }`}>
-                        {t(`gender.${suggestion.suggestedGender}`)}
-                      </span>
-                    </p>
+            <div className="space-y-4 pt-6 border-t border-gray-200 dark:border-gray-700">
+              <h4 className="text-xl font-bold text-gray-800 dark:text-gray-100 flex items-center gap-3">
+                <Zap size={24} className="text-yellow-500 animate-pulse" />
+                <span className="bg-gradient-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent">
+                  {t('ai_suggestions.pending_gender_suggestions')}
+                </span>
+                <span className="bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-200 px-3 py-1 rounded-full text-sm font-semibold">
+                  {genderSuggestions.length} مورد
+                </span>
+              </h4>
+              <div className="grid gap-4">
+                {genderSuggestions.map((suggestion, index) => (
+                  <div
+                    key={suggestion.contactId}
+                    className="bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-700 p-4 rounded-xl border border-gray-200 dark:border-gray-600 shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-[1.02] animate-in fade-in slide-in-from-bottom-4"
+                    style={{ animationDelay: `${index * 100}ms` }}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <p className="font-bold text-lg text-gray-800 dark:text-gray-100 mb-2">{suggestion.contactName}</p>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
+                            {t('ai_suggestions.suggested_gender')}:
+                          </span>
+                          <span className={`px-3 py-1 rounded-full text-sm font-bold ${
+                            suggestion.suggestedGender === 'male'
+                              ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white'
+                              : suggestion.suggestedGender === 'female'
+                              ? 'bg-gradient-to-r from-pink-500 to-pink-600 text-white'
+                              : 'bg-gradient-to-r from-gray-500 to-gray-600 text-white'
+                          }`}>
+                            {suggestion.suggestedGender === 'male' && '👨'}
+                            {suggestion.suggestedGender === 'female' && '👩'}
+                            {suggestion.suggestedGender === 'not_specified' && '❓'}
+                            {t(`gender.${suggestion.suggestedGender}`)}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex gap-3">
+                        <GlassButton
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleAcceptSuggestion(suggestion)}
+                          className="w-12 h-12 rounded-full bg-green-100 hover:bg-green-200 dark:bg-green-900/30 dark:hover:bg-green-800/50 text-green-600 hover:text-green-700 transition-all duration-300 transform hover:scale-110"
+                        >
+                          <CheckCircle size={24} />
+                        </GlassButton>
+                        <GlassButton
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleDiscardSuggestion(suggestion.contactId)}
+                          className="w-12 h-12 rounded-full bg-red-100 hover:bg-red-200 dark:bg-red-900/30 dark:hover:bg-red-800/50 text-red-600 hover:text-red-700 transition-all duration-300 transform hover:scale-110"
+                        >
+                          <XCircle size={24} />
+                        </GlassButton>
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex gap-2">
-                    <GlassButton
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleAcceptSuggestion(suggestion)}
-                      className="text-green-600 hover:bg-green-100 dark:text-green-400 dark:hover:bg-gray-600/50"
-                    >
-                      <CheckCircle size={20} />
-                    </GlassButton>
-                    <GlassButton
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleDiscardSuggestion(suggestion.contactId)}
-                      className="text-red-600 hover:bg-red-100 dark:text-red-400 dark:hover:bg-gray-600/50"
-                    >
-                      <XCircle size={20} />
-                    </GlassButton>
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           )}
         </ModernCardContent>
