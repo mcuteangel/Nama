@@ -229,7 +229,19 @@
     "test_components": "Test Components",
     "gemini_description": "Configure AI for better experience 🤖",
     "security_settings": "Security Settings",
-    "model_settings": "Model Settings"
+    "model_settings": "Model Settings",
+    "dev_only": "DEV ONLY",
+    "test_edge_function": "Test Edge Function",
+    "clear_cache": "Clear Cache",
+    "storage_info": "Storage Info",
+    "debug_tools": "Debug Tools",
+    "console_results_hint": "💡 All results are displayed in Browser Console",
+    "dev_only_warning": "⚠️ These settings are only available in Development environment",
+    "default_contact_display_mode": "Default Contact Display Mode",
+    "select_display_mode": "Select Display Mode",
+    "display_mode_grid": "Grid",
+    "display_mode_list": "List",
+    "default_contact_display_mode_description": "Choose how contacts are displayed by default"
   },
   "user_management": {
     "title": "User Management",

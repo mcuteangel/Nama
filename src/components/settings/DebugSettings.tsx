@@ -74,19 +74,19 @@ const DebugSettings: React.FC = () => {
   const debugTools = [
     {
       icon: <Bug size={14} />,
-      label: 'تست Edge Function',
+      label: t('settings.test_edge_function'),
       action: handleTestConnection,
       color: 'border-orange-200 hover:bg-orange-100'
     },
     {
       icon: <Zap size={14} />,
-      label: 'پاک کردن Cache',
+      label: t('settings.clear_cache'),
       action: handleClearCache,
       color: 'border-orange-200 hover:bg-orange-100'
     },
     {
       icon: <Info size={14} />,
-      label: 'اطلاعات Storage',
+      label: t('settings.storage_info'),
       action: handleShowStorageInfo,
       color: 'border-orange-200 hover:bg-orange-100'
     }
@@ -99,7 +99,7 @@ const DebugSettings: React.FC = () => {
           <Cpu size={20} />
           {t('settings.debug_mode', 'حالت دیباگ')}
           <span className="text-xs bg-orange-100 dark:bg-orange-900 px-2 py-1 rounded-full">
-            DEV ONLY
+            {t('settings.dev_only')}
           </span>
         </ModernCardTitle>
       </ModernCardHeader>
@@ -129,7 +129,7 @@ const DebugSettings: React.FC = () => {
           <div className="space-y-3 p-3 border-l-4 border-orange-300 bg-orange-50 dark:bg-orange-950 rounded-r-lg">
             <h4 className="font-semibold text-orange-800 dark:text-orange-200 flex items-center gap-2">
               <TestTube size={16} />
-              ابزارهای تشخیص عیب
+              {t('settings.debug_tools')}
             </h4>
             
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
@@ -148,13 +148,13 @@ const DebugSettings: React.FC = () => {
             </div>
             
             <div className="text-xs text-orange-700 dark:text-orange-300 mt-2">
-              💡 همه نتایج در Browser Console نمایش داده می‌شوند
+              {t('settings.console_results_hint')}
             </div>
           </div>
         )}
         
         <div className="text-xs text-gray-500 dark:text-gray-400 mt-4">
-          ⚠️ این تنظیمات فقط در محیط Development در دسترس هستند
+          {t('settings.dev_only_warning')}
         </div>
       </ModernCardContent>
     </ModernCard>

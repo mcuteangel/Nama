@@ -241,7 +241,19 @@
     "test_components": "تست کامپوننت‌ها",
     "gemini_description": "پیکربندی هوش مصنوعی برای تجربه بهتر 🤖",
     "security_settings": "تنظیمات امنیتی",
-    "model_settings": "تنظیمات مدل"
+    "model_settings": "تنظیمات مدل",
+    "dev_only": "فقط توسعه",
+    "test_edge_function": "تست Edge Function",
+    "clear_cache": "پاک کردن Cache",
+    "storage_info": "اطلاعات Storage",
+    "debug_tools": "ابزارهای تشخیص عیب",
+    "console_results_hint": "💡 همه نتایج در Browser Console نمایش داده می‌شوند",
+    "dev_only_warning": "⚠️ این تنظیمات فقط در محیط Development در دسترس هستند",
+    "default_contact_display_mode": "حالت نمایش پیش‌فرض مخاطبین",
+    "select_display_mode": "انتخاب حالت نمایش",
+    "display_mode_grid": "شبکه‌ای",
+    "display_mode_list": "لیستی",
+    "default_contact_display_mode_description": "نحوه نمایش پیش‌فرض لیست مخاطبین را انتخاب کنید"
   },
   "statistics": {
     "title": "آمار و تحلیل‌ها",
