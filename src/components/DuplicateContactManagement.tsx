@@ -10,8 +10,8 @@ import { invalidateCache } from '@/utils/cache-helpers';
 import { ContactCrudService } from '@/services/contact-crud-service';
 import EmptyState from './common/EmptyState';
 import LoadingSpinner from './common/LoadingSpinner';
-import { ModernCard, ModernCardHeader, ModernCardTitle, ModernCardDescription, ModernCardContent } from "@/components/ui/modern-card";
 import { GlassButton } from "@/components/ui/glass-button";
+import AIBaseCard from './ai/AIBaseCard';
 
 interface DuplicateContact {
   id: string;
@@ -290,7 +290,7 @@ const DuplicateContactManagement: React.FC = () => {
         mergedCustomFields.length > 0 ? supabase.from('custom_fields').insert(mergedCustomFields.map(cf => ({ ...cf, id: undefined }))) : Promise.resolve(),
       ]);
 
-      const { error: deleteDuplicateError } = await ContactCrudService.deleteContact(duplicateContact.id); // Updated service call
+      const { error: deleteDuplicateError } = await ContactCrudService.deleteContact(duplicateContact.id);
 
       if (deleteDuplicateError) throw new Error(deleteDuplicateError);
 
@@ -301,8 +301,6 @@ const DuplicateContactManagement: React.FC = () => {
     } catch (err: unknown) {
       ErrorManager.logError(err, { component: 'DuplicateContactManagement', action: 'mergeContacts', mainContact, duplicateContact });
       ErrorManager.notifyUser(`${t('ai_suggestions.error_merging_contacts')}: ${ErrorManager.getErrorMessage(err)}`, 'error');
-    } finally {
-      // dismissToast(toastId);
     }
   }, [session, t, fetchAllContactsForDuplicates]);
 
@@ -316,81 +314,104 @@ const DuplicateContactManagement: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6">
-      <ModernCard variant="glass" className="rounded-xl p-4">
-        <ModernCardHeader className="pb-2">
-          <ModernCardTitle className="text-xl font-bold flex items-center gap-2">
-            <Copy size={20} className="text-orange-500" /> {t('ai_suggestions.duplicate_contact_management_title')}
-          </ModernCardTitle>
-          <ModernCardDescription>
-            {t('ai_suggestions.duplicate_contact_management_description')}
-          </ModernCardDescription>
-        </ModernCardHeader>
-        <ModernCardContent className="space-y-4">
-          <GlassButton
-            onClick={fetchAllContactsForDuplicates}
-            disabled={isScanning}
-            variant="gradient-sunset"
-            className="w-full flex items-center gap-2 px-6 py-2 rounded-lg font-semibold shadow-md transition-all duration-300 transform hover:scale-105"
-          >
-            {isScanning && <LoadingSpinner size={16} className="me-2" />}
-            <Merge size={16} className="me-2" />
-            {t('ai_suggestions.scan_for_duplicates')}
-          </GlassButton>
+    <AIBaseCard
+      title={t('ai_suggestions.duplicate_contact_management_title')}
+      description={t('ai_suggestions.duplicate_contact_management_description')}
+      icon={<Copy size={20} />}
+      variant="warning"
+      compact
+    >
+      <GlassButton
+        onClick={fetchAllContactsForDuplicates}
+        disabled={isScanning}
+        variant="gradient-primary"
+        className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg font-medium text-sm"
+      >
+        {isScanning ? (
+          <LoadingSpinner size={14} />
+        ) : (
+          <Merge size={14} />
+        )}
+        {t('ai_suggestions.scan_for_duplicates')}
+      </GlassButton>
 
-          {duplicatePairs.length === 0 && !isScanning && (
-            <EmptyState
-              icon={Copy}
-              title={t('ai_suggestions.no_duplicates_found')}
-              description={t('ai_suggestions.no_duplicates_found_description')}
-            />
-          )}
+      {duplicatePairs.length === 0 && !isScanning && (
+        <EmptyState
+          icon={Copy}
+          title={t('ai_suggestions.no_duplicates_found')}
+          description={t('ai_suggestions.no_duplicates_found_description')}
+        />
+      )}
 
-          {duplicatePairs.length > 0 && (
-            <div className="space-y-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-              <h4 className="text-lg font-semibold text-gray-800 dark:text-gray-100">{t('ai_suggestions.pending_duplicate_suggestions')}</h4>
-              {duplicatePairs.map((pair, index) => (
-                <div key={index} className="flex flex-col p-3 glass rounded-lg shadow-sm space-y-2">
-                  <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-200">
-                    <Info size={16} className="text-blue-500" /> {t('ai_suggestions.duplicate_reason')}: {pair.reason}
+      {duplicatePairs.length > 0 && (
+        <div className="space-y-2 pt-3 border-t border-gray-200 dark:border-gray-700">
+          <h4 className="text-sm font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
+            <Info size={16} className="text-blue-500" />
+            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              {t('ai_suggestions.pending_duplicate_suggestions')}
+            </span>
+            <span className="bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-200 px-2 py-1 rounded-full text-xs font-semibold">
+              {duplicatePairs.length}
+            </span>
+          </h4>
+          <div className="grid gap-2">
+            {duplicatePairs.map((pair, index) => (
+              <div
+                key={index}
+                className="bg-gradient-to-r from-white/20 via-gray-50/30 to-slate-50/30 dark:from-gray-800/20 dark:via-gray-700/30 dark:to-gray-600/30 p-2 rounded-lg border border-white/30 backdrop-blur-sm shadow-sm"
+              >
+                <div className="flex items-center gap-2 text-xs text-gray-700 dark:text-gray-200 mb-2">
+                  <Info size={12} className="text-blue-500" />
+                  {t('ai_suggestions.duplicate_reason')}: {pair.reason}
+                </div>
+                <div className="grid grid-cols-1 gap-2">
+                  <div className="p-2 border rounded-md bg-gray-50 dark:bg-gray-700">
+                    <p className="font-medium text-sm text-gray-800 dark:text-gray-100">
+                      {t('ai_suggestions.main_contact')}: {pair.mainContact.first_name} {pair.mainContact.last_name}
+                    </p>
+                    {pair.mainContact.email_addresses.slice(0, 1).map((e, i) => (
+                      <p key={i} className="text-xs text-gray-600 dark:text-gray-300 truncate">{e.email_address}</p>
+                    ))}
+                    {pair.mainContact.phone_numbers.slice(0, 1).map((p, i) => (
+                      <p key={i} className="text-xs text-gray-600 dark:text-gray-300">{p.phone_number}</p>
+                    ))}
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="p-2 border rounded-md bg-gray-50 dark:bg-gray-700">
-                      <p className="font-medium text-gray-800 dark:text-gray-100">{t('ai_suggestions.main_contact')}: {pair.mainContact.first_name} {pair.mainContact.last_name}</p>
-                      {pair.mainContact.email_addresses.map((e, i) => <p key={i} className="text-sm text-gray-600 dark:text-gray-300">{e.email_address}</p>)}
-                      {pair.mainContact.phone_numbers.map((p, i) => <p key={i} className="text-sm text-gray-600 dark:text-gray-300">{p.phone_number}</p>)}
-                    </div>
-                    <div className="p-2 border rounded-md bg-gray-50 dark:bg-gray-700">
-                      <p className="font-medium text-gray-800 dark:text-gray-100">{t('ai_suggestions.duplicate_contact')}: {pair.duplicateContact.first_name} {pair.duplicateContact.last_name}</p>
-                      {pair.duplicateContact.email_addresses.map((e, i) => <p key={i} className="text-sm text-gray-600 dark:text-gray-300">{e.email_address}</p>)}
-                      {pair.duplicateContact.phone_numbers.map((p, i) => <p key={i} className="text-sm text-gray-600 dark:text-gray-300">{p.phone_number}</p>)}
-                    </div>
-                  </div>
-                  <div className="flex justify-end gap-2 mt-3">
-                    <GlassButton
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleMergeContacts(pair.mainContact, pair.duplicateContact)}
-                      className="text-green-600 hover:bg-green-100 dark:text-green-400 dark:hover:bg-gray-600/50"
-                    >
-                      <Merge size={20} />
-                    </GlassButton>
-                    <GlassButton
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleDiscardDuplicate(pair.duplicateContact.id)}
-                      className="text-red-600 hover:bg-red-100 dark:text-red-400 dark:hover:bg-gray-600/50"
-                    >
-                      <XCircle size={20} />
-                    </GlassButton>
+                  <div className="p-2 border rounded-md bg-gray-50 dark:bg-gray-700">
+                    <p className="font-medium text-sm text-gray-800 dark:text-gray-100">
+                      {t('ai_suggestions.duplicate_contact')}: {pair.duplicateContact.first_name} {pair.duplicateContact.last_name}
+                    </p>
+                    {pair.duplicateContact.email_addresses.slice(0, 1).map((e, i) => (
+                      <p key={i} className="text-xs text-gray-600 dark:text-gray-300 truncate">{e.email_address}</p>
+                    ))}
+                    {pair.duplicateContact.phone_numbers.slice(0, 1).map((p, i) => (
+                      <p key={i} className="text-xs text-gray-600 dark:text-gray-300">{p.phone_number}</p>
+                    ))}
                   </div>
                 </div>
-              ))}
-            </div>
-          )}
-        </ModernCardContent>
-      </ModernCard>
-    </div>
+                <div className="flex justify-end gap-1 mt-2">
+                  <GlassButton
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleMergeContacts(pair.mainContact, pair.duplicateContact)}
+                    className="w-7 h-7 rounded-full bg-green-100/50 hover:bg-green-200/70 dark:bg-green-900/30 dark:hover:bg-green-800/50 text-green-600 hover:text-green-700"
+                  >
+                    <Merge size={14} />
+                  </GlassButton>
+                  <GlassButton
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleDiscardDuplicate(pair.duplicateContact.id)}
+                    className="w-7 h-7 rounded-full bg-red-100/50 hover:bg-red-200/70 dark:bg-red-900/30 dark:hover:bg-red-800/50 text-red-600 hover:text-red-700"
+                  >
+                    <XCircle size={14} />
+                  </GlassButton>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </AIBaseCard>
   );
 };
 

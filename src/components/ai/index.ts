@@ -6,3 +6,4 @@
 export { default as AISuggestionCard } from './AISuggestionCard';
 export { default as GeminiSettings } from './GeminiSettings';
 export { default as GenderSuggestionManagement } from './GenderSuggestionManagement';
+export { default as AIBaseCard } from './AIBaseCard';

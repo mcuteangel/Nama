@@ -201,6 +201,7 @@
     "persian": "Persian",
     "english": "English",
     "ai_settings": "AI Settings",
+    "gemini_settings": "Gemini Settings",
     "gemini_api_key": "Gemini API Key",
     "enter_gemini_api_key": "Enter your Gemini API Key",
     "gemini_api_key_description": "Enter your Gemini API key to use AI features. This key is stored securely.",
@@ -225,7 +226,10 @@
     "component_testing": "Component Testing",
     "rtl_components_test": "RTL Components Test",
     "rtl_components_test_description": "Test UI components in right-to-left layouts",
-    "test_components": "Test Components"
+    "test_components": "Test Components",
+    "gemini_description": "Configure AI for better experience 🤖",
+    "security_settings": "Security Settings",
+    "model_settings": "Model Settings"
   },
   "user_management": {
     "title": "User Management",

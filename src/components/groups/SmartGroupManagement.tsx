@@ -10,8 +10,8 @@ import { invalidateCache } from '@/utils/cache-helpers';
 import { useGroups } from '@/hooks/use-groups';
 import EmptyState from '../common/EmptyState';
 import LoadingSpinner from '../common/LoadingSpinner';
-import { ModernCard, ModernCardHeader, ModernCardTitle, ModernCardDescription, ModernCardContent } from "@/components/ui/modern-card";
-import { GlassButton, GradientGlassButton } from "@/components/ui/glass-button";
+import { GlassButton } from "@/components/ui/glass-button";
+import AIBaseCard from '../ai/AIBaseCard';
 
 interface ContactWithoutGroup {
   id: string;
@@ -164,77 +164,92 @@ const SmartGroupManagement: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6">
-      <ModernCard variant="glass" className="rounded-xl p-4 fade-in-up">
-        <ModernCardHeader className="pb-2">
-          <ModernCardTitle className="text-xl font-bold flex items-center gap-2">
-            <Users size={20} className="text-purple-500" /> {t('ai_suggestions.smart_group_management_title')}
-          </ModernCardTitle>
-          <ModernCardDescription>
-            {t('ai_suggestions.smart_group_management_description')}
-          </ModernCardDescription>
-        </ModernCardHeader>
-        <ModernCardContent className="space-y-4">
-          <GradientGlassButton
-            onClick={generateGroupSuggestions}
-            disabled={isGeneratingSuggestions || contactsWithoutGroup.length === 0}
-            className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold shadow-lg hover-lift"
-          >
-            {isGeneratingSuggestions && <LoadingSpinner size={20} />}
-            <Sparkles size={20} />
-            {t('ai_suggestions.generate_group_suggestions')}
-          </GradientGlassButton>
+    <AIBaseCard
+      title={t('ai_suggestions.smart_group_management_title')}
+      description={t('ai_suggestions.smart_group_management_description')}
+      icon={<Users size={20} />}
+      variant="secondary"
+      compact
+    >
+      <GlassButton
+        onClick={generateGroupSuggestions}
+        disabled={isGeneratingSuggestions || contactsWithoutGroup.length === 0}
+        variant="gradient-primary"
+        className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg font-medium text-sm"
+      >
+        {isGeneratingSuggestions ? (
+          <LoadingSpinner size={14} />
+        ) : (
+          <Sparkles size={14} />
+        )}
+        {t('ai_suggestions.generate_group_suggestions')}
+      </GlassButton>
 
-          {contactsWithoutGroup.length === 0 && !isGeneratingSuggestions && (
-            <EmptyState
-              icon={Users}
-              title={t('ai_suggestions.all_contacts_grouped')}
-              description={t('ai_suggestions.all_contacts_grouped_description')}
-            />
-          )}
+      {contactsWithoutGroup.length === 0 && !isGeneratingSuggestions && (
+        <EmptyState
+          icon={Users}
+          title={t('ai_suggestions.all_contacts_grouped')}
+          description={t('ai_suggestions.all_contacts_grouped_description')}
+        />
+      )}
 
-          {groupSuggestions.length > 0 && (
-            <div className="space-y-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-              <h4 className="text-lg font-semibold text-gray-800 dark:text-gray-100">{t('ai_suggestions.pending_group_suggestions')}</h4>
-              {groupSuggestions.map((suggestion, index) => (
-                <div key={index} className="flex items-center justify-between p-4 glass rounded-xl shadow-sm hover-lift">
-                  <div>
-                    <p className="font-medium text-gray-800 dark:text-gray-100">{suggestion.contact_name}</p>
-                    <p className="text-sm text-gray-600 dark:text-gray-300 flex items-center gap-1 mt-1">
-                      {t('ai_suggestions.suggested_group')}:
-                      <span 
-                        className="px-3 py-1 rounded-full text-xs font-medium text-white inline-flex items-center"
+      {groupSuggestions.length > 0 && (
+        <div className="space-y-2 pt-3 border-t border-gray-200 dark:border-gray-700">
+          <h4 className="text-sm font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
+            <Sparkles size={16} className="text-yellow-500" />
+            <span className="bg-gradient-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent">
+              {t('ai_suggestions.pending_group_suggestions')}
+            </span>
+            <span className="bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-200 px-2 py-1 rounded-full text-xs font-semibold">
+              {groupSuggestions.length}
+            </span>
+          </h4>
+          <div className="grid gap-2">
+            {groupSuggestions.map((suggestion, index) => (
+              <div
+                key={index}
+                className="bg-gradient-to-r from-white/20 via-gray-50/30 to-slate-50/30 dark:from-gray-800/20 dark:via-gray-700/30 dark:to-gray-600/30 p-2 rounded-lg border border-white/30 backdrop-blur-sm shadow-sm"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <p className="font-medium text-sm text-gray-800 dark:text-gray-100 mb-1">{suggestion.contact_name}</p>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-medium text-gray-600 dark:text-gray-300">
+                        {t('ai_suggestions.suggested_group')}:
+                      </span>
+                      <span
+                        className="px-2 py-1 rounded-full text-xs font-medium text-white inline-flex items-center"
                         style={{ backgroundColor: suggestion.suggested_group_color || '#cccccc' }}
                       >
                         {suggestion.suggested_group_name}
                       </span>
-                    </p>
+                    </div>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex gap-1">
                     <GlassButton
                       variant="ghost"
-                      size="icon"
+                      size="sm"
                       onClick={() => handleApplySuggestion(suggestion)}
-                      className="text-green-600 hover:bg-green-100 dark:text-green-400 dark:hover:bg-gray-600/50 hover-lift"
+                      className="w-7 h-7 rounded-full bg-green-100/50 hover:bg-green-200/70 dark:bg-green-900/30 dark:hover:bg-green-800/50 text-green-600 hover:text-green-700"
                     >
-                      <CheckCircle size={20} />
+                      <CheckCircle size={14} />
                     </GlassButton>
                     <GlassButton
                       variant="ghost"
-                      size="icon"
+                      size="sm"
                       onClick={() => handleDiscardSuggestion(suggestion.contact_id)}
-                      className="text-red-600 hover:bg-red-100 dark:text-red-400 dark:hover:bg-gray-600/50 hover-lift"
+                      className="w-7 h-7 rounded-full bg-red-100/50 hover:bg-red-200/70 dark:bg-red-900/30 dark:hover:bg-red-800/50 text-red-600 hover:text-red-700"
                     >
-                      <XCircle size={20} />
+                      <XCircle size={14} />
                     </GlassButton>
                   </div>
                 </div>
-              ))}
-            </div>
-          )}
-        </ModernCardContent>
-      </ModernCard>
-    </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </AIBaseCard>
   );
 };
 
