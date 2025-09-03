@@ -2,7 +2,7 @@ import React, { useState, useCallback, useEffect, useMemo, useRef } from "react"
 import { ModernTextarea } from "@/components/ui/modern-textarea";
 import { GlassButton } from "@/components/ui/glass-button";
 import { ModernTabs, ModernTabsList, ModernTabsTrigger, ModernTabsContent } from "@/components/ui/modern-tabs";
-import { Sparkles, UserCheck, Mic, StopCircle, Search, Brain, Zap, Settings, Users, Shield, FileText, Wrench, Copy, Heart } from "lucide-react";
+import { Sparkles, UserCheck, Mic, StopCircle, Search, Brain, Zap, Settings, Users, Shield, FileText, Wrench, Copy, Heart, CheckSquare, Square, CheckCircle, XCircle, FolderOpen } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useContactExtractor } from "@/hooks/use-contact-extractor";
 import { ErrorManager } from "@/lib/error-manager";
@@ -31,7 +31,7 @@ interface AISuggestionDisplay extends AISuggestionCardProps {
   id: string;
 }
 
-const AISuggestions = React.memo(() => {
+const AISuggestions: React.FC = () => {
   const { t } = useTranslation();
   const { session, isLoading: isSessionLoading } = useSession();
   const navigate = useNavigate();
@@ -41,6 +41,8 @@ const AISuggestions = React.memo(() => {
   const [isProcessingSuggestions, setIsProcessingSuggestions] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('suggestions');
+  const [selectedSuggestions, setSelectedSuggestions] = useState<Set<string>>(new Set());
+  const [isBatchMode, setIsBatchMode] = useState(false);
 
   const searchInputRef = useRef<HTMLInputElement>(null);
 
@@ -305,6 +307,53 @@ const AISuggestions = React.memo(() => {
     }
   }, [navigate]);
 
+  // Batch operations functions
+  const handleSelectAll = useCallback(() => {
+    if (selectedSuggestions.size === filteredSuggestions.length) {
+      setSelectedSuggestions(new Set());
+    } else {
+      setSelectedSuggestions(new Set(filteredSuggestions.map(s => s.id)));
+    }
+  }, [selectedSuggestions.size, filteredSuggestions]);
+
+  const handleSelectSuggestion = useCallback((suggestionId: string) => {
+    setSelectedSuggestions(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(suggestionId)) {
+        newSet.delete(suggestionId);
+      } else {
+        newSet.add(suggestionId);
+      }
+      return newSet;
+    });
+  }, []);
+
+  const handleBatchAccept = useCallback(async () => {
+    if (selectedSuggestions.size === 0) return;
+
+    const selectedItems = filteredSuggestions.filter(s => selectedSuggestions.has(s.id));
+
+    for (const suggestion of selectedItems) {
+      await handleProcessSuggestion(suggestion);
+    }
+
+    setSelectedSuggestions(new Set());
+    ErrorManager.notifyUser(t('ai_suggestions.batch_accept_success', { count: selectedItems.length }), 'success');
+  }, [selectedSuggestions, filteredSuggestions, handleProcessSuggestion, t]);
+
+  const handleBatchDiscard = useCallback(async () => {
+    if (selectedSuggestions.size === 0) return;
+
+    const selectedItems = filteredSuggestions.filter(s => selectedSuggestions.has(s.id));
+
+    for (const suggestion of selectedItems) {
+      await handleDiscardSuggestion(suggestion.id);
+    }
+
+    setSelectedSuggestions(new Set());
+    ErrorManager.notifyUser(t('ai_suggestions.batch_discard_success', { count: selectedItems.length }), 'success');
+  }, [selectedSuggestions, filteredSuggestions, handleDiscardSuggestion, t]);
+
   if (isSessionLoading) {
     return <LoadingMessage message={t('common.loading')} />;
   }
@@ -446,18 +495,63 @@ const AISuggestions = React.memo(() => {
                     </p>
                   </div>
                 </div>
-                <div className="relative w-full sm:w-80">
-                  <Search size={20} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                  <input
-                    ref={searchInputRef}
-                    type="text"
-                    placeholder={t('common.search_suggestions', 'جستجو در پیشنهادات...')}
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-4 focus:ring-blue-300 focus:border-blue-500 transition-all duration-300"
-                  />
+                <div className="flex items-center gap-3">
+                  {/* Batch Mode Toggle */}
+                  <GlassButton
+                    onClick={() => setIsBatchMode(!isBatchMode)}
+                    variant={isBatchMode ? "gradient-primary" : "outline"}
+                    className="flex items-center gap-2"
+                  >
+                    {isBatchMode ? <CheckSquare size={16} /> : <Square size={16} />}
+                    {t('ai_suggestions.batch_mode', 'حالت گروهی')}
+                  </GlassButton>
+                  <div className="relative w-full sm:w-80">
+                    <Search size={20} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                    <input
+                      ref={searchInputRef}
+                      type="text"
+                      placeholder={t('common.search_suggestions', 'جستجو در پیشنهادات...')}
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full pl-10 pr-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-4 focus:ring-blue-300 focus:border-blue-500 transition-all duration-300"
+                    />
+                  </div>
                 </div>
               </div>
+
+              {/* Batch Actions */}
+              {isBatchMode && selectedSuggestions.size > 0 && (
+                <div className="mb-4 p-4 bg-gradient-to-r from-blue-50/60 to-purple-50/60 dark:from-blue-900/30 dark:to-purple-900/30 rounded-xl border border-white/30">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <CheckSquare size={20} className="text-blue-500" />
+                      <span className="font-medium text-gray-800 dark:text-gray-100">
+                        {selectedSuggestions.size} {t('ai_suggestions.selected', 'انتخاب شده')}
+                      </span>
+                    </div>
+                    <div className="flex gap-2">
+                      <GlassButton
+                        onClick={handleBatchAccept}
+                        variant="gradient-primary"
+                        className="flex items-center gap-2"
+                        disabled={isSavingOrUpdating}
+                      >
+                        <CheckCircle size={16} />
+                        {t('ai_suggestions.accept_selected', 'پذیرش انتخاب شده‌ها')}
+                      </GlassButton>
+                      <GlassButton
+                        onClick={handleBatchDiscard}
+                        variant="destructive"
+                        className="flex items-center gap-2"
+                        disabled={isSavingOrUpdating}
+                      >
+                        <XCircle size={16} />
+                        {t('ai_suggestions.discard_selected', 'رد انتخاب شده‌ها')}
+                      </GlassButton>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Loading State */}
               {(isLoadingSuggestions || isSavingOrUpdating) && (
@@ -477,13 +571,27 @@ const AISuggestions = React.memo(() => {
                     className="animate-in fade-in slide-in-from-bottom-4"
                     style={{ animationDelay: `${index * 100}ms` }}
                   >
-                    <AISuggestionCard
-                      suggestion={suggestion}
-                      onProcess={handleProcessSuggestion}
-                      onDiscard={handleDiscardSuggestion}
-                      onEdit={handleEditSuggestion}
-                      isProcessing={isSavingOrUpdating}
-                    />
+                    <div className="flex items-start gap-3">
+                      {isBatchMode && (
+                        <GlassButton
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleSelectSuggestion(suggestion.id)}
+                          className={`mt-2 flex-shrink-0 ${selectedSuggestions.has(suggestion.id) ? 'text-blue-500' : 'text-gray-400'}`}
+                        >
+                          {selectedSuggestions.has(suggestion.id) ? <CheckSquare size={20} /> : <Square size={20} />}
+                        </GlassButton>
+                      )}
+                      <div className="flex-1">
+                        <AISuggestionCard
+                          suggestion={suggestion}
+                          onProcess={handleProcessSuggestion}
+                          onDiscard={handleDiscardSuggestion}
+                          onEdit={handleEditSuggestion}
+                          isProcessing={isSavingOrUpdating}
+                        />
+                      </div>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -600,7 +708,7 @@ const AISuggestions = React.memo(() => {
       </ModernTabs>
     </DashboardLayout>
   );
-});
+};
 
 AISuggestions.displayName = 'AISuggestions';
 
