@@ -1,15 +1,12 @@
 import * as React from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { DayPicker } from "react-day-picker";
-
 import { cn } from "@/lib/utils";
-import { buttonVariants } from "@/components/ui/button";
-import { ModernCalendar, type ModernCalendarProps } from "@/components/ui/modern-calendar";
+import { JalaliCalendar } from "@/components/JalaliCalendar";
+import type { JalaliCalendarProps } from "@/components/JalaliCalendar";
 
-export type CalendarProps = ModernCalendarProps;
+export type CalendarProps = JalaliCalendarProps;
 
 function Calendar(props: CalendarProps) {
-  return <ModernCalendar {...props} />;
+  return <JalaliCalendar {...props} />;
 }
 Calendar.displayName = "Calendar";
 

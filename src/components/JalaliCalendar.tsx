@@ -12,7 +12,7 @@ import { cn, applyGlassEffect } from '@/lib/utils';
 import moment from 'moment-jalaali';
 import { useJalaliCalendar } from '@/hooks/use-jalali-calendar';
 
-interface JalaliCalendarProps {
+export interface JalaliCalendarProps {
   selected?: Date | undefined;
   onSelect?: (date: Date) => void;
   className?: string;

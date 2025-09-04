@@ -1,8 +1,14 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Calendar, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import { GlassButton } from '@/components/ui/glass-button';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
+import {
+  ModernPopover,
+  ModernPopoverContent,
+  ModernPopoverTrigger,
+} from '@/components/ui/modern-popover';
+import { JalaliCalendar } from '@/components/JalaliCalendar';
 
 interface StatisticsDateFilterProps {
   onDateRangeChange: (startDate: string | null, endDate: string | null) => void;
@@ -44,30 +50,46 @@ const StatisticsDateFilter: React.FC<StatisticsDateFilterProps> = ({
             <label className="text-sm font-medium text-foreground">
               {t('statistics.start_date')}
             </label>
-            <div className="relative">
-              <input
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                className="w-full rounded-lg border border-border bg-background/50 p-2 text-foreground backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-primary"
-              />
-              <Calendar className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-            </div>
+            <ModernPopover>
+              <ModernPopoverTrigger asChild>
+                <GlassButton
+                  variant="glass"
+                  className="w-full justify-start text-left font-normal py-2 bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 hover:bg-white/40 dark:hover:bg-gray-700/40"
+                >
+                  {startDate ? new Date(startDate).toLocaleDateString() : t('statistics.start_date')}
+                </GlassButton>
+              </ModernPopoverTrigger>
+              <ModernPopoverContent className="w-auto p-0" glassEffect="card">
+                <JalaliCalendar
+                  selected={startDate ? new Date(startDate) : undefined}
+                  onSelect={(date) => setStartDate(date ? date.toISOString() : '')}
+                  showToggle={true}
+                />
+              </ModernPopoverContent>
+            </ModernPopover>
           </div>
 
           <div className="space-y-2">
             <label className="text-sm font-medium text-foreground">
               {t('statistics.end_date')}
             </label>
-            <div className="relative">
-              <input
-                type="date"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                className="w-full rounded-lg border border-border bg-background/50 p-2 text-foreground backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-primary"
-              />
-              <Calendar className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-            </div>
+            <ModernPopover>
+              <ModernPopoverTrigger asChild>
+                <GlassButton
+                  variant="glass"
+                  className="w-full justify-start text-left font-normal py-2 bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 hover:bg-white/40 dark:hover:bg-gray-700/40"
+                >
+                  {endDate ? new Date(endDate).toLocaleDateString() : t('statistics.end_date')}
+                </GlassButton>
+              </ModernPopoverTrigger>
+              <ModernPopoverContent className="w-auto p-0" glassEffect="card">
+                <JalaliCalendar
+                  selected={endDate ? new Date(endDate) : undefined}
+                  onSelect={(date) => setEndDate(date ? date.toISOString() : '')}
+                  showToggle={true}
+                />
+              </ModernPopoverContent>
+            </ModernPopover>
           </div>
 
           <div className="flex gap-2">
@@ -95,19 +117,41 @@ const StatisticsDateFilter: React.FC<StatisticsDateFilterProps> = ({
               {t('statistics.compare_period')}
             </label>
             <div className="flex gap-2">
-              <input
-                type="date"
-                value={compareStartDate}
-                onChange={(e) => setCompareStartDate(e.target.value)}
-                className="flex-1 rounded-lg border border-border bg-background/50 p-2 text-foreground backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-primary"
-              />
+              <ModernPopover>
+                <ModernPopoverTrigger asChild>
+                  <GlassButton
+                    variant="glass"
+                    className="flex-1 justify-start text-left font-normal py-2 bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 hover:bg-white/40 dark:hover:bg-gray-700/40"
+                  >
+                    {compareStartDate ? new Date(compareStartDate).toLocaleDateString() : t('statistics.start_date')}
+                  </GlassButton>
+                </ModernPopoverTrigger>
+                <ModernPopoverContent className="w-auto p-0" glassEffect="card">
+                  <JalaliCalendar
+                    selected={compareStartDate ? new Date(compareStartDate) : undefined}
+                    onSelect={(date) => setCompareStartDate(date ? date.toISOString() : '')}
+                    showToggle={true}
+                  />
+                </ModernPopoverContent>
+              </ModernPopover>
               <span className="self-center text-muted-foreground">-</span>
-              <input
-                type="date"
-                value={compareEndDate}
-                onChange={(e) => setCompareEndDate(e.target.value)}
-                className="flex-1 rounded-lg border border-border bg-background/50 p-2 text-foreground backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-primary"
-              />
+              <ModernPopover>
+                <ModernPopoverTrigger asChild>
+                  <GlassButton
+                    variant="glass"
+                    className="flex-1 justify-start text-left font-normal py-2 bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 hover:bg-white/40 dark:hover:bg-gray-700/40"
+                  >
+                    {compareEndDate ? new Date(compareEndDate).toLocaleDateString() : t('statistics.end_date')}
+                  </GlassButton>
+                </ModernPopoverTrigger>
+                <ModernPopoverContent className="w-auto p-0" glassEffect="card">
+                  <JalaliCalendar
+                    selected={compareEndDate ? new Date(compareEndDate) : undefined}
+                    onSelect={(date) => setCompareEndDate(date ? date.toISOString() : '')}
+                    showToggle={true}
+                  />
+                </ModernPopoverContent>
+              </ModernPopover>
             </div>
           </div>
 
