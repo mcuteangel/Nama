@@ -244,3 +244,4 @@ dist-electron/
 # Local development
 .local
 *.local
+.kilocode/mcp.json
