@@ -1,30 +1,40 @@
-import React, { useMemo, useEffect, useRef } from "react";
+import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { BarChart3, Users, Calendar, Award, TrendingUp, Target, Zap } from "lucide-react";
+import { BarChart3, Users, Calendar, Award, TrendingUp, Target, Zap, LucideProps } from "lucide-react";
 import { StatisticsData } from "./types";
 
 /**
- * Ultra-Modern StatisticsCompactStats - Next-Gen Metrics Dashboard
+ * Refactored StatisticsCompactStats - Improved Performance and Maintainability
  *
- * Features:
- * - Advanced metric cards with morphing animations
- * - Real-time data visualization with live updates
- * - AI-powered insights and trend analysis
- * - Interactive hover effects with micro-animations
- * - Dynamic gradient backgrounds and particle effects
- * - Performance indicators with predictive analytics
- * - Voice-guided metric exploration
- * - Responsive grid layout with fluid animations
+ * Key improvements:
+ * - Better component organization
+ * - Improved type safety
+ * - Removed unnecessary DOM manipulation
+ * - Simplified animation logic
+ * - Better separation of concerns
  */
 interface StatisticsCompactStatsProps {
   data: StatisticsData;
 }
 
+// Define the stat item structure
+interface StatItem {
+  label: string;
+  value: number;
+  icon: React.ComponentType<LucideProps>;
+  color: string;
+  bgColor: string;
+  hoverColor: string;
+  trend: string;
+  trendColor: string;
+  particleColor: string;
+}
+
 export const StatisticsCompactStats: React.FC<StatisticsCompactStatsProps> = ({ data }) => {
   const { t } = useTranslation();
-  const containerRef = useRef<HTMLDivElement>(null);
 
-  const stats = useMemo(() => [
+  // Memoized stats data to prevent unnecessary recalculations
+  const stats: StatItem[] = useMemo(() => [
     {
       label: t('statistics.total_contacts', 'کل مخاطبین'),
       value: data.totalContacts || 0,
@@ -71,41 +81,17 @@ export const StatisticsCompactStats: React.FC<StatisticsCompactStatsProps> = ({ 
     }
   ], [data, t]);
 
-  // Advanced particle system for metrics celebration
-  useEffect(() => {
-    if (!containerRef.current) return;
-
-    const container = containerRef.current;
-    const particlesContainer = document.createElement('div');
-    particlesContainer.className = 'absolute inset-0 pointer-events-none overflow-hidden rounded-2xl';
-    container.appendChild(particlesContainer);
-
-    // Create floating particles for each metric
-    stats.forEach((stat, statIndex) => {
-      for (let i = 0; i < 3; i++) {
-        const particle = document.createElement('div');
-        particle.className = 'absolute w-1 h-1 rounded-full animate-pulse';
-        particle.style.backgroundColor = stat.particleColor;
-        particle.style.left = `${15 + (statIndex * 25)}%`;
-        particle.style.top = `${20 + Math.random() * 60}%`;
-        particle.style.animationDelay = `${Math.random() * 2 + statIndex * 0.5}s`;
-        particle.style.animationDuration = `${1 + Math.random() * 2}s`;
-        particlesContainer.appendChild(particle);
-      }
-    });
-
-    // Cleanup
-    return () => {
-      if (container.contains(particlesContainer)) {
-        container.removeChild(particlesContainer);
-      }
-    };
-  }, [stats]);
+  // Calculate progress percentage for each stat
+  const calculateProgress = (value: number): number => {
+    return Math.min((value / 100) * 100, 100);
+  };
 
   return (
-    <div ref={containerRef} className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8 relative">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
       {stats.map((stat, index) => {
         const Icon = stat.icon;
+        const progress = calculateProgress(stat.value);
+        
         return (
           <div
             key={index}
@@ -168,7 +154,7 @@ export const StatisticsCompactStats: React.FC<StatisticsCompactStatsProps> = ({ 
                   <div
                     className={`h-full bg-gradient-to-r ${stat.color} rounded-full transition-all duration-1000 ease-out`}
                     style={{
-                      width: `${Math.min((stat.value / 100) * 100, 100)}%`,
+                      width: `${progress}%`,
                       animationDelay: `${index * 200}ms`
                     }}
                   />
@@ -176,7 +162,7 @@ export const StatisticsCompactStats: React.FC<StatisticsCompactStatsProps> = ({ 
                 <div className="flex items-center justify-between mt-1">
                   <span className="text-xs text-gray-500 dark:text-gray-400">پیشرفت</span>
                   <span className="text-xs text-gray-600 dark:text-gray-300 font-medium">
-                    {Math.min(Math.round((stat.value / 100) * 100), 100)}%
+                    {Math.round(progress)}%
                   </span>
                 </div>
               </div>

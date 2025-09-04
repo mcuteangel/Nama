@@ -4,6 +4,7 @@ import BaseLineChart from './BaseLineChart';
 import { CreationTimeData } from './types';
 import { useTranslation } from "react-i18next";
 import moment from 'moment-jalaali';
+import { useAppSettings } from '@/hooks/use-app-settings';
 
 /**
  * Ultra-Modern ContactsByCreationTimeChart - Time-based Contact Growth Analysis
@@ -22,6 +23,7 @@ interface ContactsByCreationTimeChartProps {
 
 const ContactsByCreationTimeChart: React.FC<ContactsByCreationTimeChartProps> = ({ data }) => {
   const { i18n } = useTranslation();
+  const { settings: appSettings } = useAppSettings();
   const containerRef = useRef<HTMLDivElement>(null);
   const [growthMode, setGrowthMode] = useState(false);
   const [selectedPeriod, setSelectedPeriod] = useState<string | null>(null);
@@ -42,8 +44,8 @@ const ContactsByCreationTimeChart: React.FC<ContactsByCreationTimeChartProps> = 
     }
   }, [data]);
 
-  // Determine calendar type based on current language
-  const isJalali = i18n.language === 'fa';
+  // Determine calendar type based on app settings
+  const isJalali = appSettings.calendarType === 'jalali';
 
   const formattedData = useMemo(() => {
     return data.map(item => {

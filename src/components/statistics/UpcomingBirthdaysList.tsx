@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { ModernCard, ModernCardHeader, ModernCardTitle, ModernCardContent } from "@/components/ui/modern-card";
 import moment from 'moment-jalaali';
 import { BirthdayContact } from './types';
+import { useAppSettings } from '@/hooks/use-app-settings';
 
 /**
  * Ultra-Modern UpcomingBirthdaysList - Next-Gen Birthday Celebration
@@ -23,11 +24,12 @@ interface UpcomingBirthdaysListProps {
 
 const UpcomingBirthdaysList: React.FC<UpcomingBirthdaysListProps> = ({ data }) => {
   const { t, i18n } = useTranslation();
+  const { settings: appSettings } = useAppSettings();
   const listRef = useRef<HTMLDivElement>(null);
   const [celebratingIndex, setCelebratingIndex] = useState<number | null>(null);
 
-  // Determine calendar type based on current language
-  const isJalali = i18n.language === 'fa';
+  // Determine calendar type based on app settings
+  const isJalali = appSettings.calendarType === 'jalali';
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
