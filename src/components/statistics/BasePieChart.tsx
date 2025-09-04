@@ -147,7 +147,8 @@ const BasePieChart: React.FC<BasePieChartProps> = ({
   const CustomTooltip: React.FC<TooltipProps<ValueType, NameType>> = ({ active, payload }) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
-      const percentage = ((data.value / formattedData.reduce((sum, d) => sum + d.value, 0)) * 100).toFixed(1);
+      const total = formattedData.reduce((sum, d) => sum + (typeof d.value === 'number' ? d.value : parseFloat(d.value as string) || 0), 0);
+      const percentage = ((typeof data.value === 'number' ? data.value : parseFloat(data.value as string) || 0) / total * 100).toFixed(1);
 
       return (
         <div className="bg-background/95 border border-border/50 rounded-xl p-4 shadow-2xl backdrop-blur-xl">
@@ -327,10 +328,10 @@ const BasePieChart: React.FC<BasePieChartProps> = ({
                     fontSize: '14px'
                   }}
                   iconType="circle"
-                  formatter={(value, entry) => (
+                  formatter={(value, entry, index) => (
                     <span style={{
                       color: entry.color,
-                      fontWeight: selectedSlice === entry.index ? 'bold' : 'normal'
+                      fontWeight: selectedSlice === index ? 'bold' : 'normal'
                     }}>
                       {value}
                     </span>
@@ -354,7 +355,7 @@ const BasePieChart: React.FC<BasePieChartProps> = ({
                     {formattedData[selectedSlice].value} {t('common.contacts')}
                   </p>
                   <p className="text-muted-foreground">
-                    {((formattedData[selectedSlice].value / formattedData.reduce((sum, d) => sum + d.value, 0)) * 100).toFixed(1)}% از کل
+                    {((Number(formattedData[selectedSlice].value) / formattedData.reduce((sum, d) => sum + Number(d.value), 0)) * 100).toFixed(1)}% از کل
                   </p>
                 </div>
               </div>

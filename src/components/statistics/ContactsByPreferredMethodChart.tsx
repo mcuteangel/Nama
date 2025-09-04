@@ -43,7 +43,7 @@ const ContactsByPreferredMethodChart: React.FC<ContactsByPreferredMethodChartPro
 
   // Method-specific icons and colors
   const getMethodConfig = (method: string) => {
-    const configs: Record<string, { icon: React.ComponentType<any>, colors: { primary: string, secondary: string, accent: string }, label: string }> = {
+    const configs: Record<string, { icon: React.ComponentType<React.SVGProps<SVGSVGElement>>, colors: { primary: string, secondary: string, accent: string }, label: string }> = {
       'phone': { icon: Phone, colors: { primary: 'from-green-500 to-emerald-500', secondary: 'from-green-400 to-emerald-400', accent: '#10B981' }, label: 'تلفن' },
       'email': { icon: Mail, colors: { primary: 'from-blue-500 to-indigo-500', secondary: 'from-blue-400 to-indigo-400', accent: '#3B82F6' }, label: 'ایمیل' },
       'message': { icon: MessageCircle, colors: { primary: 'from-purple-500 to-violet-500', secondary: 'from-purple-400 to-violet-400', accent: '#8B5CF6' }, label: 'پیام' },
