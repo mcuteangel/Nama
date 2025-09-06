@@ -1,4 +1,4 @@
-import React, { createContext } from 'react';
+import { createContext } from 'react';
 import { StatisticsData } from "./types";
 
 export type StatisticsAction =

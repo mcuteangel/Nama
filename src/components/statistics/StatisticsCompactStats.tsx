@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { BarChart3, Users, Calendar, Award, TrendingUp, Target, Zap, LucideProps } from "lucide-react";
+import { BarChart3, Users, Calendar, Award, TrendingUp, Zap, LucideProps } from "lucide-react";
 import { StatisticsData } from "./types";
 import { cn } from "@/lib/utils";
 

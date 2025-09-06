@@ -4,13 +4,7 @@ import {
   TrendingUp,
   Calendar,
   Award,
-  PieChart,
-  Users,
-  MessageCircle,
-  Clock,
-  Building,
-  Briefcase
-} from "lucide-react";
+  PieChart} from "lucide-react";
 
 import { ModernCard, ModernCardContent } from "@/components/ui/modern-card";
 import { ModernTabs, ModernTabsList, ModernTabsTrigger, ModernTabsContent } from "@/components/ui/modern-tabs";
