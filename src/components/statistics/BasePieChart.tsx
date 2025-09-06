@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useRef, useEffect } from 'react';
+import React, { useMemo, useState, useRef, useEffect, useCallback } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, TooltipProps } from 'recharts';
 import { useTranslation } from "react-i18next";
 import { ModernCard, ModernCardHeader, ModernCardTitle, ModernCardContent } from "@/components/ui/modern-card";
@@ -45,7 +45,7 @@ const COLORS = [
   '#DDA0DD', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E9'
 ];
 
-const BasePieChart: React.FC<BasePieChartProps> = ({
+const BasePieChart: React.FC<BasePieChartProps> = React.memo(({
   data,
   title,
   icon: Icon,
@@ -63,6 +63,12 @@ const BasePieChart: React.FC<BasePieChartProps> = ({
   const chartRef = useRef<HTMLDivElement>(null);
   const particlesRef = useRef<HTMLDivElement>(null);
   const isRTL = i18n.dir() === 'rtl';
+
+  // Memoized data formatting to prevent unnecessary recalculations
+  const formattedData = useMemo(() => data.map((item: ChartDataItem) => ({
+    name: translationPrefix ? t(`${translationPrefix}.${item[nameKey]}`) : item[nameKey],
+    value: item[valueKey] || item.value,
+  })), [data, t, translationPrefix, nameKey, valueKey]);
 
   // Advanced particle system for data celebration
   useEffect(() => {
@@ -86,7 +92,8 @@ const BasePieChart: React.FC<BasePieChartProps> = ({
     });
   }, [data]);
 
-  const exportToCSV = () => {
+  // Memoized export functions to prevent recreation on each render
+  const exportToCSV = useCallback(() => {
     const csvContent = [
       [t('common.category'), t('common.count'), t('common.percentage')],
       ...data.map(item => [
@@ -101,9 +108,9 @@ const BasePieChart: React.FC<BasePieChartProps> = ({
     link.href = URL.createObjectURL(blob);
     link.download = `${title.replace(/\s+/g, '_')}.csv`;
     link.click();
-  };
+  }, [data, nameKey, t, title, translationPrefix, valueKey]);
 
-  const exportToExcel = () => {
+  const exportToExcel = useCallback(() => {
     const excelData = data.map(item => ({
       [t('common.category')]: translationPrefix ? t(`${translationPrefix}.${item[nameKey]}`) : item[nameKey],
       [t('common.count')]: item[valueKey],
@@ -114,9 +121,9 @@ const BasePieChart: React.FC<BasePieChartProps> = ({
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, title.substring(0, 31));
     XLSX.writeFile(workbook, `${title.replace(/\s+/g, '_')}.xlsx`);
-  };
+  }, [data, nameKey, t, title, translationPrefix, valueKey]);
 
-  const exportToPDF = async () => {
+  const exportToPDF = useCallback(async () => {
     if (chartRef.current) {
       const canvas = await html2canvas(chartRef.current);
       const imgData = canvas.toDataURL('image/png');
@@ -128,9 +135,9 @@ const BasePieChart: React.FC<BasePieChartProps> = ({
       pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
       pdf.save(`${title.replace(/\s+/g, '_')}.pdf`);
     }
-  };
+  }, [title]);
 
-  const exportToPNG = async () => {
+  const exportToPNG = useCallback(async () => {
     if (chartRef.current) {
       const canvas = await html2canvas(chartRef.current);
       const link = document.createElement('a');
@@ -138,12 +145,7 @@ const BasePieChart: React.FC<BasePieChartProps> = ({
       link.href = canvas.toDataURL('image/png');
       link.click();
     }
-  };
-
-  const formattedData = useMemo(() => data.map((item: ChartDataItem) => ({
-    name: translationPrefix ? t(`${translationPrefix}.${item[nameKey]}`) : item[nameKey],
-    value: item[valueKey] || item.value,
-  })), [data, t, translationPrefix, nameKey, valueKey]);
+  }, [title]);
 
   const CustomTooltip: React.FC<TooltipProps<ValueType, NameType>> = ({ active, payload }) => {
     if (active && payload && payload.length) {
@@ -169,7 +171,7 @@ const BasePieChart: React.FC<BasePieChartProps> = ({
             </p>
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <TrendingUp size={12} />
-              <span>{t('statistics.growth')}: 8.5%</span>
+              <span>{t('statistics.growth')}: {t('statistics.positive_growth_value', '8.5%')}</span>
             </div>
           </div>
         </div>
@@ -178,17 +180,17 @@ const BasePieChart: React.FC<BasePieChartProps> = ({
     return null;
   };
 
-  const onPieEnter = (_: unknown, index: number) => {
+  const onPieEnter = useCallback((_: unknown, index: number) => {
     setHoveredSlice(index);
-  };
+  }, []);
 
-  const onPieLeave = () => {
+  const onPieLeave = useCallback(() => {
     setHoveredSlice(null);
-  };
+  }, []);
 
-  const onPieClick = (_: unknown, index: number) => {
+  const onPieClick = useCallback((_: unknown, index: number) => {
     setSelectedSlice(selectedSlice === index ? null : index);
-  };
+  }, [selectedSlice]);
 
   return (
     <ModernCard
@@ -295,7 +297,7 @@ const BasePieChart: React.FC<BasePieChartProps> = ({
                   innerRadius={35}
                   fill="#8884d8"
                   dataKey="value"
-                  label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                  label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}${t('statistics.percentage')}`}
                   onMouseEnter={onPieEnter}
                   onMouseLeave={onPieLeave}
                   onClick={onPieClick}
@@ -387,6 +389,6 @@ const BasePieChart: React.FC<BasePieChartProps> = ({
       </ModernCardContent>
     </ModernCard>
   );
-};
+});
 
-export default React.memo(BasePieChart);
+export default BasePieChart;

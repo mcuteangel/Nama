@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { PieChart as PieChartIcon, Users, Heart, Star } from "lucide-react";
 import BasePieChart from './BasePieChart';
 import ChartErrorBoundary from './ChartErrorBoundary';
@@ -22,7 +22,7 @@ interface ContactsByGenderChartProps {
 }
 
 // Enhanced icon wrapper with gender-specific styling
-const GenderIconWrapper = ({ gender, ...props }: { gender?: string; size?: number; className?: string }) => {
+const GenderIconWrapper = React.memo(({ gender, ...props }: { gender?: string; size?: number; className?: string }) => {
   const getGenderIcon = () => {
     switch (gender?.toLowerCase()) {
       case 'male':
@@ -37,9 +37,9 @@ const GenderIconWrapper = ({ gender, ...props }: { gender?: string; size?: numbe
   };
 
   return getGenderIcon();
-};
+});
 
-const ContactsByGenderChart: React.FC<ContactsByGenderChartProps> = ({ data }) => {
+const ContactsByGenderChart: React.FC<ContactsByGenderChartProps> = React.memo(({ data }) => {
   const { t, i18n } = useTranslation();
   const containerRef = useRef<HTMLDivElement>(null);
   const [celebrationMode, setCelebrationMode] = useState(false);
@@ -61,7 +61,7 @@ const ContactsByGenderChart: React.FC<ContactsByGenderChartProps> = ({ data }) =
   }, [data]);
 
   // Gender-specific color schemes
-  const getGenderColors = (gender: string) => {
+  const getGenderColors = useCallback((gender: string) => {
     const colors: Record<string, { primary: string; secondary: string; accent: string }> = {
       'male': { primary: 'from-blue-500 to-cyan-500', secondary: 'from-blue-400 to-cyan-400', accent: '#06B6D4' },
       'female': { primary: 'from-pink-500 to-rose-500', secondary: 'from-pink-400 to-rose-400', accent: '#EC4899' },
@@ -69,16 +69,16 @@ const ContactsByGenderChart: React.FC<ContactsByGenderChartProps> = ({ data }) =
     };
 
     return colors[gender.toLowerCase()] || colors.other;
-  };
+  }, []);
 
-  // Separate insights data for UI components
-  const genderInsights = data.map(item => ({
+  // Memoized gender insights data for UI components
+  const genderInsights = useMemo(() => data.map(item => ({
     gender: item.gender,
     count: item.count,
     percentage: ((item.count / data.reduce((sum, d) => sum + d.count, 0)) * 100).toFixed(1),
     trend: Math.random() > 0.5 ? 'up' : 'down',
     recommendation: item.count > 10 ? 'balanced' : 'needs_attention'
-  }));
+  })), [data]);
 
   return (
     <div ref={containerRef} className="relative" dir={isRTL ? 'rtl' : 'ltr'}>
@@ -149,7 +149,7 @@ const ContactsByGenderChart: React.FC<ContactsByGenderChartProps> = ({ data }) =
                       />
                       <span className="font-semibold text-white">{item.gender}</span>
                     </div>
-                    <span className="text-white/80 text-sm">{item.percentage}%</span>
+                    <span className="text-white/80 text-sm">{item.percentage}{t('statistics.percentage')}</span>
                   </div>
 
                   <div className="flex items-center justify-between">
@@ -170,6 +170,6 @@ const ContactsByGenderChart: React.FC<ContactsByGenderChartProps> = ({ data }) =
       </ChartErrorBoundary>
     </div>
   );
-};
+});
 
-export default React.memo(ContactsByGenderChart);
+export default ContactsByGenderChart;

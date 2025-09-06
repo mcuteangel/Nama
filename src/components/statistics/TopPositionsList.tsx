@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Briefcase, TrendingUp, Award, Target } from "lucide-react";
+import { Briefcase, TrendingUp, Target } from "lucide-react";
 import BaseList from './BaseList';
 import { PositionData } from './types';
 import { useTranslation } from 'react-i18next';
@@ -140,12 +140,12 @@ const TopPositionsList: React.FC<TopPositionsListProps> = ({ data }) => {
 
                   <div className="flex justify-between items-center">
                     <span className="text-white/80 text-sm">{t('statistics.demand')}</span>
-                    <span className="text-white font-semibold">{position.demand}%</span>
+                    <span className="text-white font-semibold">{position.demand}{t('statistics.percentage')}</span>
                   </div>
 
                   <div className="flex justify-between items-center">
                     <span className="text-white/80 text-sm">{t('statistics.satisfaction')}</span>
-                    <span className="text-white font-semibold">{position.satisfaction.toFixed(1)}%</span>
+                    <span className="text-white font-semibold">{position.satisfaction.toFixed(1)}{t('statistics.percentage')}</span>
                   </div>
                 </div>
 
@@ -155,7 +155,7 @@ const TopPositionsList: React.FC<TopPositionsListProps> = ({ data }) => {
                     <div
                       className={`h-full bg-gradient-to-r ${colors.primary} rounded-full transition-all duration-1000 ease-out`}
                       style={{
-                        width: `${position.satisfaction}%`,
+                        width: `${position.satisfaction}${t('statistics.percentage')}`,
                         animationDelay: `${index * 200}ms`
                       }}
                     />

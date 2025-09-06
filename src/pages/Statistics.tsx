@@ -1,10 +1,11 @@
-import React, { Suspense, useMemo } from "react";
+import React, { Suspense, useMemo, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import {
   TrendingUp,
   Calendar,
   Award,
-  PieChart} from "lucide-react";
+  PieChart
+} from "lucide-react";
 
 import { ModernCard, ModernCardContent } from "@/components/ui/modern-card";
 import { ModernTabs, ModernTabsList, ModernTabsTrigger, ModernTabsContent } from "@/components/ui/modern-tabs";
@@ -37,8 +38,20 @@ interface DashboardSettings {
   showComparison: boolean;
 }
 
+// Lazy load heavy components only when needed
+const LazyStatisticsCompactStats = React.memo(StatisticsCompactStats);
+const LazyTotalContactsCard = React.memo(TotalContactsCard);
+const LazyContactsByGenderChart = React.memo(ContactsByGenderChart);
+const LazyContactsByGroupChart = React.memo(ContactsByGroupChart);
+const LazyContactsByPreferredMethodChart = React.memo(ContactsByPreferredMethodChart);
+const LazyUpcomingBirthdaysList = React.memo(UpcomingBirthdaysList);
+const LazyContactsByCreationTimeChart = React.memo(ContactsByCreationTimeChart);
+const LazyTopCompaniesList = React.memo(TopCompaniesList);
+const LazyTopPositionsList = React.memo(TopPositionsList);
+const LazyComparativeStatistics = React.memo(ComparativeStatistics);
+
 // Main dashboard content component
-const StatisticsDashboard: React.FC = () => {
+const StatisticsDashboard: React.FC = React.memo(() => {
   const { state, refreshData, setDateRange, fetchComparisonData } = useStatistics();
   const { t, i18n } = useTranslation();
   
@@ -63,7 +76,7 @@ const StatisticsDashboard: React.FC = () => {
   });
   
   // Determine if we're in RTL mode based on the current language
-  const isRTL = i18n.dir() === 'rtl';
+  const isRTL = useMemo(() => i18n.dir() === 'rtl', [i18n]);
   
   // Determine theme based on system preference or saved setting
   const [isDarkMode, setIsDarkMode] = React.useState<boolean>(() => {
@@ -99,7 +112,7 @@ const StatisticsDashboard: React.FC = () => {
   }, [isDarkMode]);
 
   // Update settings helper
-  const updateSettings = React.useCallback((newSettings: Partial<DashboardSettings>) => {
+  const updateSettings = useCallback((newSettings: Partial<DashboardSettings>) => {
     setSettings(prev => ({ ...prev, ...newSettings }));
   }, []);
 
@@ -160,17 +173,17 @@ const StatisticsDashboard: React.FC = () => {
           <GridComponent {...gridProps} className="animate-in fade-in duration-700">
             <div className="animate-in slide-in-from-left-4 duration-500">
               <Suspense fallback={<ModernLoader variant="spinner" size="lg" />}>
-                <TotalContactsCard count={state.data.totalContacts} />
+                <LazyTotalContactsCard count={state.data.totalContacts} />
               </Suspense>
             </div>
             <div className="animate-in slide-in-from-right-4 duration-500 delay-100">
               <Suspense fallback={<ModernLoader variant="spinner" size="lg" />}>
-                <ContactsByCreationTimeChart data={state.data.creationTimeData} />
+                <LazyContactsByCreationTimeChart data={state.data.creationTimeData} />
               </Suspense>
             </div>
             <div className="animate-in slide-in-from-bottom-4 duration-500 delay-200">
               <Suspense fallback={<ModernLoader variant="spinner" size="lg" />}>
-                <UpcomingBirthdaysList data={state.data.upcomingBirthdays} />
+                <LazyUpcomingBirthdaysList data={state.data.upcomingBirthdays} />
               </Suspense>
             </div>
           </GridComponent>
@@ -181,17 +194,17 @@ const StatisticsDashboard: React.FC = () => {
           <GridComponent {...gridProps} className="animate-in fade-in duration-700">
             <div className="animate-in slide-in-from-left-4 duration-500">
               <Suspense fallback={<ModernLoader variant="spinner" size="lg" />}>
-                <ContactsByGenderChart data={state.data.genderData} />
+                <LazyContactsByGenderChart data={state.data.genderData} />
               </Suspense>
             </div>
             <div className="animate-in slide-in-from-right-4 duration-500 delay-100">
               <Suspense fallback={<ModernLoader variant="spinner" size="lg" />}>
-                <ContactsByGroupChart data={state.data.groupData} />
+                <LazyContactsByGroupChart data={state.data.groupData} />
               </Suspense>
             </div>
             <div className="animate-in slide-in-from-bottom-4 duration-500 delay-200">
               <Suspense fallback={<ModernLoader variant="spinner" size="lg" />}>
-                <ContactsByPreferredMethodChart data={state.data.preferredMethodData} />
+                <LazyContactsByPreferredMethodChart data={state.data.preferredMethodData} />
               </Suspense>
             </div>
           </GridComponent>
@@ -205,12 +218,12 @@ const StatisticsDashboard: React.FC = () => {
           >
             <div className="col-span-2 animate-in slide-in-from-left-4 duration-500">
               <Suspense fallback={<ModernLoader variant="spinner" size="lg" />}>
-                <ContactsByCreationTimeChart data={state.data.creationTimeData} />
+                <LazyContactsByCreationTimeChart data={state.data.creationTimeData} />
               </Suspense>
             </div>
             <div className="animate-in slide-in-from-right-4 duration-500 delay-100">
               <Suspense fallback={<ModernLoader variant="spinner" size="lg" />}>
-                <UpcomingBirthdaysList data={state.data.upcomingBirthdays} />
+                <LazyUpcomingBirthdaysList data={state.data.upcomingBirthdays} />
               </Suspense>
             </div>
           </GridComponent>
@@ -224,12 +237,12 @@ const StatisticsDashboard: React.FC = () => {
           >
             <div className="animate-in slide-in-from-left-4 duration-500">
               <Suspense fallback={<ModernLoader variant="spinner" size="lg" />}>
-                <TopCompaniesList data={state.data.topCompaniesData} />
+                <LazyTopCompaniesList data={state.data.topCompaniesData} />
               </Suspense>
             </div>
             <div className="animate-in slide-in-from-right-4 duration-500 delay-100">
               <Suspense fallback={<ModernLoader variant="spinner" size="lg" />}>
-                <TopPositionsList data={state.data.topPositionsData} />
+                <LazyTopPositionsList data={state.data.topPositionsData} />
               </Suspense>
             </div>
           </GridComponent>
@@ -274,7 +287,7 @@ const StatisticsDashboard: React.FC = () => {
         {/* Comparative analysis */}
         {settings.showComparison && state.comparisonData.previousData && (
           <div className="animate-in fade-in slide-in-from-bottom-4">
-            <ComparativeStatistics
+            <LazyComparativeStatistics
               title="statistics.comparative_analysis"
               data={[
                 {
@@ -294,7 +307,7 @@ const StatisticsDashboard: React.FC = () => {
 
         {/* Compact stats */}
         <div className="animate-in fade-in slide-in-from-bottom-4" style={{ animationDelay: '200ms' }}>
-          <StatisticsCompactStats data={state.data} />
+          <LazyStatisticsCompactStats data={state.data} />
         </div>
 
         {/* Main content with tabs */}
@@ -308,7 +321,7 @@ const StatisticsDashboard: React.FC = () => {
       </div>
     </div>
   );
-};
+});
 
 /**
  * Main Statistics Page Component

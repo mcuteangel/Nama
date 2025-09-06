@@ -86,7 +86,7 @@ const ContactsByPreferredMethodChart: React.FC<ContactsByPreferredMethodChartPro
         {/* Communication efficiency indicator */}
         <div className={`absolute top-4 ${isRTL ? 'right-4' : 'left-4'} z-10 bg-white/10 backdrop-blur-sm rounded-xl p-3 shadow-lg`}>
           <div className="flex items-center gap-2 text-sm">
-            <MessageCircle size={16} className="text-blue-400" />
+            <MessageCircle className="text-blue-400" width={16} height={16} />
             <span className="text-white font-medium">{t('statistics.communication_optimization')}</span>
           </div>
         </div>
@@ -118,7 +118,7 @@ const ContactsByPreferredMethodChart: React.FC<ContactsByPreferredMethodChartPro
                     className="p-2 rounded-lg bg-white/20 shadow-lg"
                     style={{ color: method.config.colors.accent }}
                   >
-                    <Icon size={20} />
+                    <Icon width={20} height={20} />
                   </div>
                   <div>
                     <h3 className="font-bold text-white text-sm">{method.config.label}</h3>
@@ -129,7 +129,7 @@ const ContactsByPreferredMethodChart: React.FC<ContactsByPreferredMethodChartPro
                 <div className="space-y-2">
                   <div className="flex justify-between items-center">
                     <span className="text-white/80 text-xs">{t('statistics.efficiency')}</span>
-                    <span className="text-white font-semibold text-sm">{method.efficiency.toFixed(1)}%</span>
+                    <span className="text-white font-semibold text-sm">{method.efficiency.toFixed(1)}{t('statistics.percentage')}</span>
                   </div>
 
                   <div className="flex justify-between items-center">
@@ -148,7 +148,7 @@ const ContactsByPreferredMethodChart: React.FC<ContactsByPreferredMethodChartPro
                     <div
                       className={`h-full bg-gradient-to-r ${method.config.colors.primary} rounded-full transition-all duration-1000 ease-out`}
                       style={{
-                        width: `${method.efficiency}%`,
+                        width: `${method.efficiency}${t('statistics.percentage')}`,
                         animationDelay: `${index * 200}ms`
                       }}
                     />

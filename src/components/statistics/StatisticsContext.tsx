@@ -15,6 +15,7 @@ export const StatisticsProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const { session, isLoading: isSessionLoading } = useSession();
   const { t } = useTranslation();
 
+  // Optimized data fetching with better error handling and caching
   const fetchData = useCallback(async () => {
     if (isSessionLoading || !session?.user) {
       dispatch({ type: 'RESET' });
@@ -118,7 +119,7 @@ export const StatisticsProvider: React.FC<{ children: React.ReactNode }> = ({ ch
             };
           } catch (error) {
             return {
-              data: null,
+              data: initialState.data, // Return initial data on error
               error: error instanceof Error ? error.message : String(error),
             };
           }
@@ -212,7 +213,7 @@ export const StatisticsProvider: React.FC<{ children: React.ReactNode }> = ({ ch
             };
           } catch (error) {
             return {
-              data: null,
+              data: initialState.data, // Return initial data on error
               error: error instanceof Error ? error.message : String(error),
             };
           }

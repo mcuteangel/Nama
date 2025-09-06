@@ -140,13 +140,13 @@ const ContactsByGroupChart: React.FC<ContactsByGroupChartProps> = ({ data }) => 
                     <span className="text-white/80 text-sm">{t('statistics.growth')}</span>
                     <div className="flex items-center gap-1">
                       <TrendingUp size={14} className="text-green-400" />
-                      <span className="text-green-400 font-semibold">+{group.growth.toFixed(1)}%</span>
+                      <span className="text-green-400 font-semibold">+{group.growth.toFixed(1)}{t('statistics.percentage')}</span>
                     </div>
                   </div>
 
                   <div className="flex justify-between items-center">
                     <span className="text-white/80 text-sm">{t('statistics.efficiency')}</span>
-                    <span className="text-white font-semibold">{group.efficiency.toFixed(1)}%</span>
+                    <span className="text-white font-semibold">{group.efficiency.toFixed(1)}{t('statistics.percentage')}</span>
                   </div>
                 </div>
 
@@ -200,14 +200,14 @@ const ContactsByGroupChart: React.FC<ContactsByGroupChartProps> = ({ data }) => 
 
               <div className="text-center p-4 bg-white/10 rounded-xl">
                 <div className="text-2xl font-bold text-green-400 mb-1">
-                  +{groupInsights.find(g => g.name === selectedGroup)?.growth.toFixed(1)}%
+                  +{groupInsights.find(g => g.name === selectedGroup)?.growth.toFixed(1)}{t('statistics.percentage')}
                 </div>
                 <div className="text-sm text-white/80">{t('statistics.growth')}</div>
               </div>
 
               <div className="text-center p-4 bg-white/10 rounded-xl">
                 <div className="text-2xl font-bold text-blue-400 mb-1">
-                  {groupInsights.find(g => g.name === selectedGroup)?.efficiency.toFixed(1)}%
+                  {groupInsights.find(g => g.name === selectedGroup)?.efficiency.toFixed(1)}{t('statistics.percentage')}
                 </div>
                 <div className="text-sm text-white/80">{t('statistics.efficiency')}</div>
               </div>

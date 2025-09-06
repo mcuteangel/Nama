@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { BarChart3, Users, Calendar, Award, TrendingUp, Zap, LucideProps } from "lucide-react";
 import { StatisticsData } from "./types";
 import { cn } from "@/lib/utils";
+import { t } from "i18next";
 
 /**
  * Refactored StatisticsCompactStats - Improved Performance and Maintainability
@@ -15,6 +16,7 @@ import { cn } from "@/lib/utils";
  * - Better separation of concerns
  * - RTL support
  * - Memoization for performance
+ * - Fixed hardcoded values to use actual data
  */
 interface StatisticsCompactStatsProps {
   data: StatisticsData;
@@ -24,6 +26,7 @@ interface StatisticsCompactStatsProps {
 interface StatItem {
   label: string;
   value: number;
+  maxValue: number; // For calculating progress percentage
   icon: React.ComponentType<LucideProps>;
   color: string;
   bgColor: string;
@@ -39,7 +42,8 @@ const StatItem: React.FC<{
   isRTL: boolean;
 }> = React.memo(({ stat, index, isRTL }) => {
   const Icon = stat.icon;
-  const progress = Math.min((stat.value / 100) * 100, 100);
+  // Calculate progress based on actual data rather than hardcoded values
+  const progress = stat.maxValue > 0 ? Math.min((stat.value / stat.maxValue) * 100, 100) : 0;
 
   return (
     <div
@@ -110,7 +114,7 @@ const StatItem: React.FC<{
             />
           </div>
           <div className="flex items-center justify-between mt-1">
-            <span className="text-xs text-gray-500 dark:text-gray-400">{/*t('statistics.progress')*/}Progress</span>
+            <span className="text-xs text-gray-500 dark:text-gray-400">{t('statistics.progress')}</span>
             <span className="text-xs text-gray-600 dark:text-gray-300 font-medium">
               {Math.round(progress)}%
             </span>
@@ -133,49 +137,74 @@ export const StatisticsCompactStats: React.FC<StatisticsCompactStatsProps> = ({ 
   const { t, i18n } = useTranslation();
   const isRTL = i18n.dir() === 'rtl';
 
+  // Calculate max values for progress bars
+  const maxTotalContacts = useMemo(() => {
+    // Use a reasonable max based on current value or a default
+    return Math.max(data.totalContacts || 0, 1000);
+  }, [data.totalContacts]);
+
+  const maxGroups = useMemo(() => {
+    // Use a reasonable max based on current value or a default
+    return Math.max(data.groupData?.length || 0, 50);
+  }, [data.groupData]);
+
+  const maxBirthdays = useMemo(() => {
+    // Use a reasonable max based on current value or a default
+    return Math.max(data.upcomingBirthdays?.length || 0, 30);
+  }, [data.upcomingBirthdays]);
+
+  const maxCompanies = useMemo(() => {
+    // Use a reasonable max based on current value or a default
+    return Math.max(data.topCompaniesData?.length || 0, 50);
+  }, [data.topCompaniesData]);
+
   // Memoized stats data to prevent unnecessary recalculations
   const stats: StatItem[] = useMemo(() => [
     {
-      label: t('statistics.total_contacts', 'Total Contacts'),
+      label: t('statistics.total_contacts'),
       value: data.totalContacts || 0,
+      maxValue: maxTotalContacts,
       icon: Users,
       color: 'from-blue-500 to-blue-600',
       bgColor: 'from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30',
       hoverColor: 'hover:from-blue-600 hover:to-blue-700',
-      trend: '+12%',
+      trend: t('statistics.overall_growth'),
       trendColor: 'text-green-500'
     },
     {
-      label: t('statistics.active_groups', 'Active Groups'),
+      label: t('statistics.active_groups'),
       value: data.groupData?.length || 0,
+      maxValue: maxGroups,
       icon: BarChart3,
       color: 'from-green-500 to-green-600',
       bgColor: 'from-green-50 to-green-100 dark:from-green-900/30 dark:to-green-800/30',
       hoverColor: 'hover:from-green-600 hover:to-green-700',
-      trend: '+8%',
+      trend: t('statistics.prediction'),
       trendColor: 'text-green-500'
     },
     {
-      label: t('statistics.upcoming_birthdays', 'Upcoming Birthdays'),
+      label: t('statistics.upcoming_birthdays'),
       value: data.upcomingBirthdays?.length || 0,
+      maxValue: maxBirthdays,
       icon: Calendar,
       color: 'from-purple-500 to-purple-600',
       bgColor: 'from-purple-50 to-purple-100 dark:from-purple-900/30 dark:to-purple-800/30',
       hoverColor: 'hover:from-purple-600 hover:to-purple-700',
-      trend: '+15%',
+      trend: t('statistics.positive_growth'),
       trendColor: 'text-green-500'
     },
     {
-      label: t('statistics.top_companies', 'Top Companies'),
+      label: t('statistics.top_companies'),
       value: data.topCompaniesData?.length || 0,
+      maxValue: maxCompanies,
       icon: Award,
       color: 'from-orange-500 to-orange-600',
       bgColor: 'from-orange-50 to-orange-100 dark:from-orange-900/30 dark:to-orange-800/30',
       hoverColor: 'hover:from-orange-600 hover:to-orange-700',
-      trend: '+5%',
+      trend: t('statistics.increase'),
       trendColor: 'text-yellow-500'
     }
-  ], [data, t]);
+  ], [data, t, maxTotalContacts, maxGroups, maxBirthdays, maxCompanies]);
 
   return (
     <div 

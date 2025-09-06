@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Building, TrendingUp, Award, Target } from "lucide-react";
+import { Building, TrendingUp, Target } from "lucide-react";
 import BaseList from './BaseList';
 import { CompanyData } from './types';
 import { useTranslation } from 'react-i18next';
@@ -138,12 +138,12 @@ const TopCompaniesList: React.FC<TopCompaniesListProps> = ({ data }) => {
 
                   <div className="flex justify-between items-center">
                     <span className="text-white/80 text-sm">{t('statistics.market_share')}</span>
-                    <span className="text-white font-semibold">{company.marketShare}%</span>
+                    <span className="text-white font-semibold">{company.marketShare}{t('statistics.percentage')}</span>
                   </div>
 
                   <div className="flex justify-between items-center">
                     <span className="text-white/80 text-sm">{t('statistics.satisfaction')}</span>
-                    <span className="text-white font-semibold">{company.satisfaction.toFixed(1)}%</span>
+                    <span className="text-white font-semibold">{company.satisfaction.toFixed(1)}{t('statistics.percentage')}</span>
                   </div>
                 </div>
 
@@ -153,7 +153,7 @@ const TopCompaniesList: React.FC<TopCompaniesListProps> = ({ data }) => {
                     <div
                       className={`h-full bg-gradient-to-r ${colors.primary} rounded-full transition-all duration-1000 ease-out`}
                       style={{
-                        width: `${company.satisfaction}%`,
+                        width: `${company.satisfaction}${t('statistics.percentage')}`,
                         animationDelay: `${index * 200}ms`
                       }}
                     />
@@ -211,17 +211,17 @@ const TopCompaniesList: React.FC<TopCompaniesListProps> = ({ data }) => {
                     </div>
 
                     <div className="text-center p-4 bg-white/10 rounded-xl">
-                      <div className="text-2xl font-bold text-blue-400 mb-1">{company.marketShare}%</div>
+                      <div className="text-2xl font-bold text-blue-400 mb-1">{company.marketShare}{t('statistics.percentage')}</div>
                       <div className="text-sm text-white/80">{t('statistics.market_share')}</div>
                     </div>
 
                     <div className="text-center p-4 bg-white/10 rounded-xl">
-                      <div className="text-2xl font-bold text-green-400 mb-1">+{company.growth.toFixed(1)}%</div>
+                      <div className="text-2xl font-bold text-green-400 mb-1">+{company.growth.toFixed(1)}{t('statistics.percentage')}</div>
                       <div className="text-sm text-white/80">{t('statistics.growth')}</div>
                     </div>
 
                     <div className="text-center p-4 bg-white/10 rounded-xl">
-                      <div className="text-2xl font-bold text-purple-400 mb-1">{company.satisfaction.toFixed(1)}%</div>
+                      <div className="text-2xl font-bold text-purple-400 mb-1">{company.satisfaction.toFixed(1)}{t('statistics.percentage')}</div>
                       <div className="text-sm text-white/80">{t('statistics.satisfaction')}</div>
                     </div>
                   </>

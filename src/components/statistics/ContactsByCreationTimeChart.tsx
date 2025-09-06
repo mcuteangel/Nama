@@ -190,6 +190,11 @@ const ContactsByCreationTimeChart: React.FC<
     }
   };
 
+  // Calculate max count for progress bars
+  const maxCount = useMemo(() => {
+    return data.length > 0 ? Math.max(...data.map(item => item.count)) : 0;
+  }, [data]);
+
   return (
     <div ref={containerRef} className="relative" dir={isRTL ? "rtl" : "ltr"}>
       {/* Growth celebration overlay */}
@@ -314,12 +319,10 @@ const ContactsByCreationTimeChart: React.FC<
                     <div
                       className={`h-full bg-gradient-to-r ${colors.primary} rounded-full transition-all duration-1000 ease-out`}
                       style={{
-                        width: `${Math.min(
-                          (period.count /
-                            Math.max(...data.map((d) => d.count))) *
-                            100,
+                        width: `${maxCount > 0 ? Math.min(
+                          (period.count / maxCount) * 100,
                           100
-                        )}%`,
+                        ) : 0}%`,
                         animationDelay: `${index * 200}ms`,
                       }}
                     />

@@ -18,7 +18,7 @@ interface TotalContactsCardProps {
  * - Improved RTL support
  * - Better accessibility
  */
-const TotalContactsCard: React.FC<TotalContactsCardProps> = ({ count }) => {
+const TotalContactsCard: React.FC<TotalContactsCardProps> = React.memo(({ count }) => {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.dir() === 'rtl';
 
@@ -39,6 +39,16 @@ const TotalContactsCard: React.FC<TotalContactsCardProps> = ({ count }) => {
     sparkle3: { left: '45%', top: '75%', animationDelay: '1.4s' },
     sparkle4: { left: '85%', top: '65%', animationDelay: '2.1s' },
   }), []);
+
+  // Memoized percentage calculation
+  const percentage = useMemo(() => {
+    return count ? `${Math.min(Math.round((count / 1000) * 100), 100)}%` : '0%';
+  }, [count]);
+
+  // Memoized width calculation for progress bar
+  const progressBarWidth = useMemo(() => {
+    return count ? `${Math.min((count / 1000) * 100, 100)}%` : '0%';
+  }, [count]);
 
   return (
     <ModernCard
@@ -101,7 +111,7 @@ const TotalContactsCard: React.FC<TotalContactsCardProps> = ({ count }) => {
             <span className="text-white drop-shadow-lg text-xl">{t('statistics.total_contacts')}</span>
             <div className="flex items-center gap-2 text-white/80 text-sm">
               <TrendingUp size={14} className={isRTL ? 'rotate-180' : ''} />
-              <span>{t('statistics.monthly_growth', '12% monthly growth')}</span>
+              <span>{t('statistics.monthly_growth')}</span>
             </div>
           </div>
         </ModernCardTitle>
@@ -157,11 +167,11 @@ const TotalContactsCard: React.FC<TotalContactsCardProps> = ({ count }) => {
             <div className="h-1 bg-white/20 rounded-full overflow-hidden">
               <div
                 className="h-full bg-gradient-to-r from-yellow-400 to-green-400 rounded-full transition-all duration-1000 ease-out"
-                style={{ width: count ? `${Math.min((count / 1000) * 100, 100)}%` : '0%' }}
+                style={{ width: progressBarWidth }}
               />
             </div>
             <p className="text-xs text-white/70 mt-1 text-center">
-              {count ? `${Math.min(Math.round((count / 1000) * 100), 100)}% ${t('statistics.of_goal')}` : t('common.loading')}
+              {count ? `${percentage} ${t('statistics.of_goal')}` : t('common.loading')}
             </p>
           </div>
         </div>
@@ -173,6 +183,6 @@ const TotalContactsCard: React.FC<TotalContactsCardProps> = ({ count }) => {
       </div>
     </ModernCard>
   );
-};
+});
 
-export default React.memo(TotalContactsCard);
+export default TotalContactsCard;

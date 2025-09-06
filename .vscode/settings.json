@@ -4,5 +4,9 @@
     ],
     "i18n-ally.sourceLanguage": "fa",
     "i18n-ally.keystyle": "nested",
-    "i18n-ally.pathMatcher": "{locale}/translation.json"
+    "i18n-ally.pathMatcher": "{locale}/translation.json",
+    "i18n-ally.extract.ignored": [
+        "(prefers-color-scheme: dark)",
+        "Overview"
+    ]
 }
