@@ -15,7 +15,8 @@ interface ComparativeStatisticsProps {
 }
 
 const ComparativeStatistics: React.FC<ComparativeStatisticsProps> = ({ data, title }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.dir() === 'rtl';
 
   const calculateChange = (current: number, previous: number) => {
     if (previous === 0) {
@@ -37,7 +38,7 @@ const ComparativeStatistics: React.FC<ComparativeStatisticsProps> = ({ data, tit
   };
 
   return (
-    <ModernCard variant="glass" className="rounded-2xl p-6">
+    <ModernCard variant="glass" className="rounded-2xl p-6" dir={isRTL ? 'rtl' : 'ltr'}>
       <ModernCardHeader className="pb-4">
         <ModernCardTitle className="text-xl font-bold bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
           {t(title)}
@@ -47,12 +48,12 @@ const ComparativeStatistics: React.FC<ComparativeStatisticsProps> = ({ data, tit
         {data.map((item, index) => {
           const change = calculateChange(item.current, item.previous);
           return (
-            <div key={index} className="flex items-center justify-between p-3 rounded-lg bg-background/50 hover:bg-background/80 transition-all duration-300">
+            <div key={index} className="flex items-center justify-between p-3 rounded-lg bg-background/50 hover:bg-background/80 transition-all duration-300" dir={isRTL ? 'rtl' : 'ltr'}>
               <span className="font-medium text-foreground">{item.label}</span>
               <div className="flex items-center gap-3">
-                <div className="text-right">
-                  <div className="font-bold text-lg">{item.current.toLocaleString()}</div>
-                  <div className="text-sm text-muted-foreground line-through">{item.previous.toLocaleString()}</div>
+                <div className={isRTL ? 'text-right' : 'text-left'}>
+                  <div className="font-bold text-lg">{item.current.toLocaleString(isRTL ? 'fa-IR' : undefined)}</div>
+                  <div className="text-sm text-muted-foreground line-through">{item.previous.toLocaleString(isRTL ? 'fa-IR' : undefined)}</div>
                 </div>
                 <div className={`flex items-center gap-1 ${getChangeColor(change)}`}>
                   {getChangeIcon(change)}

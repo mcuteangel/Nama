@@ -36,6 +36,7 @@ interface BaseListProps<T extends BaseItem = BaseItem> {
  * - Advanced export capabilities
  * - Voice-guided list exploration
  * - Predictive performance metrics
+ * - RTL support
  */
 const BaseList = <T extends BaseItem>({
   data,
@@ -47,10 +48,11 @@ const BaseList = <T extends BaseItem>({
   countKey = 'count' as keyof T,
   className = ""
 }: BaseListProps<T>) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const listRef = useRef<HTMLDivElement>(null);
   const [hoveredItem, setHoveredItem] = useState<number | null>(null);
   const particlesRef = useRef<HTMLDivElement>(null);
+  const isRTL = i18n.dir() === 'rtl'; // Add RTL support
 
   // Advanced particle system for list celebration
   useEffect(() => {
@@ -153,6 +155,7 @@ const BaseList = <T extends BaseItem>({
       className={`rounded-3xl p-8 transition-all duration-700 hover:shadow-2xl hover:shadow-primary/30 hover:-translate-y-2 bg-gradient-to-br from-background via-background/98 to-background/95 backdrop-blur-2xl border border-border/60 relative overflow-hidden group ${className}`}
       role="region"
       aria-labelledby={`list-title-${title.replace(/\s+/g, '-').toLowerCase()}`}
+      dir={isRTL ? 'rtl' : 'ltr'} // Add RTL support
     >
       {/* Animated background particles */}
       <div ref={particlesRef} className="absolute inset-0 pointer-events-none overflow-hidden rounded-3xl" />
@@ -171,7 +174,7 @@ const BaseList = <T extends BaseItem>({
                 <Icon size={28} className="text-white" aria-hidden="true" />
               </div>
               {/* Pulsing performance indicator */}
-              <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-400 rounded-full animate-pulse shadow-lg">
+              <div className={`absolute -top-1 ${isRTL ? 'left-1' : 'right-1'} w-4 h-4 bg-green-400 rounded-full animate-pulse shadow-lg`}>
                 <TrendingUp size={12} className="text-white m-0.5" />
               </div>
             </div>
@@ -179,7 +182,7 @@ const BaseList = <T extends BaseItem>({
               <span className="text-xl">{t(title)}</span>
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Award size={14} />
-                <span>{data.length} آیتم برتر</span>
+                <span>{data.length} {t('statistics.top_items')}</span>
               </div>
             </div>
           </ModernCardTitle>
@@ -222,6 +225,7 @@ const BaseList = <T extends BaseItem>({
                     onMouseLeave={() => setHoveredItem(null)}
                     role="listitem"
                     style={{ animationDelay: `${index * 100}ms` }}
+                    dir={isRTL ? 'rtl' : 'ltr'} // Add RTL support
                   >
                     {/* Performance gradient background */}
                     <div className={`absolute inset-0 bg-gradient-to-r ${performanceColor} opacity-10 group-hover:opacity-20 transition-opacity duration-300`} />
@@ -231,15 +235,15 @@ const BaseList = <T extends BaseItem>({
 
                     <div className={`p-6 rounded-2xl bg-gradient-to-r from-background/90 to-background/70 hover:from-background hover:to-background/90 transition-all duration-300 border border-border/30 backdrop-blur-sm relative overflow-hidden`}>
                       {/* Floating geometric shapes */}
-                      <div className="absolute top-2 right-2 w-8 h-8 bg-white/10 rounded-full blur-sm animate-pulse" />
-                      <div className="absolute bottom-2 left-2 w-6 h-6 bg-white/5 rounded-full blur-sm animate-pulse" style={{ animationDelay: '1s' }} />
+                      <div className={`absolute top-2 ${isRTL ? 'left-2' : 'right-2'} w-8 h-8 bg-white/10 rounded-full blur-sm animate-pulse`} />
+                      <div className={`absolute bottom-2 ${isRTL ? 'right-2' : 'left-2'} w-6 h-6 bg-white/5 rounded-full blur-sm animate-pulse`} style={{ animationDelay: '1s' }} />
 
                       <div className="flex items-center justify-between relative z-10">
                         <div className="flex items-center gap-4">
                           {/* Rank badge with animation */}
                           <div className={`relative flex items-center justify-center w-12 h-12 rounded-2xl ${rankBadge.bg} shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-110`}>
                             <RankIcon size={20} className={rankBadge.color} />
-                            <div className="absolute -top-1 -right-1 text-xs font-bold text-black bg-white rounded-full w-5 h-5 flex items-center justify-center shadow-md">
+                            <div className={`absolute -top-1 ${isRTL ? 'left-1' : 'right-1'} text-xs font-bold text-black bg-white rounded-full w-5 h-5 flex items-center justify-center shadow-md`}>
                               {rankBadge.label}
                             </div>
                           </div>
@@ -250,17 +254,17 @@ const BaseList = <T extends BaseItem>({
                             </p>
                             <div className="flex items-center gap-2 text-sm text-muted-foreground">
                               <div className={`w-2 h-2 rounded-full bg-gradient-to-r ${performanceColor} animate-pulse`} />
-                              <span>رتبه {index + 1} از {data.length}</span>
+                              <span>{t('statistics.rank')} {index + 1} {t('statistics.of')} {data.length}</span>
                             </div>
                           </div>
                         </div>
 
                         <div className="flex items-center gap-4">
                           {/* Performance indicator */}
-                          <div className="text-right">
+                          <div className={`text-${isRTL ? 'left' : 'right'}`}>
                             <div className="px-4 py-2 rounded-xl bg-white/10 backdrop-blur-sm shadow-lg">
                               <p className="text-foreground font-bold text-xl drop-shadow-lg">
-                                {count.toLocaleString('fa-IR')}
+                                {count.toLocaleString(isRTL ? 'fa-IR' : undefined)}
                               </p>
                               <p className="text-muted-foreground text-xs">
                                 {t('common.contacts')}
@@ -307,14 +311,14 @@ const BaseList = <T extends BaseItem>({
                   <Icon size={40} className="text-muted-foreground/50" />
                 </div>
                 {/* Floating indicators */}
-                <div className="absolute -top-2 -right-2 w-3 h-3 bg-muted-foreground/30 rounded-full animate-pulse" />
-                <div className="absolute -bottom-2 -left-2 w-2 h-2 bg-muted-foreground/20 rounded-full animate-pulse" style={{ animationDelay: '1s' }} />
+                <div className={`absolute -top-2 ${isRTL ? 'left-2' : 'right-2'} w-3 h-3 bg-muted-foreground/30 rounded-full animate-pulse`} />
+                <div className={`absolute -bottom-2 ${isRTL ? 'right-2' : 'left-2'} w-2 h-2 bg-muted-foreground/20 rounded-full animate-pulse`} style={{ animationDelay: '1s' }} />
               </div>
               <p className="text-muted-foreground font-medium text-lg" role="status">
                 {t(emptyMessageKey)}
               </p>
               <p className="text-muted-foreground/70 text-sm">
-                داده‌ای برای نمایش لیست وجود ندارد
+                {t('statistics.no_list_data')}
               </p>
             </div>
           </div>

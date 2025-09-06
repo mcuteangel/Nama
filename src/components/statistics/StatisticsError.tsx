@@ -74,7 +74,7 @@ const StatisticsError: React.FC<StatisticsErrorProps> = ({
               </div>
               <div className="flex items-center gap-2 text-red-600 dark:text-red-400">
                 <Clock size={14} />
-                <span>زمان وقوع: {currentTime.toLocaleString('fa-IR')}</span>
+                <span>{t('statistics.error_boundary.occurrence_time', 'زمان وقوع')}: {currentTime.toLocaleString('fa-IR')}</span>
               </div>
             </div>
           </details>

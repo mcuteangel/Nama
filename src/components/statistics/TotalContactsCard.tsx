@@ -19,11 +19,13 @@ interface TotalContactsCardProps {
  * - AI-powered insights and predictions
  * - Dynamic gradient backgrounds
  * - Advanced micro-interactions
+ * - RTL support
  */
 const TotalContactsCard: React.FC<TotalContactsCardProps> = ({ count }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const cardRef = useRef<HTMLDivElement>(null);
   const particlesRef = useRef<HTMLDivElement>(null);
+  const isRTL = i18n.dir() === 'rtl'; // Add RTL support
 
   // Advanced particle system
   useEffect(() => {
@@ -61,7 +63,7 @@ const TotalContactsCard: React.FC<TotalContactsCardProps> = ({ count }) => {
 
   // Morphing number animation
   const formatNumber = (num: number) => {
-    return new Intl.NumberFormat('fa-IR').format(num);
+    return new Intl.NumberFormat(isRTL ? 'fa-IR' : undefined).format(num);
   };
 
   return (
@@ -80,6 +82,7 @@ const TotalContactsCard: React.FC<TotalContactsCardProps> = ({ count }) => {
       )}
       role="region"
       aria-labelledby="total-contacts-title"
+      dir={isRTL ? 'rtl' : 'ltr'} // Add RTL support
     >
       {/* Animated background particles */}
       <div ref={particlesRef} className="absolute inset-0 overflow-hidden rounded-3xl" />
@@ -88,9 +91,9 @@ const TotalContactsCard: React.FC<TotalContactsCardProps> = ({ count }) => {
       <div className="absolute inset-0 bg-gradient-to-br from-cyan-400/20 via-blue-500/20 to-purple-600/20 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
 
       {/* Floating geometric shapes */}
-      <div className="absolute top-4 right-4 w-16 h-16 bg-white/10 rounded-full blur-xl animate-pulse" />
-      <div className="absolute bottom-4 left-4 w-12 h-12 bg-white/5 rounded-full blur-lg animate-pulse" style={{ animationDelay: '1s' }} />
-      <div className="absolute top-1/2 left-6 w-8 h-8 bg-white/5 rounded-full blur-md animate-pulse" style={{ animationDelay: '2s' }} />
+      <div className={`absolute top-4 ${isRTL ? 'left-4' : 'right-4'} w-16 h-16 bg-white/10 rounded-full blur-xl animate-pulse`} />
+      <div className={`absolute bottom-4 ${isRTL ? 'right-4' : 'left-4'} w-12 h-12 bg-white/5 rounded-full blur-lg animate-pulse`} style={{ animationDelay: '1s' }} />
+      <div className={`absolute top-1/2 ${isRTL ? 'right-6' : 'left-6'} w-8 h-8 bg-white/5 rounded-full blur-md animate-pulse`} style={{ animationDelay: '2s' }} />
 
       <ModernCardHeader className="pb-8 relative z-10">
         <ModernCardTitle
@@ -107,8 +110,8 @@ const TotalContactsCard: React.FC<TotalContactsCardProps> = ({ count }) => {
           <div className="flex flex-col items-start">
             <span className="text-white drop-shadow-lg text-xl">{t('statistics.total_contacts')}</span>
             <div className="flex items-center gap-2 text-white/80 text-sm">
-              <TrendingUp size={14} />
-              <span>رشد 12% ماهانه</span>
+              <TrendingUp size={14} className={isRTL ? 'rotate-180' : ''} />
+              <span>{t('statistics.monthly_growth', '12% monthly growth')}</span>
             </div>
           </div>
         </ModernCardTitle>
@@ -135,7 +138,7 @@ const TotalContactsCard: React.FC<TotalContactsCardProps> = ({ count }) => {
           )}
 
           {/* Floating indicators */}
-          <div className="absolute -top-2 -right-2 flex gap-1">
+          <div className={`absolute -top-2 ${isRTL ? 'left-2' : 'right-2'} flex gap-1`}>
             <div className="w-3 h-3 bg-green-400 rounded-full animate-bounce" style={{ animationDelay: '0s' }} />
             <div className="w-3 h-3 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
             <div className="w-3 h-3 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }} />
@@ -147,11 +150,11 @@ const TotalContactsCard: React.FC<TotalContactsCardProps> = ({ count }) => {
           <div className="flex items-center justify-center gap-4 text-white/90">
             <div className="flex items-center gap-2 px-3 py-1 bg-white/10 rounded-full backdrop-blur-sm">
               <Sparkles size={14} className="text-yellow-300" />
-              <span className="text-sm font-medium">فعال</span>
+              <span className="text-sm font-medium">{t('statistics.active')}</span>
             </div>
             <div className="flex items-center gap-2 px-3 py-1 bg-white/10 rounded-full backdrop-blur-sm">
               <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-              <span className="text-sm font-medium">آنلاین</span>
+              <span className="text-sm font-medium">{t('statistics.online')}</span>
             </div>
           </div>
 
@@ -168,7 +171,7 @@ const TotalContactsCard: React.FC<TotalContactsCardProps> = ({ count }) => {
               />
             </div>
             <p className="text-xs text-white/70 mt-1 text-center">
-              {count ? `${Math.min(Math.round((count / 1000) * 100), 100)}% از هدف` : 'در حال بارگذاری...'}
+              {count ? `${Math.min(Math.round((count / 1000) * 100), 100)}% ${t('statistics.of_goal')}` : t('common.loading')}
             </p>
           </div>
         </div>

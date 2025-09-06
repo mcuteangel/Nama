@@ -56,12 +56,13 @@ const BasePieChart: React.FC<BasePieChartProps> = ({
   nameKey = 'name',
   valueKey = 'count'
 }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [showTooltip, setShowTooltip] = useState(false);
   const [hoveredSlice, setHoveredSlice] = useState<number | null>(null);
   const [selectedSlice, setSelectedSlice] = useState<number | null>(null);
   const chartRef = useRef<HTMLDivElement>(null);
   const particlesRef = useRef<HTMLDivElement>(null);
+  const isRTL = i18n.dir() === 'rtl';
 
   // Advanced particle system for data celebration
   useEffect(() => {
@@ -151,7 +152,7 @@ const BasePieChart: React.FC<BasePieChartProps> = ({
       const percentage = ((typeof data.value === 'number' ? data.value : parseFloat(data.value as string) || 0) / total * 100).toFixed(1);
 
       return (
-        <div className="bg-background/95 border border-border/50 rounded-xl p-4 shadow-2xl backdrop-blur-xl">
+        <div className="bg-background/95 border border-border/50 rounded-xl p-4 shadow-2xl backdrop-blur-xl" dir={isRTL ? 'rtl' : 'ltr'}>
           <div className="flex items-center gap-3 mb-2">
             <div
               className="w-4 h-4 rounded-full shadow-lg"
@@ -164,11 +165,11 @@ const BasePieChart: React.FC<BasePieChartProps> = ({
               {payload[0].value} {t('common.contacts')}
             </p>
             <p className="text-muted-foreground text-sm">
-              {percentage}% از کل
+              {percentage}% {t('common.of_total')}
             </p>
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <TrendingUp size={12} />
-              <span>رشد 8.5%</span>
+              <span>{t('statistics.growth')}: 8.5%</span>
             </div>
           </div>
         </div>
@@ -195,6 +196,7 @@ const BasePieChart: React.FC<BasePieChartProps> = ({
       className={`rounded-3xl p-8 transition-all duration-700 hover:shadow-2xl hover:shadow-primary/30 hover:-translate-y-2 bg-gradient-to-br from-background via-background/98 to-background/95 backdrop-blur-2xl border border-border/60 relative overflow-hidden group ${className}`}
       role="region"
       aria-labelledby={`chart-title-${title.replace(/\s+/g, '-').toLowerCase()}`}
+      dir={isRTL ? 'rtl' : 'ltr'}
     >
       {/* Animated background particles */}
       <div ref={particlesRef} className="absolute inset-0 pointer-events-none overflow-hidden rounded-3xl" />
@@ -213,7 +215,7 @@ const BasePieChart: React.FC<BasePieChartProps> = ({
                 <Icon size={28} className="text-white" aria-hidden="true" />
               </div>
               {/* Pulsing insight indicator */}
-              <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-400 rounded-full animate-pulse shadow-lg">
+              <div className={`absolute -top-1 ${isRTL ? 'left-1' : 'right-1'} w-4 h-4 bg-green-400 rounded-full animate-pulse shadow-lg`}>
                 <Zap size={12} className="text-white m-0.5" />
               </div>
             </div>
@@ -221,7 +223,7 @@ const BasePieChart: React.FC<BasePieChartProps> = ({
               <span className="text-xl">{t(title)}</span>
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Target size={14} />
-                <span>{data.length} دسته‌بندی</span>
+                <span>{data.length} {t('statistics.categories')}</span>
               </div>
             </div>
           </ModernCardTitle>
@@ -239,7 +241,7 @@ const BasePieChart: React.FC<BasePieChartProps> = ({
                     <HelpCircle size={18} className="text-muted-foreground" />
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent side="top" className="max-w-xs">
+                <TooltipContent side="top" className="max-w-xs" dir={isRTL ? 'rtl' : 'ltr'}>
                   <p className="text-sm">{t('statistics.chart_help', 'این نمودار توزیع داده‌ها را به صورت دایره‌ای نمایش می‌دهد. هر بخش نشان‌دهنده نسبت یک دسته است.')}</p>
                 </TooltipContent>
               </UITooltip>
@@ -325,13 +327,16 @@ const BasePieChart: React.FC<BasePieChartProps> = ({
                 <Legend
                   wrapperStyle={{
                     paddingTop: '20px',
-                    fontSize: '14px'
+                    fontSize: '14px',
+                    direction: isRTL ? 'rtl' : 'ltr'
                   }}
                   iconType="circle"
                   formatter={(value, entry, index) => (
                     <span style={{
                       color: entry.color,
-                      fontWeight: selectedSlice === index ? 'bold' : 'normal'
+                      fontWeight: selectedSlice === index ? 'bold' : 'normal',
+                      direction: isRTL ? 'rtl' : 'ltr',
+                      textAlign: isRTL ? 'right' : 'left'
                     }}>
                       {value}
                     </span>
@@ -342,7 +347,7 @@ const BasePieChart: React.FC<BasePieChartProps> = ({
 
             {/* Interactive slice info */}
             {selectedSlice !== null && (
-              <div className="absolute top-4 right-4 bg-background/95 border border-border/50 rounded-xl p-4 shadow-2xl backdrop-blur-xl max-w-xs">
+              <div className={`absolute top-4 ${isRTL ? 'left-4' : 'right-4'} bg-background/95 border border-border/50 rounded-xl p-4 shadow-2xl backdrop-blur-xl max-w-xs`} dir={isRTL ? 'rtl' : 'ltr'}>
                 <div className="flex items-center gap-3 mb-2">
                   <div
                     className="w-4 h-4 rounded-full shadow-lg"
@@ -355,7 +360,7 @@ const BasePieChart: React.FC<BasePieChartProps> = ({
                     {formattedData[selectedSlice].value} {t('common.contacts')}
                   </p>
                   <p className="text-muted-foreground">
-                    {((Number(formattedData[selectedSlice].value) / formattedData.reduce((sum, d) => sum + Number(d.value), 0)) * 100).toFixed(1)}% از کل
+                    {((Number(formattedData[selectedSlice].value) / formattedData.reduce((sum, d) => sum + Number(d.value), 0)) * 100).toFixed(1)}% {t('common.of_total')}
                   </p>
                 </div>
               </div>
@@ -368,14 +373,14 @@ const BasePieChart: React.FC<BasePieChartProps> = ({
                 <Icon size={40} className="text-muted-foreground/50" />
               </div>
               {/* Floating indicators */}
-              <div className="absolute -top-2 -right-2 w-3 h-3 bg-muted-foreground/30 rounded-full animate-pulse" />
-              <div className="absolute -bottom-2 -left-2 w-2 h-2 bg-muted-foreground/20 rounded-full animate-pulse" style={{ animationDelay: '1s' }} />
+              <div className={`absolute -top-2 ${isRTL ? 'left-2' : 'right-2'} w-3 h-3 bg-muted-foreground/30 rounded-full animate-pulse`} />
+              <div className={`absolute -bottom-2 ${isRTL ? 'right-2' : 'left-2'} w-2 h-2 bg-muted-foreground/20 rounded-full animate-pulse`} style={{ animationDelay: '1s' }} />
             </div>
             <p className="text-muted-foreground font-medium text-lg" role="status">
               {t(emptyMessageKey)}
             </p>
             <p className="text-muted-foreground/70 text-sm">
-              داده‌ای برای نمایش وجود ندارد
+              {t('statistics.no_data')}
             </p>
           </div>
         )}

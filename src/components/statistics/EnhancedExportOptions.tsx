@@ -44,24 +44,24 @@ const EnhancedExportOptions: React.FC<EnhancedExportOptionsProps> = ({
       <DropdownMenuContent align="end" className="w-48">
         <DropdownMenuItem onClick={onExportCSV}>
           <FileText className="mr-2 h-4 w-4" />
-          <span>CSV</span>
+          <span>{t('common.export_csv')}</span>
         </DropdownMenuItem>
         {onExportExcel && (
           <DropdownMenuItem onClick={onExportExcel}>
             <FileSpreadsheet className="mr-2 h-4 w-4" />
-            <span>Excel</span>
+            <span>{t('common.export_excel')}</span>
           </DropdownMenuItem>
         )}
         {onExportPDF && (
           <DropdownMenuItem onClick={onExportPDF}>
             <FileText className="mr-2 h-4 w-4" />
-            <span>PDF</span>
+            <span>{t('common.export_pdf')}</span>
           </DropdownMenuItem>
         )}
         {onExportPNG && (
           <DropdownMenuItem onClick={onExportPNG}>
             <Image className="mr-2 h-4 w-4" />
-            <span>PNG</span>
+            <span>{t('common.export_png')}</span>
           </DropdownMenuItem>
         )}
       </DropdownMenuContent>

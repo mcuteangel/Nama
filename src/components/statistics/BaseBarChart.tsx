@@ -60,11 +60,12 @@ const BaseBarChart: React.FC<BaseBarChartProps> = ({
   valueKey = 'count',
   colorKey = 'color'
 }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [hoveredBar, setHoveredBar] = useState<number | null>(null);
   const [selectedBar, setSelectedBar] = useState<number | null>(null);
   const chartRef = useRef<HTMLDivElement>(null);
   const particlesRef = useRef<HTMLDivElement>(null);
+  const isRTL = i18n.dir() === 'rtl';
 
   // Advanced particle system for data celebration
   useEffect(() => {
@@ -153,7 +154,7 @@ const BaseBarChart: React.FC<BaseBarChartProps> = ({
       const percentage = (((data.count || 0) / total) * 100).toFixed(1);
 
       return (
-        <div className="bg-background/95 border border-border/50 rounded-xl p-4 shadow-2xl backdrop-blur-xl">
+        <div className="bg-background/95 border border-border/50 rounded-xl p-4 shadow-2xl backdrop-blur-xl" dir={isRTL ? 'rtl' : 'ltr'}>
           <div className="flex items-center gap-3 mb-2">
             <div
               className="w-4 h-4 rounded-full shadow-lg"
@@ -166,11 +167,11 @@ const BaseBarChart: React.FC<BaseBarChartProps> = ({
               {payload[0].value} {t('common.contacts')}
             </p>
             <p className="text-muted-foreground text-sm">
-              {percentage}% از کل
+              {percentage}% {t('common.of_total')}
             </p>
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <TrendingUp size={12} />
-              <span>رشد 12.3%</span>
+              <span>{t('statistics.growth')}: 12.3%</span>
             </div>
           </div>
         </div>
@@ -197,6 +198,7 @@ const BaseBarChart: React.FC<BaseBarChartProps> = ({
       className={`rounded-3xl p-8 transition-all duration-700 hover:shadow-2xl hover:shadow-primary/30 hover:-translate-y-2 bg-gradient-to-br from-background via-background/98 to-background/95 backdrop-blur-2xl border border-border/60 relative overflow-hidden group ${className}`}
       role="region"
       aria-labelledby={`chart-title-${title.replace(/\s+/g, '-').toLowerCase()}`}
+      dir={isRTL ? 'rtl' : 'ltr'}
     >
       {/* Animated background particles */}
       <div ref={particlesRef} className="absolute inset-0 pointer-events-none overflow-hidden rounded-3xl" />
@@ -215,7 +217,7 @@ const BaseBarChart: React.FC<BaseBarChartProps> = ({
                 <Icon size={28} className="text-white" aria-hidden="true" />
               </div>
               {/* Pulsing insight indicator */}
-              <div className="absolute -top-1 -right-1 w-4 h-4 bg-blue-400 rounded-full animate-pulse shadow-lg">
+              <div className={`absolute -top-1 ${isRTL ? 'left-1' : 'right-1'} w-4 h-4 bg-blue-400 rounded-full animate-pulse shadow-lg`}>
                 <Target size={12} className="text-white m-0.5" />
               </div>
             </div>
@@ -223,7 +225,7 @@ const BaseBarChart: React.FC<BaseBarChartProps> = ({
               <span className="text-xl">{t(title)}</span>
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <TrendingUp size={14} />
-                <span>{data.length} دسته‌بندی</span>
+                <span>{data.length} {t('statistics.categories')}</span>
               </div>
             </div>
           </ModernCardTitle>
@@ -254,10 +256,11 @@ const BaseBarChart: React.FC<BaseBarChartProps> = ({
                 data={formattedData}
                 margin={{
                   top: 20,
-                  right: 30,
-                  left: 20,
+                  right: isRTL ? 20 : 30,
+                  left: isRTL ? 30 : 20,
                   bottom: 80,
                 }}
+                layout={isRTL ? "vertical" : "horizontal"}
               >
                 <defs>
                   {formattedData.map((entry, index: number) => (
@@ -286,16 +289,18 @@ const BaseBarChart: React.FC<BaseBarChartProps> = ({
 
                 <XAxis
                   dataKey="name"
-                  angle={-45}
-                  textAnchor="end"
+                  angle={isRTL ? 45 : -45}
+                  textAnchor={isRTL ? "start" : "end"}
                   height={100}
                   tick={{ fontSize: 12, fill: 'currentColor', opacity: 0.7 }}
                   axisLine={{ stroke: 'currentColor', opacity: 0.2 }}
+                  reversed={isRTL}
                 />
 
                 <YAxis
                   tick={{ fontSize: 12, fill: 'currentColor', opacity: 0.7 }}
                   axisLine={{ stroke: 'currentColor', opacity: 0.2 }}
+                  orientation={isRTL ? "right" : "left"}
                 />
 
                 <Tooltip
@@ -309,13 +314,16 @@ const BaseBarChart: React.FC<BaseBarChartProps> = ({
                 <Legend
                   wrapperStyle={{
                     paddingTop: '20px',
-                    fontSize: '14px'
+                    fontSize: '14px',
+                    direction: isRTL ? 'rtl' : 'ltr'
                   }}
                   iconType="rect"
                   formatter={(value, entry, index) => (
                     <span style={{
                       color: entry.color,
-                      fontWeight: selectedBar === index ? 'bold' : 'normal'
+                      fontWeight: selectedBar === index ? 'bold' : 'normal',
+                      direction: isRTL ? 'rtl' : 'ltr',
+                      textAlign: isRTL ? 'right' : 'left'
                     }}>
                       {value}
                     </span>
@@ -351,7 +359,7 @@ const BaseBarChart: React.FC<BaseBarChartProps> = ({
 
             {/* Interactive bar info */}
             {selectedBar !== null && (
-              <div className="absolute top-4 right-4 bg-background/95 border border-border/50 rounded-xl p-4 shadow-2xl backdrop-blur-xl max-w-xs">
+              <div className={`absolute top-4 ${isRTL ? 'left-4' : 'right-4'} bg-background/95 border border-border/50 rounded-xl p-4 shadow-2xl backdrop-blur-xl max-w-xs`} dir={isRTL ? 'rtl' : 'ltr'}>
                 <div className="flex items-center gap-3 mb-2">
                   <div
                     className="w-4 h-4 rounded-full shadow-lg"
@@ -364,7 +372,7 @@ const BaseBarChart: React.FC<BaseBarChartProps> = ({
                     {formattedData[selectedBar].count} {t('common.contacts')}
                   </p>
                   <p className="text-muted-foreground">
-                    {((formattedData[selectedBar]?.count || 0) / formattedData.reduce((sum, d) => sum + (d.count || 0), 0) * 100).toFixed(1)}% از کل
+                    {((formattedData[selectedBar]?.count || 0) / formattedData.reduce((sum, d) => sum + (d.count || 0), 0) * 100).toFixed(1)}% {t('common.of_total')}
                   </p>
                 </div>
               </div>
@@ -378,14 +386,14 @@ const BaseBarChart: React.FC<BaseBarChartProps> = ({
                   <Icon size={40} className="text-muted-foreground/50" />
                 </div>
                 {/* Floating indicators */}
-                <div className="absolute -top-2 -right-2 w-3 h-3 bg-muted-foreground/30 rounded-full animate-pulse" />
-                <div className="absolute -bottom-2 -left-2 w-2 h-2 bg-muted-foreground/20 rounded-full animate-pulse" style={{ animationDelay: '1s' }} />
+                <div className={`absolute -top-2 ${isRTL ? 'left-2' : 'right-2'} w-3 h-3 bg-muted-foreground/30 rounded-full animate-pulse`} />
+                <div className={`absolute -bottom-2 ${isRTL ? 'right-2' : 'left-2'} w-2 h-2 bg-muted-foreground/20 rounded-full animate-pulse`} style={{ animationDelay: '1s' }} />
               </div>
               <p className="text-muted-foreground font-medium text-lg" role="status">
                 {t(emptyMessageKey)}
               </p>
               <p className="text-muted-foreground/70 text-sm">
-                داده‌ای برای نمایش وجود ندارد
+                {t('statistics.no_data')}
               </p>
             </div>
           </div>

@@ -38,6 +38,7 @@ interface BaseLineChartProps {
  * - Advanced export capabilities
  * - Voice-guided trend exploration
  * - Predictive analytics overlay
+ * - RTL support
  */
 const BaseLineChart: React.FC<BaseLineChartProps> = ({
   data,
@@ -49,10 +50,11 @@ const BaseLineChart: React.FC<BaseLineChartProps> = ({
   nameKey = 'name',
   valueKey = 'count'
 }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation(); // Add i18n for RTL support
   const [hoveredPoint, setHoveredPoint] = useState<number | null>(null);
   const chartRef = useRef<HTMLDivElement>(null);
   const particlesRef = useRef<HTMLDivElement>(null);
+  const isRTL = i18n.dir() === 'rtl'; // Add RTL support
 
   // Advanced particle system for trend celebration
   useEffect(() => {
@@ -134,7 +136,7 @@ const BaseLineChart: React.FC<BaseLineChartProps> = ({
       const trend = 'up'; // Default trend - can be enhanced with actual comparison logic
 
       return (
-        <div className="bg-background/95 border border-border/50 rounded-xl p-4 shadow-2xl backdrop-blur-xl">
+        <div className="bg-background/95 border border-border/50 rounded-xl p-4 shadow-2xl backdrop-blur-xl" dir={isRTL ? 'rtl' : 'ltr'}>
           <div className="flex items-center gap-3 mb-2">
             <div className="w-4 h-4 rounded-full shadow-lg bg-blue-500" />
             <p className="font-bold text-foreground">{`${data.name}`}</p>
@@ -145,11 +147,11 @@ const BaseLineChart: React.FC<BaseLineChartProps> = ({
             </p>
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <TrendingUp size={12} className={trend === 'up' ? 'text-green-500' : 'text-red-500'} />
-              <span>{trend === 'up' ? 'رشد مثبت' : 'کاهش'}</span>
+              <span>{trend === 'up' ? t('statistics.positive_growth') : t('statistics.decrease')}</span>
             </div>
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <Target size={12} />
-              <span>پیش‌بینی: +15%</span>
+              <span>{t('statistics.prediction')}</span>
             </div>
           </div>
         </div>
@@ -172,6 +174,7 @@ const BaseLineChart: React.FC<BaseLineChartProps> = ({
       className={`rounded-3xl p-8 transition-all duration-700 hover:shadow-2xl hover:shadow-primary/30 hover:-translate-y-2 bg-gradient-to-br from-background via-background/98 to-background/95 backdrop-blur-2xl border border-border/60 relative overflow-hidden group ${className}`}
       role="region"
       aria-labelledby={`chart-title-${title.replace(/\s+/g, '-').toLowerCase()}`}
+      dir={isRTL ? 'rtl' : 'ltr'} // Add RTL support
     >
       {/* Animated background particles */}
       <div ref={particlesRef} className="absolute inset-0 pointer-events-none overflow-hidden rounded-3xl" />
@@ -190,7 +193,7 @@ const BaseLineChart: React.FC<BaseLineChartProps> = ({
                 <Icon size={28} className="text-white" aria-hidden="true" />
               </div>
               {/* Pulsing trend indicator */}
-              <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-400 rounded-full animate-pulse shadow-lg">
+              <div className={`absolute -top-1 ${isRTL ? 'left-1' : 'right-1'} w-4 h-4 bg-green-400 rounded-full animate-pulse shadow-lg`}>
                 <TrendingUp size={12} className="text-white m-0.5" />
               </div>
             </div>
@@ -198,7 +201,7 @@ const BaseLineChart: React.FC<BaseLineChartProps> = ({
               <span className="text-xl">{t(title)}</span>
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Target size={14} />
-                <span>{data.length} نقطه داده</span>
+                <span>{data.length} {t('statistics.data_points')}</span>
               </div>
             </div>
           </ModernCardTitle>
@@ -336,11 +339,11 @@ const BaseLineChart: React.FC<BaseLineChartProps> = ({
               <div className="absolute top-4 right-4 bg-background/95 border border-border/50 rounded-xl p-3 shadow-2xl backdrop-blur-xl">
                 <div className="flex items-center gap-2 text-sm">
                   <TrendingUp size={16} className="text-green-500" />
-                  <span className="font-semibold">رشد کلی: +23%</span>
+                  <span className="font-semibold">{t('statistics.overall_growth', 'Overall Growth: +23%')}</span>
                 </div>
                 <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
                   <Zap size={12} />
-                  <span>پیش‌بینی ماه آینده</span>
+                  <span>{t('statistics.next_month_prediction', 'Next Month Prediction')}</span>
                 </div>
               </div>
             )}
@@ -360,7 +363,7 @@ const BaseLineChart: React.FC<BaseLineChartProps> = ({
                 {t(emptyMessageKey)}
               </p>
               <p className="text-muted-foreground/70 text-sm">
-                داده‌ای برای نمایش روند وجود ندارد
+                {t('statistics.no_trend_data', 'No data available for trend display')}
               </p>
             </div>
           </div>

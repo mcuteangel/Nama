@@ -14,7 +14,7 @@ const StatisticsLoading: React.FC<StatisticsLoadingProps> = ({ isDarkMode, isRTL
   const { t } = useTranslation();
   
   return (
-    <div className={`min-h-screen ${isDarkMode ? 'bg-gradient-to-br from-gray-900 via-slate-900 to-gray-900' : 'bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50'} transition-all duration-700 p-3 sm:p-4 md:p-6 lg:p-8`}>
+    <div className={`min-h-screen ${isDarkMode ? 'bg-gradient-to-br from-gray-900 via-slate-900 to-gray-900' : 'bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50'} transition-all duration-700 p-3 sm:p-4 md:p-6 lg:p-8`} dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8">
         {/* Header */}
         <div className="text-center py-8 sm:py-12 md:py-16 relative overflow-hidden">
@@ -48,7 +48,7 @@ const StatisticsLoading: React.FC<StatisticsLoadingProps> = ({ isDarkMode, isRTL
                 className="max-w-lg h-3"
               />
               <div className="text-sm text-muted-foreground">
-                بارگذاری داده‌ها...
+                {t('statistics.loading_data', 'بارگذاری داده‌ها...')}
               </div>
             </div>
 

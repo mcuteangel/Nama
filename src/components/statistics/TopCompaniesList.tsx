@@ -14,16 +14,18 @@ import { useTranslation } from 'react-i18next';
  * - AI-powered company insights and recommendations
  * - Dynamic company-based color schemes
  * - Voice-guided company analysis
+ * - RTL support
  */
 interface TopCompaniesListProps {
   data: CompanyData[];
 }
 
 const TopCompaniesList: React.FC<TopCompaniesListProps> = ({ data }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const containerRef = useRef<HTMLDivElement>(null);
   const [performanceMode, setPerformanceMode] = useState(false);
   const [selectedCompany, setSelectedCompany] = useState<string | null>(null);
+  const isRTL = i18n.dir() === 'rtl';
 
   // Advanced company performance analysis
   useEffect(() => {
@@ -62,14 +64,14 @@ const TopCompaniesList: React.FC<TopCompaniesListProps> = ({ data }) => {
   };
 
   return (
-    <div ref={containerRef} className="relative">
+    <div ref={containerRef} className="relative" dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Performance celebration overlay */}
       {performanceMode && (
         <div className="absolute inset-0 pointer-events-none z-50 flex items-center justify-center">
           <div className="text-center space-y-4 animate-bounce">
             <div className="text-6xl animate-spin">🏢</div>
             <div className="text-2xl font-bold text-white drop-shadow-lg bg-black/50 px-6 py-3 rounded-2xl backdrop-blur-sm">
-              شرکت‌های برتر عالی! 🏆
+              {t('statistics.excellent_top_companies')} 🏆
             </div>
           </div>
         </div>
@@ -77,10 +79,10 @@ const TopCompaniesList: React.FC<TopCompaniesListProps> = ({ data }) => {
 
       <div className="relative">
         {/* Company analysis indicator */}
-        <div className="absolute top-4 left-4 z-10 bg-white/10 backdrop-blur-sm rounded-xl p-3 shadow-lg">
+        <div className={`absolute top-4 ${isRTL ? 'right-4' : 'left-4'} z-10 bg-white/10 backdrop-blur-sm rounded-xl p-3 shadow-lg`}>
           <div className="flex items-center gap-2 text-sm">
             <Building size={16} className="text-teal-400" />
-            <span className="text-white font-medium">تحلیل شرکت‌ها</span>
+            <span className="text-white font-medium">{t('statistics.company_analysis')}</span>
           </div>
         </div>
 
@@ -106,9 +108,10 @@ const TopCompaniesList: React.FC<TopCompaniesListProps> = ({ data }) => {
                   selectedCompany === company.company ? 'ring-2 ring-white/50 scale-105' : ''
                 }`}
                 onClick={() => setSelectedCompany(selectedCompany === company.company ? null : company.company)}
+                dir={isRTL ? 'rtl' : 'ltr'}
               >
                 {/* Rank badge */}
-                <div className="absolute top-2 right-2">
+                <div className={`absolute top-2 ${isRTL ? 'left-2' : 'right-2'}`}>
                   <div className={`px-2 py-1 rounded-full text-xs font-bold ${
                     index === 0 ? 'bg-yellow-500/20 text-yellow-200' :
                     index === 1 ? 'bg-gray-400/20 text-gray-200' :
@@ -129,17 +132,17 @@ const TopCompaniesList: React.FC<TopCompaniesListProps> = ({ data }) => {
 
                 <div className="space-y-2">
                   <div className="flex justify-between items-center">
-                    <span className="text-white/80 text-sm">مخاطبین</span>
+                    <span className="text-white/80 text-sm">{t('statistics.contacts')}</span>
                     <span className="text-white font-bold text-xl">{company.count}</span>
                   </div>
 
                   <div className="flex justify-between items-center">
-                    <span className="text-white/80 text-sm">سهم بازار</span>
+                    <span className="text-white/80 text-sm">{t('statistics.market_share')}</span>
                     <span className="text-white font-semibold">{company.marketShare}%</span>
                   </div>
 
                   <div className="flex justify-between items-center">
-                    <span className="text-white/80 text-sm">رضایت</span>
+                    <span className="text-white/80 text-sm">{t('statistics.satisfaction')}</span>
                     <span className="text-white font-semibold">{company.satisfaction.toFixed(1)}%</span>
                   </div>
                 </div>
@@ -166,8 +169,8 @@ const TopCompaniesList: React.FC<TopCompaniesListProps> = ({ data }) => {
                       ? 'bg-green-500/20 text-green-200'
                       : 'bg-purple-500/20 text-purple-200'
                   }`}>
-                    {company.category === 'enterprise' ? 'سازمانی' :
-                     company.category === 'mid_size' ? 'متوسط' : 'استارتاپ'}
+                    {company.category === 'enterprise' ? t('statistics.enterprise') :
+                     company.category === 'mid_size' ? t('statistics.mid_size') : t('statistics.startup')}
                   </div>
 
                   <div className="flex items-center gap-1">
@@ -175,7 +178,7 @@ const TopCompaniesList: React.FC<TopCompaniesListProps> = ({ data }) => {
                     <span className={`text-xs font-semibold ${
                       company.trend === 'growing' ? 'text-green-400' : 'text-blue-400'
                     }`}>
-                      {company.trend === 'growing' ? 'رشد' : 'پایدار'}
+                      {company.trend === 'growing' ? t('statistics.growing') : t('statistics.stable')}
                     </span>
                   </div>
                 </div>
@@ -189,10 +192,10 @@ const TopCompaniesList: React.FC<TopCompaniesListProps> = ({ data }) => {
 
         {/* Company comparison tool */}
         {selectedCompany && (
-          <div className="mt-6 p-6 bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 shadow-2xl">
+          <div className="mt-6 p-6 bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 shadow-2xl" dir={isRTL ? 'rtl' : 'ltr'}>
             <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
               <Target size={20} />
-              تحلیل شرکت {selectedCompany}
+              {t('statistics.company_analysis_title', { company: selectedCompany })}
             </h3>
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -204,22 +207,22 @@ const TopCompaniesList: React.FC<TopCompaniesListProps> = ({ data }) => {
                   <>
                     <div className="text-center p-4 bg-white/10 rounded-xl">
                       <div className="text-2xl font-bold text-white mb-1">{company.count}</div>
-                      <div className="text-sm text-white/80">مخاطبین</div>
+                      <div className="text-sm text-white/80">{t('statistics.contacts')}</div>
                     </div>
 
                     <div className="text-center p-4 bg-white/10 rounded-xl">
                       <div className="text-2xl font-bold text-blue-400 mb-1">{company.marketShare}%</div>
-                      <div className="text-sm text-white/80">سهم بازار</div>
+                      <div className="text-sm text-white/80">{t('statistics.market_share')}</div>
                     </div>
 
                     <div className="text-center p-4 bg-white/10 rounded-xl">
-                      <div className="text-2xl font-bold text-green-400 mb-1">{company.satisfaction.toFixed(1)}%</div>
-                      <div className="text-sm text-white/80">رضایت</div>
+                      <div className="text-2xl font-bold text-green-400 mb-1">+{company.growth.toFixed(1)}%</div>
+                      <div className="text-sm text-white/80">{t('statistics.growth')}</div>
                     </div>
 
                     <div className="text-center p-4 bg-white/10 rounded-xl">
-                      <div className="text-2xl font-bold text-purple-400 mb-1">+{company.growth.toFixed(1)}%</div>
-                      <div className="text-sm text-white/80">رشد</div>
+                      <div className="text-2xl font-bold text-purple-400 mb-1">{company.satisfaction.toFixed(1)}%</div>
+                      <div className="text-sm text-white/80">{t('statistics.satisfaction')}</div>
                     </div>
                   </>
                 );

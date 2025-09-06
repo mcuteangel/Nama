@@ -105,7 +105,7 @@ const StatisticsHeader: React.FC<StatisticsHeaderProps> = ({
   }, [settings.voiceEnabled, refreshData, isDarkMode, setIsDarkMode]);
 
   return (
-    <div className="text-center py-8 sm:py-12 md:py-16 relative overflow-hidden">
+    <div className="text-center py-8 sm:py-12 md:py-16 relative overflow-hidden" dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 via-purple-600/10 to-pink-600/10 rounded-3xl blur-3xl"></div>
 
       <div className="relative z-10">
@@ -115,9 +115,9 @@ const StatisticsHeader: React.FC<StatisticsHeaderProps> = ({
             <div className="relative bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 p-4 sm:p-6 rounded-2xl shadow-2xl group-hover:shadow-3xl group-hover:scale-105 transition-all duration-500">
               <BarChart3 size={48} className="text-white animate-pulse" />
             </div>
-            <Sparkles size={20} className="absolute -top-2 -right-2 text-yellow-400 animate-bounce" />
-            <Zap size={16} className="absolute -bottom-2 -left-2 text-yellow-500 animate-ping" />
-            <Activity size={14} className="absolute top-2 left-2 text-green-400 animate-pulse" />
+            <Sparkles size={20} className={`absolute -top-2 ${isRTL ? 'left-2' : 'right-2'} text-yellow-400 animate-bounce`} />
+            <Zap size={16} className={`absolute -bottom-2 ${isRTL ? 'right-2' : 'left-2'} text-yellow-500 animate-ping`} />
+            <Activity size={14} className={`absolute top-2 ${isRTL ? 'right-2' : 'left-2'} text-green-400 animate-pulse`} />
           </div>
         </div>
 
@@ -130,14 +130,14 @@ const StatisticsHeader: React.FC<StatisticsHeaderProps> = ({
         </p>
 
         {/* Control panel */}
-        <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 md:gap-4 mb-6 sm:mb-8 animate-in fade-in slide-in-from-bottom-4" style={{ animationDelay: '400ms' }}>
+        <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 md:gap-4 mb-6 sm:mb-8 animate-in fade-in slide-in-from-bottom-4" style={{ animationDelay: '400ms' }} dir={isRTL ? 'rtl' : 'ltr'}>
           <GlassButton
             variant="glass"
             effect="lift"
             onClick={refreshData}
             className={`${isDarkMode ? 'bg-gray-800/50' : 'bg-white/50'} hover:bg-opacity-70 shadow-xl px-4 sm:px-6 py-2 sm:py-3 rounded-2xl`}
           >
-            <RefreshCw size={16} className="mr-2" />
+            <RefreshCw size={16} className={`mr-2 ${isRTL ? 'rotate-180' : ''}`} />
             <span className="hidden sm:inline">{t('common.refresh', 'به‌روزرسانی')}</span>
           </GlassButton>
 
@@ -147,8 +147,8 @@ const StatisticsHeader: React.FC<StatisticsHeaderProps> = ({
             onClick={() => updateSettings({ voiceEnabled: !settings.voiceEnabled })}
             className={`${settings.voiceEnabled ? 'bg-green-500/20' : 'bg-gray-500/20'} px-4 sm:px-6 py-2 sm:py-3 rounded-2xl`}
           >
-            {settings.voiceEnabled ? <Volume2 size={16} className="mr-2" /> : <VolumeX size={16} className="mr-2" />}
-            <span className="hidden sm:inline">{settings.voiceEnabled ? 'صدا فعال' : 'صدا غیرفعال'}</span>
+            {settings.voiceEnabled ? <Volume2 size={16} className={`mr-2 ${isRTL ? 'rotate-180' : ''}`} /> : <VolumeX size={16} className={`mr-2 ${isRTL ? 'rotate-180' : ''}`} />}
+            <span className="hidden sm:inline">{settings.voiceEnabled ? t('statistics.voice_enabled') : t('statistics.voice_disabled')}</span>
           </GlassButton>
 
           <GlassButton
@@ -157,8 +157,8 @@ const StatisticsHeader: React.FC<StatisticsHeaderProps> = ({
             onClick={() => updateSettings({ showSettings: !settings.showSettings })}
             className="px-4 sm:px-6 py-2 sm:py-3 rounded-2xl"
           >
-            <Settings size={16} className="mr-2" />
-            <span className="hidden sm:inline">تنظیمات</span>
+            <Settings size={16} className={`mr-2 ${isRTL ? 'rotate-180' : ''}`} />
+            <span className="hidden sm:inline">{t('statistics.settings')}</span>
           </GlassButton>
 
           <GlassButton
@@ -167,8 +167,8 @@ const StatisticsHeader: React.FC<StatisticsHeaderProps> = ({
             onClick={() => setIsDarkMode(!isDarkMode)}
             className="px-4 sm:px-6 py-2 sm:py-3 rounded-2xl"
           >
-            {isDarkMode ? <Sun size={16} className="mr-2" /> : <Moon size={16} className="mr-2" />}
-            <span className="hidden sm:inline">{isDarkMode ? 'روشن' : 'تیره'}</span>
+            {isDarkMode ? <Sun size={16} className={`mr-2 ${isRTL ? 'rotate-180' : ''}`} /> : <Moon size={16} className={`mr-2 ${isRTL ? 'rotate-180' : ''}`} />}
+            <span className="hidden sm:inline">{isDarkMode ? t('statistics.light_mode') : t('statistics.dark_mode')}</span>
           </GlassButton>
 
           <ModernBadge
@@ -177,22 +177,22 @@ const StatisticsHeader: React.FC<StatisticsHeaderProps> = ({
             effect="glow"
             className="px-4 sm:px-6 py-2 sm:py-3 text-sm font-semibold"
           >
-            <Zap size={14} className="mr-2" />
+            <Zap size={14} className={`mr-2 ${isRTL ? 'rotate-180' : ''}`} />
             {t('statistics.live_data', 'داده‌های زنده')}
           </ModernBadge>
         </div>
 
         {/* Settings panel */}
         {settings.showSettings && (
-          <div className="bg-white/10 dark:bg-gray-800/10 backdrop-blur-xl rounded-2xl p-4 sm:p-6 max-w-md mx-auto shadow-2xl border border-white/20 animate-in fade-in slide-in-from-top-4">
+          <div className="bg-white/10 dark:bg-gray-800/10 backdrop-blur-xl rounded-2xl p-4 sm:p-6 max-w-md mx-auto shadow-2xl border border-white/20 animate-in fade-in slide-in-from-top-4" dir={isRTL ? 'rtl' : 'ltr'}>
             <h3 className="text-base sm:text-lg font-bold text-white mb-4 flex items-center gap-2">
               <Palette size={18} />
-              تنظیمات نمایش
+              {t('statistics.display_settings')}
             </h3>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-white mb-2">طرح‌بندی</label>
+                <label className="block text-sm font-medium text-white mb-2">{t('statistics.layout')}</label>
                 <div className="flex gap-2">
                   <button
                     onClick={() => updateSettings({ layoutMode: 'masonry' })}
@@ -213,28 +213,28 @@ const StatisticsHeader: React.FC<StatisticsHeaderProps> = ({
         )}
 
         {/* Real-time clock and stats */}
-        <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 md:gap-8 animate-in fade-in slide-in-from-bottom-4" style={{ animationDelay: '600ms' }}>
+        <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 md:gap-8 animate-in fade-in slide-in-from-bottom-4" style={{ animationDelay: '600ms' }} dir={isRTL ? 'rtl' : 'ltr'}>
           <div className="text-center">
             <div className="text-lg sm:text-2xl font-bold text-white mb-1">
               {appSettings.calendarType === 'jalali' 
                 ? currentTime.toLocaleTimeString('fa-IR') 
                 : currentTime.toLocaleTimeString('en-US')}
             </div>
-            <div className="text-xs sm:text-sm text-white/70">زمان فعلی</div>
+            <div className="text-xs sm:text-sm text-white/70">{t('statistics.current_time')}</div>
           </div>
 
           <div className="text-center">
             <div className="text-lg sm:text-2xl font-bold text-green-400 mb-1">
               {state.data.totalContacts || 0}
             </div>
-            <div className="text-xs sm:text-sm text-white/70">کل مخاطبین</div>
+            <div className="text-xs sm:text-sm text-white/70">{t('statistics.total_contacts')}</div>
           </div>
 
           <div className="text-center">
             <div className="text-lg sm:text-2xl font-bold text-blue-400 mb-1">
               {state.data.groupData?.length || 0}
             </div>
-            <div className="text-xs sm:text-sm text-white/70">گروه‌ها</div>
+            <div className="text-xs sm:text-sm text-white/70">{t('statistics.groups')}</div>
           </div>
         </div>
       </div>

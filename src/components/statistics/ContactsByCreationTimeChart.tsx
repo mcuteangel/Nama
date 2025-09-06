@@ -16,17 +16,19 @@ import { useAppSettings } from '@/hooks/use-app-settings';
  * - AI-powered seasonal pattern recognition
  * - Dynamic time-based color schemes
  * - Voice-guided temporal insights
+ * - RTL support
  */
 interface ContactsByCreationTimeChartProps {
   data: CreationTimeData[];
 }
 
 const ContactsByCreationTimeChart: React.FC<ContactsByCreationTimeChartProps> = ({ data }) => {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { settings: appSettings } = useAppSettings();
   const containerRef = useRef<HTMLDivElement>(null);
   const [growthMode, setGrowthMode] = useState(false);
   const [selectedPeriod, setSelectedPeriod] = useState<string | null>(null);
+  const isRTL = i18n.dir() === 'rtl';
 
   // Advanced growth analysis
   useEffect(() => {
@@ -62,7 +64,7 @@ const ContactsByCreationTimeChart: React.FC<ContactsByCreationTimeChartProps> = 
         return {
           name: formattedDate,
           count: item.count,
-          season: ['بهار', 'تابستان', 'پاییز', 'زمستان'][season]
+          season: [t('statistics.spring'), t('statistics.summer'), t('statistics.fall'), t('statistics.winter')][season]
         };
       } else {
         // For Gregorian calendar, format as YYYY/MM
@@ -75,7 +77,7 @@ const ContactsByCreationTimeChart: React.FC<ContactsByCreationTimeChartProps> = 
         };
       }
     });
-  }, [data, isJalali]);
+  }, [data, isJalali, t]);
 
   // Time-based insights
   const timeInsights = useMemo(() => {
@@ -97,7 +99,7 @@ const ContactsByCreationTimeChart: React.FC<ContactsByCreationTimeChartProps> = 
           original: item.month_year,
           name: formattedDate,
           count: item.count,
-          season: ['بهار', 'تابستان', 'پاییز', 'زمستان'][season]
+          season: [t('statistics.spring'), t('statistics.summer'), t('statistics.fall'), t('statistics.winter')][season]
         };
       } else {
         // For Gregorian calendar, format as YYYY/MM
@@ -132,7 +134,7 @@ const ContactsByCreationTimeChart: React.FC<ContactsByCreationTimeChartProps> = 
     });
 
     return insights;
-  }, [data, isJalali]);
+  }, [data, isJalali, t]);
 
   // Seasonal color schemes
   const getSeasonalColors = (season: string) => {
@@ -151,14 +153,14 @@ const ContactsByCreationTimeChart: React.FC<ContactsByCreationTimeChartProps> = 
   };
 
   return (
-    <div ref={containerRef} className="relative">
+    <div ref={containerRef} className="relative" dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Growth celebration overlay */}
       {growthMode && (
         <div className="absolute inset-0 pointer-events-none z-50 flex items-center justify-center">
           <div className="text-center space-y-4 animate-bounce">
             <div className="text-6xl animate-spin">📈</div>
             <div className="text-2xl font-bold text-white drop-shadow-lg bg-black/50 px-6 py-3 rounded-2xl backdrop-blur-sm">
-              رشد عالی در طول زمان! 🚀
+              {t('statistics.excellent_time_growth')} 🚀
             </div>
           </div>
         </div>
@@ -166,10 +168,10 @@ const ContactsByCreationTimeChart: React.FC<ContactsByCreationTimeChartProps> = 
 
       <div className="relative">
         {/* Time analysis indicator */}
-        <div className="absolute top-4 right-4 z-10 bg-white/10 backdrop-blur-sm rounded-xl p-3 shadow-lg">
+        <div className={`absolute top-4 ${isRTL ? 'left-4' : 'right-4'} z-10 bg-white/10 backdrop-blur-sm rounded-xl p-3 shadow-lg`}>
           <div className="flex items-center gap-2 text-sm">
             <Clock size={16} className="text-indigo-400" />
-            <span className="text-white font-medium">تحلیل زمانی</span>
+            <span className="text-white font-medium">{t('statistics.time_analysis')}</span>
           </div>
         </div>
 
@@ -195,29 +197,37 @@ const ContactsByCreationTimeChart: React.FC<ContactsByCreationTimeChartProps> = 
                   selectedPeriod === period.month_year ? 'ring-2 ring-white/50 scale-105' : ''
                 }`}
                 onClick={() => setSelectedPeriod(selectedPeriod === period.month_year ? null : period.month_year)}
+                dir={isRTL ? 'rtl' : 'ltr'}
               >
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-white font-semibold text-sm">{period.formattedName}</span>
-                  <span className="text-white/80 text-xs">{period.season}</span>
+                  <div className={`px-2 py-1 rounded-full text-xs font-bold ${
+                    period.performance === 'excellent' ? 'bg-green-500/20 text-green-200' :
+                    period.performance === 'good' ? 'bg-blue-500/20 text-blue-200' :
+                    'bg-red-500/20 text-red-200'
+                  }`}>
+                    {period.performance === 'excellent' ? t('statistics.excellent') :
+                     period.performance === 'good' ? t('statistics.good') :
+                     t('statistics.needs_improvement')}
+                  </div>
                 </div>
 
                 <div className="space-y-2">
                   <div className="flex justify-between items-center">
-                    <span className="text-white/80 text-sm">مخاطبین</span>
+                    <span className="text-white/80 text-xs">{t('statistics.contact_count')}</span>
                     <span className="text-white font-bold">{period.count}</span>
                   </div>
 
                   <div className="flex justify-between items-center">
-                    <span className="text-white/80 text-sm">رشد</span>
+                    <span className="text-white/80 text-xs">{t('statistics.growth')}</span>
                     <div className="flex items-center gap-1">
-                      <TrendingUp
-                        size={14}
-                        className={period.growth >= 0 ? 'text-green-400' : 'text-red-400'}
-                      />
-                      <span className={`text-sm font-semibold ${
-                        period.growth >= 0 ? 'text-green-400' : 'text-red-400'
-                      }`}>
-                        {period.growth >= 0 ? '+' : ''}{period.growth.toFixed(1)}%
+                      {period.growth > 0 ? (
+                        <TrendingUp size={12} className="text-green-400" />
+                      ) : (
+                        <TrendingUp size={12} className="text-red-400 rotate-180" />
+                      )}
+                      <span className={period.growth > 0 ? 'text-green-400' : 'text-red-400'}>
+                        {Math.abs(period.growth).toFixed(1)}%
                       </span>
                     </div>
                   </div>
@@ -229,24 +239,24 @@ const ContactsByCreationTimeChart: React.FC<ContactsByCreationTimeChartProps> = 
                     <div
                       className={`h-full bg-gradient-to-r ${colors.primary} rounded-full transition-all duration-1000 ease-out`}
                       style={{
-                        width: `${Math.max(10, Math.min(100, 50 + period.growth))}%`,
+                        width: `${Math.min((period.count / Math.max(...data.map(d => d.count))) * 100, 100)}%`,
                         animationDelay: `${index * 200}ms`
                       }}
                     />
                   </div>
                 </div>
 
-                {/* Performance badge */}
+                {/* Trend indicator */}
                 <div className="mt-3 text-center">
                   <div className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
-                    period.performance === 'excellent'
-                      ? 'bg-green-500/20 text-green-200'
-                      : period.performance === 'good'
-                      ? 'bg-blue-500/20 text-blue-200'
-                      : 'bg-yellow-500/20 text-yellow-200'
+                    period.trend === 'up' ? 'bg-green-500/20 text-green-200' :
+                    period.trend === 'down' ? 'bg-red-500/20 text-red-200' :
+                    'bg-blue-500/20 text-blue-200'
                   }`}>
-                    {period.performance === 'excellent' ? 'عالی' :
-                     period.performance === 'good' ? 'خوب' : 'نیاز بهبود'}
+                    <Target size={10} />
+                    {period.trend === 'up' ? t('statistics.increasing') :
+                     period.trend === 'down' ? t('statistics.decreasing') :
+                     t('statistics.stable')}
                   </div>
                 </div>
               </div>
@@ -254,14 +264,15 @@ const ContactsByCreationTimeChart: React.FC<ContactsByCreationTimeChartProps> = 
           })}
         </div>
 
-        {/* Seasonal analysis */}
-        <div className="mt-6 p-6 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 backdrop-blur-xl rounded-2xl border border-white/20 shadow-xl">
+        {/* Time-based recommendations */}
+        <div className="mt-6 p-6 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 backdrop-blur-xl rounded-2xl border border-white/20 shadow-xl" dir={isRTL ? 'rtl' : 'ltr'}>
           <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-            📊 تحلیل فصلی مخاطبین
+            <Calendar size={20} className="text-indigo-400" />
+            {t('statistics.time_based_recommendations')}
           </h3>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {['بهار', 'تابستان', 'پاییز', 'زمستان'].map((season, index) => {
+            {[t('statistics.spring'), t('statistics.summer'), t('statistics.fall'), t('statistics.winter')].map((season, index) => {
               const seasonData = timeInsights.filter(item => item.season === season);
               const avgGrowth = seasonData.reduce((sum, item) => sum + item.growth, 0) / seasonData.length || 0;
               const colors = getSeasonalColors(season);
@@ -291,23 +302,20 @@ const ContactsByCreationTimeChart: React.FC<ContactsByCreationTimeChartProps> = 
               );
             })}
           </div>
-        </div>
 
-        {/* Growth prediction */}
-        <div className="mt-6 p-4 bg-gradient-to-r from-green-500/10 to-blue-500/10 backdrop-blur-xl rounded-2xl border border-white/20 shadow-xl">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Target size={20} className="text-green-400" />
-              <div>
-                <h4 className="font-bold text-white">پیش‌بینی رشد</h4>
-                <p className="text-sm text-white/80">بر اساس روند فعلی</p>
-              </div>
+            <div className="p-4 bg-white/10 rounded-xl">
+              <h4 className="font-semibold text-white mb-2">{t('statistics.low_activity')}</h4>
+              <p className="text-sm text-white/80">
+                {t('statistics.low_activity_description')}
+              </p>
             </div>
-            <div className="text-right">
-              <div className="text-2xl font-bold text-green-400">+23%</div>
-              <div className="text-sm text-white/80">ماه آینده</div>
+
+            <div className="p-4 bg-white/10 rounded-xl">
+              <h4 className="font-semibold text-white mb-2">{t('statistics.seasonal_patterns')}</h4>
+              <p className="text-sm text-white/80">
+                {t('statistics.seasonal_patterns_description')}
+              </p>
             </div>
-          </div>
         </div>
       </div>
     </div>

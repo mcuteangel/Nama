@@ -20,7 +20,7 @@ const StatisticsFooter: React.FC<StatisticsFooterProps> = ({ isDarkMode }) => {
             {t('statistics.data_insights', 'تحلیل داده‌های شما')}
           </span>
           <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-            آمارهای دقیق و به‌روز • بروزرسانی لحظه‌ای
+            {t('statistics.data_insights_description', 'آمارهای دقیق و به‌روز • بروزرسانی لحظه‌ای')}
           </span>
         </div>
         <div className="flex items-center gap-2">

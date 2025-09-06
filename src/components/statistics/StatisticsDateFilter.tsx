@@ -21,12 +21,13 @@ const StatisticsDateFilter: React.FC<StatisticsDateFilterProps> = ({
   onDateRangeChange, 
   onComparePeriod 
 }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { calendarType, formatDate } = useJalaliCalendar();
   const [startDate, setStartDate] = useState<string>('');
   const [endDate, setEndDate] = useState<string>('');
   const [compareStartDate, setCompareStartDate] = useState<string>('');
   const [compareEndDate, setCompareEndDate] = useState<string>('');
+  const isRTL = i18n.dir() === 'rtl'; // Add RTL support
 
   const formatDisplayDate = (dateString: string) => {
     if (!dateString) return '';
@@ -51,7 +52,7 @@ const StatisticsDateFilter: React.FC<StatisticsDateFilterProps> = ({
   };
 
   return (
-    <ModernCard variant="glass" className="mb-6">
+    <ModernCard variant="glass" className="mb-6" dir={isRTL ? 'rtl' : 'ltr'}>
       <ModernCardContent className="p-4">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
           {/* Date Range Filter */}
@@ -116,7 +117,7 @@ const StatisticsDateFilter: React.FC<StatisticsDateFilterProps> = ({
               onClick={handleClearFilter}
               className="px-3"
             >
-              <X size={16} />
+              <X size={16} className={isRTL ? 'rotate-180' : ''} />
             </GlassButton>
           </div>
 

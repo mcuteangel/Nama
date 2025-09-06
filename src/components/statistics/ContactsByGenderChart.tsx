@@ -15,6 +15,7 @@ import { useTranslation } from 'react-i18next';
  * - AI-powered gender insights and trends
  * - Personalized gender-based recommendations
  * - Voice-guided gender data exploration
+ * - RTL support
  */
 interface ContactsByGenderChartProps {
   data: GenderData[];
@@ -39,9 +40,10 @@ const GenderIconWrapper = ({ gender, ...props }: { gender?: string; size?: numbe
 };
 
 const ContactsByGenderChart: React.FC<ContactsByGenderChartProps> = ({ data }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const containerRef = useRef<HTMLDivElement>(null);
   const [celebrationMode, setCelebrationMode] = useState(false);
+  const isRTL = i18n.dir() === 'rtl';
 
   // Advanced celebration system for gender diversity
   useEffect(() => {
@@ -79,14 +81,14 @@ const ContactsByGenderChart: React.FC<ContactsByGenderChartProps> = ({ data }) =
   }));
 
   return (
-    <div ref={containerRef} className="relative">
+    <div ref={containerRef} className="relative" dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Celebration overlay */}
       {celebrationMode && (
         <div className="absolute inset-0 pointer-events-none z-50 flex items-center justify-center">
           <div className="text-center space-y-4 animate-bounce">
             <div className="text-6xl animate-spin">🌈</div>
             <div className="text-2xl font-bold text-white drop-shadow-lg bg-black/50 px-6 py-3 rounded-2xl backdrop-blur-sm">
-              تعادل جنسیتی عالی! 🎉
+              {t('statistics.gender_balance_excellent')} 🎉
             </div>
           </div>
         </div>
@@ -99,7 +101,7 @@ const ContactsByGenderChart: React.FC<ContactsByGenderChartProps> = ({ data }) =
       >
         <div className="relative">
           {/* Gender diversity indicator */}
-          <div className="absolute top-4 left-4 z-10 bg-white/10 backdrop-blur-sm rounded-xl p-3 shadow-lg">
+          <div className={`absolute top-4 ${isRTL ? 'right-4' : 'left-4'} z-10 bg-white/10 backdrop-blur-sm rounded-xl p-3 shadow-lg`}>
             <div className="flex items-center gap-2 text-sm">
               <div className="flex gap-1">
                 {data.map((item, index) => (
@@ -113,7 +115,7 @@ const ContactsByGenderChart: React.FC<ContactsByGenderChartProps> = ({ data }) =
                   />
                 ))}
               </div>
-              <span className="text-white font-medium">تنوع جنسیتی</span>
+              <span className="text-white font-medium">{t('statistics.gender_diversity')}</span>
             </div>
           </div>
 
@@ -137,6 +139,7 @@ const ContactsByGenderChart: React.FC<ContactsByGenderChartProps> = ({ data }) =
                 <div
                   key={index}
                   className={`p-4 rounded-xl bg-gradient-to-r ${colors.secondary} backdrop-blur-sm border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105`}
+                  dir={isRTL ? 'rtl' : 'ltr'}
                 >
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
@@ -156,7 +159,7 @@ const ContactsByGenderChart: React.FC<ContactsByGenderChartProps> = ({ data }) =
                         ? 'bg-green-500/20 text-green-200'
                         : 'bg-yellow-500/20 text-yellow-200'
                     }`}>
-                      {item.recommendation === 'balanced' ? 'متعادل' : 'نیاز به توجه'}
+                      {item.recommendation === 'balanced' ? t('statistics.balanced') : t('statistics.needs_attention')}
                     </div>
                   </div>
                 </div>

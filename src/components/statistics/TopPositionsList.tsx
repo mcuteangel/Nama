@@ -14,16 +14,18 @@ import { useTranslation } from 'react-i18next';
  * - AI-powered position insights and recommendations
  * - Dynamic position-based color schemes
  * - Voice-guided position analysis
+ * - RTL support
  */
 interface TopPositionsListProps {
   data: PositionData[];
 }
 
 const TopPositionsList: React.FC<TopPositionsListProps> = ({ data }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const containerRef = useRef<HTMLDivElement>(null);
   const [performanceMode, setPerformanceMode] = useState(false);
   const [selectedPosition, setSelectedPosition] = useState<string | null>(null);
+  const isRTL = i18n.dir() === 'rtl'; // Add RTL support
 
   // Advanced position performance analysis
   useEffect(() => {
@@ -64,14 +66,14 @@ const TopPositionsList: React.FC<TopPositionsListProps> = ({ data }) => {
   };
 
   return (
-    <div ref={containerRef} className="relative">
+    <div ref={containerRef} className="relative" dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Performance celebration overlay */}
       {performanceMode && (
         <div className="absolute inset-0 pointer-events-none z-50 flex items-center justify-center">
           <div className="text-center space-y-4 animate-bounce">
             <div className="text-6xl animate-spin">💼</div>
             <div className="text-2xl font-bold text-white drop-shadow-lg bg-black/50 px-6 py-3 rounded-2xl backdrop-blur-sm">
-              تنوع شغلی عالی! 🎯
+              {t('statistics.excellent_position_diversity')} 🎯
             </div>
           </div>
         </div>
@@ -79,10 +81,10 @@ const TopPositionsList: React.FC<TopPositionsListProps> = ({ data }) => {
 
       <div className="relative">
         {/* Position analysis indicator */}
-        <div className="absolute top-4 left-4 z-10 bg-white/10 backdrop-blur-sm rounded-xl p-3 shadow-lg">
+        <div className={`absolute top-4 ${isRTL ? 'right-4' : 'left-4'} z-10 bg-white/10 backdrop-blur-sm rounded-xl p-3 shadow-lg`}>
           <div className="flex items-center gap-2 text-sm">
             <Briefcase size={16} className="text-orange-400" />
-            <span className="text-white font-medium">تحلیل موقعیت‌ها</span>
+            <span className="text-white font-medium">{t('statistics.position_analysis')}</span>
           </div>
         </div>
 
@@ -108,9 +110,10 @@ const TopPositionsList: React.FC<TopPositionsListProps> = ({ data }) => {
                   selectedPosition === position.position ? 'ring-2 ring-white/50 scale-105' : ''
                 }`}
                 onClick={() => setSelectedPosition(selectedPosition === position.position ? null : position.position)}
+                dir={isRTL ? 'rtl' : 'ltr'}
               >
                 {/* Rank badge */}
-                <div className="absolute top-2 right-2">
+                <div className={`absolute top-2 ${isRTL ? 'left-2' : 'right-2'}`}>
                   <div className={`px-2 py-1 rounded-full text-xs font-bold ${
                     index === 0 ? 'bg-yellow-500/20 text-yellow-200' :
                     index === 1 ? 'bg-gray-400/20 text-gray-200' :
@@ -131,17 +134,17 @@ const TopPositionsList: React.FC<TopPositionsListProps> = ({ data }) => {
 
                 <div className="space-y-2">
                   <div className="flex justify-between items-center">
-                    <span className="text-white/80 text-sm">مخاطبین</span>
+                    <span className="text-white/80 text-sm">{t('statistics.contacts')}</span>
                     <span className="text-white font-bold text-xl">{position.count}</span>
                   </div>
 
                   <div className="flex justify-between items-center">
-                    <span className="text-white/80 text-sm">تقاضا</span>
+                    <span className="text-white/80 text-sm">{t('statistics.demand')}</span>
                     <span className="text-white font-semibold">{position.demand}%</span>
                   </div>
 
                   <div className="flex justify-between items-center">
-                    <span className="text-white/80 text-sm">رضایت</span>
+                    <span className="text-white/80 text-sm">{t('statistics.satisfaction')}</span>
                     <span className="text-white font-semibold">{position.satisfaction.toFixed(1)}%</span>
                   </div>
                 </div>
@@ -170,9 +173,9 @@ const TopPositionsList: React.FC<TopPositionsListProps> = ({ data }) => {
                       ? 'bg-green-500/20 text-green-200'
                       : 'bg-orange-500/20 text-orange-200'
                   }`}>
-                    {position.category === 'leadership' ? 'رهبری' :
-                     position.category === 'senior' ? 'ارشد' :
-                     position.category === 'mid_level' ? 'متوسط' : 'ورودی'}
+                    {position.category === 'leadership' ? t('statistics.leadership') :
+                     position.category === 'senior' ? t('statistics.senior') :
+                     position.category === 'mid_level' ? t('statistics.mid_level') : t('statistics.entry')}
                   </div>
 
                   <div className="flex items-center gap-1">
@@ -180,7 +183,7 @@ const TopPositionsList: React.FC<TopPositionsListProps> = ({ data }) => {
                     <span className={`text-xs font-semibold ${
                       position.trend === 'high_demand' ? 'text-green-400' : 'text-blue-400'
                     }`}>
-                      {position.trend === 'high_demand' ? 'تقاضای بالا' : 'پایدار'}
+                      {position.trend === 'high_demand' ? t('statistics.high_demand') : t('statistics.stable')}
                     </span>
                   </div>
                 </div>
@@ -194,10 +197,10 @@ const TopPositionsList: React.FC<TopPositionsListProps> = ({ data }) => {
 
         {/* Position comparison tool */}
         {selectedPosition && (
-          <div className="mt-6 p-6 bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 shadow-2xl">
+          <div className="mt-6 p-6 bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 shadow-2xl" dir={isRTL ? 'rtl' : 'ltr'}>
             <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
               <Target size={20} />
-              تحلیل موقعیت {selectedPosition}
+              {t('statistics.position_analysis_title', { position: selectedPosition })}
             </h3>
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -209,22 +212,22 @@ const TopPositionsList: React.FC<TopPositionsListProps> = ({ data }) => {
                   <>
                     <div className="text-center p-4 bg-white/10 rounded-xl">
                       <div className="text-2xl font-bold text-white mb-1">{position.count}</div>
-                      <div className="text-sm text-white/80">مخاطبین</div>
+                      <div className="text-sm text-white/80">{t('statistics.contacts')}</div>
                     </div>
 
                     <div className="text-center p-4 bg-white/10 rounded-xl">
                       <div className="text-2xl font-bold text-blue-400 mb-1">{position.demand}%</div>
-                      <div className="text-sm text-white/80">تقاضا</div>
+                      <div className="text-sm text-white/80">{t('statistics.demand')}</div>
                     </div>
 
                     <div className="text-center p-4 bg-white/10 rounded-xl">
                       <div className="text-2xl font-bold text-green-400 mb-1">{position.satisfaction.toFixed(1)}%</div>
-                      <div className="text-sm text-white/80">رضایت</div>
+                      <div className="text-sm text-white/80">{t('statistics.satisfaction')}</div>
                     </div>
 
                     <div className="text-center p-4 bg-white/10 rounded-xl">
                       <div className="text-2xl font-bold text-purple-400 mb-1">+{position.growth.toFixed(1)}%</div>
-                      <div className="text-sm text-white/80">رشد</div>
+                      <div className="text-sm text-white/80">{t('statistics.growth')}</div>
                     </div>
                   </>
                 );
@@ -234,27 +237,28 @@ const TopPositionsList: React.FC<TopPositionsListProps> = ({ data }) => {
         )}
 
         {/* Career insights */}
-        <div className="mt-6 p-6 bg-gradient-to-r from-orange-500/10 to-red-500/10 backdrop-blur-xl rounded-2xl border border-white/20 shadow-xl">
+        <div className="mt-6 p-6 bg-gradient-to-r from-orange-500/10 to-red-500/10 backdrop-blur-xl rounded-2xl border border-white/20 shadow-xl" dir={isRTL ? 'rtl' : 'ltr'}>
           <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-            💼 بینش‌های شغلی
+            <Briefcase size={20} className="text-orange-400" />
+            {t('statistics.career_insights')}
           </h3>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="p-4 bg-white/10 rounded-xl">
-              <h4 className="font-semibold text-white mb-2">موقعیت‌های پرتقاضا</h4>
+              <h4 className="font-semibold text-white mb-2">{t('statistics.high_demand_positions')}</h4>
               <ul className="text-sm text-white/80 space-y-1">
-                <li>• موقعیت‌های رهبری در حال رشد</li>
-                <li>• نقش‌های فنی همچنان محبوب</li>
-                <li>• فرصت‌های دورکاری افزایش یافته</li>
+                <li>{t('statistics.leadership_roles_growing')}</li>
+                <li>{t('statistics.technical_roles_popular')}</li>
+                <li>{t('statistics.remote_opportunities_increasing')}</li>
               </ul>
             </div>
 
             <div className="p-4 bg-white/10 rounded-xl">
-              <h4 className="font-semibold text-white mb-2">پیشنهادات بهبود</h4>
+              <h4 className="font-semibold text-white mb-2">{t('statistics.improvement_suggestions')}</h4>
               <ul className="text-sm text-white/80 space-y-1">
-                <li>• تمرکز روی مهارت‌های نرم</li>
-                <li>• یادگیری مداوم تکنولوژی</li>
-                <li>• شبکه‌سازی حرفه‌ای</li>
+                <li>{t('statistics.focus_on_soft_skills')}</li>
+                <li>{t('statistics.continuous_learning')}</li>
+                <li>{t('statistics.professional_networking')}</li>
               </ul>
             </div>
           </div>

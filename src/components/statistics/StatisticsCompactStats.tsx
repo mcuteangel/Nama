@@ -12,6 +12,7 @@ import { StatisticsData } from "./types";
  * - Removed unnecessary DOM manipulation
  * - Simplified animation logic
  * - Better separation of concerns
+ * - RTL support
  */
 interface StatisticsCompactStatsProps {
   data: StatisticsData;
@@ -31,7 +32,8 @@ interface StatItem {
 }
 
 export const StatisticsCompactStats: React.FC<StatisticsCompactStatsProps> = ({ data }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.dir() === 'rtl';
 
   // Memoized stats data to prevent unnecessary recalculations
   const stats: StatItem[] = useMemo(() => [
@@ -87,7 +89,7 @@ export const StatisticsCompactStats: React.FC<StatisticsCompactStatsProps> = ({ 
   };
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8" dir={isRTL ? 'rtl' : 'ltr'}>
       {stats.map((stat, index) => {
         const Icon = stat.icon;
         const progress = calculateProgress(stat.value);
@@ -99,6 +101,7 @@ export const StatisticsCompactStats: React.FC<StatisticsCompactStatsProps> = ({ 
               index % 2 === 0 ? 'animate-in slide-in-from-left-4' : 'animate-in slide-in-from-right-4'
             }`}
             style={{ animationDelay: `${index * 150}ms` }}
+            dir={isRTL ? 'rtl' : 'ltr'}
           >
             {/* Dynamic gradient background */}
             <div className={`absolute inset-0 bg-gradient-to-br ${stat.bgColor} opacity-80 group-hover:opacity-100 transition-opacity duration-300`} />
@@ -111,8 +114,8 @@ export const StatisticsCompactStats: React.FC<StatisticsCompactStatsProps> = ({ 
 
             <div className="relative p-6 bg-white/10 dark:bg-gray-800/10 backdrop-blur-sm border border-white/20 dark:border-gray-700/20 rounded-2xl h-full flex flex-col justify-between group-hover:shadow-2xl group-hover:shadow-black/10 transition-all duration-300">
               {/* Floating geometric shapes */}
-              <div className="absolute top-2 right-2 w-6 h-6 bg-white/10 rounded-full blur-sm animate-pulse" />
-              <div className="absolute bottom-2 left-2 w-4 h-4 bg-white/5 rounded-full blur-sm animate-pulse" style={{ animationDelay: '1s' }} />
+              <div className={`absolute top-2 ${isRTL ? 'left-2' : 'right-2'} w-6 h-6 bg-white/10 rounded-full blur-sm animate-pulse`} />
+              <div className={`absolute bottom-2 ${isRTL ? 'right-2' : 'left-2'} w-4 h-4 bg-white/5 rounded-full blur-sm animate-pulse`} style={{ animationDelay: '1s' }} />
 
               <div className="flex items-start justify-between relative z-10">
                 <div className="flex-1">
@@ -128,13 +131,13 @@ export const StatisticsCompactStats: React.FC<StatisticsCompactStatsProps> = ({ 
                   </div>
 
                   <p className="text-3xl font-black text-gray-800 dark:text-gray-100 group-hover:text-white transition-colors duration-300 drop-shadow-lg">
-                    {stat.value.toLocaleString('fa-IR')}
+                    {stat.value.toLocaleString(isRTL ? 'fa-IR' : undefined)}
                   </p>
                 </div>
 
                 {/* Enhanced icon with animation */}
                 <div className="relative">
-                  <div className={`p-3 rounded-xl bg-gradient-to-r ${stat.color} ${stat.hoverColor} shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-110 group-hover:rotate-12`}>
+                  <div className={`p-3 rounded-xl bg-gradient-to-r ${stat.color} ${stat.hoverColor} shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-110 ${isRTL ? 'group-hover:-rotate-12' : 'group-hover:rotate-12'}`}>
                     <Icon size={24} className="text-white drop-shadow-sm" />
                   </div>
 
@@ -142,7 +145,7 @@ export const StatisticsCompactStats: React.FC<StatisticsCompactStatsProps> = ({ 
                   <div className={`absolute inset-0 rounded-xl bg-gradient-to-r ${stat.color} animate-ping opacity-0 group-hover:opacity-30`} style={{ animationDuration: '2s' }} />
 
                   {/* Performance indicator */}
-                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-400 rounded-full animate-pulse shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <div className={`absolute -top-1 ${isRTL ? 'left-1' : 'right-1'} w-4 h-4 bg-green-400 rounded-full animate-pulse shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300`}>
                     <Zap size={10} className="text-white m-0.5" />
                   </div>
                 </div>
@@ -160,7 +163,7 @@ export const StatisticsCompactStats: React.FC<StatisticsCompactStatsProps> = ({ 
                   />
                 </div>
                 <div className="flex items-center justify-between mt-1">
-                  <span className="text-xs text-gray-500 dark:text-gray-400">پیشرفت</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">{t('statistics.progress')}</span>
                   <span className="text-xs text-gray-600 dark:text-gray-300 font-medium">
                     {Math.round(progress)}%
                   </span>

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Cake, Calendar, Heart, Gift, Star } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { ModernCard, ModernCardHeader, ModernCardTitle, ModernCardContent } from "@/components/ui/modern-card";
@@ -17,6 +17,7 @@ import { useAppSettings } from '@/hooks/use-app-settings';
  * - AI-powered birthday insights
  * - Dynamic particle celebrations
  * - Voice announcements for upcoming birthdays
+ * - RTL support
  */
 interface UpcomingBirthdaysListProps {
   data: BirthdayContact[];
@@ -27,6 +28,7 @@ const UpcomingBirthdaysList: React.FC<UpcomingBirthdaysListProps> = ({ data }) =
   const { settings: appSettings } = useAppSettings();
   const listRef = useRef<HTMLDivElement>(null);
   const [celebratingIndex, setCelebratingIndex] = useState<number | null>(null);
+  const isRTL = i18n.dir() === 'rtl';
 
   // Determine calendar type based on app settings
   const isJalali = appSettings.calendarType === 'jalali';
@@ -99,16 +101,17 @@ const UpcomingBirthdaysList: React.FC<UpcomingBirthdaysListProps> = ({ data }) =
       className="rounded-3xl p-8 col-span-1 md:col-span-2 lg:col-span-1 transition-all duration-700 hover:shadow-2xl hover:shadow-pink-500/30 hover:-translate-y-2 bg-gradient-to-br from-background via-background/98 to-background/95 backdrop-blur-2xl border border-border/60 relative overflow-hidden group"
       role="region"
       aria-labelledby="upcoming-birthdays-title"
+      dir={isRTL ? 'rtl' : 'ltr'}
     >
       {/* Animated background with floating hearts */}
       <div className="absolute inset-0 overflow-hidden rounded-3xl">
-        <div className="absolute top-4 right-4 w-8 h-8 text-pink-300/20 animate-bounce">
+        <div className={`absolute top-4 ${isRTL ? 'left-4' : 'right-4'} w-8 h-8 text-pink-300/20 animate-bounce`}>
           <Heart size={32} fill="currentColor" />
         </div>
-        <div className="absolute bottom-4 left-4 w-6 h-6 text-red-300/20 animate-bounce" style={{ animationDelay: '1s' }}>
+        <div className={`absolute bottom-4 ${isRTL ? 'right-4' : 'left-4'} w-6 h-6 text-red-300/20 animate-bounce`} style={{ animationDelay: '1s' }}>
           <Star size={24} fill="currentColor" />
         </div>
-        <div className="absolute top-1/2 left-6 w-4 h-4 text-yellow-300/20 animate-bounce" style={{ animationDelay: '2s' }}>
+        <div className={`absolute top-1/2 ${isRTL ? 'right-6' : 'left-6'} w-4 h-4 text-yellow-300/20 animate-bounce`} style={{ animationDelay: '2s' }}>
           <Gift size={16} fill="currentColor" />
         </div>
       </div>
@@ -129,7 +132,7 @@ const UpcomingBirthdaysList: React.FC<UpcomingBirthdaysListProps> = ({ data }) =
             <span className="text-xl">{t('statistics.upcoming_birthdays')}</span>
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Calendar size={14} />
-              <span>{data.length} تولد نزدیک</span>
+              <span>{data.length} {t('statistics.upcoming_birthdays_count')}</span>
             </div>
           </div>
         </ModernCardTitle>
@@ -155,6 +158,7 @@ const UpcomingBirthdaysList: React.FC<UpcomingBirthdaysListProps> = ({ data }) =
                     }`}
                     onClick={() => triggerCelebration(index)}
                     role="listitem"
+                    dir={isRTL ? 'rtl' : 'ltr'}
                   >
                     {/* Celebration particles */}
                     {isCelebrating && (
@@ -177,8 +181,8 @@ const UpcomingBirthdaysList: React.FC<UpcomingBirthdaysListProps> = ({ data }) =
                     <div className={`p-6 rounded-2xl bg-gradient-to-r ${colors.bg} ${colors.hover} transition-all duration-500 hover:shadow-2xl border border-white/20 backdrop-blur-sm relative overflow-hidden`}>
                       {/* Animated background pattern */}
                       <div className="absolute inset-0 opacity-10">
-                        <div className="absolute top-2 right-2 w-16 h-16 border-2 border-white rounded-full animate-spin" style={{ animationDuration: '3s' }} />
-                        <div className="absolute bottom-2 left-2 w-12 h-12 border-2 border-white rounded-full animate-spin" style={{ animationDuration: '4s', animationDirection: 'reverse' }} />
+                        <div className={`absolute top-2 ${isRTL ? 'left-2' : 'right-2'} w-16 h-16 border-2 border-white rounded-full animate-spin`} style={{ animationDuration: '3s' }} />
+                        <div className={`absolute bottom-2 ${isRTL ? 'right-2' : 'left-2'} w-12 h-12 border-2 border-white rounded-full animate-spin`} style={{ animationDuration: '4s', animationDirection: 'reverse' }} />
                       </div>
 
                       <div className="flex items-center justify-between relative z-10">
@@ -188,7 +192,7 @@ const UpcomingBirthdaysList: React.FC<UpcomingBirthdaysListProps> = ({ data }) =
                               <Cake size={24} className={colors.icon} />
                             </div>
                             {/* Birthday badge */}
-                            <div className="absolute -top-1 -right-1 w-5 h-5 bg-yellow-400 rounded-full flex items-center justify-center shadow-lg">
+                            <div className={`absolute -top-1 ${isRTL ? 'left-1' : 'right-1'} w-5 h-5 bg-yellow-400 rounded-full flex items-center justify-center shadow-lg`}>
                               <span className="text-xs font-bold text-black">🎂</span>
                             </div>
                           </div>
@@ -200,35 +204,33 @@ const UpcomingBirthdaysList: React.FC<UpcomingBirthdaysListProps> = ({ data }) =
                             <div className="flex items-center gap-2 text-white/90 text-sm">
                               <Calendar size={14} />
                               <span>{formatDate(contact.birthday)}</span>
+                              <span>•</span>
+                              <span>{getDaysText(contact.days_until_birthday)}</span>
                             </div>
                           </div>
                         </div>
 
-                        <div className="flex items-center gap-3">
-                          <div className="text-right">
-                            <div className={`px-4 py-2 rounded-xl bg-white/20 backdrop-blur-sm shadow-lg ${isCelebrating ? 'animate-pulse' : ''}`}>
-                              <p className="text-white font-bold text-lg drop-shadow-lg">
-                                {contact.days_until_birthday === 0 ? '🎉' : contact.days_until_birthday}
-                              </p>
-                              <p className="text-white/80 text-xs">
-                                {getDaysText(contact.days_until_birthday)}
-                              </p>
-                            </div>
-                          </div>
-
-                          <div className={`w-3 h-3 rounded-full bg-white animate-pulse shadow-lg ${isCelebrating ? 'animate-ping' : ''}`} />
+                        <div className={`px-3 py-1 rounded-full text-xs font-bold ${
+                          theme === 'today' ? 'bg-yellow-300 text-black' :
+                          theme === 'soon' ? 'bg-pink-300 text-black' :
+                          theme === 'week' ? 'bg-blue-300 text-black' :
+                          'bg-gray-300 text-black'
+                        }`}>
+                          {theme === 'today' ? t('statistics.today') :
+                           theme === 'soon' ? t('statistics.coming_soon') :
+                           theme === 'week' ? t('statistics.this_week') :
+                           t('statistics.later')}
                         </div>
                       </div>
 
-                      {/* Celebration ribbon */}
-                      {contact.days_until_birthday === 0 && (
-                        <div className="absolute top-2 left-2 bg-yellow-400 text-black px-3 py-1 rounded-full text-xs font-bold shadow-lg animate-bounce">
-                          🎂 تولد امروز!
-                        </div>
-                      )}
-
-                      {/* Hover effect overlay */}
-                      <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl" />
+                      {/* Personalized message */}
+                      <div className="mt-4 pt-4 border-t border-white/20">
+                        <p className="text-white/90 text-sm italic">
+                          {theme === 'today' ? t('statistics.happy_birthday_message') :
+                           theme === 'soon' ? t('statistics.upcoming_birthday_message') :
+                           t('statistics.future_birthday_message')}
+                        </p>
+                      </div>
                     </div>
                   </div>
                 );
@@ -236,25 +238,21 @@ const UpcomingBirthdaysList: React.FC<UpcomingBirthdaysListProps> = ({ data }) =
             </div>
           </>
         ) : (
-          <div className="h-full flex items-center justify-center relative">
+          <div className="h-full flex items-center justify-center">
             <div className="text-center space-y-4">
               <div className="relative">
                 <div className="w-20 h-20 mx-auto rounded-2xl bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center shadow-xl">
                   <Cake size={40} className="text-muted-foreground/50" />
                 </div>
-                {/* Floating hearts */}
-                <div className="absolute -top-2 -right-2 text-red-400 animate-bounce">
-                  <Heart size={16} fill="currentColor" />
-                </div>
-                <div className="absolute -bottom-2 -left-2 text-pink-400 animate-bounce" style={{ animationDelay: '1s' }}>
-                  <Heart size={12} fill="currentColor" />
-                </div>
+                {/* Floating indicators */}
+                <div className={`absolute -top-2 ${isRTL ? 'left-2' : 'right-2'} w-3 h-3 bg-muted-foreground/30 rounded-full animate-pulse`} />
+                <div className={`absolute -bottom-2 ${isRTL ? 'right-2' : 'left-2'} w-2 h-2 bg-muted-foreground/20 rounded-full animate-pulse`} style={{ animationDelay: '1s' }} />
               </div>
               <p className="text-muted-foreground font-medium text-lg" role="status">
                 {t('statistics.no_upcoming_birthdays')}
               </p>
               <p className="text-muted-foreground/70 text-sm">
-                هیچ تولدی در آینده نزدیک نیست
+                {t('statistics.no_upcoming_birthdays_description')}
               </p>
             </div>
           </div>
