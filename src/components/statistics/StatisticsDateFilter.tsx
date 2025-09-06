@@ -9,6 +9,8 @@ import {
   ModernPopoverTrigger,
 } from '@/components/ui/modern-popover';
 import { JalaliCalendar } from '@/components/JalaliCalendar';
+import { useJalaliCalendar } from '@/hooks/use-jalali-calendar';
+import moment from 'moment-jalaali';
 
 interface StatisticsDateFilterProps {
   onDateRangeChange: (startDate: string | null, endDate: string | null) => void;
@@ -20,10 +22,17 @@ const StatisticsDateFilter: React.FC<StatisticsDateFilterProps> = ({
   onComparePeriod 
 }) => {
   const { t } = useTranslation();
+  const { calendarType, formatDate } = useJalaliCalendar();
   const [startDate, setStartDate] = useState<string>('');
   const [endDate, setEndDate] = useState<string>('');
   const [compareStartDate, setCompareStartDate] = useState<string>('');
   const [compareEndDate, setCompareEndDate] = useState<string>('');
+
+  const formatDisplayDate = (dateString: string) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return formatDate(date);
+  };
 
   const handleApplyFilter = () => {
     onDateRangeChange(startDate || null, endDate || null);
@@ -56,7 +65,7 @@ const StatisticsDateFilter: React.FC<StatisticsDateFilterProps> = ({
                   variant="glass"
                   className="w-full justify-start text-left font-normal py-2 bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 hover:bg-white/40 dark:hover:bg-gray-700/40"
                 >
-                  {startDate ? new Date(startDate).toLocaleDateString() : t('statistics.start_date')}
+                  {startDate ? formatDisplayDate(startDate) : t('statistics.start_date')}
                 </GlassButton>
               </ModernPopoverTrigger>
               <ModernPopoverContent className="w-auto p-0" glassEffect="card">
@@ -79,7 +88,7 @@ const StatisticsDateFilter: React.FC<StatisticsDateFilterProps> = ({
                   variant="glass"
                   className="w-full justify-start text-left font-normal py-2 bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 hover:bg-white/40 dark:hover:bg-gray-700/40"
                 >
-                  {endDate ? new Date(endDate).toLocaleDateString() : t('statistics.end_date')}
+                  {endDate ? formatDisplayDate(endDate) : t('statistics.end_date')}
                 </GlassButton>
               </ModernPopoverTrigger>
               <ModernPopoverContent className="w-auto p-0" glassEffect="card">
@@ -123,7 +132,7 @@ const StatisticsDateFilter: React.FC<StatisticsDateFilterProps> = ({
                     variant="glass"
                     className="flex-1 justify-start text-left font-normal py-2 bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 hover:bg-white/40 dark:hover:bg-gray-700/40"
                   >
-                    {compareStartDate ? new Date(compareStartDate).toLocaleDateString() : t('statistics.start_date')}
+                    {compareStartDate ? formatDisplayDate(compareStartDate) : t('statistics.start_date')}
                   </GlassButton>
                 </ModernPopoverTrigger>
                 <ModernPopoverContent className="w-auto p-0" glassEffect="card">
@@ -141,7 +150,7 @@ const StatisticsDateFilter: React.FC<StatisticsDateFilterProps> = ({
                     variant="glass"
                     className="flex-1 justify-start text-left font-normal py-2 bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 hover:bg-white/40 dark:hover:bg-gray-700/40"
                   >
-                    {compareEndDate ? new Date(compareEndDate).toLocaleDateString() : t('statistics.end_date')}
+                    {compareEndDate ? formatDisplayDate(compareEndDate) : t('statistics.end_date')}
                   </GlassButton>
                 </ModernPopoverTrigger>
                 <ModernPopoverContent className="w-auto p-0" glassEffect="card">

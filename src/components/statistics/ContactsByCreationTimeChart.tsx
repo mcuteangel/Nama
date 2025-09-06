@@ -52,23 +52,26 @@ const ContactsByCreationTimeChart: React.FC<ContactsByCreationTimeChartProps> = 
       // Parse the date string (assumed to be in YYYY-MM format)
       const [year, month] = item.month_year.split('-').map(Number);
 
-      // Create a date object for the first day of the month
       if (isJalali) {
-        // For Jalali calendar, we need to convert Gregorian date to Jalali
+        // For Jalali calendar, convert Gregorian date to Jalali
         const gregorianDate = new Date(year, month - 1, 1);
         const jalaliDate = moment(gregorianDate);
         // Format as Jalali month/year
         const formattedDate = jalaliDate.format('jYYYY/jMM');
+        const season = Math.floor((jalaliDate.jMonth()) / 3);
         return {
           name: formattedDate,
           count: item.count,
+          season: ['بهار', 'تابستان', 'پاییز', 'زمستان'][season]
         };
       } else {
         // For Gregorian calendar, format as YYYY/MM
         const formattedDate = `${year}/${month.toString().padStart(2, '0')}`;
+        const season = Math.floor((month - 1) / 3);
         return {
           name: formattedDate,
           count: item.count,
+          season: ['Spring', 'Summer', 'Fall', 'Winter'][season]
         };
       }
     });
@@ -78,21 +81,58 @@ const ContactsByCreationTimeChart: React.FC<ContactsByCreationTimeChartProps> = 
   const timeInsights = useMemo(() => {
     if (!data.length) return [];
 
+    // First, create formatted data to get the proper date formatting
+    const formattedItems = data.map(item => {
+      // Parse the date string (assumed to be in YYYY-MM format)
+      const [year, month] = item.month_year.split('-').map(Number);
+
+      if (isJalali) {
+        // For Jalali calendar, convert Gregorian date to Jalali
+        const gregorianDate = new Date(year, month - 1, 1);
+        const jalaliDate = moment(gregorianDate);
+        // Format as Jalali month/year
+        const formattedDate = jalaliDate.format('jYYYY/jMM');
+        const season = Math.floor((jalaliDate.jMonth()) / 3);
+        return {
+          original: item.month_year,
+          name: formattedDate,
+          count: item.count,
+          season: ['بهار', 'تابستان', 'پاییز', 'زمستان'][season]
+        };
+      } else {
+        // For Gregorian calendar, format as YYYY/MM
+        const formattedDate = `${year}/${month.toString().padStart(2, '0')}`;
+        const season = Math.floor((month - 1) / 3);
+        return {
+          original: item.month_year,
+          name: formattedDate,
+          count: item.count,
+          season: ['Spring', 'Summer', 'Fall', 'Winter'][season]
+        };
+      }
+    });
+
     const insights = data.map((item, index) => {
       const growth = index > 0 ? ((item.count - data[index - 1].count) / data[index - 1].count) * 100 : 0;
-      const season = Math.floor((parseInt(item.month_year.split('-')[1]) - 1) / 3);
+      
+      // Find the formatted item that matches this original item
+      const formattedItem = formattedItems.find(f => f.original === item.month_year) || {
+        name: item.month_year,
+        season: 'Unknown'
+      };
 
       return {
         ...item,
+        formattedName: formattedItem.name,
         growth,
-        season: ['بهار', 'تابستان', 'پاییز', 'زمستان'][season],
+        season: formattedItem.season,
         performance: growth > 10 ? 'excellent' : growth > 0 ? 'good' : 'needs_improvement',
         trend: growth > 5 ? 'up' : growth < -5 ? 'down' : 'stable'
       };
     });
 
     return insights;
-  }, [data]);
+  }, [data, isJalali]);
 
   // Seasonal color schemes
   const getSeasonalColors = (season: string) => {
@@ -157,7 +197,7 @@ const ContactsByCreationTimeChart: React.FC<ContactsByCreationTimeChartProps> = 
                 onClick={() => setSelectedPeriod(selectedPeriod === period.month_year ? null : period.month_year)}
               >
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-white font-semibold text-sm">{period.month_year}</span>
+                  <span className="text-white font-semibold text-sm">{period.formattedName}</span>
                   <span className="text-white/80 text-xs">{period.season}</span>
                 </div>
 

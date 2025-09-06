@@ -4,15 +4,18 @@ import { ModernPopover, ModernPopoverContent, ModernPopoverTrigger } from '@/com
 import { GlassButton } from "@/components/ui/glass-button";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { CalendarIcon } from 'lucide-react';
-import { format } from 'date-fns-jalali';
 import { JalaliCalendar } from '@/components/JalaliCalendar';
 import { cn } from '@/lib/utils';
 import { ContactFormValues } from '@/types/contact';
 import { useTranslation } from 'react-i18next';
+import { useAppSettings } from '@/hooks/use-app-settings';
+import { useJalaliCalendar } from '@/hooks/use-jalali-calendar';
 
 const ContactImportantDates: React.FC = React.memo(() => {
   const { t } = useTranslation();
   const form = useFormContext<ContactFormValues>();
+  const { settings } = useAppSettings();
+  const { formatDate } = useJalaliCalendar();
 
   return (
     <div className="space-y-4 pt-6 border-t border-gray-200 dark:border-gray-700">
@@ -40,12 +43,12 @@ const ContactImportantDates: React.FC = React.memo(() => {
                     >
                       <span className="flex items-center">
                         <CalendarIcon className="ml-2 h-4 w-4" />
-                        {field.value ? format(new Date(field.value), "yyyy/MM/dd") : <span>{t('form_placeholders.select_birth_date')}</span>}
+                        {field.value ? formatDate(new Date(field.value)) : <span>{t('form_placeholders.select_birth_date')}</span>}
                       </span>
                     </GlassButton>
                   </FormControl>
                 </ModernPopoverTrigger>
-                <ModernPopoverContent className="w-auto p-0" glassEffect="strong">
+                <ModernPopoverContent className="w-auto p-0" glassEffect="card">
                   <JalaliCalendar
                     selected={field.value ? new Date(field.value) : undefined}
                     onSelect={(date) => field.onChange(date ? date.toISOString() : "")}
@@ -61,7 +64,7 @@ const ContactImportantDates: React.FC = React.memo(() => {
       </div>
     </div>
   );
-}, (prevProps, nextProps) => {
+}, () => {
   // Custom comparison function for React.memo - prevent re-renders unless necessary
   return true;
 });

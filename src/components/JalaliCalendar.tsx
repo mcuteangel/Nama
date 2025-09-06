@@ -11,6 +11,7 @@ import { GlassButton } from "@/components/ui/glass-button";
 import { cn, applyGlassEffect } from '@/lib/utils';
 import moment from 'moment-jalaali';
 import { useJalaliCalendar } from '@/hooks/use-jalali-calendar';
+import { useAppSettings } from '@/hooks/use-app-settings';
 
 export interface JalaliCalendarProps {
   selected?: Date | undefined;
@@ -26,9 +27,13 @@ export function JalaliCalendar({
   onSelect, 
   className, 
   variant = 'glass',
-  locale: initialLocale = 'fa',
+  locale: initialLocale,
   showToggle = true
 }: JalaliCalendarProps) {
+  // Get the default calendar type from app settings
+  const { settings } = useAppSettings();
+  const defaultLocale = initialLocale || (settings.calendarType === 'jalali' ? 'fa' : 'en');
+  
   // Store dates as timestamps to prevent infinite re-renders
   const [currentDate, setCurrentDate] = useState(() => {
     return selected ? moment(selected).valueOf() : moment().startOf('day').valueOf();
@@ -46,13 +51,18 @@ export function JalaliCalendar({
   const currentMoment = moment(currentDate);
   const selectedMoment = moment(selectedDate);
 
-  const [locale, setLocale] = useState<'fa' | 'en'>(initialLocale);
+  const [locale, setLocale] = useState<'fa' | 'en'>(defaultLocale);
   const isJalali = locale === 'fa';
 
   // Sync with external locale changes
   useEffect(() => {
-    setLocale(initialLocale);
-  }, [initialLocale]);
+    if (initialLocale) {
+      setLocale(initialLocale);
+    } else {
+      // Use the app settings calendar type as default
+      setLocale(settings.calendarType === 'jalali' ? 'fa' : 'en');
+    }
+  }, [initialLocale, settings.calendarType]);
 
   const monthDays = React.useMemo(() => {
     const days: Array<{
@@ -102,7 +112,7 @@ export function JalaliCalendar({
       ? endOfMonth.clone().endOf('week') // استفاده از week برای تقویم شمسی
       : endOfMonth.clone().endOf('week'); // استفاده از week برای تقویم میلادی
 
-    let day = startOfWeek.clone();
+    const day = startOfWeek.clone();
     let dayIndex = 0;
     while (day.isSameOrBefore(endOfWeek, 'day')) {
       const isCurrentMonth = isJalali
@@ -144,7 +154,7 @@ export function JalaliCalendar({
   }, [currentMoment, selectedMoment, isJalali]);
 
   const goToPreviousMonth = () => {
-    setCurrentDate(prev => {
+    setCurrentDate((prev: number) => {
       const date = moment(prev);
       return isJalali 
         ? date.subtract(1, 'jMonth').valueOf()
@@ -153,7 +163,7 @@ export function JalaliCalendar({
   };
 
   const goToNextMonth = () => {
-    setCurrentDate(prev => {
+    setCurrentDate((prev: number) => {
       const date = moment(prev);
       return isJalali 
         ? date.add(1, 'jMonth').valueOf()
@@ -216,7 +226,7 @@ export function JalaliCalendar({
   const { month, year, monthName, yearNumber } = getMonthYear();
 
   const changeMonth = (monthIndex: number) => {
-    setCurrentDate(prev => {
+    setCurrentDate((prev: number) => {
       const newDate = moment(prev);
       if (isJalali) {
         newDate.jMonth(monthIndex);
@@ -229,7 +239,7 @@ export function JalaliCalendar({
   };
 
   const changeYear = (year: number) => {
-    setCurrentDate(prev => {
+    setCurrentDate((prev: number) => {
       const newDate = moment(prev);
       if (isJalali) {
         newDate.jYear(year);
@@ -279,7 +289,7 @@ export function JalaliCalendar({
     <div 
       className={cn(
         "p-4 rounded-lg w-full max-w-xs shadow-lg",
-        variant === 'glass' && applyGlassEffect("glassAdvanced"),
+        variant === 'glass' && applyGlassEffect("advanced"),
         "transition-all duration-200 hover:shadow-xl",
         className,
         isJalali ? 'font-sans' : 'font-sans'
@@ -332,7 +342,7 @@ export function JalaliCalendar({
                   <ChevronDown className="mr-1 h-3 w-3 opacity-50" />
                 </GlassButton>
               </ModernPopoverTrigger>
-              <ModernPopoverContent className="w-48 p-2" align={isJalali ? 'end' : 'start'} glassEffect="glassAdvanced">
+              <ModernPopoverContent className="w-48 p-2" align={isJalali ? 'end' : 'start'} glassEffect="advanced">
                 <div className="grid grid-cols-3 gap-1">
                   {(isJalali 
                     ? ['فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور', 'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند']
@@ -370,7 +380,7 @@ export function JalaliCalendar({
                   <ChevronDown className="mr-1 h-3 w-3 opacity-50" />
                 </GlassButton>
               </ModernPopoverTrigger>
-              <ModernPopoverContent className="w-64 p-3" align={isJalali ? 'end' : 'start'} glassEffect="glassAdvanced">
+              <ModernPopoverContent className="w-64 p-3" align={isJalali ? 'end' : 'start'} glassEffect="advanced">
                 <div className="flex justify-between items-center mb-2">
                   <GlassButton
                     variant="ghost"

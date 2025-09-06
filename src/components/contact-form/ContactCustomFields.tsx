@@ -7,30 +7,32 @@ import { GlassButton } from "@/components/ui/glass-button";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { CalendarIcon, Plus } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { format } from 'date-fns-jalali';
 import { JalaliCalendar } from '@/components/JalaliCalendar';
 import { cn } from '@/lib/utils';
 import { CustomFieldForm } from '@/components/custom-fields';
 import { CustomFieldTemplate } from '@/domain/schemas/custom-field-template';
 import { ContactFormValues } from '@/types/contact';
 import { useTranslation } from 'react-i18next';
+import { useJalaliCalendar } from '@/hooks/use-jalali-calendar';
 
 interface ContactCustomFieldsProps {
   availableTemplates: CustomFieldTemplate[];
   loadingTemplates: boolean;
   fetchTemplates: () => void;
+  onAddField?: () => void;
 }
 
 const ContactCustomFields: React.FC<ContactCustomFieldsProps> = React.memo(({
-  availableTemplates,
-  loadingTemplates,
+  availableTemplates = [],
+  loadingTemplates = false,
   fetchTemplates,
 }) => {
   const { t } = useTranslation();
-  const form = useFormContext<ContactFormValues>();
-
+  const { control, watch } = useFormContext<ContactFormValues>();
+  const { formatDate } = useJalaliCalendar();
+  
   // Memoize custom fields to prevent unnecessary re-renders
-  const customFields = useMemo(() => form.watch("customFields") || [], [form]);
+  const customFields = useMemo(() => watch("customFields") || [], [watch]);
 
   // Memoize template mapping to prevent unnecessary re-renders
   const templateMap = useMemo(() => {
@@ -88,7 +90,7 @@ const ContactCustomFields: React.FC<ContactCustomFieldsProps> = React.memo(({
             return (
               <FormField
                 key={template.id}
-                control={form.control}
+                control={control}
                 name={fieldName}
                 render={({ field }) => (
                   <FormItem>
@@ -127,7 +129,7 @@ const ContactCustomFields: React.FC<ContactCustomFieldsProps> = React.memo(({
                             >
                               <span className="flex items-center">
                                 <CalendarIcon className="ml-2 h-4 w-4" />
-                                {field.value ? format(new Date(field.value), "yyyy/MM/dd") : <span>{t('form_placeholders.select_birth_date')}</span>}
+                                {field.value ? formatDate(new Date(field.value)) : <span>{t('form_placeholders.select_birth_date')}</span>}
                               </span>
                             </GlassButton>
                           </ModernPopoverTrigger>
