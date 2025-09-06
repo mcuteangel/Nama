@@ -1,4 +1,4 @@
-import React, { Suspense } from "react";
+import React, { Suspense, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import {
   TrendingUp,
@@ -105,9 +105,144 @@ const StatisticsDashboard: React.FC = () => {
   }, [isDarkMode]);
 
   // Update settings helper
-  const updateSettings = (newSettings: Partial<DashboardSettings>) => {
+  const updateSettings = React.useCallback((newSettings: Partial<DashboardSettings>) => {
     setSettings(prev => ({ ...prev, ...newSettings }));
-  };
+  }, []);
+
+  // Memoized tab content to prevent unnecessary re-renders
+  const tabContent = useMemo(() => {
+    const gridProps = settings.layoutMode === 'masonry' 
+      ? { columns: 3, gap: "lg" } as const
+      : { breakpoints: { sm: 1, md: 2, lg: 3, xl: 4 } } as const;
+    
+    const GridComponent = settings.layoutMode === 'masonry' ? MasonryGrid : ResponsiveGrid;
+    
+    return (
+      <ModernTabs defaultValue="overview" className="w-full" dir={isRTL ? 'rtl' : 'ltr'}>
+        <ModernTabsList
+          className="grid w-full grid-cols-2 sm:grid-cols-4 mb-6 sm:mb-8 bg-white/10 dark:bg-gray-800/10 backdrop-blur-xl rounded-2xl p-2 border border-white/20"
+          glassEffect="default"
+          hoverEffect="lift"
+        >
+          <ModernTabsTrigger
+            value="overview"
+            className="flex items-center gap-1 sm:gap-2 rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-600 data-[state=active]:text-white transition-all duration-300 hover:scale-105 text-xs sm:text-sm"
+            hoverEffect="scale"
+          >
+            <TrendingUp size={14} className={isRTL ? 'rotate-180' : ''} />
+            <span className="hidden xs:inline">{t('statistics.overview', 'Overview')}</span>
+          </ModernTabsTrigger>
+
+          <ModernTabsTrigger
+            value="distribution"
+            className="flex items-center gap-1 sm:gap-2 rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-green-500 data-[state=active]:to-blue-600 data-[state=active]:text-white transition-all duration-300 hover:scale-105 text-xs sm:text-sm"
+            hoverEffect="scale"
+          >
+            <PieChart size={14} className={isRTL ? 'rotate-180' : ''} />
+            <span className="hidden xs:inline">{t('statistics.distribution', 'Distribution')}</span>
+          </ModernTabsTrigger>
+
+          <ModernTabsTrigger
+            value="timeline"
+            className="flex items-center gap-1 sm:gap-2 rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300 hover:scale-105 text-xs sm:text-sm"
+            hoverEffect="scale"
+          >
+            <Calendar size={14} className={isRTL ? 'rotate-180' : ''} />
+            <span className="hidden xs:inline">{t('statistics.timeline', 'Timeline')}</span>
+          </ModernTabsTrigger>
+
+          <ModernTabsTrigger
+            value="insights"
+            className="flex items-center gap-1 sm:gap-2 rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-red-600 data-[state=active]:text-white transition-all duration-300 hover:scale-105 text-xs sm:text-sm"
+            hoverEffect="scale"
+          >
+            <Award size={14} className={isRTL ? 'rotate-180' : ''} />
+            <span className="hidden xs:inline">{t('statistics.insights', 'Insights')}</span>
+          </ModernTabsTrigger>
+        </ModernTabsList>
+
+        {/* Overview Tab */}
+        <ModernTabsContent value="overview" className="space-y-6 sm:space-y-8">
+          <GridComponent {...gridProps} className="animate-in fade-in duration-700">
+            <div className="animate-in slide-in-from-left-4 duration-500">
+              <Suspense fallback={<ModernLoader variant="spinner" size="lg" />}>
+                <TotalContactsCard count={state.data.totalContacts} />
+              </Suspense>
+            </div>
+            <div className="animate-in slide-in-from-right-4 duration-500 delay-100">
+              <Suspense fallback={<ModernLoader variant="spinner" size="lg" />}>
+                <ContactsByCreationTimeChart data={state.data.creationTimeData} />
+              </Suspense>
+            </div>
+            <div className="animate-in slide-in-from-bottom-4 duration-500 delay-200">
+              <Suspense fallback={<ModernLoader variant="spinner" size="lg" />}>
+                <UpcomingBirthdaysList data={state.data.upcomingBirthdays} />
+              </Suspense>
+            </div>
+          </GridComponent>
+        </ModernTabsContent>
+
+        {/* Distribution Tab */}
+        <ModernTabsContent value="distribution" className="space-y-6 sm:space-y-8">
+          <GridComponent {...gridProps} className="animate-in fade-in duration-700">
+            <div className="animate-in slide-in-from-left-4 duration-500">
+              <Suspense fallback={<ModernLoader variant="spinner" size="lg" />}>
+                <ContactsByGenderChart data={state.data.genderData} />
+              </Suspense>
+            </div>
+            <div className="animate-in slide-in-from-right-4 duration-500 delay-100">
+              <Suspense fallback={<ModernLoader variant="spinner" size="lg" />}>
+                <ContactsByGroupChart data={state.data.groupData} />
+              </Suspense>
+            </div>
+            <div className="animate-in slide-in-from-bottom-4 duration-500 delay-200">
+              <Suspense fallback={<ModernLoader variant="spinner" size="lg" />}>
+                <ContactsByPreferredMethodChart data={state.data.preferredMethodData} />
+              </Suspense>
+            </div>
+          </GridComponent>
+        </ModernTabsContent>
+
+        {/* Timeline Tab */}
+        <ModernTabsContent value="timeline" className="space-y-6 sm:space-y-8">
+          <GridComponent 
+            {...(settings.layoutMode === 'masonry' ? { columns: 2, gap: "lg" } : { breakpoints: { sm: 1, md: 2, lg: 3, xl: 4 } })}
+            className="animate-in fade-in duration-700"
+          >
+            <div className="col-span-2 animate-in slide-in-from-left-4 duration-500">
+              <Suspense fallback={<ModernLoader variant="spinner" size="lg" />}>
+                <ContactsByCreationTimeChart data={state.data.creationTimeData} />
+              </Suspense>
+            </div>
+            <div className="animate-in slide-in-from-right-4 duration-500 delay-100">
+              <Suspense fallback={<ModernLoader variant="spinner" size="lg" />}>
+                <UpcomingBirthdaysList data={state.data.upcomingBirthdays} />
+              </Suspense>
+            </div>
+          </GridComponent>
+        </ModernTabsContent>
+
+        {/* Insights Tab */}
+        <ModernTabsContent value="insights" className="space-y-6 sm:space-y-8">
+          <GridComponent 
+            {...(settings.layoutMode === 'masonry' ? { columns: 2, gap: "lg" } : { breakpoints: { sm: 1, md: 2, lg: 3, xl: 4 } })}
+            className="animate-in fade-in duration-700"
+          >
+            <div className="animate-in slide-in-from-left-4 duration-500">
+              <Suspense fallback={<ModernLoader variant="spinner" size="lg" />}>
+                <TopCompaniesList data={state.data.topCompaniesData} />
+              </Suspense>
+            </div>
+            <div className="animate-in slide-in-from-right-4 duration-500 delay-100">
+              <Suspense fallback={<ModernLoader variant="spinner" size="lg" />}>
+                <TopPositionsList data={state.data.topPositionsData} />
+              </Suspense>
+            </div>
+          </GridComponent>
+        </ModernTabsContent>
+      </ModernTabs>
+    );
+  }, [settings.layoutMode, isRTL, t, state.data]);
 
   // Loading state
   if (state.loading) {
@@ -171,193 +306,7 @@ const StatisticsDashboard: React.FC = () => {
         {/* Main content with tabs */}
         <ModernCard variant="glass" hover="lift" className="backdrop-blur-2xl border border-white/30 shadow-2xl">
           <ModernCardContent className="p-4 sm:p-6 md:p-8">
-            <ModernTabs defaultValue="overview" className="w-full" dir={isRTL ? 'rtl' : 'ltr'}>
-              <ModernTabsList
-                className="grid w-full grid-cols-2 sm:grid-cols-4 mb-6 sm:mb-8 bg-white/10 dark:bg-gray-800/10 backdrop-blur-xl rounded-2xl p-2 border border-white/20"
-                glassEffect="default"
-                hoverEffect="lift"
-              >
-                <ModernTabsTrigger
-                  value="overview"
-                  className="flex items-center gap-1 sm:gap-2 rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-600 data-[state=active]:text-white transition-all duration-300 hover:scale-105 text-xs sm:text-sm"
-                  hoverEffect="scale"
-                >
-                  <TrendingUp size={14} className={isRTL ? 'rotate-180' : ''} />
-                  <span className="hidden xs:inline">{t('statistics.overview', 'نمای کلی')}</span>
-                </ModernTabsTrigger>
-
-                <ModernTabsTrigger
-                  value="distribution"
-                  className="flex items-center gap-1 sm:gap-2 rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-green-500 data-[state=active]:to-blue-600 data-[state=active]:text-white transition-all duration-300 hover:scale-105 text-xs sm:text-sm"
-                  hoverEffect="scale"
-                >
-                  <PieChart size={14} className={isRTL ? 'rotate-180' : ''} />
-                  <span className="hidden xs:inline">{t('statistics.distribution', 'توزیع')}</span>
-                </ModernTabsTrigger>
-
-                <ModernTabsTrigger
-                  value="timeline"
-                  className="flex items-center gap-1 sm:gap-2 rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300 hover:scale-105 text-xs sm:text-sm"
-                  hoverEffect="scale"
-                >
-                  <Calendar size={14} className={isRTL ? 'rotate-180' : ''} />
-                  <span className="hidden xs:inline">{t('statistics.timeline', 'زمان‌بندی')}</span>
-                </ModernTabsTrigger>
-
-                <ModernTabsTrigger
-                  value="insights"
-                  className="flex items-center gap-1 sm:gap-2 rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-red-600 data-[state=active]:text-white transition-all duration-300 hover:scale-105 text-xs sm:text-sm"
-                  hoverEffect="scale"
-                >
-                  <Award size={14} className={isRTL ? 'rotate-180' : ''} />
-                  <span className="hidden xs:inline">{t('statistics.insights', 'بینش‌ها')}</span>
-                </ModernTabsTrigger>
-              </ModernTabsList>
-
-              {/* Overview Tab */}
-              <ModernTabsContent value="overview" className="space-y-6 sm:space-y-8">
-                {settings.layoutMode === 'masonry' ? (
-                  <MasonryGrid columns={3} gap="lg" className="animate-in fade-in duration-700">
-                    <div className="animate-in slide-in-from-left-4 duration-500">
-                      <Suspense fallback={<ModernLoader variant="spinner" size="lg" />}>
-                        <TotalContactsCard count={state.data.totalContacts} />
-                      </Suspense>
-                    </div>
-                    <div className="animate-in slide-in-from-right-4 duration-500 delay-100">
-                      <Suspense fallback={<ModernLoader variant="spinner" size="lg" />}>
-                        <ContactsByCreationTimeChart data={state.data.creationTimeData} />
-                      </Suspense>
-                    </div>
-                    <div className="animate-in slide-in-from-bottom-4 duration-500 delay-200">
-                      <Suspense fallback={<ModernLoader variant="spinner" size="lg" />}>
-                        <UpcomingBirthdaysList data={state.data.upcomingBirthdays} />
-                      </Suspense>
-                    </div>
-                  </MasonryGrid>
-                ) : (
-                  <ResponsiveGrid breakpoints={{ sm: 1, md: 2, lg: 3, xl: 4 }} className="animate-in fade-in duration-700">
-                    <div className="animate-in slide-in-from-left-4 duration-500">
-                      <Suspense fallback={<ModernLoader variant="spinner" size="lg" />}>
-                        <TotalContactsCard count={state.data.totalContacts} />
-                      </Suspense>
-                    </div>
-                    <div className="animate-in slide-in-from-right-4 duration-500 delay-100">
-                      <Suspense fallback={<ModernLoader variant="spinner" size="lg" />}>
-                        <ContactsByCreationTimeChart data={state.data.creationTimeData} />
-                      </Suspense>
-                    </div>
-                    <div className="animate-in slide-in-from-bottom-4 duration-500 delay-200">
-                      <Suspense fallback={<ModernLoader variant="spinner" size="lg" />}>
-                        <UpcomingBirthdaysList data={state.data.upcomingBirthdays} />
-                      </Suspense>
-                    </div>
-                  </ResponsiveGrid>
-                )}
-              </ModernTabsContent>
-
-              {/* Distribution Tab */}
-              <ModernTabsContent value="distribution" className="space-y-6 sm:space-y-8">
-                {settings.layoutMode === 'masonry' ? (
-                  <MasonryGrid columns={3} gap="lg" className="animate-in fade-in duration-700">
-                    <div className="animate-in slide-in-from-left-4 duration-500">
-                      <Suspense fallback={<ModernLoader variant="spinner" size="lg" />}>
-                        <ContactsByGenderChart data={state.data.genderData} />
-                      </Suspense>
-                    </div>
-                    <div className="animate-in slide-in-from-right-4 duration-500 delay-100">
-                      <Suspense fallback={<ModernLoader variant="spinner" size="lg" />}>
-                        <ContactsByGroupChart data={state.data.groupData} />
-                      </Suspense>
-                    </div>
-                    <div className="animate-in slide-in-from-bottom-4 duration-500 delay-200">
-                      <Suspense fallback={<ModernLoader variant="spinner" size="lg" />}>
-                        <ContactsByPreferredMethodChart data={state.data.preferredMethodData} />
-                      </Suspense>
-                    </div>
-                  </MasonryGrid>
-                ) : (
-                  <ResponsiveGrid breakpoints={{ sm: 1, md: 2, lg: 3, xl: 4 }} className="animate-in fade-in duration-700">
-                    <div className="animate-in slide-in-from-left-4 duration-500">
-                      <Suspense fallback={<ModernLoader variant="spinner" size="lg" />}>
-                        <ContactsByGenderChart data={state.data.genderData} />
-                      </Suspense>
-                    </div>
-                    <div className="animate-in slide-in-from-right-4 duration-500 delay-100">
-                      <Suspense fallback={<ModernLoader variant="spinner" size="lg" />}>
-                        <ContactsByGroupChart data={state.data.groupData} />
-                      </Suspense>
-                    </div>
-                    <div className="animate-in slide-in-from-bottom-4 duration-500 delay-200">
-                      <Suspense fallback={<ModernLoader variant="spinner" size="lg" />}>
-                        <ContactsByPreferredMethodChart data={state.data.preferredMethodData} />
-                      </Suspense>
-                    </div>
-                  </ResponsiveGrid>
-                )}
-              </ModernTabsContent>
-
-              {/* Timeline Tab */}
-              <ModernTabsContent value="timeline" className="space-y-6 sm:space-y-8">
-                {settings.layoutMode === 'masonry' ? (
-                  <MasonryGrid columns={2} gap="lg" className="animate-in fade-in duration-700">
-                    <div className="col-span-2 animate-in slide-in-from-left-4 duration-500">
-                      <Suspense fallback={<ModernLoader variant="spinner" size="lg" />}>
-                        <ContactsByCreationTimeChart data={state.data.creationTimeData} />
-                      </Suspense>
-                    </div>
-                    <div className="animate-in slide-in-from-right-4 duration-500 delay-100">
-                      <Suspense fallback={<ModernLoader variant="spinner" size="lg" />}>
-                        <UpcomingBirthdaysList data={state.data.upcomingBirthdays} />
-                      </Suspense>
-                    </div>
-                  </MasonryGrid>
-                ) : (
-                  <ResponsiveGrid breakpoints={{ sm: 1, md: 2, lg: 3, xl: 4 }} className="animate-in fade-in duration-700">
-                    <div className="col-span-2 animate-in slide-in-from-left-4 duration-500">
-                      <Suspense fallback={<ModernLoader variant="spinner" size="lg" />}>
-                        <ContactsByCreationTimeChart data={state.data.creationTimeData} />
-                      </Suspense>
-                    </div>
-                    <div className="animate-in slide-in-from-right-4 duration-500 delay-100">
-                      <Suspense fallback={<ModernLoader variant="spinner" size="lg" />}>
-                        <UpcomingBirthdaysList data={state.data.upcomingBirthdays} />
-                      </Suspense>
-                    </div>
-                  </ResponsiveGrid>
-                )}
-              </ModernTabsContent>
-
-              {/* Reports Tab */}
-              <ModernTabsContent value="reports" className="space-y-6 sm:space-y-8">
-                {settings.layoutMode === 'masonry' ? (
-                  <MasonryGrid columns={2} gap="lg" className="animate-in fade-in duration-700">
-                    <div className="animate-in slide-in-from-left-4 duration-500">
-                      <Suspense fallback={<ModernLoader variant="spinner" size="lg" />}>
-                        <TopCompaniesList data={state.data.topCompaniesData} />
-                      </Suspense>
-                    </div>
-                    <div className="animate-in slide-in-from-right-4 duration-500 delay-100">
-                      <Suspense fallback={<ModernLoader variant="spinner" size="lg" />}>
-                        <TopPositionsList data={state.data.topPositionsData} />
-                      </Suspense>
-                    </div>
-                  </MasonryGrid>
-                ) : (
-                  <ResponsiveGrid breakpoints={{ sm: 1, md: 2, lg: 3, xl: 4 }} className="animate-in fade-in duration-700">
-                    <div className="animate-in slide-in-from-left-4 duration-500">
-                      <Suspense fallback={<ModernLoader variant="spinner" size="lg" />}>
-                        <TopCompaniesList data={state.data.topCompaniesData} />
-                      </Suspense>
-                    </div>
-                    <div className="animate-in slide-in-from-right-4 duration-500 delay-100">
-                      <Suspense fallback={<ModernLoader variant="spinner" size="lg" />}>
-                        <TopPositionsList data={state.data.topPositionsData} />
-                      </Suspense>
-                    </div>
-                  </ResponsiveGrid>
-                )}
-              </ModernTabsContent>
-            </ModernTabs>
+            {tabContent}
           </ModernCardContent>
         </ModernCard>
 

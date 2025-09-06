@@ -1,7 +1,8 @@
 {
     "i18n-ally.localesPaths": [
-        "public/locales"
+        "src/locales"
     ],
     "i18n-ally.sourceLanguage": "fa",
-    "i18n-ally.keystyle": "nested"
+    "i18n-ally.keystyle": "nested",
+    "i18n-ally.pathMatcher": "{locale}/translation.json"
 }

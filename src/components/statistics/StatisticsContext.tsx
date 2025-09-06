@@ -1,4 +1,4 @@
-import React, { useReducer, useEffect, useCallback } from 'react';
+import React, { useReducer, useEffect, useCallback, useMemo } from 'react';
 import { useSession } from "@/integrations/supabase/auth";
 import { ContactStatisticsService } from "@/services/contact-statistics-service";
 import { fetchWithCache } from "@/utils/cache-helpers";
@@ -27,76 +27,111 @@ export const StatisticsProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       const userId = session.user.id;
       const cacheKey = `statistics_dashboard_${userId}${state.dateRange.startDate ? `_from_${state.dateRange.startDate}_to_${state.dateRange.endDate}` : ''}`;
 
-      const { data, fromCache } = await fetchWithCache<StatisticsData>(
+      const result = await fetchWithCache<StatisticsData>(
         cacheKey,
         async () => {
-          // Add date range parameters to all service calls
-          const startDate = state.dateRange.startDate;
-          const endDate = state.dateRange.endDate;
-          
-          const [
-            { data: totalData, error: totalError },
-            { data: genderStats, error: genderError },
-            { data: groupStats, error: groupError },
-            { data: methodStats, error: methodError },
-            { data: birthdaysData, error: birthdaysError },
-            { data: creationTimeStats, error: creationTimeError },
-            { data: companiesStats, error: companiesError },
-            { data: positionsStats, error: errorPositions },
-          ] = await Promise.all([
-            ContactStatisticsService.getTotalContacts(userId, startDate, endDate),
-            ContactStatisticsService.getContactsByGender(userId, startDate, endDate),
-            ContactStatisticsService.getContactsByGroup(userId, startDate, endDate),
-            ContactStatisticsService.getContactsByPreferredMethod(userId, startDate, endDate),
-            ContactStatisticsService.getUpcomingBirthdays(userId, startDate, endDate),
-            ContactStatisticsService.getContactsByCreationMonth(userId, startDate, endDate),
-            ContactStatisticsService.getTopCompanies(userId, 5, startDate, endDate),
-            ContactStatisticsService.getTopPositions(userId, 5, startDate, endDate),
-          ]);
+          try {
+            // Add date range parameters to all service calls
+            const startDate = state.dateRange.startDate;
+            const endDate = state.dateRange.endDate;
+            
+            // Fetch all statistics in parallel for better performance
+            const [
+              totalResult,
+              genderResult,
+              groupResult,
+              methodResult,
+              birthdaysResult,
+              creationTimeResult,
+              companiesResult,
+              positionsResult,
+            ] = await Promise.allSettled([
+              ContactStatisticsService.getTotalContacts(userId, startDate, endDate),
+              ContactStatisticsService.getContactsByGender(userId, startDate, endDate),
+              ContactStatisticsService.getContactsByGroup(userId, startDate, endDate),
+              ContactStatisticsService.getContactsByPreferredMethod(userId, startDate, endDate),
+              ContactStatisticsService.getUpcomingBirthdays(userId, startDate, endDate),
+              ContactStatisticsService.getContactsByCreationMonth(userId, startDate, endDate),
+              ContactStatisticsService.getTopCompanies(userId, 5, startDate, endDate),
+              ContactStatisticsService.getTopPositions(userId, 5, startDate, endDate),
+            ]);
 
-          // Log individual errors but continue with available data
-          const errors: string[] = [];
-          if (totalError) errors.push(`Total Contacts: ${totalError}`);
-          if (genderError) errors.push(`Gender Stats: ${genderError}`);
-          if (groupError) errors.push(`Group Stats: ${groupError}`);
-          if (methodError) errors.push(`Method Stats: ${methodError}`);
-          if (birthdaysError) errors.push(`Birthdays: ${birthdaysError}`);
-          if (creationTimeError) errors.push(`Creation Time: ${creationTimeError}`);
-          if (companiesError) errors.push(`Companies: ${companiesError}`);
-          if (errorPositions) errors.push(`Positions: ${errorPositions}`);
+            // Process results with proper error handling
+            const totalData = totalResult.status === 'fulfilled' ? totalResult.value.data : null;
+            const totalError = totalResult.status === 'rejected' ? totalResult.reason : null;
+            
+            const genderData = genderResult.status === 'fulfilled' ? genderResult.value.data || [] : [];
+            const genderError = genderResult.status === 'rejected' ? genderResult.reason : null;
+            
+            const groupData = groupResult.status === 'fulfilled' ? groupResult.value.data || [] : [];
+            const groupError = groupResult.status === 'rejected' ? groupResult.reason : null;
+            
+            const methodData = methodResult.status === 'fulfilled' ? methodResult.value.data || [] : [];
+            const methodError = methodResult.status === 'rejected' ? methodResult.reason : null;
+            
+            const birthdaysData = birthdaysResult.status === 'fulfilled' ? birthdaysResult.value.data || [] : [];
+            const birthdaysError = birthdaysResult.status === 'rejected' ? birthdaysResult.reason : null;
+            
+            const creationTimeData = creationTimeResult.status === 'fulfilled' ? creationTimeResult.value.data || [] : [];
+            const creationTimeError = creationTimeResult.status === 'rejected' ? creationTimeResult.reason : null;
+            
+            const companiesData = companiesResult.status === 'fulfilled' ? companiesResult.value.data || [] : [];
+            const companiesError = companiesResult.status === 'rejected' ? companiesResult.reason : null;
+            
+            const positionsData = positionsResult.status === 'fulfilled' ? positionsResult.value.data || [] : [];
+            const positionsError = positionsResult.status === 'rejected' ? positionsResult.reason : null;
 
-          // If critical data (total contacts) failed, throw error
-          if (totalError) {
-            throw new Error(`Failed to load total contacts: ${totalError}`);
+            // Log individual errors but continue with available data
+            const errors: string[] = [];
+            if (totalError) errors.push(`Total Contacts: ${totalError}`);
+            if (genderError) errors.push(`Gender Stats: ${genderError}`);
+            if (groupError) errors.push(`Group Stats: ${groupError}`);
+            if (methodError) errors.push(`Method Stats: ${methodError}`);
+            if (birthdaysError) errors.push(`Birthdays: ${birthdaysError}`);
+            if (creationTimeError) errors.push(`Creation Time: ${creationTimeError}`);
+            if (companiesError) errors.push(`Companies: ${companiesError}`);
+            if (positionsError) errors.push(`Positions: ${positionsError}`);
+
+            // If critical data (total contacts) failed, throw error
+            if (totalError) {
+              throw new Error(`Failed to load total contacts: ${totalError}`);
+            }
+
+            // Log non-critical errors
+            if (errors.length > 1) { // More than just total contacts error
+              console.warn('Some statistics failed to load:', errors.slice(1));
+              ErrorManager.logError(new Error('Partial statistics failure: ' + errors.slice(1).join('; ')), { component: 'StatisticsContext', action: 'fetchData' });
+            }
+
+            return {
+              data: {
+                totalContacts: totalData,
+                genderData,
+                groupData,
+                preferredMethodData: methodData,
+                upcomingBirthdays: birthdaysData,
+                creationTimeData,
+                topCompaniesData: companiesData,
+                topPositionsData: positionsData,
+              },
+              error: null,
+            };
+          } catch (error) {
+            return {
+              data: null,
+              error: error instanceof Error ? error.message : String(error),
+            };
           }
-
-          // Log non-critical errors
-          if (errors.length > 1) { // More than just total contacts error
-            console.warn('Some statistics failed to load:', errors.slice(1));
-            ErrorManager.logError(new Error('Partial statistics failure: ' + errors.slice(1).join('; ')), { component: 'StatisticsContext', action: 'fetchData' });
-          }
-
-          return {
-            data: {
-              totalContacts: totalData,
-              genderData: genderStats || [],
-              groupData: groupStats || [],
-              preferredMethodData: methodStats || [],
-              upcomingBirthdays: birthdaysData || [],
-              creationTimeData: creationTimeStats || [],
-              topCompaniesData: companiesStats || [],
-              topPositionsData: positionsStats || [],
-            },
-            error: null,
-          };
         }
       );
 
-      if (data) {
-        dispatch({ type: 'SET_DATA', payload: data });
-        if (!fromCache) {
+      if (result.data) {
+        dispatch({ type: 'SET_DATA', payload: result.data });
+        if (!result.fromCache) {
           ErrorManager.notifyUser(t('statistics.stats_loaded_success'), 'success');
         }
+      } else if (result.error) {
+        throw new Error(result.error);
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : t('statistics.error_loading_stats');
@@ -127,47 +162,67 @@ export const StatisticsProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     try {
       const userId = session.user.id;
       
-      const { data: previousData } = await fetchWithCache<StatisticsData>(
+      const result = await fetchWithCache<StatisticsData>(
         `statistics_comparison_${userId}_from_${startDate}_to_${endDate}`,
         async () => {
-          const [
-            { data: totalData },
-            { data: genderStats },
-            { data: groupStats },
-            { data: methodStats },
-            { data: birthdaysData },
-            { data: creationTimeStats },
-            { data: companiesStats },
-            { data: positionsStats },
-          ] = await Promise.all([
-            ContactStatisticsService.getTotalContacts(userId, startDate, endDate),
-            ContactStatisticsService.getContactsByGender(userId, startDate, endDate),
-            ContactStatisticsService.getContactsByGroup(userId, startDate, endDate),
-            ContactStatisticsService.getContactsByPreferredMethod(userId, startDate, endDate),
-            ContactStatisticsService.getUpcomingBirthdays(userId, startDate, endDate),
-            ContactStatisticsService.getContactsByCreationMonth(userId, startDate, endDate),
-            ContactStatisticsService.getTopCompanies(userId, 5, startDate, endDate),
-            ContactStatisticsService.getTopPositions(userId, 5, startDate, endDate),
-          ]);
+          try {
+            // Fetch all comparison data in parallel
+            const [
+              totalResult,
+              genderResult,
+              groupResult,
+              methodResult,
+              birthdaysResult,
+              creationTimeResult,
+              companiesResult,
+              positionsResult,
+            ] = await Promise.allSettled([
+              ContactStatisticsService.getTotalContacts(userId, startDate, endDate),
+              ContactStatisticsService.getContactsByGender(userId, startDate, endDate),
+              ContactStatisticsService.getContactsByGroup(userId, startDate, endDate),
+              ContactStatisticsService.getContactsByPreferredMethod(userId, startDate, endDate),
+              ContactStatisticsService.getUpcomingBirthdays(userId, startDate, endDate),
+              ContactStatisticsService.getContactsByCreationMonth(userId, startDate, endDate),
+              ContactStatisticsService.getTopCompanies(userId, 5, startDate, endDate),
+              ContactStatisticsService.getTopPositions(userId, 5, startDate, endDate),
+            ]);
 
-          return {
-            data: {
-              totalContacts: totalData,
-              genderData: genderStats || [],
-              groupData: groupStats || [],
-              preferredMethodData: methodStats || [],
-              upcomingBirthdays: birthdaysData || [],
-              creationTimeData: creationTimeStats || [],
-              topCompaniesData: companiesStats || [],
-              topPositionsData: positionsStats || [],
-            },
-            error: null,
-          };
+            // Process results with proper error handling
+            const totalData = totalResult.status === 'fulfilled' ? totalResult.value.data : null;
+            const genderData = genderResult.status === 'fulfilled' ? genderResult.value.data || [] : [];
+            const groupData = groupResult.status === 'fulfilled' ? groupResult.value.data || [] : [];
+            const methodData = methodResult.status === 'fulfilled' ? methodResult.value.data || [] : [];
+            const birthdaysData = birthdaysResult.status === 'fulfilled' ? birthdaysResult.value.data || [] : [];
+            const creationTimeData = creationTimeResult.status === 'fulfilled' ? creationTimeResult.value.data || [] : [];
+            const companiesData = companiesResult.status === 'fulfilled' ? companiesResult.value.data || [] : [];
+            const positionsData = positionsResult.status === 'fulfilled' ? positionsResult.value.data || [] : [];
+
+            return {
+              data: {
+                totalContacts: totalData,
+                genderData,
+                groupData,
+                preferredMethodData: methodData,
+                upcomingBirthdays: birthdaysData,
+                creationTimeData,
+                topCompaniesData: companiesData,
+                topPositionsData: positionsData,
+              },
+              error: null,
+            };
+          } catch (error) {
+            return {
+              data: null,
+              error: error instanceof Error ? error.message : String(error),
+            };
+          }
         }
       );
 
-      if (previousData) {
-        dispatch({ type: 'SET_COMPARISON_DATA', payload: { previousData } });
+      if (result.data) {
+        dispatch({ type: 'SET_COMPARISON_DATA', payload: { previousData: result.data } });
+      } else if (result.error) {
+        throw new Error(result.error);
       }
     } catch (error) {
       console.error('Failed to fetch comparison data:', error);
@@ -175,12 +230,21 @@ export const StatisticsProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     }
   }, [session, isSessionLoading]);
 
+  // Memoize context value to prevent unnecessary re-renders
+  const contextValue = useMemo(() => ({
+    state,
+    fetchData,
+    refreshData,
+    setDateRange,
+    fetchComparisonData
+  }), [state, fetchData, refreshData, setDateRange, fetchComparisonData]);
+
   useEffect(() => {
     fetchData();
   }, [fetchData]);
 
   return (
-    <StatisticsContext.Provider value={{ state, fetchData, refreshData, setDateRange, fetchComparisonData }}>
+    <StatisticsContext.Provider value={contextValue}>
       {children}
     </StatisticsContext.Provider>
   );

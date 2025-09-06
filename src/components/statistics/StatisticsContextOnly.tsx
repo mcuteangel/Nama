@@ -9,32 +9,29 @@ export type StatisticsAction =
   | { type: 'SET_DATE_RANGE'; payload: { startDate: string | null; endDate: string | null } }
   | { type: 'SET_COMPARISON_DATA'; payload: { previousData: StatisticsData | null } };
 
-// Initial state
-export const initialState: {
-  data: StatisticsData;
-  loading: boolean;
-  error: string | null;
-  dateRange: { startDate: string | null; endDate: string | null };
-  comparisonData: { previousData: StatisticsData | null };
-} = {
+// Initial state with proper typing
+export const initialState = {
   data: {
-    totalContacts: null,
-    genderData: [],
-    groupData: [],
-    preferredMethodData: [],
-    upcomingBirthdays: [],
-    creationTimeData: [],
-    topCompaniesData: [],
-    topPositionsData: [],
+    totalContacts: null as number | null,
+    genderData: [] as Array<{ gender: string; count: number }>,
+    groupData: [] as Array<{ name: string; color?: string; count: number }>,
+    preferredMethodData: [] as Array<{ method: string; count: number }>,
+    upcomingBirthdays: [] as Array<{ id: string; first_name: string; last_name: string; birthday: string; days_until_birthday: number }>,
+    creationTimeData: [] as Array<{ month_year: string; count: number }>,
+    topCompaniesData: [] as Array<{ company: string; count: number }>,
+    topPositionsData: [] as Array<{ position: string; count: number }>,
   },
   loading: false,
-  error: null,
-  dateRange: { startDate: null, endDate: null },
-  comparisonData: { previousData: null },
+  error: null as string | null,
+  dateRange: { startDate: null as string | null, endDate: null as string | null },
+  comparisonData: { previousData: null as StatisticsData | null },
 };
 
-// Reducer
-export function statisticsReducer(state: typeof initialState, action: StatisticsAction): typeof initialState {
+// Reducer with improved type safety
+export function statisticsReducer(
+  state: typeof initialState, 
+  action: StatisticsAction
+): typeof initialState {
   switch (action.type) {
     case 'SET_LOADING':
       return { ...state, loading: action.payload };
@@ -53,7 +50,7 @@ export function statisticsReducer(state: typeof initialState, action: Statistics
   }
 }
 
-// Context
+// Context with proper typing
 export interface StatisticsContextType {
   state: typeof initialState;
   fetchData: () => Promise<void>;

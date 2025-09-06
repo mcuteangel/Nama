@@ -1,7 +1,7 @@
 import { useContext } from 'react';
 import { StatisticsContext, type StatisticsContextType } from './StatisticsContextOnly';
 
-// Hook to use the context
+// Enhanced hook with better error handling
 export const useStatistics = (): StatisticsContextType => {
   const context = useContext(StatisticsContext);
   if (context === undefined) {
