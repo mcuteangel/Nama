@@ -2,9 +2,9 @@ import * as z from 'zod';
 
 // Define the base object schema first
 const baseCustomFieldTemplateSchema = z.object({
-  name: z.string().min(1, { message: 'نام فیلد نمی‌تواند خالی باشد.' }),
-  type: z.enum(['text', 'number', 'date', 'list'], { message: 'نوع فیلد معتبر نیست.' }),
-  options: z.array(z.string().min(1, { message: 'گزینه‌های لیست نمی‌توانند خالی باشند.' })).optional(),
+  name: z.string().min(1, { message: 'custom_field_template.name_required' }),
+  type: z.enum(['text', 'number', 'date', 'list'], { message: 'custom_field_template.type_invalid' }),
+  options: z.array(z.string().min(1, { message: 'custom_field_template.option_required' })).optional(),
   description: z.string().optional(),
   required: z.boolean().default(false),
 });
@@ -14,7 +14,7 @@ export const customFieldTemplateSchema = baseCustomFieldTemplateSchema.superRefi
   if (data.type === 'list' && (!data.options || data.options.length === 0)) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      message: 'برای فیلد از نوع "لیست"، حداقل یک گزینه الزامی است.',
+      message: 'custom_field_template.list_options_required',
       path: ['options'],
     });
   }
