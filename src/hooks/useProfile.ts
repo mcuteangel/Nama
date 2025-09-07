@@ -12,6 +12,8 @@ export interface ProfileData {
   phone?: string | null;
   bio?: string | null;
   avatar_url?: string | null;
+  location?: string | null;
+  birthday?: string | null;
 }
 
 export interface UseProfileReturn {
@@ -49,7 +51,7 @@ export const useProfile = (): UseProfileReturn => {
         async () => {
           const { data, error } = await supabase
             .from('profiles')
-            .select('first_name, last_name, phone, bio, avatar_url')
+            .select('first_name, last_name, phone, bio, avatar_url, location, birthday')
             .eq('id', session.user.id)
             .maybeSingle();
 

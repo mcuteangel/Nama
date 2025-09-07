@@ -321,7 +321,9 @@
     "profile_user": "User Profile",
     "user_email": "Email",
     "position": "Position/Expertise",
-    "company": "Company"
+    "company": "Company",
+    "location": "Location",
+    "birthday": "Birthday"
   },
   "form_placeholders": {
     "enter_name": "Enter your name",
@@ -340,7 +342,9 @@
     "first_name": "First Name*",
     "last_name": "Last Name*",
     "position": "Position/Expertise",
-    "company": "Company"
+    "company": "Company",
+    "enter_location": "Enter your location",
+    "enter_bio": "Tell us about yourself..."
   },
   "section_titles": {
     "custom_fields": "Custom Fields",

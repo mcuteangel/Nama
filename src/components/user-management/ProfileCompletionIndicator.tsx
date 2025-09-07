@@ -48,6 +48,18 @@ const ProfileCompletionIndicator: React.FC<ProfileCompletionIndicatorProps> = ({
         completed: !!profile?.avatar_url,
         required: false,
       },
+      {
+        key: 'location',
+        label: t('form_labels.location'),
+        completed: !!profile?.location?.trim(),
+        required: false,
+      },
+      {
+        key: 'birthday',
+        label: t('form_labels.birthday'),
+        completed: !!profile?.birthday,
+        required: false,
+      },
     ];
 
     const requiredFields = fields.filter(f => f.required);

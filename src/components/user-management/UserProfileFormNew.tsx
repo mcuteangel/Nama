@@ -14,7 +14,7 @@ import { motion } from 'framer-motion';
 import { useProfile, ProfileData } from '@/hooks/useProfile';
 import ProfileAvatar from './ProfileAvatar';
 import ProfileCompletionIndicator from './ProfileCompletionIndicator';
-import { User, Mail, Phone, FileText, Save, CheckCircle } from 'lucide-react';
+import { User, Mail, Phone, FileText, Save, CheckCircle, MapPin, Calendar } from 'lucide-react';
 
 // Schema validation for profile form
 const profileSchema = z.object({
@@ -22,6 +22,8 @@ const profileSchema = z.object({
   last_name: z.string().optional(),
   phone: z.string().optional(),
   bio: z.string().optional(),
+  location: z.string().optional(),
+  birthday: z.string().optional(),
 });
 
 type ProfileFormValues = z.infer<typeof profileSchema>;
@@ -50,9 +52,11 @@ const UserProfileFormNew: React.FC = () => {
         last_name: profile.last_name || '',
         phone: profile.phone || '',
         bio: profile.bio || '',
+        location: profile.location || '',
+        birthday: profile.birthday || '',
       });
     }
-  }, [profile, form]);
+  }, [profile]);
 
   // Handle form submission
   const onSubmit = async (values: ProfileFormValues) => {
@@ -63,6 +67,8 @@ const UserProfileFormNew: React.FC = () => {
         last_name: values.last_name || null,
         phone: values.phone || null,
         bio: values.bio || null,
+        location: values.location || null,
+        birthday: values.birthday || null,
       };
       await updateProfile(dataToUpdate);
     } catch (err) {
@@ -249,6 +255,94 @@ const UserProfileFormNew: React.FC = () => {
           >
             <span className="w-1 h-1 bg-red-500 rounded-full"></span>
             {form.formState.errors.bio.message}
+          </motion.p>
+        )}
+      </motion.div>
+
+      {/* Location Field */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, delay: 0.4 }}
+        className="space-y-3"
+      >
+        <Label htmlFor="location" className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
+          <MapPin size={16} className="text-primary" />
+          {t('form_labels.location')}
+        </Label>
+        <div className="relative">
+          <input
+            id="location"
+            {...form.register('location')}
+            placeholder={t('form_placeholders.enter_location')}
+            className="w-full pl-4 pr-4 py-3 bg-white/60 dark:bg-gray-800/60 border-2 border-gray-200/50 dark:border-gray-700/50 rounded-xl text-gray-800 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all duration-200"
+            disabled={loading}
+            aria-invalid={!!form.formState.errors.location}
+            aria-describedby={form.formState.errors.location ? "location-error" : undefined}
+          />
+          {form.watch('location') && (
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2"
+            >
+              <CheckCircle size={16} className="text-green-500" />
+            </motion.div>
+          )}
+        </div>
+        {form.formState.errors.location && (
+          <motion.p
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            id="location-error"
+            className="text-red-500 text-sm flex items-center gap-1"
+          >
+            <span className="w-1 h-1 bg-red-500 rounded-full"></span>
+            {form.formState.errors.location.message}
+          </motion.p>
+        )}
+      </motion.div>
+
+      {/* Birthday Field */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, delay: 0.5 }}
+        className="space-y-3"
+      >
+        <Label htmlFor="birthday" className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
+          <Calendar size={16} className="text-primary" />
+          {t('form_labels.birthday')}
+        </Label>
+        <div className="relative">
+          <input
+            id="birthday"
+            type="date"
+            {...form.register('birthday')}
+            className="w-full pl-4 pr-4 py-3 bg-white/60 dark:bg-gray-800/60 border-2 border-gray-200/50 dark:border-gray-700/50 rounded-xl text-gray-800 dark:text-gray-100 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all duration-200"
+            disabled={loading}
+            aria-invalid={!!form.formState.errors.birthday}
+            aria-describedby={form.formState.errors.birthday ? "birthday-error" : undefined}
+          />
+          {form.watch('birthday') && (
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2"
+            >
+              <CheckCircle size={16} className="text-green-500" />
+            </motion.div>
+          )}
+        </div>
+        {form.formState.errors.birthday && (
+          <motion.p
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            id="birthday-error"
+            className="text-red-500 text-sm flex items-center gap-1"
+          >
+            <span className="w-1 h-1 bg-red-500 rounded-full"></span>
+            {form.formState.errors.birthday.message}
           </motion.p>
         )}
       </motion.div>
