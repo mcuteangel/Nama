@@ -5,6 +5,8 @@ import * as z from 'zod';
 import { GlassButton } from "@/components/ui/glass-button";
 import { Label } from '@/components/ui/label';
 import { ModernInput } from '@/components/ui/modern-input';
+import { ModernTextarea } from '@/components/ui/modern-textarea';
+import { ModernDatePicker } from '@/components/ui/modern-date-picker'; // Added import
 import { ModernCard, ModernCardHeader, ModernCardTitle, ModernCardContent, ModernCardFooter } from '@/components/ui/modern-card';
 import { useSession } from '@/integrations/supabase/auth';
 import LoadingMessage from '../common/LoadingMessage';
@@ -14,15 +16,24 @@ import { motion } from 'framer-motion';
 import { useProfile, ProfileData } from '@/hooks/useProfile';
 import ProfileAvatar from './ProfileAvatar';
 import ProfileCompletionIndicator from './ProfileCompletionIndicator';
-import { User, Mail, Phone, FileText, Save, CheckCircle, MapPin, Calendar } from 'lucide-react';
+import { User, Mail, Phone, FileText, Save, CheckCircle, MapPin, Calendar, AlertCircle } from 'lucide-react';
 
-// Schema validation for profile form
+// Schema validation for profile form with enhanced validation
 const profileSchema = z.object({
   first_name: z.string().optional(),
   last_name: z.string().optional(),
-  phone: z.string().optional(),
-  bio: z.string().optional(),
-  location: z.string().optional(),
+  phone: z.string().optional().refine(
+    (val) => !val || /^(\+98|0)?9\d{9}$/.test(val),
+    { message: "Invalid phone number format" }
+  ),
+  bio: z.string().optional().refine(
+    (val) => !val || val.length <= 500,
+    { message: "Bio must be less than 500 characters" }
+  ),
+  location: z.string().optional().refine(
+    (val) => !val || val.length <= 100,
+    { message: "Location must be less than 100 characters" }
+  ),
   birthday: z.string().optional(),
 });
 
@@ -31,7 +42,7 @@ type ProfileFormValues = z.infer<typeof profileSchema>;
 const UserProfileFormNew: React.FC = () => {
   const { t } = useTranslation();
   const { session } = useSession();
-  const { profile, loading, error, updateProfile, clearError } = useProfile();
+  const { profile, loading, error, updateProfile, clearError, retryOperation } = useProfile();
 
   // React Hook Form setup
   const form = useForm<ProfileFormValues>({
@@ -41,6 +52,8 @@ const UserProfileFormNew: React.FC = () => {
       last_name: '',
       phone: '',
       bio: '',
+      location: '',
+      birthday: '',
     },
   });
 
@@ -56,7 +69,7 @@ const UserProfileFormNew: React.FC = () => {
         birthday: profile.birthday || '',
       });
     }
-  }, [profile]);
+  }, [form, profile]);
 
   // Handle form submission
   const onSubmit = async (values: ProfileFormValues) => {
@@ -88,7 +101,7 @@ const UserProfileFormNew: React.FC = () => {
       >
         <Label htmlFor="first_name" className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
           <User size={16} className="text-primary" />
-          {t('form_labels.first_name')}
+          {t('form_labels.first_name')} <span className="text-red-500">*</span>
         </Label>
         <div className="relative">
           <ModernInput
@@ -101,7 +114,7 @@ const UserProfileFormNew: React.FC = () => {
             aria-invalid={!!form.formState.errors.first_name}
             aria-describedby={form.formState.errors.first_name ? "first-name-error" : undefined}
           />
-          {form.watch('first_name') && (
+          {form.watch('first_name') && !form.formState.errors.first_name && (
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
@@ -118,7 +131,7 @@ const UserProfileFormNew: React.FC = () => {
             id="first-name-error"
             className="text-red-500 text-sm flex items-center gap-1"
           >
-            <span className="w-1 h-1 bg-red-500 rounded-full"></span>
+            <AlertCircle size={14} />
             {form.formState.errors.first_name.message}
           </motion.p>
         )}
@@ -133,7 +146,7 @@ const UserProfileFormNew: React.FC = () => {
       >
         <Label htmlFor="last_name" className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
           <User size={16} className="text-primary" />
-          {t('form_labels.last_name')}
+          {t('form_labels.last_name')} <span className="text-red-500">*</span>
         </Label>
         <div className="relative">
           <ModernInput
@@ -146,7 +159,7 @@ const UserProfileFormNew: React.FC = () => {
             aria-invalid={!!form.formState.errors.last_name}
             aria-describedby={form.formState.errors.last_name ? "last-name-error" : undefined}
           />
-          {form.watch('last_name') && (
+          {form.watch('last_name') && !form.formState.errors.last_name && (
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
@@ -163,7 +176,7 @@ const UserProfileFormNew: React.FC = () => {
             id="last-name-error"
             className="text-red-500 text-sm flex items-center gap-1"
           >
-            <span className="w-1 h-1 bg-red-500 rounded-full"></span>
+            <AlertCircle size={14} />
             {form.formState.errors.last_name.message}
           </motion.p>
         )}
@@ -184,14 +197,14 @@ const UserProfileFormNew: React.FC = () => {
           <ModernInput
             id="phone"
             {...form.register('phone')}
-            placeholder={t('form_placeholders.enter_phone')}
+            placeholder={t('form_placeholders.phone_example')}
             variant="glass"
             className="pl-4 pr-4 py-3 bg-white/60 dark:bg-gray-800/60 border-2 border-gray-200/50 dark:border-gray-700/50 rounded-xl text-gray-800 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all duration-200"
             disabled={loading}
             aria-invalid={!!form.formState.errors.phone}
             aria-describedby={form.formState.errors.phone ? "phone-error" : undefined}
           />
-          {form.watch('phone') && (
+          {form.watch('phone') && !form.formState.errors.phone && (
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
@@ -208,8 +221,8 @@ const UserProfileFormNew: React.FC = () => {
             id="phone-error"
             className="text-red-500 text-sm flex items-center gap-1"
           >
-            <span className="w-1 h-1 bg-red-500 rounded-full"></span>
-            {form.formState.errors.phone.message}
+            <AlertCircle size={14} />
+            {form.formState.errors.phone.message || t('errors.invalid_phone_format')}
           </motion.p>
         )}
       </motion.div>
@@ -226,17 +239,18 @@ const UserProfileFormNew: React.FC = () => {
           {t('form_labels.bio')}
         </Label>
         <div className="relative">
-          <textarea
+          <ModernTextarea
             id="bio"
             {...form.register('bio')}
             placeholder={t('form_placeholders.enter_bio')}
+            variant="glass"
             className="w-full pl-4 pr-4 py-3 bg-white/60 dark:bg-gray-800/60 border-2 border-gray-200/50 dark:border-gray-700/50 rounded-xl text-gray-800 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all duration-200 resize-none"
             rows={4}
             disabled={loading}
             aria-invalid={!!form.formState.errors.bio}
             aria-describedby={form.formState.errors.bio ? "bio-error" : undefined}
           />
-          {form.watch('bio') && (
+          {form.watch('bio') && !form.formState.errors.bio && (
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
@@ -245,6 +259,9 @@ const UserProfileFormNew: React.FC = () => {
               <CheckCircle size={16} className="text-green-500" />
             </motion.div>
           )}
+          <div className="absolute bottom-2 right-3 text-xs text-gray-500">
+            {form.watch('bio')?.length || 0}/500
+          </div>
         </div>
         {form.formState.errors.bio && (
           <motion.p
@@ -253,7 +270,7 @@ const UserProfileFormNew: React.FC = () => {
             id="bio-error"
             className="text-red-500 text-sm flex items-center gap-1"
           >
-            <span className="w-1 h-1 bg-red-500 rounded-full"></span>
+            <AlertCircle size={14} />
             {form.formState.errors.bio.message}
           </motion.p>
         )}
@@ -271,16 +288,17 @@ const UserProfileFormNew: React.FC = () => {
           {t('form_labels.location')}
         </Label>
         <div className="relative">
-          <input
+          <ModernInput
             id="location"
             {...form.register('location')}
             placeholder={t('form_placeholders.enter_location')}
-            className="w-full pl-4 pr-4 py-3 bg-white/60 dark:bg-gray-800/60 border-2 border-gray-200/50 dark:border-gray-700/50 rounded-xl text-gray-800 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all duration-200"
+            variant="glass"
+            className="pl-4 pr-4 py-3 bg-white/60 dark:bg-gray-800/60 border-2 border-gray-200/50 dark:border-gray-700/50 rounded-xl text-gray-800 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all duration-200"
             disabled={loading}
             aria-invalid={!!form.formState.errors.location}
             aria-describedby={form.formState.errors.location ? "location-error" : undefined}
           />
-          {form.watch('location') && (
+          {form.watch('location') && !form.formState.errors.location && (
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
@@ -297,7 +315,7 @@ const UserProfileFormNew: React.FC = () => {
             id="location-error"
             className="text-red-500 text-sm flex items-center gap-1"
           >
-            <span className="w-1 h-1 bg-red-500 rounded-full"></span>
+            <AlertCircle size={14} />
             {form.formState.errors.location.message}
           </motion.p>
         )}
@@ -315,20 +333,18 @@ const UserProfileFormNew: React.FC = () => {
           {t('form_labels.birthday')}
         </Label>
         <div className="relative">
-          <input
-            id="birthday"
-            type="date"
-            {...form.register('birthday')}
-            className="w-full pl-4 pr-4 py-3 bg-white/60 dark:bg-gray-800/60 border-2 border-gray-200/50 dark:border-gray-700/50 rounded-xl text-gray-800 dark:text-gray-100 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all duration-200"
+          <ModernDatePicker
+            value={form.watch('birthday') || ''}
+            onChange={(date) => form.setValue('birthday', date, { shouldValidate: true, shouldDirty: true })}
+            placeholder={t('form_placeholders.select_birth_date')}
+            variant="glass"
             disabled={loading}
-            aria-invalid={!!form.formState.errors.birthday}
-            aria-describedby={form.formState.errors.birthday ? "birthday-error" : undefined}
           />
-          {form.watch('birthday') && (
+          {form.watch('birthday') && !form.formState.errors.birthday && (
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2"
+              className="absolute left-3 top-1/2 transform -translate-y-1/2"
             >
               <CheckCircle size={16} className="text-green-500" />
             </motion.div>
@@ -341,7 +357,7 @@ const UserProfileFormNew: React.FC = () => {
             id="birthday-error"
             className="text-red-500 text-sm flex items-center gap-1"
           >
-            <span className="w-1 h-1 bg-red-500 rounded-full"></span>
+            <AlertCircle size={14} />
             {form.formState.errors.birthday.message}
           </motion.p>
         )}
@@ -414,7 +430,7 @@ const UserProfileFormNew: React.FC = () => {
             >
               <ProfileAvatar
                 avatarUrl={profile?.avatar_url}
-                onAvatarUpdate={(url: string) => {
+                onAvatarUpdate={() => {
                   // The profile will be refreshed automatically by the hook
                 }}
                 size="lg"
@@ -426,6 +442,9 @@ const UserProfileFormNew: React.FC = () => {
             <p className="text-gray-600 dark:text-gray-400">
               {t('profile.description')}
             </p>
+            <p className="text-sm text-gray-500 dark:text-gray-500 mt-2">
+              {t('profile.required_fields_notice')}
+            </p>
             {error && (
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
@@ -433,18 +452,29 @@ const UserProfileFormNew: React.FC = () => {
                 className="mt-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg"
               >
                 <p className="text-red-600 dark:text-red-400 text-sm flex items-center gap-2">
-                  <span className="w-2 h-2 bg-red-500 rounded-full"></span>
+                  <AlertCircle size={16} />
                   {error}
                 </p>
-                <GlassButton
-                  variant="ghost"
-                  size="sm"
-                  onClick={clearError}
-                  disabled={loading}
-                  className="mt-2 text-red-600 hover:bg-red-100 dark:hover:bg-red-900/40"
-                >
-                  {t('actions.retry')}
-                </GlassButton>
+                <div className="flex gap-2 mt-2">
+                  <GlassButton
+                    variant="ghost"
+                    size="sm"
+                    onClick={clearError}
+                    disabled={loading}
+                    className="text-red-600 hover:bg-red-100 dark:hover:bg-red-900/40"
+                  >
+                    {t('actions.dismiss')}
+                  </GlassButton>
+                  <GlassButton
+                    variant="ghost"
+                    size="sm"
+                    onClick={retryOperation}
+                    disabled={loading}
+                    className="text-red-600 hover:bg-red-100 dark:hover:bg-red-900/40"
+                  >
+                    {t('actions.retry')}
+                  </GlassButton>
+                </div>
               </motion.div>
             )}
           </ModernCardHeader>
@@ -462,7 +492,7 @@ const UserProfileFormNew: React.FC = () => {
                   <GlassButton
                     type="submit"
                     className="w-full px-8 py-4 rounded-xl bg-gradient-to-r from-primary to-purple-600 text-white font-semibold transition-all duration-300 hover:shadow-lg hover:shadow-primary/25 disabled:opacity-50 disabled:cursor-not-allowed"
-                    disabled={loading}
+                    disabled={loading || !form.formState.isDirty}
                     aria-label={loading ? t('actions.saving_progress') : t('actions.save_changes')}
                   >
                     <div className="flex items-center justify-center gap-3">

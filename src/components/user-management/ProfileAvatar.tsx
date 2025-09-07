@@ -1,11 +1,21 @@
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Camera, Upload, X, User, Edit3 } from 'lucide-react';
+import { Upload, X, User, Edit3, AlertCircle, Trash2 } from 'lucide-react';
 import { GlassButton } from "@/components/ui/glass-button";
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { useSession } from '@/integrations/supabase/auth';
 import { showSuccess, showError } from '@/utils/toast';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface ProfileAvatarProps {
   avatarUrl?: string | null;
@@ -25,6 +35,8 @@ const ProfileAvatar: React.FC<ProfileAvatarProps> = ({
   const [isUploading, setIsUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [showUploadOptions, setShowUploadOptions] = useState(false);
+  const [showPreviewDialog, setShowPreviewDialog] = useState(false);
+  const [showRemoveDialog, setShowRemoveDialog] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const sizeClasses = {
@@ -57,24 +69,33 @@ const ProfileAvatar: React.FC<ProfileAvatarProps> = ({
       return;
     }
 
+    // Create preview
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      setPreviewUrl(e.target?.result as string);
+      setShowPreviewDialog(true);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const confirmUpload = async () => {
+    if (!previewUrl) return;
+
+    const fileInput = fileInputRef.current?.files?.[0];
+    if (!fileInput) return;
+
     setIsUploading(true);
+    setShowPreviewDialog(false);
 
     try {
-      // Create preview
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setPreviewUrl(e.target?.result as string);
-      };
-      reader.readAsDataURL(file);
-
       // Upload to Supabase Storage
-      const fileExt = file.name.split('.').pop();
+      const fileExt = fileInput.name.split('.').pop();
       const fileName = `${session?.user?.id}_${Date.now()}.${fileExt}`;
       const filePath = `avatars/${fileName}`;
 
       const { error: uploadError } = await supabase.storage
         .from('avatars')
-        .upload(filePath, file, {
+        .upload(filePath, fileInput, {
           cacheControl: '3600',
           upsert: false
         });
@@ -109,6 +130,9 @@ const ProfileAvatar: React.FC<ProfileAvatarProps> = ({
       setPreviewUrl(null);
     } finally {
       setIsUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     }
   };
 
@@ -124,6 +148,7 @@ const ProfileAvatar: React.FC<ProfileAvatarProps> = ({
       onAvatarUpdate('');
       showSuccess(t('system_messages.avatar_removed'));
       setShowUploadOptions(false);
+      setShowRemoveDialog(false);
     } catch (error) {
       showError(t('errors.avatar_remove_failed'));
     }
@@ -212,11 +237,11 @@ const ProfileAvatar: React.FC<ProfileAvatarProps> = ({
 
                 {avatarUrl && (
                   <GlassButton
-                    onClick={handleRemoveAvatar}
+                    onClick={() => setShowRemoveDialog(true)}
                     className="w-full justify-start gap-3 text-left text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
                     variant="ghost"
                   >
-                    <X size={16} />
+                    <Trash2 size={16} />
                     {t('profile.remove_avatar')}
                   </GlassButton>
                 )}
@@ -252,6 +277,64 @@ const ProfileAvatar: React.FC<ProfileAvatarProps> = ({
           onClick={() => setShowUploadOptions(false)}
         />
       )}
+
+      {/* Image Preview Dialog */}
+      <AlertDialog open={showPreviewDialog} onOpenChange={setShowPreviewDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('profile.preview_avatar')}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('profile.preview_avatar_description')}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="flex justify-center py-4">
+            {previewUrl && (
+              <img 
+                src={previewUrl} 
+                alt={t('profile.avatar_preview')} 
+                className="max-w-full max-h-64 rounded-lg object-contain"
+              />
+            )}
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => {
+              setPreviewUrl(null);
+              if (fileInputRef.current) {
+                fileInputRef.current.value = '';
+              }
+            }}>
+              {t('actions.cancel')}
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={confirmUpload}>
+              {t('actions.confirm')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Remove Avatar Confirmation Dialog */}
+      <AlertDialog open={showRemoveDialog} onOpenChange={setShowRemoveDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <AlertCircle className="text-red-500" />
+              {t('profile.remove_avatar_confirm_title')}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('profile.remove_avatar_confirm_description')}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('actions.cancel')}</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleRemoveAvatar}
+              className="bg-red-500 hover:bg-red-600"
+            >
+              {t('actions.remove')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

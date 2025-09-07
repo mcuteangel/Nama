@@ -1,12 +1,19 @@
 import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { CheckCircle, Circle, Award, TrendingUp } from 'lucide-react';
+import { CheckCircle, Circle, Award, TrendingUp, AlertCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useProfile } from '@/hooks/useProfile';
 
 interface ProfileCompletionIndicatorProps {
   compact?: boolean;
   showDetails?: boolean;
+}
+
+interface FieldInfo {
+  key: string;
+  label: string;
+  completed: boolean;
+  required: boolean;
 }
 
 const ProfileCompletionIndicator: React.FC<ProfileCompletionIndicatorProps> = ({
@@ -16,66 +23,72 @@ const ProfileCompletionIndicator: React.FC<ProfileCompletionIndicatorProps> = ({
   const { t } = useTranslation();
   const { profile } = useProfile();
 
-  const completionData = useMemo(() => {
-    const fields = [
-      {
-        key: 'first_name',
-        label: t('form_labels.first_name'),
-        completed: !!profile?.first_name?.trim(),
-        required: true,
-      },
-      {
-        key: 'last_name',
-        label: t('form_labels.last_name'),
-        completed: !!profile?.last_name?.trim(),
-        required: true,
-      },
-      {
-        key: 'phone',
-        label: t('form_labels.phone'),
-        completed: !!profile?.phone?.trim(),
-        required: false,
-      },
-      {
-        key: 'bio',
-        label: t('form_labels.bio'),
-        completed: !!profile?.bio?.trim(),
-        required: false,
-      },
-      {
-        key: 'avatar',
-        label: t('profile.avatar'),
-        completed: !!profile?.avatar_url,
-        required: false,
-      },
-      {
-        key: 'location',
-        label: t('form_labels.location'),
-        completed: !!profile?.location?.trim(),
-        required: false,
-      },
-      {
-        key: 'birthday',
-        label: t('form_labels.birthday'),
-        completed: !!profile?.birthday,
-        required: false,
-      },
-    ];
+  // Memoize field data to prevent unnecessary recalculations
+  const fieldData = React.useMemo((): FieldInfo[] => [
+    {
+      key: 'first_name',
+      label: t('form_labels.first_name'),
+      completed: !!profile?.first_name?.trim(),
+      required: true,
+    },
+    {
+      key: 'last_name',
+      label: t('form_labels.last_name'),
+      completed: !!profile?.last_name?.trim(),
+      required: true,
+    },
+    {
+      key: 'phone',
+      label: t('form_labels.phone'),
+      completed: !!profile?.phone?.trim(),
+      required: false,
+    },
+    {
+      key: 'bio',
+      label: t('form_labels.bio'),
+      completed: !!profile?.bio?.trim(),
+      required: false,
+    },
+    {
+      key: 'avatar',
+      label: t('profile.avatar'),
+      completed: !!profile?.avatar_url,
+      required: false,
+    },
+    {
+      key: 'location',
+      label: t('form_labels.location'),
+      completed: !!profile?.location?.trim(),
+      required: false,
+    },
+    {
+      key: 'birthday',
+      label: t('form_labels.birthday'),
+      completed: !!profile?.birthday,
+      required: false,
+    },
+  ], [profile, t]);
 
-    const requiredFields = fields.filter(f => f.required);
-    const optionalFields = fields.filter(f => !f.required);
+  // Memoize completion calculations
+  const completionData = React.useMemo(() => {
+    const requiredFields = fieldData.filter(f => f.required);
+    const optionalFields = fieldData.filter(f => !f.required);
 
     const requiredCompleted = requiredFields.filter(f => f.completed).length;
     const optionalCompleted = optionalFields.filter(f => f.completed).length;
 
-    const requiredProgress = (requiredCompleted / requiredFields.length) * 100;
-    const optionalProgress = (optionalCompleted / optionalFields.length) * 100;
+    const requiredProgress = requiredFields.length > 0 
+      ? (requiredCompleted / requiredFields.length) * 100 
+      : 100;
+    const optionalProgress = optionalFields.length > 0 
+      ? (optionalCompleted / optionalFields.length) * 100 
+      : 100;
 
     // Overall completion (required fields have more weight)
     const overallProgress = (requiredProgress * 0.7) + (optionalProgress * 0.3);
 
     return {
-      fields,
+      fieldData,
       requiredCompleted,
       requiredTotal: requiredFields.length,
       optionalCompleted,
@@ -84,7 +97,7 @@ const ProfileCompletionIndicator: React.FC<ProfileCompletionIndicatorProps> = ({
       optionalProgress,
       overallProgress,
     };
-  }, [profile, t]);
+  }, [fieldData]);
 
   const getProgressColor = (progress: number) => {
     if (progress >= 80) return 'text-green-500';
@@ -204,6 +217,10 @@ const ProfileCompletionIndicator: React.FC<ProfileCompletionIndicatorProps> = ({
             transition={{ duration: 1, delay: 0.5, ease: "easeOut" }}
           />
         </div>
+        <div className="flex justify-between text-xs text-gray-500 dark:text-gray-500 mt-1">
+          <span>{t('profile.completion.required_fields')}</span>
+          <span>{completionData.requiredCompleted}/{completionData.requiredTotal} {t('profile.completion.completed')}</span>
+        </div>
       </div>
 
       {showDetails && (
@@ -250,7 +267,7 @@ const ProfileCompletionIndicator: React.FC<ProfileCompletionIndicatorProps> = ({
 
           {/* Field Status */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-6">
-            {completionData.fields.map((field, index) => (
+            {completionData.fieldData.map((field, index) => (
               <motion.div
                 key={field.key}
                 initial={{ opacity: 0, x: -10 }}
@@ -274,6 +291,28 @@ const ProfileCompletionIndicator: React.FC<ProfileCompletionIndicatorProps> = ({
               </motion.div>
             ))}
           </div>
+
+          {/* Tips for improvement */}
+          {completionData.overallProgress < 100 && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1 }}
+              className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800"
+            >
+              <div className="flex items-start gap-2">
+                <AlertCircle size={16} className="text-blue-500 mt-0.5 flex-shrink-0" />
+                <div>
+                  <h4 className="text-sm font-medium text-blue-800 dark:text-blue-200">
+                    {t('profile.completion.tips_title')}
+                  </h4>
+                  <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
+                    {t('profile.completion.tips_description')}
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+          )}
         </div>
       )}
     </motion.div>

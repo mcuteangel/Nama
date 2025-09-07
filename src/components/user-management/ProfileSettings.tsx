@@ -4,23 +4,25 @@ import { motion } from 'framer-motion';
 import { ModernCard, ModernCardContent, ModernCardHeader, ModernCardTitle } from '@/components/ui/modern-card';
 import { GlassButton } from '@/components/ui/glass-button';
 import { Label } from '@/components/ui/label';
-import { ModernInput } from '@/components/ui/modern-input';
+import { ModernSwitch } from '@/components/ui/modern-switch';
+import { 
+  ModernSelect, 
+  ModernSelectContent, 
+  ModernSelectItem, 
+  ModernSelectTrigger, 
+  ModernSelectValue 
+} from '@/components/ui/modern-select';
 import {
   Bell,
-  Moon,
   Sun,
-  Globe,
   Shield,
-  User,
-  Mail,
-  Phone,
   Save,
-  CheckCircle,
-  AlertTriangle,
-  Info
-} from 'lucide-react';
+  CheckCircle} from 'lucide-react';
 
-interface ProfileSettingsProps {}
+interface ProfileSettingsProps {
+  // This interface can be extended with props if needed in the future
+  className?: string;
+}
 
 const ProfileSettings: React.FC<ProfileSettingsProps> = () => {
   const { t, i18n } = useTranslation();
@@ -38,10 +40,7 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = () => {
   const [loading, setLoading] = useState(false);
   const [saved, setSaved] = useState(false);
 
-  // Determine if we're in RTL mode
-  const isRTL = React.useMemo(() => i18n.dir() === 'rtl', [i18n]);
-
-  const handleSettingChange = (key: string, value: any) => {
+  const handleSettingChange = (key: string, value: boolean | string) => {
     setSettings(prev => ({ ...prev, [key]: value }));
     setSaved(false);
   };
@@ -188,38 +187,38 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = () => {
                     </div>
                     <div className="ml-4">
                       {item.type === 'toggle' && (
-                        <GlassButton
-                          variant={settings[item.key as keyof typeof settings] ? "default" : "ghost"}
-                          size="sm"
-                          onClick={() => handleSettingChange(item.key, !settings[item.key as keyof typeof settings])}
-                          className={`px-4 py-2 rounded-lg transition-all duration-200 ${
-                            settings[item.key as keyof typeof settings]
-                              ? 'bg-gradient-to-r from-green-500 to-blue-600 text-white'
-                              : 'hover:bg-white/50 dark:hover:bg-gray-700/50'
-                          }`}
-                        >
-                          {settings[item.key as keyof typeof settings] ? (
-                            <div className="flex items-center gap-2">
-                              <CheckCircle size={14} />
-                              <span className="text-xs">{t('settings.enabled')}</span>
-                            </div>
-                          ) : (
-                            <span className="text-xs">{t('settings.disabled')}</span>
-                          )}
-                        </GlassButton>
+                        <ModernSwitch
+                          checked={settings[item.key as keyof typeof settings] as boolean}
+                          onCheckedChange={(checked) => handleSettingChange(item.key, checked)}
+                          className="data-[state=checked]:bg-green-500"
+                        />
                       )}
                       {item.type === 'select' && (
-                        <select
+                        <ModernSelect 
                           value={settings[item.key as keyof typeof settings] as string}
-                          onChange={(e) => handleSettingChange(item.key, e.target.value)}
-                          className="px-3 py-2 bg-white/60 dark:bg-gray-800/60 border border-gray-200/50 dark:border-gray-700/50 rounded-lg text-sm text-gray-800 dark:text-gray-100 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all duration-200"
+                          onValueChange={(value) => handleSettingChange(item.key, value)}
                         >
-                          {item.options?.map((option) => (
-                            <option key={option.value} value={option.value}>
-                              {option.label}
-                            </option>
-                          ))}
-                        </select>
+                          <ModernSelectTrigger 
+                            variant="glass" 
+                            className="w-40 bg-white/30 dark:bg-gray-800/30 border border-white/30 dark:border-gray-700/30"
+                          >
+                            <ModernSelectValue />
+                          </ModernSelectTrigger>
+                          <ModernSelectContent 
+                            variant="glass" 
+                            className="bg-white/80 dark:bg-gray-800/80 border border-white/30 dark:border-gray-700/30"
+                          >
+                            {item.options?.map((option) => (
+                              <ModernSelectItem 
+                                key={option.value} 
+                                value={option.value}
+                                className="hover:bg-white/20 dark:hover:bg-gray-700/50"
+                              >
+                                {option.label}
+                              </ModernSelectItem>
+                            ))}
+                          </ModernSelectContent>
+                        </ModernSelect>
                       )}
                     </div>
                   </motion.div>

@@ -248,11 +248,14 @@
     "server_processing_error": "Error processing server request",
     "invalid_response_format": "Invalid server response format",
     "profile_load_error": "Error loading profile: {{message}}",
+    "profile_load_retry": "Error loading profile (attempt {{retryCount}} of {{maxRetries}}): {{message}}",
     "update_profile_error": "An error occurred while updating profile",
     "load_custom_fields_failed": "Failed to load custom field templates",
     "delete_custom_field_failed": "Failed to delete custom field template",
     "create_custom_field_template_error": "Error creating custom field template",
-    "edit_custom_field_template_error": "Error updating custom field template"
+    "edit_custom_field_template_error": "Error updating custom field template",
+    "max_retries_exceeded": "Maximum retry attempts exceeded. Please try again later.",
+    "invalid_phone_format": "Invalid phone number format"
   },
   "actions": {
     "add_new_group": "Add New Group",
@@ -270,7 +273,10 @@
     "edit": "Edit",
     "delete": "Delete",
     "back": "Back",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "remove": "Remove",
+    "dismiss": "Dismiss"
   },
   "system_messages": {
     "preparing_group_form": "Preparing group form...",
@@ -637,5 +643,69 @@
     "contact_details": "Contact Details",
     "birthday": "Birthday",
     "days_until_birthday": "Days Until Birthday"
+  },
+  "profile": {
+    "avatar_alt": "User avatar",
+    "edit_avatar": "Edit avatar",
+    "upload_new": "Upload new",
+    "remove_avatar": "Remove avatar",
+    "select_image": "Select image",
+    "avatar": "Avatar",
+    "avatar_preview": "Avatar preview",
+    "preview_avatar": "Preview Avatar",
+    "preview_avatar_description": "Please review your avatar before uploading.",
+    "remove_avatar_confirm_title": "Remove Avatar",
+    "remove_avatar_confirm_description": "Are you sure you want to remove your avatar? This action cannot be undone.",
+    "required_fields_notice": "Fields marked with * are required.",
+    "completion": {
+      "title": "Profile Completion",
+      "overall": "Overall",
+      "required": "Required Fields",
+      "optional": "Optional Fields",
+      "required_fields": "Required Fields",
+      "completed": "Completed",
+      "complete": "Your profile is complete! Great job!",
+      "almost": "You're almost there! Just a few more details.",
+      "good": "Good progress! Keep going.",
+      "keep_going": "Keep going! Add more details to your profile.",
+      "get_started": "Get started by adding some information to your profile.",
+      "tips_title": "Profile Completion Tips",
+      "tips_description": "Complete your profile to unlock all features and get the most out of the application."
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "description": "Manage application settings and user preferences",
+    "notifications": {
+      "title": "Notifications",
+      "email": "Email Notifications",
+      "email_desc": "Receive email notifications for important updates",
+      "push": "Push Notifications",
+      "push_desc": "Receive push notifications on your device",
+      "sms": "SMS Notifications",
+      "sms_desc": "Receive SMS notifications for critical alerts"
+    },
+    "appearance": {
+      "title": "Appearance",
+      "theme": "Dark Mode",
+      "theme_desc": "Enable dark mode for reduced eye strain",
+      "language": "Language",
+      "language_desc": "Change the application language"
+    },
+    "privacy": {
+      "title": "Privacy & Security",
+      "visibility": "Profile Visibility",
+      "visibility_desc": "Control who can see your profile information",
+      "public": "Public",
+      "private": "Private",
+      "contacts": "Contacts Only",
+      "two_factor": "Two-Factor Authentication",
+      "two_factor_desc": "Add an extra layer of security to your account"
+    },
+    "group_description": "{{group}} settings and preferences",
+    "saving": "Saving...",
+    "saved": "Saved",
+    "save_changes": "Save Changes",
+    "changes_saved": "Changes saved successfully"
   }
 }

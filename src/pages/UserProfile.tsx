@@ -182,7 +182,7 @@ const UserProfile: React.FC = () => {
               glassEffect="default"
               hoverEffect="lift"
             >
-              {tabs.map((tab, index) => {
+              {tabs.map((tab) => {
                 const Icon = tab.icon;
                 return (
                   <ModernTabsTrigger

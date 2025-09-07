@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSession } from '@/integrations/supabase/auth';
 import { fetchWithCache, invalidateCache } from '@/utils/cache-helpers';
@@ -23,6 +23,7 @@ export interface UseProfileReturn {
   updateProfile: (data: Partial<ProfileData>) => Promise<void>;
   refreshProfile: () => Promise<void>;
   clearError: () => void;
+  retryOperation: () => Promise<void>;
 }
 
 export const useProfile = (): UseProfileReturn => {
@@ -31,11 +32,10 @@ export const useProfile = (): UseProfileReturn => {
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const retryCount = useRef(0);
+  const maxRetries = 3;
 
-  const clearError = useCallback(() => {
-    setError(null);
-  }, []);
-
+  // Declare fetchProfile first so it can be referenced by other functions
   const fetchProfile = useCallback(async (showToast = false) => {
     if (isSessionLoading || !session?.user) {
       return;
@@ -73,12 +73,36 @@ export const useProfile = (): UseProfileReturn => {
     } catch (err) {
       const errorMessage = ErrorManager.getErrorMessage(err as Error);
       setError(errorMessage);
-      showError(t('errors.profile_load_error', { message: errorMessage }));
+      
+      if (retryCount.current < maxRetries) {
+        showError(t('errors.profile_load_retry', { 
+          message: errorMessage,
+          retryCount: retryCount.current + 1,
+          maxRetries
+        }));
+      } else {
+        showError(t('errors.profile_load_error', { message: errorMessage }));
+      }
+      
       ErrorManager.logError(err as Error, { component: "useProfile", action: "fetchProfile" });
     } finally {
       setLoading(false);
     }
   }, [session, isSessionLoading, t]);
+
+  const clearError = useCallback(() => {
+    setError(null);
+    retryCount.current = 0;
+  }, []);
+
+  const retryOperation = useCallback(async () => {
+    if (retryCount.current < maxRetries) {
+      retryCount.current += 1;
+      await fetchProfile(true);
+    } else {
+      showError(t('errors.max_retries_exceeded'));
+    }
+  }, [t]); // Removed fetchProfile from dependencies to break circular dependency
 
   const updateProfile = useCallback(async (data: Partial<ProfileData>) => {
     if (!session?.user) {
@@ -112,7 +136,7 @@ export const useProfile = (): UseProfileReturn => {
     } catch (err) {
       const errorMessage = ErrorManager.getErrorMessage(err as Error);
       setError(errorMessage);
-      showError(t('errors.update_profile_error'));
+      showError(t('errors.update_profile_error', { message: errorMessage }));
       ErrorManager.logError(err as Error, { component: "useProfile", action: "updateProfile" });
       throw err;
     } finally {
@@ -136,5 +160,6 @@ export const useProfile = (): UseProfileReturn => {
     updateProfile,
     refreshProfile,
     clearError,
+    retryOperation
   };
 };

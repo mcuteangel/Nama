@@ -526,13 +526,16 @@
     "server_processing_error": "خطا در پردازش درخواست سرور",
     "invalid_response_format": "فرمت پاسخ سرور نامعتبر",
     "profile_load_error": "خطا در بارگذاری پروفایل: {{message}}",
+    "profile_load_retry": "خطا در بارگذاری پروفایل (تلاش {{retryCount}} از {{maxRetries}}): {{message}}",
     "update_profile_error": "خطایی در به‌روزرسانی پروفایل رخ داد",
     "unknown": "خطای ناشناخته",
     "loading_ungrouped_contacts": "خطا در بارگذاری مخاطبین بدون گروه",
     "load_custom_fields_failed": "خطا در بارگذاری قالب‌های فیلد سفارشی",
     "delete_custom_field_failed": "خطا در حذف قالب فیلد سفارشی",
     "create_custom_field_template_error": "خطا در ایجاد قالب فیلد سفارشی",
-    "edit_custom_field_template_error": "خطا در به‌روزرسانی قالب فیلد سفارشی"
+    "edit_custom_field_template_error": "خطا در به‌روزرسانی قالب فیلد سفارشی",
+    "max_retries_exceeded": "حداکثر تلاش‌های مجدد انجام شد. لطفاً بعداً دوباره تلاش کنید.",
+    "invalid_phone_format": "فرمت شماره تلفن نامعتبر است"
   },
   "actions": {
     "add_new_group": "افزودن گروه جدید",
@@ -550,7 +553,10 @@
     "edit": "ویرایش",
     "delete": "حذف",
     "back": "بازگشت",
-    "cancel": "لغو"
+    "cancel": "لغو",
+    "confirm": "تایید",
+    "remove": "حذف",
+    "dismiss": "رد کردن"
   },
   "system_messages": {
     "preparing_group_form": "در حال آماده‌سازی فرم گروه...",
@@ -914,5 +920,34 @@
     "contact_details": "جزئیات تماس",
     "birthday": "تولد",
     "days_until_birthday": "روز تا تولد"
+  },
+  "profile": {
+    "avatar_alt": "آواتار کاربر",
+    "edit_avatar": "ویرایش آواتار",
+    "upload_new": "آپلود جدید",
+    "remove_avatar": "حذف آواتار",
+    "select_image": "انتخاب تصویر",
+    "avatar": "آواتار",
+    "avatar_preview": "پیش‌نمایش آواتار",
+    "preview_avatar": "پیش‌نمایش آواتار",
+    "preview_avatar_description": "لطفاً قبل از آپلود آواتار خود را بررسی کنید.",
+    "remove_avatar_confirm_title": "حذف آواتار",
+    "remove_avatar_confirm_description": "آیا از حذف آواتار خود مطمئن هستید؟ این عمل قابل بازگشت نیست.",
+    "required_fields_notice": "فیلدهای مشخص شده با * الزامی هستند.",
+    "completion": {
+      "title": "تکمیل پروفایل",
+      "overall": "کلی",
+      "required": "فیلدهای الزامی",
+      "optional": "فیلدهای اختیاری",
+      "required_fields": "فیلدهای الزامی",
+      "completed": "تکمیل شده",
+      "complete": "پروفایل شما کامل است! آفرین!",
+      "almost": "نزدیک به تکمیل! فقط چند جزئیات دیگر.",
+      "good": "پیشرفت خوبی دارید! ادامه دهید.",
+      "keep_going": "ادامه دهید! اطلاعات بیشتری به پروفایل خود اضافه کنید.",
+      "get_started": "با افزودن اطلاعاتی به پروفایل خود شروع کنید.",
+      "tips_title": "نکات تکمیل پروفایل",
+      "tips_description": "برای باز کردن تمام ویژگی‌ها و بهره‌برداری کامل از برنامه، پروفایل خود را تکمیل کنید."
+    }
   }
 }
