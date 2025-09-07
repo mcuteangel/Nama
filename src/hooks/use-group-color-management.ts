@@ -52,7 +52,7 @@ export const useGroupColorManagement = (): UseGroupColorManagementReturn => {
 
   const onErrorFetchColors = useCallback((err: Error) => {
     console.error("Error fetching existing group colors:", err);
-    ErrorManager.notifyUser(t('settings.error_loading_group_colors'), 'error');
+    ErrorManager.notifyUser(t('errors.loading_group_colors'), 'error');
     setInitialColor('#60A5FA');
     setExistingGroupColors([]);
   }, [t]);

@@ -4,6 +4,7 @@ import { useSession } from "@/integrations/supabase/auth";
 import { fetchWithCache, invalidateCache } from "@/utils/cache-helpers";
 import { useErrorHandler } from "./use-error-handler";
 import { ErrorManager } from "@/lib/error-manager";
+import { useTranslation } from "react-i18next";
 
 interface Group {
   id: string;
@@ -13,13 +14,14 @@ interface Group {
 
 export const useGroups = () => {
   const { session, isLoading: isSessionLoading } = useSession();
+  const { t } = useTranslation();
   const [groups, setGroups] = useState<Group[]>([]);
 
   const onSuccessGroups = useCallback((result: { data: Group[] | null; error: string | null; fromCache: boolean }) => {
     if (result && !result.fromCache) {
-      ErrorManager.notifyUser("گروه‌ها با موفقیت بارگذاری شدند.", 'success');
+      ErrorManager.notifyUser(t('groups.load_success'), 'success');
     }
-  }, []);
+  }, [t]);
 
   const onErrorGroups = useCallback((err: unknown) => {
     ErrorManager.logError(err, { component: 'useGroups', action: 'fetchGroups' });
@@ -32,7 +34,7 @@ export const useGroups = () => {
     maxRetries: 3,
     retryDelay: 1000,
     showToast: false,
-    customErrorMessage: "خطا در بارگذاری گروه‌ها",
+    customErrorMessage: t('groups.load_error'),
     onSuccess: onSuccessGroups,
     onError: onErrorGroups,
   });
@@ -68,7 +70,7 @@ export const useGroups = () => {
       setGroups(data || []);
       return { data, error: null, fromCache };
     });
-  }, [session, isSessionLoading, executeAsync, cacheKey]);
+  }, [session, isSessionLoading, executeAsync, cacheKey, t]);
 
   // Add a function to refresh groups when needed
   const refreshGroups = useCallback(() => {
