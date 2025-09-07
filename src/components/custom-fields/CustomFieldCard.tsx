@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { GlassButton } from "@/components/ui/glass-button";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 
-type TemplateType = 'text' | 'number' | 'date' | 'list';
+type TemplateType = 'text' | 'number' | 'date' | 'list' | 'checklist';
 
 interface CustomFieldCardProps {
   field: CustomFieldTemplate;
@@ -30,6 +30,7 @@ const CustomFieldCard: React.FC<CustomFieldCardProps> = ({
       case 'number': return 'secondary';
       case 'date': return 'outline';
       case 'list': return 'secondary';
+      case 'checklist': return 'secondary';
       default: return 'default';
     }
   };
@@ -40,6 +41,7 @@ const CustomFieldCard: React.FC<CustomFieldCardProps> = ({
       case 'number': return '🔢';
       case 'date': return '📅';
       case 'list': return '📋';
+      case 'checklist': return '✅';
       default: return '📝';
     }
   };
@@ -50,6 +52,7 @@ const CustomFieldCard: React.FC<CustomFieldCardProps> = ({
       case 'number': return t('contact_form.number');
       case 'date': return t('contact_form.date');
       case 'list': return t('contact_form.list');
+      case 'checklist': return t('contact_form.checklist');
       default: return type;
     }
   };
@@ -111,7 +114,7 @@ const CustomFieldCard: React.FC<CustomFieldCardProps> = ({
               size="sm"
               onClick={() => onEdit(field)}
               className="text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/30 transition-all duration-300 hover:scale-110 hover:rotate-6 shadow-lg"
-              aria-label={`ویرایش ${field.name}`}
+              aria-label={`${t('actions.edit')} ${field.name}`}
             >
               <Edit size={20} />
             </GlassButton>
@@ -122,7 +125,7 @@ const CustomFieldCard: React.FC<CustomFieldCardProps> = ({
               onClick={() => onDelete(field.id)}
               className="text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/30 transition-all duration-300 hover:scale-110 hover:-rotate-6 shadow-lg"
               disabled={isDeleting}
-              aria-label={`حذف ${field.name}`}
+              aria-label={`${t('actions.delete')} ${field.name}`}
             >
               {isDeleting ? <LoadingSpinner size={20} /> : <Trash2 size={20} />}
             </GlassButton>
@@ -137,12 +140,14 @@ const CustomFieldCard: React.FC<CustomFieldCardProps> = ({
           </div>
         )}
 
-        {field.type === 'list' && field.options && field.options.length > 0 && (
+        {(field.type === 'list' || field.type === 'checklist') && field.options && field.options.length > 0 && (
           <div className="border-t border-gray-200/60 dark:border-gray-700/60 pt-5">
             <div className="flex items-center gap-2 mb-4">
-              <span className="text-lg">📋</span>
+              <span className="text-lg">{getTypeIcon(field.type)}</span>
               <p className="text-sm font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
-                {t('contact_form.list_options')}
+                {field.type === 'checklist' 
+                  ? t('contact_form.checklist_options') 
+                  : t('contact_form.list_options')}
               </p>
             </div>
             <div className="flex flex-wrap gap-3">

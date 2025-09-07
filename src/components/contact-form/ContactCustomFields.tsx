@@ -5,7 +5,7 @@ import { ModernSelect, ModernSelectContent, ModernSelectItem, ModernSelectTrigge
 import { ModernPopover, ModernPopoverContent, ModernPopoverTrigger } from '@/components/ui/modern-popover';
 import { GlassButton } from "@/components/ui/glass-button";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
-import { CalendarIcon, Plus } from 'lucide-react';
+import { CalendarIcon, Plus, Check } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { JalaliCalendar } from '@/components/JalaliCalendar';
 import { cn } from '@/lib/utils';
@@ -14,6 +14,7 @@ import { CustomFieldTemplate } from '@/domain/schemas/custom-field-template';
 import { ContactFormValues } from '@/types/contact';
 import { useTranslation } from 'react-i18next';
 import { useJalaliCalendar } from '@/hooks/use-jalali-calendar';
+import { ControllerRenderProps } from 'react-hook-form';
 
 interface ContactCustomFieldsProps {
   availableTemplates: CustomFieldTemplate[];
@@ -28,7 +29,7 @@ const ContactCustomFields: React.FC<ContactCustomFieldsProps> = React.memo(({
   fetchTemplates,
 }) => {
   const { t } = useTranslation();
-  const { control, watch } = useFormContext<ContactFormValues>();
+  const { control, watch, setValue } = useFormContext<ContactFormValues>();
   const { formatDate } = useJalaliCalendar();
   
   // Memoize custom fields to prevent unnecessary re-renders
@@ -44,6 +45,24 @@ const ContactCustomFields: React.FC<ContactCustomFieldsProps> = React.memo(({
     });
     return map;
   }, [availableTemplates]);
+
+  // Handle checklist changes
+  const handleChecklistChange = (
+    field: ControllerRenderProps<ContactFormValues, `customFields.${number}.value`>, 
+    option: string, 
+    checked: boolean
+  ) => {
+    const currentValue = field.value ? field.value.split(',').map((v: string) => v.trim()) : [];
+    let newValue: string[];
+    
+    if (checked) {
+      newValue = [...currentValue, option];
+    } else {
+      newValue = currentValue.filter((v: string) => v !== option);
+    }
+    
+    field.onChange(newValue.join(', '));
+  };
 
   return (
     <div className="space-y-4 pt-6 border-t border-gray-200 dark:border-gray-700">
@@ -160,6 +179,31 @@ const ContactCustomFields: React.FC<ContactCustomFieldsProps> = React.memo(({
                             ))}
                           </ModernSelectContent>
                         </ModernSelect>
+                      ) : template.type === 'checklist' ? (
+                        <div className="space-y-2 p-3 bg-white/20 dark:bg-gray-700/20 rounded-lg border border-white/30 dark:border-gray-600/30">
+                          {template.options && template.options.map((option) => {
+                            const currentValue = field.value ? field.value.split(',').map((v: string) => v.trim()) : [];
+                            const isChecked = currentValue.includes(option);
+                            
+                            return (
+                              <div key={option} className="flex items-center">
+                                <input
+                                  type="checkbox"
+                                  id={`${field.name}-${option}`}
+                                  checked={isChecked}
+                                  onChange={(e) => handleChecklistChange(field, option, e.target.checked)}
+                                  className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                                />
+                                <label 
+                                  htmlFor={`${field.name}-${option}`} 
+                                  className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                                >
+                                  {option}
+                                </label>
+                              </div>
+                            );
+                          })}
+                        </div>
                       ) : (
                         <ModernInput 
                           disabled 

@@ -1,0 +1,2 @@
+-- Update comment for custom_field_templates.type to include checklist as a valid type
+COMMENT ON COLUMN public.custom_field_templates.type IS 'e.g., ''text'', ''number'', ''date'', ''list'', ''checklist''';

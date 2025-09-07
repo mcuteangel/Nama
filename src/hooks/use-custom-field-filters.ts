@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { type CustomFieldTemplate } from "@/domain/schemas/custom-field-template";
 
-type TemplateType = 'text' | 'number' | 'date' | 'list';
+type TemplateType = 'text' | 'number' | 'date' | 'list' | 'checklist';
 
 export const useCustomFieldFilters = (customFields: CustomFieldTemplate[]) => {
   const [searchTerm, setSearchTerm] = useState("");
