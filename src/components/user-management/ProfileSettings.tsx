@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { ModernCard, ModernCardContent, ModernCardHeader, ModernCardTitle } from '@/components/ui/modern-card';
@@ -12,47 +12,82 @@ import {
   ModernSelectTrigger, 
   ModernSelectValue 
 } from '@/components/ui/modern-select';
+import useAppSettings from '@/hooks/use-app-settings';
 import {
   Bell,
   Sun,
   Shield,
   Save,
-  CheckCircle} from 'lucide-react';
+  CheckCircle,
+  AlertCircle
+} from 'lucide-react';
 
 interface ProfileSettingsProps {
-  // This interface can be extended with props if needed in the future
   className?: string;
 }
 
 const ProfileSettings: React.FC<ProfileSettingsProps> = () => {
   const { t, i18n } = useTranslation();
-  const [settings, setSettings] = useState({
-    emailNotifications: true,
-    pushNotifications: false,
-    smsNotifications: false,
-    darkMode: false,
-    language: i18n.language,
-    timezone: 'Asia/Tehran',
-    twoFactorAuth: false,
-    profileVisibility: 'public',
-  });
-
+  const { settings, updateSettings, isLoaded, error, clearError } = useAppSettings();
+  const [localSettings, setLocalSettings] = useState(settings);
   const [loading, setLoading] = useState(false);
   const [saved, setSaved] = useState(false);
 
-  const handleSettingChange = (key: string, value: boolean | string) => {
-    setSettings(prev => ({ ...prev, [key]: value }));
+  // Update local settings when app settings change
+  useEffect(() => {
+    if (isLoaded) {
+      setLocalSettings(settings);
+    }
+  }, [settings, isLoaded]);
+
+  const handleSettingChange = (key: string, value: any) => {
+    setLocalSettings(prev => ({ ...prev, [key]: value }));
     setSaved(false);
   };
 
   const handleSave = async () => {
     setLoading(true);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    setLoading(false);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 3000);
+    try {
+      updateSettings(localSettings);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+    } catch (error) {
+      console.error('Failed to save settings:', error);
+    } finally {
+      setLoading(false);
+    }
   };
+
+  // Show loading state while settings are being loaded
+  if (!isLoaded) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="text-center">
+          <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <p className="mt-4 text-gray-600 dark:text-gray-400">{t('loading_messages.loading_settings')}</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error if there's an error loading settings
+  if (error) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="text-center p-6 bg-red-50 dark:bg-red-900/20 rounded-xl border border-red-200 dark:border-red-800 max-w-md">
+          <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+          <h3 className="text-xl font-bold text-red-800 dark:text-red-200 mb-2">{t('errors.settings_load_error')}</h3>
+          <p className="text-red-600 dark:text-red-400 mb-4">{error}</p>
+          <GlassButton 
+            onClick={clearError}
+            className="bg-red-500 hover:bg-red-600 text-white"
+          >
+            {t('actions.try_again')}
+          </GlassButton>
+        </div>
+      </div>
+    );
+  }
 
   const settingGroups = [
     {
@@ -88,9 +123,14 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = () => {
       bgColor: 'bg-purple-50 dark:bg-purple-900/20',
       items: [
         {
-          key: 'darkMode',
+          key: 'theme',
           label: t('settings.appearance.theme'),
-          type: 'toggle',
+          type: 'select',
+          options: [
+            { value: 'system', label: t('settings.appearance.system') },
+            { value: 'light', label: t('settings.appearance.light') },
+            { value: 'dark', label: t('settings.appearance.dark') },
+          ],
           description: t('settings.appearance.theme_desc'),
         },
         {
@@ -102,6 +142,16 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = () => {
             { value: 'fa', label: 'فارسی' },
           ],
           description: t('settings.appearance.language_desc'),
+        },
+        {
+          key: 'calendarType',
+          label: t('settings.appearance.calendar'),
+          type: 'select',
+          options: [
+            { value: 'jalali', label: t('settings.appearance.jalali') },
+            { value: 'gregorian', label: t('settings.appearance.gregorian') },
+          ],
+          description: t('settings.appearance.calendar_desc'),
         },
       ],
     },
@@ -188,14 +238,14 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = () => {
                     <div className="ml-4">
                       {item.type === 'toggle' && (
                         <ModernSwitch
-                          checked={settings[item.key as keyof typeof settings] as boolean}
+                          checked={localSettings[item.key as keyof typeof localSettings] as boolean}
                           onCheckedChange={(checked) => handleSettingChange(item.key, checked)}
                           className="data-[state=checked]:bg-green-500"
                         />
                       )}
                       {item.type === 'select' && (
                         <ModernSelect 
-                          value={settings[item.key as keyof typeof settings] as string}
+                          value={localSettings[item.key as keyof typeof localSettings] as string}
                           onValueChange={(value) => handleSettingChange(item.key, value)}
                         >
                           <ModernSelectTrigger 

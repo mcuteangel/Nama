@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import UserProfileFormNew from "@/components/user-management/UserProfileFormNew";
 import ProfileSettings from "@/components/user-management/ProfileSettings";
+import NotificationSettings from "@/components/user-management/NotificationSettings";
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { User, Settings, Bell, Sparkles, ArrowLeft } from 'lucide-react';
@@ -8,6 +9,7 @@ import { GlassButton } from "@/components/ui/glass-button";
 import { useNavigate } from 'react-router-dom';
 import { ModernTabs, ModernTabsList, ModernTabsTrigger, ModernTabsContent } from "@/components/ui/modern-tabs";
 import { ModernCard, ModernCardContent } from "@/components/ui/modern-card";
+import useAppSettings from '@/hooks/use-app-settings';
 
 type TabType = 'profile' | 'settings' | 'notifications';
 
@@ -15,33 +17,37 @@ const UserProfile: React.FC = () => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<TabType>('profile');
+  const { settings, updateSettings } = useAppSettings();
 
-  // Determine if we're in RTL mode based on the current language
-  const isRTL = useMemo(() => i18n.dir() === 'rtl', [i18n]);
+  // Determine if we're in RTL mode based on the current language setting
+  const isRTL = useMemo(() => settings.language === 'fa', [settings.language]);
 
-  // Determine theme based on system preference or saved setting
+  // Determine theme based on settings or system preference
   const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
-    try {
-      const savedTheme = localStorage.getItem('userProfileTheme');
-      if (savedTheme !== null) {
-        return savedTheme === 'dark';
-      }
-    } catch (e) {
-      console.warn('Failed to parse theme from localStorage', e);
-    }
-
+    if (settings.theme === 'dark') return true;
+    if (settings.theme === 'light') return false;
     // Default to system preference
     return window.matchMedia('(prefers-color-scheme: dark)').matches;
   });
 
-  // Save theme preference to localStorage whenever it changes
+  // Update theme when settings change
   React.useEffect(() => {
-    try {
-      localStorage.setItem('userProfileTheme', isDarkMode ? 'dark' : 'light');
-    } catch (e) {
-      console.warn('Failed to save theme preference to localStorage', e);
+    if (settings.theme === 'dark') {
+      setIsDarkMode(true);
+    } else if (settings.theme === 'light') {
+      setIsDarkMode(false);
+    } else {
+      // System preference
+      setIsDarkMode(window.matchMedia('(prefers-color-scheme: dark)').matches);
     }
-  }, [isDarkMode]);
+  }, [settings.theme]);
+
+  // Handle theme toggle
+  const handleThemeToggle = () => {
+    const newTheme = isDarkMode ? 'light' : 'dark';
+    setIsDarkMode(!isDarkMode);
+    updateSettings({ theme: newTheme });
+  };
 
   const tabs = [
     {
@@ -80,49 +86,7 @@ const UserProfile: React.FC = () => {
       case 'settings':
         return <ProfileSettings />;
       case 'notifications':
-        return (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            className="flex flex-col items-center justify-center py-16 text-center"
-          >
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-              className="w-24 h-24 bg-gradient-to-br from-green-100 to-green-200 dark:from-green-900/30 dark:to-green-800/30 rounded-full flex items-center justify-center mb-6"
-            >
-              <Bell size={32} className="text-green-600 dark:text-green-400" />
-            </motion.div>
-            <motion.h3
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-3"
-            >
-              {t('profile.notifications.title')}
-            </motion.h3>
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-              className="text-gray-600 dark:text-gray-400 mb-8 max-w-md"
-            >
-              {t('profile.notifications.description')}
-            </motion.p>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
-            >
-              <GlassButton className="px-6 py-3">
-                <Sparkles size={16} className="mr-2" />
-                {t('profile.notifications.setup')}
-              </GlassButton>
-            </motion.div>
-          </motion.div>
-        );
+        return <NotificationSettings />;
       default:
         return <UserProfileFormNew />;
     }
@@ -161,7 +125,7 @@ const UserProfile: React.FC = () => {
 
           {/* Theme Toggle */}
           <GlassButton
-            onClick={() => setIsDarkMode(!isDarkMode)}
+            onClick={handleThemeToggle}
             variant="ghost"
             size="sm"
             className="p-2"

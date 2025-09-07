@@ -645,6 +645,20 @@
     "days_until_birthday": "Days Until Birthday"
   },
   "profile": {
+    "tabs": {
+      "profile": "Profile",
+      "profile_desc": "Manage your profile information",
+      "settings": "Settings",
+      "settings_desc": "Customize your user experience",
+      "notifications": "Notifications",
+      "notifications_desc": "Manage notification settings"
+    },
+    "notifications": {
+      "title": "Notification Settings",
+      "description": "Customize how you receive notifications from the app",
+      "setup": "Set Up Notifications"
+    },
+    "subtitle": "Manage your profile and settings",
     "avatar_alt": "User avatar",
     "edit_avatar": "Edit avatar",
     "upload_new": "Upload new",
@@ -683,14 +697,36 @@
       "push": "Push Notifications",
       "push_desc": "Receive push notifications on your device",
       "sms": "SMS Notifications",
-      "sms_desc": "Receive SMS notifications for critical alerts"
+      "sms_desc": "Receive SMS notifications for critical alerts",
+      "contact_updates": "Contact Updates",
+      "contact_updates_desc": "Get notified when your contacts are updated",
+      "ai_suggestions": "AI Suggestions",
+      "ai_suggestions_desc": "Receive AI-powered suggestions for your contacts",
+      "system_alerts": "System Alerts",
+      "system_alerts_desc": "Important system notifications and updates",
+      "marketing": "Marketing & Promotions",
+      "marketing_desc": "Receive information about new features and promotions",
+      "notification_types": "Notification Types",
+      "notification_types_desc": "Choose which types of notifications you want to receive",
+      "frequency": "Notification Frequency",
+      "frequency_desc": "Control how often you receive notifications",
+      "daily_summary": "Daily Summary Time",
+      "daily_summary_desc": "Time of day to receive your daily summary",
+      "description": "Customize how you receive notifications from the app"
     },
     "appearance": {
       "title": "Appearance",
       "theme": "Dark Mode",
       "theme_desc": "Enable dark mode for reduced eye strain",
       "language": "Language",
-      "language_desc": "Change the application language"
+      "language_desc": "Change the application language",
+      "system": "System",
+      "light": "Light",
+      "dark": "Dark",
+      "calendar": "Calendar Type",
+      "calendar_desc": "Change calendar type (Jalali/Gregorian)",
+      "jalali": "Jalali",
+      "gregorian": "Gregorian"
     },
     "privacy": {
       "title": "Privacy & Security",

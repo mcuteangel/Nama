@@ -5,6 +5,16 @@ export interface AppSettings {
   theme: 'light' | 'dark' | 'system';
   language: 'fa' | 'en';
   calendarType: 'jalali' | 'gregorian';
+  emailNotifications?: boolean;
+  pushNotifications?: boolean;
+  smsNotifications?: boolean;
+  contactUpdates?: boolean;
+  aiSuggestions?: boolean;
+  systemAlerts?: boolean;
+  marketing?: boolean;
+  dailySummaryTime?: string;
+  profileVisibility?: 'public' | 'private' | 'contacts';
+  twoFactorAuth?: boolean;
 }
 
 const defaultSettings: AppSettings = {
@@ -12,11 +22,22 @@ const defaultSettings: AppSettings = {
   theme: 'system',
   language: 'fa',
   calendarType: 'jalali',
+  emailNotifications: true,
+  pushNotifications: true,
+  smsNotifications: false,
+  contactUpdates: true,
+  aiSuggestions: true,
+  systemAlerts: true,
+  marketing: false,
+  dailySummaryTime: '09:00',
+  profileVisibility: 'public',
+  twoFactorAuth: false,
 };
 
 export const useAppSettings = () => {
   const [settings, setSettings] = useState<AppSettings>(defaultSettings);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // Load settings from localStorage on mount
   useEffect(() => {
@@ -29,6 +50,7 @@ export const useAppSettings = () => {
         }
       } catch (error) {
         console.warn('Failed to load app settings:', error);
+        setError('Failed to load settings');
       } finally {
         setIsLoaded(true);
       }
@@ -53,6 +75,7 @@ export const useAppSettings = () => {
       });
     } catch (error) {
       console.error('Failed to save app settings:', error);
+      setError('Failed to save settings');
     }
   };
 
@@ -64,16 +87,28 @@ export const useAppSettings = () => {
   // Reset settings to defaults
   const resetSettings = () => {
     setSettings(defaultSettings);
-    localStorage.removeItem('appSettings');
-    window.dispatchEvent(new CustomEvent('settingsReset'));
+    try {
+      localStorage.removeItem('appSettings');
+      window.dispatchEvent(new CustomEvent('settingsReset'));
+    } catch (error) {
+      console.error('Failed to reset app settings:', error);
+      setError('Failed to reset settings');
+    }
+  };
+
+  // Clear error
+  const clearError = () => {
+    setError(null);
   };
 
   return {
     settings,
     isLoaded,
+    error,
     updateSettings,
     getSetting,
     resetSettings,
+    clearError,
   };
 };
 
