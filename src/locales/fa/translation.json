@@ -618,7 +618,11 @@
     "cancel": "لغو",
     "confirm": "تایید",
     "remove": "حذف",
-    "dismiss": "رد کردن"
+    "dismiss": "رد کردن",
+    "add_contact": "افزودن مخاطب جدید",
+    "new": "جدید",
+    "export": "خروجی",
+    "sort": "مرتب‌سازی"
   },
   "system_messages": {
     "preparing_group_form": "در حال آماده‌سازی فرم گروه...",
@@ -793,7 +797,11 @@
   },
   "contacts": {
     "add_new_contact": "افزودن مخاطب جدید",
-    "add_contact_description": "افزودن اطلاعات و جزئیات مخاطب جدید"
+    "add_contact_description": "افزودن اطلاعات و جزئیات مخاطب جدید",
+    "management": "مدیریت مخاطبین",
+    "management_description": "ثبت، جستجو و سازماندهی مخاطبین شما",
+    "search_placeholder": "جستجوی مخاطبین...",
+    "company_placeholder": "نام شرکت..."
   },
   "custom_field_management": {
     "title": "مدیریت فیلدهای سفارشی",

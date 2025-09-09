@@ -19,11 +19,13 @@ import { ModernSelect, ModernSelectContent, ModernSelectItem, ModernSelectTrigge
 import { useGroups } from "@/hooks/use-groups";
 import { exportContactsToCsv } from "@/utils/export-contacts";
 import { useSession } from "@/integrations/supabase/auth";
+import { useTranslation } from 'react-i18next';
 
 const Contacts = React.memo(() => {
   const navigate = useNavigate();
   const { groups, fetchGroups } = useGroups();
   const { session } = useSession();
+  const { t } = useTranslation();
   const { toast } = useToast();
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -58,7 +60,7 @@ const Contacts = React.memo(() => {
   }, [fetchGroups]);
 
   const handleAddContactClick = useCallback(() => {
-    toast.info('انتقال به افزودن مخاطب جدید...');
+    toast.info(t('notifications.navigating_to_add_contact'));
     navigate("/add-contact");
   }, [navigate, toast]);
 
@@ -84,17 +86,17 @@ const Contacts = React.memo(() => {
 
   const handleExportClick = useCallback(async () => {
     if (!session?.user) {
-      toast.error('برای خروجی گرفتن باید وارد شوید.');
+      toast.error(t('errors.auth_required'));
       return;
     }
     
     setIsExporting(true);
-    toast.info('شروع خروجی مخاطبین...');
+    toast.info(t('notifications.export_started'));
     try {
       await exportContactsToCsv(session, filterValues);
-      toast.success('خروجی مخاطبین با موفقیت انجام شد!');
+      toast.success(t('notifications.export_success'));
     } catch (error) {
-      toast.error('خطا در خروجی مخاطبین');
+      toast.error(t('notifications.export_error'));
     } finally {
       setIsExporting(false);
     }
@@ -108,10 +110,10 @@ const Contacts = React.memo(() => {
       >
         <ModernCardHeader className="text-center p-4 sm:p-6">
           <ModernCardTitle gradient className="heading-1 mb-2">
-            مدیریت مخاطبین
+            {t('pages.contacts.management')}
           </ModernCardTitle>
           <ModernCardDescription className="body-large">
-            ثبت، جستجو و سازماندهی مخاطبین شما
+            {t('pages.contacts.management_description')}
           </ModernCardDescription>
         </ModernCardHeader>
         <ModernCardContent className="space-y-4 sm:space-y-6 p-4 sm:p-6 pt-0">
@@ -119,7 +121,7 @@ const Contacts = React.memo(() => {
             <div className="relative flex-grow w-full sm:w-auto">
               <ModernInput
                 type="text"
-                placeholder="جستجوی مخاطبین..."
+                placeholder={t('pages.contacts.search_placeholder')}
                 variant="glass"
                 className="w-full ps-10 pe-4 py-2 rounded-lg bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all duration-300 rtl:pr-10 rtl:pl-4"
                 value={searchTerm}
@@ -134,8 +136,8 @@ const Contacts = React.memo(() => {
                 className="flex items-center gap-2 sm:gap-2 px-4 sm:px-6 py-3 sm:py-2 text-base sm:text-base flex-grow sm:flex-grow-0 font-persian neomorphism"
               >
                 <PlusCircle size={18} className="sm:w-5 sm:h-5" />
-                <span className="hidden sm:inline">افزودن مخاطب جدید</span>
-                <span className="sm:hidden">جدید</span>
+                <span className="hidden sm:inline">{t('actions.add_contact')}</span>
+                <span className="sm:hidden">{t('actions.new')}</span>
               </GradientButton>
               <GlassButton
                 variant="glass"
@@ -148,8 +150,8 @@ const Contacts = React.memo(() => {
                 ) : (
                   <Download size={18} className="sm:w-5 sm:h-5" />
                 )}
-                <span className="hidden sm:inline">خروجی</span>
-                <span className="sm:hidden">خروجی</span>
+                <span className="hidden sm:inline">{t('actions.export')}</span>
+                <span className="sm:hidden">{t('actions.export')}</span>
               </GlassButton>
             </div>
           </div>
@@ -158,13 +160,13 @@ const Contacts = React.memo(() => {
           <div className="bg-white/20 dark:bg-gray-700/20 rounded-lg p-3 border border-white/30 dark:border-gray-600/30 backdrop-blur-sm">
             <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 items-end">
               <div>
-                <label htmlFor="group-filter" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">گروه:</label>
+                <label htmlFor="group-filter" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">{t('contact_form.group')}:</label>
                 <ModernSelect onValueChange={handleGroupChange} value={selectedGroup || "all"}>
                   <ModernSelectTrigger id="group-filter" variant="glass" className="w-full backdrop-blur-md border border-white/20 hover:bg-white/10 dark:hover:bg-white/5">
-                    <ModernSelectValue placeholder="همه گروه‌ها" />
+                    <ModernSelectValue placeholder={t('groups.all_groups')} />
                   </ModernSelectTrigger>
                   <ModernSelectContent variant="glass" className="backdrop-blur-md border border-white/20">
-                    <ModernSelectItem value="all">همه گروه‌ها</ModernSelectItem>
+                    <ModernSelectItem value="all">{t('groups.all_groups')}</ModernSelectItem>
                     {groups.map((group) => (
                       <ModernSelectItem key={group.id} value={group.id}>
                         {group.name}
@@ -175,11 +177,11 @@ const Contacts = React.memo(() => {
               </div>
 
               <div>
-                <label htmlFor="company-filter" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">شرکت:</label>
+                <label htmlFor="company-filter" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">{t('contact_form.company')}:</label>
                 <ModernInput
                   id="company-filter"
                   type="text"
-                  placeholder="نام شرکت..."
+                  placeholder={t('pages.contacts.company_placeholder')}
                   variant="glass"
                   className="w-full bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 backdrop-blur-md"
                   value={companyFilter}
@@ -188,18 +190,18 @@ const Contacts = React.memo(() => {
               </div>
 
               <div>
-                <label htmlFor="sort-option" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">مرتب‌سازی:</label>
+                <label htmlFor="sort-option" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">{t('actions.sort')}:</label>
                 <ModernSelect onValueChange={handleSortChange} value={sortOption}>
                   <ModernSelectTrigger id="sort-option" variant="glass" className="w-full backdrop-blur-md border border-white/20 hover:bg-white/10 dark:hover:bg-white/5">
-                    <ModernSelectValue placeholder="مرتب‌سازی" />
+                    <ModernSelectValue placeholder={t('sorting.sort_by')} />
                   </ModernSelectTrigger>
                   <ModernSelectContent variant="glass" className="backdrop-blur-md border border-white/20">
-                    <ModernSelectItem value="first_name_asc">نام (صعودی)</ModernSelectItem>
-                    <ModernSelectItem value="first_name_desc">نام (نزولی)</ModernSelectItem>
-                    <ModernSelectItem value="last_name_asc">نام خانوادگی (صعودی)</ModernSelectItem>
-                    <ModernSelectItem value="last_name_desc">نام خانوادگی (نزولی)</ModernSelectItem>
-                    <ModernSelectItem value="created_at_desc">تاریخ ایجاد (جدیدترین)</ModernSelectItem>
-                    <ModernSelectItem value="created_at_asc">تاریخ ایجاد (قدیمی‌ترین)</ModernSelectItem>
+                    <ModernSelectItem value="first_name_asc">{t('sorting.first_name_asc')}</ModernSelectItem>
+                    <ModernSelectItem value="first_name_desc">{t('sorting.first_name_desc')}</ModernSelectItem>
+                    <ModernSelectItem value="last_name_asc">{t('sorting.last_name_asc')}</ModernSelectItem>
+                    <ModernSelectItem value="last_name_desc">{t('sorting.last_name_desc')}</ModernSelectItem>
+                    <ModernSelectItem value="created_at_desc">{t('sorting.created_at_desc')}</ModernSelectItem>
+                    <ModernSelectItem value="created_at_asc">{t('sorting.created_at_asc')}</ModernSelectItem>
                   </ModernSelectContent>
                 </ModernSelect>
               </div>
