@@ -1,9 +1,10 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
+import { getGradient, getShadow, getSpacing, getBorderRadius, getColor, designTokens } from '@/lib/design-tokens';
 
 export interface ModernCardProps extends React.HTMLAttributes<HTMLDivElement> {
-  variant?: 'glass' | 'neomorphism' | 'gradient-primary' | 'gradient-ocean' | 'gradient-sunset' | 'gradient-success' | 'gradient-info' | 'minimal';
-  hover?: 'lift' | 'glow' | 'scale' | 'none';
+  variant?: 'glass' | 'neomorphism' | 'gradient-primary' | 'gradient-ocean' | 'gradient-sunset' | 'gradient-success' | 'gradient-info' | 'minimal' | 'glass-3d';
+  hover?: 'lift' | 'glow' | 'scale' | 'none' | 'glass-3d';
   children?: React.ReactNode;
 }
 
@@ -17,28 +18,30 @@ export interface ModernCardProps extends React.HTMLAttributes<HTMLDivElement> {
 export const ModernCard = React.forwardRef<HTMLDivElement, ModernCardProps>(
   ({ variant = 'glass', hover = 'lift', children, className, ...props }, ref) => {
     const variants = {
-      glass: 'glass-advanced border border-white/30 dark:border-gray-600/30 backdrop-blur-lg shadow-2xl',
-      neomorphism: 'neomorphism',
-      'gradient-primary': 'bg-gradient-primary text-white',
-      'gradient-ocean': 'bg-gradient-ocean text-white',
-      'gradient-sunset': 'bg-gradient-sunset text-white',
-      'gradient-success': 'bg-gradient-success text-white',
-      'gradient-info': 'bg-gradient-info text-white',
-      minimal: 'bg-background border border-border shadow-sm'
+      glass: `backdrop-blur-lg border border-white/30 dark:border-gray-600/30 ${getShadow('glass')}`,
+      neomorphism: getShadow('neomorphism'),
+      'gradient-primary': getGradient('primary'),
+      'gradient-ocean': getGradient('ocean'),
+      'gradient-sunset': getGradient('sunset'),
+      'gradient-success': getGradient('success'),
+      'gradient-info': getGradient('info'),
+      minimal: 'bg-background border border-border shadow-sm',
+      'glass-3d': `backdrop-blur-xl border border-white/20 dark:border-gray-500/30 ${getShadow('glass3d')} transform-gpu`,
     };
 
     const hoverEffects = {
       lift: 'hover-lift transition-all duration-300',
       glow: 'hover-glow transition-all duration-300',
       scale: 'hover:scale-105 transition-all duration-300',
-      none: ''
+      none: '',
+      'glass-3d': 'hover:shadow-glass3dHover hover:transform hover:scale-[1.02] hover:-translate-y-1 transition-all duration-500 ease-out',
     };
 
     return (
       <div
         ref={ref}
         className={cn(
-          'p-6 rounded-2xl',
+          `p-${getSpacing(6)} rounded-${getBorderRadius('2xl')}`,
           variants[variant],
           hoverEffects[hover],
           'fade-in-up',
@@ -61,7 +64,7 @@ export interface ModernCardHeaderProps extends React.HTMLAttributes<HTMLDivEleme
 export const ModernCardHeader = React.forwardRef<HTMLDivElement, ModernCardHeaderProps>(
   ({ children, className, ...props }, ref) => {
     return (
-      <div ref={ref} className={cn('mb-4', className)} {...props}>
+      <div ref={ref} className={cn(`mb-${getSpacing(4)}`, className)} {...props}>
         {children}
       </div>
     );
@@ -81,7 +84,7 @@ export const ModernCardTitle = React.forwardRef<HTMLHeadingElement, ModernCardTi
       <h3
         ref={ref}
         className={cn(
-          'text-2xl font-bold text-gray-800 dark:text-gray-100',
+          `text-${designTokens.typography.sizes['2xl']} font-bold text-gray-800 dark:text-gray-100`,
           gradient && 'text-gradient',
           className
         )}
@@ -102,7 +105,7 @@ export interface ModernCardDescriptionProps extends React.HTMLAttributes<HTMLPar
 export const ModernCardDescription = React.forwardRef<HTMLParagraphElement, ModernCardDescriptionProps>(
   ({ children, className, ...props }, ref) => {
     return (
-      <p ref={ref} className={cn('text-gray-600 dark:text-gray-300 body-regular', className)} {...props}>
+      <p ref={ref} className={cn(`text-gray-600 dark:text-gray-300 ${designTokens.typography.sizes.base}`, className)} {...props}>
         {children}
       </p>
     );
@@ -118,7 +121,7 @@ export interface ModernCardContentProps extends React.HTMLAttributes<HTMLDivElem
 export const ModernCardContent = React.forwardRef<HTMLDivElement, ModernCardContentProps>(
   ({ children, className, ...props }, ref) => {
     return (
-      <div ref={ref} className={cn('space-y-4', className)} {...props}>
+      <div ref={ref} className={cn(`space-y-${getSpacing(4)}`, className)} {...props}>
         {children}
       </div>
     );
@@ -134,7 +137,7 @@ export interface ModernCardFooterProps extends React.HTMLAttributes<HTMLDivEleme
 export const ModernCardFooter = React.forwardRef<HTMLDivElement, ModernCardFooterProps>(
   ({ children, className, ...props }, ref) => {
     return (
-      <div ref={ref} className={cn('mt-6 flex items-center justify-between gap-3', className)} {...props}>
+      <div ref={ref} className={cn(`mt-${getSpacing(6)} flex items-center justify-between gap-${getSpacing(3)}`, className)} {...props}>
         {children}
       </div>
     );
