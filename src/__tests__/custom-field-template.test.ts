@@ -1,5 +1,4 @@
-import { describe, it, expect } from 'vitest';
-import { customFieldTemplateSchema } from '../domain/schemas/custom-field-template';
+import { customFieldTemplateSchema } from '@/domain/schemas/custom-field-template';
 
 describe('CustomFieldTemplate Schema', () => {
   describe('checklist type', () => {

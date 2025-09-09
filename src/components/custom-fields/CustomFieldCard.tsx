@@ -30,7 +30,7 @@ const CustomFieldCard: React.FC<CustomFieldCardProps> = ({
       case 'number': return 'secondary';
       case 'date': return 'outline';
       case 'list': return 'secondary';
-      case 'checklist': return 'secondary';
+      case 'checklist': return 'success';
       default: return 'default';
     }
   };

@@ -3,7 +3,7 @@ import * as z from 'zod';
 // Define the base object schema first
 const baseCustomFieldTemplateSchema = z.object({
   name: z.string().min(1, { message: 'custom_field_template.name_required' }),
-  type: z.enum(['text', 'number', 'date', 'list', 'checklist'], { message: 'custom_field_template.type_invalid' }),
+  type: z.enum(['text', 'number', 'date', 'list'], { message: 'custom_field_template.type_invalid' }),
   options: z.array(z.string().min(1, { message: 'custom_field_template.option_required' })).optional(),
   description: z.string().optional(),
   required: z.boolean().default(false),
@@ -15,13 +15,6 @@ export const customFieldTemplateSchema = baseCustomFieldTemplateSchema.superRefi
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       message: 'custom_field_template.list_options_required',
-      path: ['options'],
-    });
-  }
-  if (data.type === 'checklist' && (!data.options || data.options.length === 0)) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: 'custom_field_template.checklist_options_required',
       path: ['options'],
     });
   }

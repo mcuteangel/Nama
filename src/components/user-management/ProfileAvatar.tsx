@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Upload, X, User, Edit3, AlertCircle, Trash2 } from 'lucide-react';
+import { Camera, Upload, X, User, Edit3, AlertCircle, Eye, Trash2 } from 'lucide-react';
 import { GlassButton } from "@/components/ui/glass-button";
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';

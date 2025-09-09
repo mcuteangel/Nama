@@ -12,23 +12,22 @@ import {
   ModernSelectTrigger, 
   ModernSelectValue 
 } from '@/components/ui/modern-select';
-import useAppSettings from '@/hooks/use-app-settings';
+import useAppSettings from '@/hooks/use-app-settings'; // Added import
 import {
   Bell,
   Sun,
   Shield,
   Save,
-  CheckCircle,
-  AlertCircle
-} from 'lucide-react';
+  CheckCircle} from 'lucide-react';
 
 interface ProfileSettingsProps {
+  // This interface can be extended with props if needed in the future
   className?: string;
 }
 
 const ProfileSettings: React.FC<ProfileSettingsProps> = () => {
   const { t, i18n } = useTranslation();
-  const { settings, updateSettings, isLoaded, error, clearError } = useAppSettings();
+  const { settings, updateSettings, isLoaded } = useAppSettings();
   const [localSettings, setLocalSettings] = useState(settings);
   const [loading, setLoading] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -65,25 +64,6 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = () => {
         <div className="text-center">
           <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
           <p className="mt-4 text-gray-600 dark:text-gray-400">{t('loading_messages.loading_settings')}</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Show error if there's an error loading settings
-  if (error) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <div className="text-center p-6 bg-red-50 dark:bg-red-900/20 rounded-xl border border-red-200 dark:border-red-800 max-w-md">
-          <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-          <h3 className="text-xl font-bold text-red-800 dark:text-red-200 mb-2">{t('errors.settings_load_error')}</h3>
-          <p className="text-red-600 dark:text-red-400 mb-4">{error}</p>
-          <GlassButton 
-            onClick={clearError}
-            className="bg-red-500 hover:bg-red-600 text-white"
-          >
-            {t('actions.try_again')}
-          </GlassButton>
         </div>
       </div>
     );

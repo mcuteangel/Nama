@@ -6,7 +6,7 @@ import { ModernSelect, ModernSelectContent, ModernSelectItem, ModernSelectTrigge
 import { GlassButton } from "@/components/ui/glass-button";
 import { Badge } from "@/components/ui/badge";
 
-type TemplateType = 'text' | 'number' | 'date' | 'list' | 'checklist';
+type TemplateType = 'text' | 'number' | 'date' | 'list';
 
 interface CustomFieldFiltersProps {
   searchTerm: string;
@@ -29,7 +29,6 @@ export const CustomFieldFilters: React.FC<CustomFieldFiltersProps> = ({
       case 'number': return '🔢';
       case 'date': return '📅';
       case 'list': return '📋';
-      case 'checklist': return '✅';
       default: return '🎯';
     }
   };
@@ -40,7 +39,6 @@ export const CustomFieldFilters: React.FC<CustomFieldFiltersProps> = ({
       case 'number': return t('contact_form.number');
       case 'date': return t('contact_form.date');
       case 'list': return t('contact_form.list');
-      case 'checklist': return t('contact_form.checklist');
       default: return t('custom_field_management.filter_all');
     }
   };
@@ -65,7 +63,7 @@ export const CustomFieldFilters: React.FC<CustomFieldFiltersProps> = ({
               {t('custom_field_management.title')}
             </h3>
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              {t('custom_field_management.filter_description')}
+              فیلتر و جستجو در فیلدهای سفارشی
             </p>
           </div>
         </div>
@@ -78,7 +76,7 @@ export const CustomFieldFilters: React.FC<CustomFieldFiltersProps> = ({
             className="text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20 transition-all duration-300 hover:scale-105"
           >
             <X size={16} className="mr-2" />
-            {t('actions.clear_filters')}
+            پاک کردن فیلترها
           </GlassButton>
         )}
       </div>
@@ -92,7 +90,7 @@ export const CustomFieldFilters: React.FC<CustomFieldFiltersProps> = ({
             <div className="relative">
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-hover:text-blue-500 transition-colors duration-300" size={20} />
               <ModernInput
-                placeholder={t('custom_field_management.search_placeholder')}
+                placeholder="جستجو در نام یا توضیح فیلدها..."
                 value={searchTerm}
                 onChange={(e) => onSearchChange(e.target.value)}
                 className="pl-12 pr-4 py-4 text-base rounded-xl border-2 border-gray-200 dark:border-gray-700 focus:border-blue-500 dark:focus:border-blue-400 transition-all duration-300 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm shadow-lg hover:shadow-xl"
@@ -101,7 +99,7 @@ export const CustomFieldFilters: React.FC<CustomFieldFiltersProps> = ({
               {searchTerm && (
                 <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
                   <Badge variant="secondary" className="text-xs px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300">
-                    {t('custom_field_management.search_term')}: {searchTerm}
+                    جستجو: {searchTerm}
                   </Badge>
                 </div>
               )}
@@ -176,15 +174,6 @@ export const CustomFieldFilters: React.FC<CustomFieldFiltersProps> = ({
                       <span className="font-medium">{t('contact_form.list')}</span>
                     </div>
                   </ModernSelectItem>
-                  <ModernSelectItem
-                    value="checklist"
-                    className="py-3 px-4 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors duration-200"
-                  >
-                    <div className="flex items-center gap-3">
-                      <span className="text-lg">✅</span>
-                      <span className="font-medium">{t('contact_form.checklist')}</span>
-                    </div>
-                  </ModernSelectItem>
                 </ModernSelectContent>
               </ModernSelect>
             </div>
@@ -198,16 +187,16 @@ export const CustomFieldFilters: React.FC<CustomFieldFiltersProps> = ({
           <Sparkles className="w-5 h-5 text-blue-600 dark:text-blue-400 animate-pulse" />
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-              {t('custom_field_management.active_filters')}:
+              فیلترهای فعال:
             </span>
             {searchTerm && (
               <Badge variant="outline" className="bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 border-blue-300 dark:border-blue-600">
-                {t('custom_field_management.search')}: "{searchTerm}"
+                جستجو: "{searchTerm}"
               </Badge>
             )}
             {filterType !== "all" && (
               <Badge variant="outline" className="bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300 border-purple-300 dark:border-purple-600">
-                {t('custom_field_management.type')}: {getTypeLabel(filterType)}
+                نوع: {getTypeLabel(filterType)}
               </Badge>
             )}
           </div>

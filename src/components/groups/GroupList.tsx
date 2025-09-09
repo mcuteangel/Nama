@@ -4,17 +4,16 @@ import { Users, PlusCircle, Search, X, BarChart3, Sparkles, Filter } from "lucid
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/integrations/supabase/auth";
 import { showSuccess, showError, showLoading, dismissToast } from "@/utils/toast";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import GroupForm from "./GroupForm";
 import GroupItem from "./GroupItem";
 import { invalidateCache, fetchWithCache } from "@/utils/cache-helpers";
 import LoadingMessage from "../common/LoadingMessage";
 import { ErrorManager } from "@/lib/error-manager";
-import EmptyState from '../common/EmptyState';
 import LoadingSpinner from '../common/LoadingSpinner';
 import { useTranslation } from "react-i18next";
 import { Input } from "@/components/ui/input";
-import { ModernCard, ModernCardHeader, ModernCardTitle, ModernCardContent } from "@/components/ui/modern-card";
+import { ModernCard, ModernCardHeader, ModernCardTitle, ModernCardContent, ModernCardDescription } from "@/components/ui/modern-card";
 
 interface Group {
   id: string;
@@ -28,7 +27,6 @@ const GroupList = () => {
   const { session, isLoading: isSessionLoading } = useSession();
   const [groups, setGroups] = useState<Group[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [isCreatingGroup, setIsCreatingGroup] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<'name' | 'created_at'>('name');
@@ -48,7 +46,7 @@ const GroupList = () => {
   }), [groups]);
 
   const filteredAndSortedGroups = useMemo(() => {
-    let filtered = groups.filter(group =>
+    const filtered = groups.filter(group =>
       group.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
 

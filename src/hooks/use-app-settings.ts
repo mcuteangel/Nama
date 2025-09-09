@@ -8,11 +8,6 @@ export interface AppSettings {
   emailNotifications?: boolean;
   pushNotifications?: boolean;
   smsNotifications?: boolean;
-  contactUpdates?: boolean;
-  aiSuggestions?: boolean;
-  systemAlerts?: boolean;
-  marketing?: boolean;
-  dailySummaryTime?: string;
   profileVisibility?: 'public' | 'private' | 'contacts';
   twoFactorAuth?: boolean;
 }
@@ -23,13 +18,8 @@ const defaultSettings: AppSettings = {
   language: 'fa',
   calendarType: 'jalali',
   emailNotifications: true,
-  pushNotifications: true,
+  pushNotifications: false,
   smsNotifications: false,
-  contactUpdates: true,
-  aiSuggestions: true,
-  systemAlerts: true,
-  marketing: false,
-  dailySummaryTime: '09:00',
   profileVisibility: 'public',
   twoFactorAuth: false,
 };

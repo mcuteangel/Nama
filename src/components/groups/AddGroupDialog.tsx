@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from "react";
-import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogTrigger, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Plus, Sparkles, Palette, Users, Zap } from "lucide-react";
 import GroupForm from "./GroupForm";
 import { useSession } from '@/integrations/supabase/auth';

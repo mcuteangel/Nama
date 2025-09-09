@@ -389,7 +389,7 @@ const UserProfileFormNew: React.FC = () => {
     </div>
   ), [form, loading, session?.user?.email, t]);
 
-  // Loading state - show loading message when loading and no profile data yet
+  // Loading state
   if (loading && !profile) {
     return (
       <div className="flex justify-center items-center h-full w-full">

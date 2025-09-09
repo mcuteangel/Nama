@@ -24,7 +24,7 @@ import { useErrorHandler } from '@/hooks/use-error-handler';
 import { ErrorManager } from '@/lib/error-manager';
 import useAppSettings from '@/hooks/use-app-settings';
 
-type TemplateType = 'text' | 'number' | 'date' | 'list' | 'checklist';
+type TemplateType = 'text' | 'number' | 'date' | 'list';
 
 interface CustomFieldFormProps {
   initialData?: CustomFieldTemplate;
@@ -78,7 +78,7 @@ const CustomFieldForm: React.FC<CustomFieldFormProps> = ({ initialData, onSucces
     defaultValues: {
       name: initialData?.name || "",
       type: initialData?.type || "text",
-      options: initialData?.type === 'list' || initialData?.type === 'checklist' ? (initialData.options || []) : [],
+      options: initialData?.type === 'list' ? (initialData.options || []) : [],
       description: initialData?.description || "",
       required: initialData?.required || false,
     },
@@ -93,7 +93,7 @@ const CustomFieldForm: React.FC<CustomFieldFormProps> = ({ initialData, onSucces
       form.reset({
         name: initialData.name,
         type: initialData.type as TemplateType,
-        options: initialData.type === 'list' || initialData.type === 'checklist' ? (initialData.options || []) : [],
+        options: initialData.type === 'list' ? (initialData.options || []) : [],
         description: initialData.description || "",
         required: initialData.required,
       });
@@ -113,7 +113,7 @@ const CustomFieldForm: React.FC<CustomFieldFormProps> = ({ initialData, onSucces
         res = await CustomFieldTemplateService.updateCustomFieldTemplate(initialData.id, {
           name: data.name.trim(),
           type: data.type,
-          options: data.type === 'list' || data.type === 'checklist' ? (data.options || []).filter(Boolean) : undefined,
+          options: data.type === 'list' ? (data.options || []).filter(Boolean) : undefined,
           description: data.description?.trim() || "",
           required: !!data.required,
         });
@@ -121,7 +121,7 @@ const CustomFieldForm: React.FC<CustomFieldFormProps> = ({ initialData, onSucces
         res = await CustomFieldTemplateService.addCustomFieldTemplate({
           name: data.name.trim(),
           type: data.type,
-          options: data.type === 'list' || data.type === 'checklist' ? (data.options || []).filter(Boolean) : undefined,
+          options: data.type === 'list' ? (data.options || []).filter(Boolean) : undefined,
           description: data.description?.trim() || "",
           required: !!data.required,
         });
@@ -169,7 +169,6 @@ const CustomFieldForm: React.FC<CustomFieldFormProps> = ({ initialData, onSucces
       case 'number': return '🔢';
       case 'date': return '📅';
       case 'list': return '📋';
-      case 'checklist': return '✅';
       default: return '🎯';
     }
   };
@@ -180,7 +179,6 @@ const CustomFieldForm: React.FC<CustomFieldFormProps> = ({ initialData, onSucces
       case 'number': return 'text-green-500';
       case 'date': return 'text-purple-500';
       case 'list': return 'text-orange-500';
-      case 'checklist': return 'text-green-600';
       default: return 'text-gray-500';
     }
   };
@@ -217,8 +215,8 @@ const CustomFieldForm: React.FC<CustomFieldFormProps> = ({ initialData, onSucces
             </ModernCardTitle>
             <p className="text-gray-600 dark:text-gray-400 mt-2 text-sm sm:text-base">
               {initialData
-                ? t('custom_field_template.edit_description')
-                : t('custom_field_template.add_description')}
+                ? 'ویرایش فیلد سفارشی موجود'
+                : 'ایجاد فیلد سفارشی جدید برای مخاطبین'}
             </p>
           </motion.div>
 
@@ -245,7 +243,7 @@ const CustomFieldForm: React.FC<CustomFieldFormProps> = ({ initialData, onSucces
                         disabled={isSubmitting}
                         className="mt-2 text-red-600 hover:bg-red-100 dark:text-red-400 dark:hover:bg-red-900/20"
                       >
-                        {t('actions.retry')} ({retryCount})
+                        تلاش مجدد ({retryCount})
                       </GlassButton>
                     )}
                   </div>
@@ -332,7 +330,7 @@ const CustomFieldForm: React.FC<CustomFieldFormProps> = ({ initialData, onSucces
                 value={values.type || "text"}
                 onValueChange={(value) => {
                   form.setValue("type", value as TemplateType, { shouldValidate: true });
-                  if (value !== "list" && value !== "checklist") {
+                  if (value !== "list") {
                     form.setValue("options", undefined, { shouldValidate: true });
                   } else {
                     form.setValue("options", form.getValues("options") || [""], { shouldValidate: true });
@@ -354,11 +352,10 @@ const CustomFieldForm: React.FC<CustomFieldFormProps> = ({ initialData, onSucces
                   className="rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl shadow-2xl"
                 >
                   {[
-                    { value: 'text', label: t('contact_form.text'), icon: '📝', desc: t('contact_form.text_description') },
-                    { value: 'number', label: t('contact_form.number'), icon: '🔢', desc: t('contact_form.number_description') },
-                    { value: 'date', label: t('contact_form.date'), icon: '📅', desc: t('contact_form.date_description') },
-                    { value: 'list', label: t('contact_form.list'), icon: '📋', desc: t('contact_form.list_description') },
-                    { value: 'checklist', label: t('contact_form.checklist'), icon: '✅', desc: t('contact_form.checklist_description') }
+                    { value: 'text', label: t('contact_form.text'), icon: '📝', desc: 'متن ساده' },
+                    { value: 'number', label: t('contact_form.number'), icon: '🔢', desc: 'عدد' },
+                    { value: 'date', label: t('contact_form.date'), icon: '📅', desc: 'تاریخ' },
+                    { value: 'list', label: t('contact_form.list'), icon: '📋', desc: 'لیست گزینه‌ها' }
                   ].map((option) => (
                     <ModernSelectItem
                       key={option.value}
@@ -391,9 +388,9 @@ const CustomFieldForm: React.FC<CustomFieldFormProps> = ({ initialData, onSucces
               </AnimatePresence>
             </motion.div>
 
-            {/* List/Checklist Options */}
+            {/* List Options */}
             <AnimatePresence>
-              {(values.type === 'list' || values.type === 'checklist') && (
+              {values.type === 'list' && (
                 <motion.div
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
@@ -404,9 +401,7 @@ const CustomFieldForm: React.FC<CustomFieldFormProps> = ({ initialData, onSucces
                   <div className="flex items-center gap-2">
                     <Info className="w-5 h-5 text-orange-500" />
                     <Label className="text-gray-700 dark:text-gray-200 font-semibold">
-                      {values.type === 'checklist' 
-                        ? t('contact_form.checklist_options') 
-                        : t('contact_form.list_options')}
+                      {t('contact_form.list_options')}
                     </Label>
                   </div>
 
@@ -521,7 +516,7 @@ const CustomFieldForm: React.FC<CustomFieldFormProps> = ({ initialData, onSucces
                 <span className="text-lg">⚠️</span>
                 {t('contact_form.required_field')}
                 <span className="text-sm text-gray-500 dark:text-gray-400">
-                  ({t('common.optional')})
+                  (اختیاری)
                 </span>
               </Label>
             </motion.div>

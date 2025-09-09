@@ -81,7 +81,6 @@
     "loading": "در حال بارگذاری گروه‌ها...",
     "load_success": "گروه‌ها با موفقیت بارگذاری شدند.",
     "load_error": "خطا در بارگذاری گروه‌ها",
-    "load_success": "گروه‌ها با موفقیت بارگذاری شدند.",
     "delete_auth_required": "برای حذف گروه باید وارد شوید.",
     "deleting_group": "در حال حذف گروه...",
     "delete_success": "گروه با موفقیت حذف شد.",
@@ -306,7 +305,60 @@
     "display_mode_list": "نمایش لیستی",
     "default_contact_display_mode_description": "حالت نمایش پیش‌فرض برای لیست مخاطبین را انتخاب کنید",
     "user_profile_description": "مدیریت اطلاعات حساب کاربری شما",
-    "toggle_theme": "تغییر پوسته"
+    "toggle_theme": "تغییر پوسته",
+    "notifications": {
+      "title": "اعلان‌ها",
+      "email": "اعلان‌های ایمیل",
+      "email_desc": "دریافت اعلان‌های ایمیل برای به‌روزرسانی‌های مهم",
+      "push": "اعلان‌های فشاری",
+      "push_desc": "دریافت اعلان‌های فشاری روی دستگاه شما",
+      "sms": "اعلان‌های پیامکی",
+      "sms_desc": "دریافت اعلان‌های پیامکی برای هشدارهای مهم",
+      "contact_updates": "به‌روزرسانی‌های مخاطبین",
+      "contact_updates_desc": "دریافت اعلان هنگام به‌روزرسانی مخاطبین شما",
+      "ai_suggestions": "پیشنهادات هوش مصنوعی",
+      "ai_suggestions_desc": "دریافت پیشنهادات مبتنی بر هوش مصنوعی برای مخاطبین شما",
+      "system_alerts": "هشدارهای سیستمی",
+      "system_alerts_desc": "اعلان‌های مهم سیستمی و به‌روزرسانی‌ها",
+      "marketing": "بازاریابی و تبلیغات",
+      "marketing_desc": "دریافت اطلاعات درباره ویژگی‌های جدید و تبلیغات",
+      "notification_types": "انواع اعلان‌ها",
+      "notification_types_desc": "انتخاب انواع اعلان‌هایی که می‌خواهید دریافت کنید",
+      "frequency": "فرکانس اعلان‌ها",
+      "frequency_desc": "کنترل دفعات دریافت اعلان‌ها",
+      "daily_summary": "زمان خلاصه روزانه",
+      "daily_summary_desc": "زمان روز برای دریافت خلاصه روزانه",
+      "description": "شخصی‌سازی نحوه دریافت اعلان‌ها از برنامه"
+    },
+    "appearance": {
+      "title": "ظاهر",
+      "theme": "حالت تاریک",
+      "theme_desc": "فعال‌سازی حالت تاریک برای کاهش فشار چشم",
+      "language": "زبان",
+      "language_desc": "تغییر زبان برنامه",
+      "system": "سیستم",
+      "light": "روشن",
+      "dark": "تاریک",
+      "calendar": "نوع تقویم",
+      "calendar_desc": "تغییر نوع تقویم (جلالی/میلادی)",
+      "jalali": "جلالی",
+      "gregorian": "میلادی"
+    },
+    "privacy": {
+      "title": "حریم خصوصی و امنیت",
+      "visibility": "قابلیت مشاهده پروفایل",
+      "visibility_desc": "کنترل اینکه چه کسانی می‌توانند اطلاعات پروفایل شما را ببینند",
+      "public": "عمومی",
+      "private": "خصوصی",
+      "contacts": "فقط مخاطبین",
+      "two_factor": "احراز هویت دو مرحله‌ای",
+      "two_factor_desc": "افزودن لایه امنیتی اضافی به حساب شما"
+    },
+    "group_description": "تنظیمات و ترجیحات {{group}}",
+    "saving": "در حال ذخیره...",
+    "saved": "ذخیره شد",
+    "save_changes": "ذخیره تغییرات",
+    "changes_saved": "تغییرات با موفقیت ذخیره شدند"
   },
   "contact_detail": {
     "contact_details": "جزئیات مخاطب",
@@ -542,11 +594,6 @@
     "delete_custom_field_failed": "خطا در حذف قالب فیلد سفارشی",
     "create_custom_field_template_error": "خطا در ایجاد قالب فیلد سفارشی",
     "edit_custom_field_template_error": "خطا در به‌روزرسانی قالب فیلد سفارشی",
-    "custom_field_template.name_required": "نام فیلد الزامی است",
-    "custom_field_template.type_invalid": "نوع فیلد نامعتبر است",
-    "custom_field_template.option_required": "مقدار گزینه الزامی است",
-    "custom_field_template.list_options_required": "گزینه‌های لیست الزامی هستند وقتی نوع فیلد لیست است",
-    "custom_field_template.checklist_options_required": "گزینه‌های چک لیست الزامی هستند وقتی نوع فیلد چک لیست است",
     "max_retries_exceeded": "حداکثر تلاش‌های مجدد انجام شد. لطفاً بعداً دوباره تلاش کنید.",
     "invalid_phone_format": "فرمت شماره تلفن نامعتبر است"
   },
@@ -940,6 +987,20 @@
     "days_until_birthday": "روز تا تولد"
   },
   "profile": {
+    "tabs": {
+      "profile": "پروفایل",
+      "profile_desc": "مدیریت اطلاعات پروفایل شما",
+      "settings": "تنظیمات",
+      "settings_desc": "شخصی‌سازی تجربه کاربری",
+      "notifications": "اعلان‌ها",
+      "notifications_desc": "مدیریت تنظیمات اعلان‌ها"
+    },
+    "notifications": {
+      "title": "تنظیمات اعلان‌ها",
+      "description": "شخصی‌سازی نحوه دریافت اعلان‌ها از برنامه",
+      "setup": "راه‌اندازی اعلان‌ها"
+    },
+    "subtitle": "مدیریت پروفایل و تنظیمات شما",
     "avatar_alt": "آواتار کاربر",
     "edit_avatar": "ویرایش آواتار",
     "upload_new": "آپلود جدید",
@@ -967,78 +1028,5 @@
       "tips_title": "نکات تکمیل پروفایل",
       "tips_description": "برای باز کردن تمام ویژگی‌ها و بهره‌برداری کامل از برنامه، پروفایل خود را تکمیل کنید."
     }
-  },
-  "settings": {
-    "title": "تنظیمات",
-    "description": "مدیریت تنظیمات برنامه و ترجیحات کاربر",
-    "notifications": {
-      "title": "اعلان‌ها",
-      "email": "اعلان‌های ایمیل",
-      "email_desc": "دریافت اعلان‌های ایمیل برای به‌روزرسانی‌های مهم",
-      "push": "اعلان‌های فشاری",
-      "push_desc": "دریافت اعلان‌های فشاری روی دستگاه شما",
-      "sms": "اعلان‌های پیامکی",
-      "sms_desc": "دریافت اعلان‌های پیامکی برای هشدارهای مهم",
-      "contact_updates": "به‌روزرسانی‌های مخاطبین",
-      "contact_updates_desc": "دریافت اعلان هنگام به‌روزرسانی مخاطبین شما",
-      "ai_suggestions": "پیشنهادات هوش مصنوعی",
-      "ai_suggestions_desc": "دریافت پیشنهادات مبتنی بر هوش مصنوعی برای مخاطبین شما",
-      "system_alerts": "هشدارهای سیستمی",
-      "system_alerts_desc": "اعلان‌های مهم سیستمی و به‌روزرسانی‌ها",
-      "marketing": "بازاریابی و تبلیغات",
-      "marketing_desc": "دریافت اطلاعات درباره ویژگی‌های جدید و تبلیغات",
-      "notification_types": "انواع اعلان‌ها",
-      "notification_types_desc": "انتخاب انواع اعلان‌هایی که می‌خواهید دریافت کنید",
-      "frequency": "فرکانس اعلان‌ها",
-      "frequency_desc": "کنترل دفعات دریافت اعلان‌ها",
-      "daily_summary": "زمان خلاصه روزانه",
-      "daily_summary_desc": "زمان روز برای دریافت خلاصه روزانه",
-      "description": "شخصی‌سازی نحوه دریافت اعلان‌ها از برنامه"
-    },
-    "appearance": {
-      "title": "ظاهر",
-      "theme": "حالت تاریک",
-      "theme_desc": "فعال‌سازی حالت تاریک برای کاهش فشار چشم",
-      "language": "زبان",
-      "language_desc": "تغییر زبان برنامه",
-      "system": "سیستم",
-      "light": "روشن",
-      "dark": "تاریک",
-      "calendar": "نوع تقویم",
-      "calendar_desc": "تغییر نوع تقویم (جلالی/میلادی)",
-      "jalali": "جلالی",
-      "gregorian": "میلادی"
-    },
-    "privacy": {
-      "title": "حریم خصوصی و امنیت",
-      "visibility": "قابلیت مشاهده پروفایل",
-      "visibility_desc": "کنترل اینکه چه کسانی می‌توانند اطلاعات پروفایل شما را ببینند",
-      "public": "عمومی",
-      "private": "خصوصی",
-      "contacts": "فقط مخاطبین",
-      "two_factor": "احراز هویت دو مرحله‌ای",
-      "two_factor_desc": "افزودن لایه امنیتی اضافی به حساب شما"
-    },
-    "group_description": "تنظیمات و ترجیحات {{group}}",
-    "saving": "در حال ذخیره...",
-    "saved": "ذخیره شد",
-    "save_changes": "ذخیره تغییرات",
-    "changes_saved": "تغییرات با موفقیت ذخیره شدند"
-  },
-  "profile": {
-    "tabs": {
-      "profile": "پروفایل",
-      "profile_desc": "مدیریت اطلاعات پروفایل شما",
-      "settings": "تنظیمات",
-      "settings_desc": "شخصی‌سازی تجربه کاربری",
-      "notifications": "اعلان‌ها",
-      "notifications_desc": "مدیریت تنظیمات اعلان‌ها"
-    },
-    "notifications": {
-      "title": "تنظیمات اعلان‌ها",
-      "description": "شخصی‌سازی نحوه دریافت اعلان‌ها از برنامه",
-      "setup": "راه‌اندازی اعلان‌ها"
-    },
-    "subtitle": "مدیریت پروفایل و تنظیمات شما"
   }
 }

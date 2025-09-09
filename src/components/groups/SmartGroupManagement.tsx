@@ -9,7 +9,6 @@ import {
   Zap,
   TrendingUp,
   BarChart3,
-  RefreshCw,
   Lightbulb,
   ArrowRight,
   Star
@@ -57,7 +56,7 @@ const SmartGroupManagement: React.FC = React.memo(() => {
   const [isGeneratingSuggestions, setIsGeneratingSuggestions] = useState(false);
   const [hoveredSuggestion, setHoveredSuggestion] = useState<string | null>(null);
   const [selectedSuggestion, setSelectedSuggestion] = useState<string | null>(null);
-  const [isAnimating, setIsAnimating] = useState(false);
+  const [, setIsAnimating] = useState(false);
 
   // محاسبات آماری پیشرفته با useMemo برای عملکرد بهتر
   const stats = useMemo(() => ({
@@ -67,8 +66,8 @@ const SmartGroupManagement: React.FC = React.memo(() => {
     successRate: groupSuggestions.length > 0 ? Math.round((groupSuggestions.length / contactsWithoutGroup.length) * 100) : 0,
     avgConfidence: groupSuggestions.length > 0 ? Math.round(groupSuggestions.reduce((sum, s) => sum + (s.confidence || 0), 0) / groupSuggestions.length) : 0,
     topCompanies: [...new Set(contactsWithoutGroup.map(c => c.company).filter(Boolean))].slice(0, 3),
-    recentSuggestions: groupSuggestions.filter(s => Date.now() - (new Date().getTime() - 3600000) < 3600000).length // Last hour
-  }), [contactsWithoutGroup.length, groupSuggestions]);
+    recentSuggestions: groupSuggestions.filter(() => Date.now() - (new Date().getTime() - 3600000) < 3600000).length // Last hour
+  }), [contactsWithoutGroup, groupSuggestions]);
 
   const onSuccessFetchContacts = useCallback((result: { data: ContactWithoutGroup[] | null; error: string | null; fromCache: boolean }) => {
     if (result.data) {

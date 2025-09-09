@@ -47,11 +47,7 @@ const ContactCustomFields: React.FC<ContactCustomFieldsProps> = React.memo(({
   }, [availableTemplates]);
 
   // Handle checklist changes
-  const handleChecklistChange = (
-    field: ControllerRenderProps<ContactFormValues, `customFields.${number}.value`>, 
-    option: string, 
-    checked: boolean
-  ) => {
+  const handleChecklistChange = (field: ControllerRenderProps<ContactFormValues, any>, option: string, checked: boolean) => {
     const currentValue = field.value ? field.value.split(',').map((v: string) => v.trim()) : [];
     let newValue: string[];
     

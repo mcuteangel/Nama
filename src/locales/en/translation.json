@@ -261,11 +261,6 @@
     "delete_custom_field_failed": "Failed to delete custom field template",
     "create_custom_field_template_error": "Error creating custom field template",
     "edit_custom_field_template_error": "Error updating custom field template",
-    "custom_field_template.name_required": "Field name is required",
-    "custom_field_template.type_invalid": "Invalid field type",
-    "custom_field_template.option_required": "Option value is required",
-    "custom_field_template.list_options_required": "List options are required when field type is list",
-    "custom_field_template.checklist_options_required": "Checklist options are required when field type is checklist",
     "max_retries_exceeded": "Maximum retry attempts exceeded. Please try again later.",
     "invalid_phone_format": "Invalid phone number format"
   },

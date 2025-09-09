@@ -1,7 +1,6 @@
 import React, { useState, useCallback, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
-import { useNavigate } from "react-router-dom";
 import { Sparkles, Palette } from "lucide-react";
 import { useGroups } from "@/hooks/use-groups";
 import { useSession } from "@/integrations/supabase/auth";
@@ -50,8 +49,7 @@ interface GroupSuggestion {
 }
 
 const GroupsManagement = () => {
-  const { t, i18n } = useTranslation();
-  const navigate = useNavigate();
+  const { t } = useTranslation();
   const { session } = useSession();
   const { groups, loadingGroups, refreshGroups } = useGroups();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
@@ -60,7 +58,7 @@ const GroupsManagement = () => {
   const [groupSuggestions, setGroupSuggestions] = useState<GroupSuggestion[]>([]);
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [selectedGroup, setSelectedGroup] = useState<{id: string, name: string} | null>(null);
+  const [selectedGroup] = useState<{id: string, name: string} | null>(null);
   const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
   const { storeTriggerElement } = useDialogFocus();
 
@@ -278,7 +276,7 @@ const GroupsManagement = () => {
 
   // Get unique colors for filter
   const availableColors = useMemo(() => {
-    const colors = new Set(groups.map((g: Group) => g.color).filter(Boolean));
+    const colors = new Set(groups.map((g: Group) => g.color).filter((color): color is string => color !== undefined));
     return Array.from(colors);
   }, [groups]);
 

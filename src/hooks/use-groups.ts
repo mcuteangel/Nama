@@ -70,7 +70,7 @@ export const useGroups = () => {
       setGroups(data || []);
       return { data, error: null, fromCache };
     });
-  }, [session, isSessionLoading, executeAsync, cacheKey, t]);
+  }, [session, isSessionLoading, executeAsync, cacheKey]);
 
   // Add a function to refresh groups when needed
   const refreshGroups = useCallback(() => {

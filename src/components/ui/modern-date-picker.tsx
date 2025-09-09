@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Calendar } from 'lucide-react';
 import { ModernInput } from '@/components/ui/modern-input';
 import { JalaliCalendar } from '@/components/JalaliCalendar';
@@ -35,11 +35,16 @@ export const ModernDatePicker = React.forwardRef<
 }, ref) => {
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
-  const [, setTempDate] = useState<Date | undefined>(
+  const [tempDate, setTempDate] = useState<Date | undefined>(
     value ? new Date(value) : undefined
   );
 
   // Format date for display
+  const formatDate = (date: Date | undefined): string => {
+    if (!date) return '';
+    // Format as YYYY-MM-DD for consistency
+    return date.toISOString().split('T')[0];
+  };
 
   // Handle date selection from calendar
   const handleDateSelect = (date: Date) => {
@@ -51,6 +56,12 @@ export const ModernDatePicker = React.forwardRef<
   };
 
   // Handle input clear
+  const handleClear = () => {
+    setTempDate(undefined);
+    if (onChange) {
+      onChange('');
+    }
+  };
 
   return (
     <div ref={ref} className={cn("relative", className)} {...props}>

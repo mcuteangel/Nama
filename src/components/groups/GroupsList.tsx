@@ -184,7 +184,7 @@ const GroupsList: React.FC<GroupsListProps> = ({
               : "space-y-4"
           }
         >
-          {filteredGroups.map((group: any, index: number) => (
+          {filteredGroups.map((group: Group, index: number) => (
             <motion.div
               key={group.id}
               initial={{ opacity: 0, y: 20 }}

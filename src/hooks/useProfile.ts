@@ -102,7 +102,7 @@ export const useProfile = (): UseProfileReturn => {
     } else {
       showError(t('errors.max_retries_exceeded'));
     }
-  }, [fetchProfile, t]); // Added fetchProfile and t to dependencies
+  }, [t]); // Removed fetchProfile from dependencies to break circular dependency
 
   const updateProfile = useCallback(async (data: Partial<ProfileData>) => {
     if (!session?.user) {

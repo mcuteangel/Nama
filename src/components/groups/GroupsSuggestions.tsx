@@ -21,8 +21,17 @@ interface GroupSuggestion {
   suggested_group_color?: string;
 }
 
+interface ContactWithoutGroup {
+  id: string;
+  first_name: string;
+  last_name: string;
+  company?: string;
+  position?: string;
+  contact_groups: { group_id: string }[];
+}
+
 interface GroupsSuggestionsProps {
-  contactsWithoutGroup: any[];
+  contactsWithoutGroup: ContactWithoutGroup[];
   groupSuggestions: GroupSuggestion[];
   isLoadingSuggestions: boolean;
   generateSuggestions: () => void;
