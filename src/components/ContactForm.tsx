@@ -12,7 +12,7 @@ import { ContactFormValues, contactFormSchema, CustomFieldFormData } from "../ty
 import { fetchWithCache } from "@/utils/cache-helpers";
 import { GlassButton } from "./ui/glass-button";
 import { ModernProgress } from "./ui/modern-progress.tsx";
-import { ModernCard, ModernCardContent } from "@/components/ui/modern-card";
+import { ModernCard, ModernCardContent, ModernCardHeader, ModernCardTitle } from "@/components/ui/modern-card";
 import { useTranslation } from "react-i18next";
 import { useAccessibility } from './accessibilityHooks';
 import { useAnnouncement } from './accessibilityHooks';
@@ -22,6 +22,7 @@ import KeyboardNavigationHandler from './KeyboardNavigationHandler';
 import { lazy, Suspense } from "react";
 import ContactFormActions from "./contact-form/ContactFormActions.tsx";
 import ContactAvatarUpload from "./ContactAvatarUpload.tsx";
+import { AlertCircle, Users } from 'lucide-react';
 
 // Lazy load form sections to improve initial loading performance
 const ContactBasicInfo = lazy(() => import("./contact-form/ContactBasicInfo.tsx"));
@@ -337,47 +338,79 @@ const ContactForm: React.FC<ContactFormProps> = React.memo(({ initialData, conta
 
   return (
     <KeyboardNavigationHandler scope="forms">
-      <ModernCard variant="glass" className="w-full rounded-xl shadow-lg">
-        <ModernCardContent className="space-y-6">
+      <ModernCard
+        variant="glass"
+        className={`
+          w-full rounded-3xl shadow-2xl overflow-hidden
+          border-2 border-white/40 dark:border-gray-600/40
+          backdrop-blur-xl
+          bg-gradient-to-br from-white/60 via-white/40 to-white/30
+          dark:from-gray-800/60 dark:via-gray-800/40 dark:to-gray-800/30
+          transition-all duration-500 ease-out
+          hover:shadow-3xl hover:shadow-purple-500/20 dark:hover:shadow-purple-900/30
+          hover:border-purple-300/50 dark:hover:border-purple-600/50
+          ${error ? 'ring-4 ring-red-400/50' : ''}
+          ${isSubmitting ? 'ring-4 ring-blue-400/50 animate-pulse' : ''}
+        `}
+      >
+        {/* Enhanced Header */}
+        <ModernCardHeader className="pb-6 border-b border-white/30 dark:border-gray-700/50 relative">
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <div className={`
+              w-12 h-12 rounded-2xl flex items-center justify-center
+              bg-gradient-to-br from-purple-500 to-blue-600
+              shadow-lg transform transition-all duration-300 hover:scale-110
+            `}>
+              <Users size={24} className="text-white" />
+            </div>
+            <ModernCardTitle className="text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+              {contactId
+                ? t('contact_form.edit_title', 'ویرایش مخاطب')
+                : t('contact_form.add_title', 'افزودن مخاطب')
+              }
+            </ModernCardTitle>
+          </div>
+
+          {/* Enhanced Error Display */}
           {error && (
-            <div 
-              role="alert"
-              aria-live="assertive"
-              className="text-sm text-destructive flex flex-col sm:flex-row items-center justify-center gap-2 mt-2 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg"
-            >
-              <span id="form-error-message" className="text-center sm:text-start">{errorMessage}</span>
+            <div className="flex items-center justify-center gap-2 text-red-500 dark:text-red-400 mb-4 animate-bounce">
+              <AlertCircle size={20} />
+              <span className="font-medium">{errorMessage}</span>
               {retryCount > 0 && (
                 <GlassButton
                   variant="ghost"
                   size="sm"
                   onClick={retrySave}
                   disabled={isSubmitting}
-                  className="text-destructive hover:bg-destructive/10 whitespace-nowrap"
+                  className="text-red-500 hover:bg-red-100/30 dark:hover:bg-red-900/20 px-3 py-1 rounded-lg text-sm ml-2"
                   aria-describedby="form-error-message"
-                  aria-label={t('accessibility.retry_save', 'Retry saving form')}
+                  aria-label={t('accessibility.retry_save', 'تلاش مجدد برای ذخیره فرم')}
                 >
                   {t('common.retry')} ({retryCount} {t('common.of')} ۳)
                 </GlassButton>
               )}
             </div>
           )}
-          
-          {/* Progress indicator for form submission */}
+
+          {/* Enhanced Progress Indicator */}
           {isSubmitting && (
-            <div className="space-y-3">
+            <div className="space-y-3 mb-4">
               <ModernProgress value={75} className="w-full" variant="gradient" />
-              <p className="text-sm text-muted-foreground text-center animate-pulse">
-                {contactId 
-                  ? t('accessibility.updating_contact', 'در حال به‌روزرسانی مخاطب...') 
+              <p className="text-sm text-blue-600 dark:text-blue-400 text-center animate-pulse font-medium">
+                {contactId
+                  ? t('accessibility.updating_contact', 'در حال به‌روزرسانی مخاطب...')
                   : t('accessibility.creating_contact', 'در حال ایجاد مخاطب...')
                 }
               </p>
             </div>
           )}
+        </ModernCardHeader>
+
+        <ModernCardContent className="p-8 space-y-8">
           <Form {...form}>
-            <form 
-              onSubmit={form.handleSubmit(onSubmit)} 
-              className="space-y-6"
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="space-y-8"
               role="form"
               aria-labelledby="contact-form-title"
               aria-describedby="contact-form-description"
@@ -394,14 +427,14 @@ const ContactForm: React.FC<ContactFormProps> = React.memo(({ initialData, conta
               </div>
               
               {/* Form progress indicator for screen readers */}
-              <div 
-                className="sr-only" 
-                aria-live="polite" 
+              <div
+                className="sr-only"
+                aria-live="polite"
                 aria-atomic="true"
               >
                 {isSubmitting && (
                   <span>
-                    {contactId 
+                    {contactId
                       ? t('accessibility.updating_contact', 'Updating contact...')
                       : t('accessibility.creating_contact', 'Creating contact...')
                     }
@@ -409,19 +442,31 @@ const ContactForm: React.FC<ContactFormProps> = React.memo(({ initialData, conta
                 )}
               </div>
               
-              <fieldset disabled={isSubmitting} className="space-y-6">
+              <fieldset disabled={isSubmitting} className="space-y-8">
                 <legend className="sr-only">
                   {t('accessibility.contact_information', 'Contact Information')}
                 </legend>
                 
-                {formSections.map((section) => (
+                {/* Render sections without individual borders, use subtle dividers */}
+                {formSections.slice(0, -1).map((section, index) => (
                   <div key={section.id} role="group" aria-labelledby={`${section.id}-section-title`}>
                     <h3 id={`${section.id}-section-title`} className="sr-only">
                       {section.title}
                     </h3>
                     {section.component}
+                    {index < formSections.length - 2 && (
+                      <div className="my-8 h-px bg-gradient-to-r from-transparent via-white/20 dark:via-gray-700/50 to-transparent"></div>
+                    )}
                   </div>
                 ))}
+                
+                {/* Actions as last section without divider */}
+                <div role="group" aria-labelledby="actions-section-title">
+                  <h3 id="actions-section-title" className="sr-only">
+                    {formSections[formSections.length - 1].title}
+                  </h3>
+                  {formSections[formSections.length - 1].component}
+                </div>
               </fieldset>
             </form>
           </Form>

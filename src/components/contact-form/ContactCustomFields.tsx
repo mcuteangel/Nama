@@ -1,11 +1,11 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { ModernInput } from '@/components/ui/modern-input';
 import { ModernSelect, ModernSelectContent, ModernSelectItem, ModernSelectTrigger, ModernSelectValue } from '@/components/ui/modern-select';
 import { ModernPopover, ModernPopoverContent, ModernPopoverTrigger } from '@/components/ui/modern-popover';
 import { GlassButton } from "@/components/ui/glass-button";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
-import { CalendarIcon, Plus } from 'lucide-react';
+import { CalendarIcon, Plus, Settings, UserCheck, AlertCircle } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { JalaliCalendar } from '@/components/JalaliCalendar';
 import { cn } from '@/lib/utils';
@@ -37,7 +37,7 @@ const ContactCustomFields: React.FC<ContactCustomFieldsProps> = React.memo(({
   const { t } = useTranslation();
   const { control, watch, setValue } = useFormContext<ContactFormValues>();
   const { formatDate } = useJalaliCalendar();
-  
+
   // Memoize custom fields to prevent unnecessary re-renders
   const customFields = useMemo(() => watch("customFields") || [], [watch]);
 
@@ -56,30 +56,37 @@ const ContactCustomFields: React.FC<ContactCustomFieldsProps> = React.memo(({
   const handleChecklistChange = (field: ControllerRenderProps<ContactFormValues, `customFields.${number}.value`>, option: string, checked: boolean) => {
     const currentValue = field.value ? field.value.split(',').map((v: string) => v.trim()) : [];
     let newValue: string[];
-    
+
     if (checked) {
       newValue = [...currentValue, option];
     } else {
       newValue = currentValue.filter((v: string) => v !== option);
     }
-    
+
     field.onChange(newValue.join(', '));
   };
 
   return (
-    <div className="space-y-4 pt-6 border-t border-gray-200 dark:border-gray-700">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-2">
-        <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 heading-3">
-          {t('section_titles.custom_fields')}
-        </h3>
+    <div className="space-y-6 pt-6 border-t border-gray-200/50 dark:border-gray-700/50">
+      {/* Enhanced Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 p-4 rounded-xl bg-gradient-to-r from-cyan-50/50 to-blue-50/50 dark:from-cyan-900/20 dark:to-blue-900/20 border border-cyan-200/30 dark:border-cyan-800/30">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg">
+            <Settings size={20} className="text-white" />
+          </div>
+          <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100">
+            {t('section_titles.custom_fields')}
+          </h3>
+        </div>
         <Dialog>
           <DialogTrigger asChild>
             <GlassButton
-              variant="glass"
+              variant="gradient-ocean"
+              effect="lift"
               size="sm"
-              className="flex items-center gap-1 px-3 py-1 rounded-lg font-medium"
+              className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5"
             >
-              <Plus size={16} />
+              <Plus size={18} className="me-2" />
               {t('actions.add_new_field')}
             </GlassButton>
           </DialogTrigger>
@@ -91,15 +98,40 @@ const ContactCustomFields: React.FC<ContactCustomFieldsProps> = React.memo(({
           </DialogContent>
         </Dialog>
       </div>
-      
+
       {loadingTemplates ? (
-        <p className="text-center text-gray-500 dark:text-gray-400 p-4 rounded-xl glass">
-          {t('loading_messages.loading_custom_field_templates')}
-        </p>
+        <div className="p-8 rounded-2xl bg-gradient-to-br from-white/60 to-white/30 dark:from-gray-800/60 dark:to-gray-900/30 border-2 border-white/40 dark:border-gray-700/40 backdrop-blur-sm text-center">
+          <div className="animate-spin w-8 h-8 border-4 border-cyan-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-300 font-medium">
+            {t('loading_messages.loading_custom_field_templates')}
+          </p>
+        </div>
       ) : availableTemplates.length === 0 ? (
-        <p className="text-center text-gray-500 dark:text-gray-400 p-4 rounded-xl glass">
-          {t('empty_states.no_custom_field_templates')}
-        </p>
+        <div className="p-8 rounded-2xl bg-gradient-to-br from-white/60 to-white/30 dark:from-gray-800/60 dark:to-gray-900/30 border-2 border-white/40 dark:border-gray-700/40 backdrop-blur-sm text-center">
+          <Settings size={48} className="text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+          <p className="text-gray-600 dark:text-gray-300 font-medium mb-4">
+            {t('empty_states.no_custom_field_templates')}
+          </p>
+          <Dialog>
+            <DialogTrigger asChild>
+              <GlassButton
+                variant="gradient-ocean"
+                effect="lift"
+                size="sm"
+                className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 mx-auto"
+              >
+                <Plus size={18} className="me-2" />
+                {t('actions.create_first_field')}
+              </GlassButton>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[500px] p-0 border-none bg-transparent shadow-none">
+              <DialogHeader className="sr-only">
+                <DialogTitle>{t('custom_field_template.add_title')}</DialogTitle>
+              </DialogHeader>
+              <CustomFieldForm onSuccess={fetchTemplates} onCancel={() => {}} />
+            </DialogContent>
+          </Dialog>
+        </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4 rounded-xl glass">
           {customFields.map((fieldItem, index) => {
@@ -107,119 +139,128 @@ const ContactCustomFields: React.FC<ContactCustomFieldsProps> = React.memo(({
             if (!template) return null;
 
             const fieldName = `customFields.${index}.value` as const;
-            
+
             return (
-              <FormField
-                key={template.id}
-                control={control}
-                name={fieldName}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-gray-700 dark:text-gray-200 font-medium">
-                      {template.name}
-                      {template.required && <span className="text-red-500 ms-1">*</span>}
-                    </FormLabel>
-                    <FormControl>
-                      {template.type === 'text' ? (
-                        <ModernInput
-                          placeholder={template.description || t('form_placeholders.field_value', { name: template.name })}
-                          variant="glass"
-                          className={GLASS_INPUT_CLASSES}
-                          {...field}
-                          value={field.value || ''}
-                        />
-                      ) : template.type === 'number' ? (
-                        <ModernInput
-                          type="number"
-                          placeholder={template.description || t('form_placeholders.field_value', { name: template.name })}
-                          variant="glass"
-                          className={GLASS_INPUT_CLASSES}
-                          {...field}
-                          value={field.value || ''}
-                          onChange={(e) => field.onChange(e.target.value === '' ? undefined : Number(e.target.value))}
-                        />
-                      ) : template.type === 'date' ? (
-                        <ModernPopover>
-                          <ModernPopoverTrigger asChild>
-                            <GlassButton
-                              variant="glass"
-                              className={cn(
-                                "w-full justify-start text-left font-normal",
-                                GLASS_INPUT_CLASSES,
-                                !field.value && "text-muted-foreground"
-                              )}
-                            >
-                              <span className="flex items-center">
-                                <CalendarIcon className="ml-2 h-4 w-4" />
-                                {field.value ? formatDate(new Date(field.value)) : <span>{t('form_placeholders.select_birth_date')}</span>}
-                              </span>
-                            </GlassButton>
-                          </ModernPopoverTrigger>
-                          <ModernPopoverContent className="w-auto p-0" glassEffect="card">
-                            <JalaliCalendar
-                              selected={field.value ? new Date(field.value) : undefined}
-                              onSelect={(date) => field.onChange(date ? date.toISOString() : "")}
-                              showToggle={false}
-                            />
-                          </ModernPopoverContent>
-                        </ModernPopover>
-                      ) : template.type === 'list' ? (
-                        <ModernSelect
-                          onValueChange={field.onChange}
-                          value={field.value || ''}
-                          disabled={!template.options || template.options.length === 0}
-                        >
-                          <FormControl>
-                            <ModernSelectTrigger variant="glass" className={GLASS_SELECT_TRIGGER_CLASSES}>
-                              <ModernSelectValue placeholder={!template.options || template.options.length === 0 ? t('form_placeholders.no_options_found') : t('form_placeholders.select_field', { name: template.name })} />
-                            </ModernSelectTrigger>
-                          </FormControl>
-                          <ModernSelectContent variant="glass" className={GLASS_SELECT_CONTENT_CLASSES}>
-                            {template.options && template.options.map((option) => (
-                              <ModernSelectItem key={option} value={option} className={GLASS_SELECT_ITEM_CLASSES}>
-                                {option}
-                              </ModernSelectItem>
-                            ))}
-                          </ModernSelectContent>
-                        </ModernSelect>
-                      ) : template.type === 'checklist' ? (
-                        <div className="space-y-2 p-3 rounded-lg border border-white/30 dark:border-gray-600/30 bg-white/20 dark:bg-gray-700/20">
-                          {template.options && template.options.map((option) => {
-                            const currentValue = field.value ? field.value.split(',').map((v: string) => v.trim()) : [];
-                            const isChecked = currentValue.includes(option);
-                            
-                            return (
-                              <div key={option} className="flex items-center">
-                                <input
-                                  type="checkbox"
-                                  id={`${field.name}-${option}`}
-                                  checked={isChecked}
-                                  onChange={(e) => handleChecklistChange(field, option, e.target.checked)}
-                                  className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                                />
-                                <label 
-                                  htmlFor={`${field.name}-${option}`} 
-                                  className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-                                >
-                                  {option}
-                                </label>
-                              </div>
-                            );
-                          })}
+              <div key={template.id} className="group/field p-4 rounded-2xl bg-gradient-to-br from-white/60 to-white/30 dark:from-gray-800/60 dark:to-gray-900/30 border-2 border-white/40 dark:border-gray-700/40 backdrop-blur-sm hover:border-cyan-300/50 dark:hover:border-cyan-600/50 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/20">
+                <FormField
+                  control={control}
+                  name={fieldName}
+                  render={({ field, fieldState }) => (
+                    <FormItem>
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500/20 to-blue-600/20 border border-cyan-200/50 dark:border-cyan-800/50 flex items-center justify-center transition-all duration-300">
+                            <Settings size={16} className="text-cyan-600 dark:text-cyan-400" />
+                          </div>
+                          <FormLabel className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                            {template.name}
+                            {template.required && <span className="text-red-500 ms-1">*</span>}
+                          </FormLabel>
                         </div>
-                      ) : (
-                        <ModernInput
-                          disabled
-                          placeholder={t('form_placeholders.unknown_field_type_placeholder')}
-                          variant="glass"
-                          className={GLASS_INPUT_CLASSES}
-                        />
-                      )}
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+
+                        <FormControl>
+                          {template.type === 'text' ? (
+                            <ModernInput
+                              placeholder={template.description || t('form_placeholders.field_value', { name: template.name })}
+                              variant="glass"
+                              className={GLASS_INPUT_CLASSES}
+                              {...field}
+                              value={field.value || ''}
+                            />
+                          ) : template.type === 'number' ? (
+                            <ModernInput
+                              type="number"
+                              placeholder={template.description || t('form_placeholders.field_value', { name: template.name })}
+                              variant="glass"
+                              className={GLASS_INPUT_CLASSES}
+                              {...field}
+                              value={field.value || ''}
+                              onChange={(e) => field.onChange(e.target.value === '' ? undefined : Number(e.target.value))}
+                            />
+                          ) : template.type === 'date' ? (
+                            <ModernPopover>
+                              <ModernPopoverTrigger asChild>
+                                <GlassButton
+                                  variant="glass"
+                                  className={cn(
+                                    "w-full justify-start text-left font-normal",
+                                    GLASS_INPUT_CLASSES,
+                                    !field.value && "text-muted-foreground"
+                                  )}
+                                >
+                                  <span className="flex items-center">
+                                    <CalendarIcon className="ml-2 h-4 w-4" />
+                                    {field.value ? formatDate(new Date(field.value)) : <span>{t('form_placeholders.select_birth_date')}</span>}
+                                  </span>
+                                </GlassButton>
+                              </ModernPopoverTrigger>
+                              <ModernPopoverContent className="w-auto p-0" glassEffect="card">
+                                <JalaliCalendar
+                                  selected={field.value ? new Date(field.value) : undefined}
+                                  onSelect={(date) => field.onChange(date ? date.toISOString() : "")}
+                                  showToggle={false}
+                                />
+                              </ModernPopoverContent>
+                            </ModernPopover>
+                          ) : template.type === 'list' ? (
+                            <ModernSelect
+                              onValueChange={field.onChange}
+                              value={field.value || ''}
+                              disabled={!template.options || template.options.length === 0}
+                            >
+                              <FormControl>
+                                <ModernSelectTrigger variant="glass" className={GLASS_SELECT_TRIGGER_CLASSES}>
+                                  <ModernSelectValue placeholder={!template.options || template.options.length === 0 ? t('form_placeholders.no_options_found') : t('form_placeholders.select_field', { name: template.name })} />
+                                </ModernSelectTrigger>
+                              </FormControl>
+                              <ModernSelectContent variant="glass" className={GLASS_SELECT_CONTENT_CLASSES}>
+                                {template.options && template.options.map((option) => (
+                                  <ModernSelectItem key={option} value={option} className={GLASS_SELECT_ITEM_CLASSES}>
+                                    {option}
+                                  </ModernSelectItem>
+                                ))}
+                              </ModernSelectContent>
+                            </ModernSelect>
+                          ) : template.type === 'checklist' ? (
+                            <div className="space-y-2 p-3 rounded-lg border border-white/30 dark:border-gray-600/30 bg-white/20 dark:bg-gray-700/20">
+                              {template.options && template.options.map((option) => {
+                                const currentValue = field.value ? field.value.split(',').map((v: string) => v.trim()) : [];
+                                const isChecked = currentValue.includes(option);
+                                
+                                return (
+                                  <div key={option} className="flex items-center">
+                                    <input
+                                      type="checkbox"
+                                      id={field.name + '-' + option}
+                                      checked={isChecked}
+                                      onChange={(e) => handleChecklistChange(field, option, e.target.checked)}
+                                      className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                                    />
+                                    <label
+                                      htmlFor={field.name + '-' + option}
+                                      className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                                    >
+                                      {option}
+                                    </label>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          ) : (
+                            <ModernInput
+                              disabled
+                              placeholder={t('form_placeholders.unknown_field_type_placeholder')}
+                              variant="glass"
+                              className={GLASS_INPUT_CLASSES}
+                            />
+                          )}
+                        </FormControl>
+                        <FormMessage />
+                      </div>
+                    </FormItem>
+                  )}
+                />
+              </div>
             );
           })}
         </div>
