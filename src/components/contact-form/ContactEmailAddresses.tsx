@@ -113,9 +113,6 @@ const ContactEmailAddresses: React.FC = React.memo(() => {
       </div>
     </div>
   );
-}, (prevProps, nextProps) => {
-  // Custom comparison function for React.memo - prevent re-renders unless necessary
-  return false;
 });
 
 ContactEmailAddresses.displayName = 'ContactEmailAddresses';

@@ -38,12 +38,6 @@ const ContactFormActions: React.FC<ContactFormActionsProps> = React.memo(({ isSu
       </GlassButton>
     </div>
   );
-}, (prevProps, nextProps) => {
-  // Custom comparison function for React.memo
-  return (
-    prevProps.isSubmitting === nextProps.isSubmitting &&
-    prevProps.contactId === nextProps.contactId
-  );
 });
 
 ContactFormActions.displayName = 'ContactFormActions';

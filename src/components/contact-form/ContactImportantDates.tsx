@@ -64,9 +64,6 @@ const ContactImportantDates: React.FC = React.memo(() => {
       </div>
     </div>
   );
-}, () => {
-  // Custom comparison function for React.memo - prevent re-renders unless necessary
-  return true;
 });
 
 ContactImportantDates.displayName = 'ContactImportantDates';

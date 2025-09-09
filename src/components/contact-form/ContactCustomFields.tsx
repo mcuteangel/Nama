@@ -5,7 +5,7 @@ import { ModernSelect, ModernSelectContent, ModernSelectItem, ModernSelectTrigge
 import { ModernPopover, ModernPopoverContent, ModernPopoverTrigger } from '@/components/ui/modern-popover';
 import { GlassButton } from "@/components/ui/glass-button";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
-import { CalendarIcon, Plus, Check } from 'lucide-react';
+import { CalendarIcon, Plus } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { JalaliCalendar } from '@/components/JalaliCalendar';
 import { cn } from '@/lib/utils';
@@ -15,6 +15,12 @@ import { ContactFormValues } from '@/types/contact';
 import { useTranslation } from 'react-i18next';
 import { useJalaliCalendar } from '@/hooks/use-jalali-calendar';
 import { ControllerRenderProps } from 'react-hook-form';
+
+// Common glass styling classes
+const GLASS_INPUT_CLASSES = "bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-primary/50";
+const GLASS_SELECT_TRIGGER_CLASSES = "w-full bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30";
+const GLASS_SELECT_CONTENT_CLASSES = "bg-white/80 dark:bg-gray-800/80 border border-white/30 dark:border-gray-600/30";
+const GLASS_SELECT_ITEM_CLASSES = "hover:bg-white/20 dark:hover:bg-gray-700/50";
 
 interface ContactCustomFieldsProps {
   availableTemplates: CustomFieldTemplate[];
@@ -47,7 +53,7 @@ const ContactCustomFields: React.FC<ContactCustomFieldsProps> = React.memo(({
   }, [availableTemplates]);
 
   // Handle checklist changes
-  const handleChecklistChange = (field: ControllerRenderProps<ContactFormValues, any>, option: string, checked: boolean) => {
+  const handleChecklistChange = (field: ControllerRenderProps<ContactFormValues, `customFields.${number}.value`>, option: string, checked: boolean) => {
     const currentValue = field.value ? field.value.split(',').map((v: string) => v.trim()) : [];
     let newValue: string[];
     
@@ -118,7 +124,7 @@ const ContactCustomFields: React.FC<ContactCustomFieldsProps> = React.memo(({
                         <ModernInput
                           placeholder={template.description || t('form_placeholders.field_value', { name: template.name })}
                           variant="glass"
-                          className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-primary/50"
+                          className={GLASS_INPUT_CLASSES}
                           {...field}
                           value={field.value || ''}
                         />
@@ -127,7 +133,7 @@ const ContactCustomFields: React.FC<ContactCustomFieldsProps> = React.memo(({
                           type="number"
                           placeholder={template.description || t('form_placeholders.field_value', { name: template.name })}
                           variant="glass"
-                          className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-primary/50"
+                          className={GLASS_INPUT_CLASSES}
                           {...field}
                           value={field.value || ''}
                           onChange={(e) => field.onChange(e.target.value === '' ? undefined : Number(e.target.value))}
@@ -138,7 +144,8 @@ const ContactCustomFields: React.FC<ContactCustomFieldsProps> = React.memo(({
                             <GlassButton
                               variant="glass"
                               className={cn(
-                                "w-full justify-start text-left font-normal bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100",
+                                "w-full justify-start text-left font-normal",
+                                GLASS_INPUT_CLASSES,
                                 !field.value && "text-muted-foreground"
                               )}
                             >
@@ -163,20 +170,20 @@ const ContactCustomFields: React.FC<ContactCustomFieldsProps> = React.memo(({
                           disabled={!template.options || template.options.length === 0}
                         >
                           <FormControl>
-                            <ModernSelectTrigger variant="glass" className="w-full bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30">
+                            <ModernSelectTrigger variant="glass" className={GLASS_SELECT_TRIGGER_CLASSES}>
                               <ModernSelectValue placeholder={!template.options || template.options.length === 0 ? t('form_placeholders.no_options_found') : t('form_placeholders.select_field', { name: template.name })} />
                             </ModernSelectTrigger>
                           </FormControl>
-                          <ModernSelectContent variant="glass" className="bg-white/80 dark:bg-gray-800/80 border border-white/30 dark:border-gray-600/30">
+                          <ModernSelectContent variant="glass" className={GLASS_SELECT_CONTENT_CLASSES}>
                             {template.options && template.options.map((option) => (
-                              <ModernSelectItem key={option} value={option} className="hover:bg-white/20 dark:hover:bg-gray-700/50">
+                              <ModernSelectItem key={option} value={option} className={GLASS_SELECT_ITEM_CLASSES}>
                                 {option}
                               </ModernSelectItem>
                             ))}
                           </ModernSelectContent>
                         </ModernSelect>
                       ) : template.type === 'checklist' ? (
-                        <div className="space-y-2 p-3 bg-white/20 dark:bg-gray-700/20 rounded-lg border border-white/30 dark:border-gray-600/30">
+                        <div className="space-y-2 p-3 rounded-lg border border-white/30 dark:border-gray-600/30 bg-white/20 dark:bg-gray-700/20">
                           {template.options && template.options.map((option) => {
                             const currentValue = field.value ? field.value.split(',').map((v: string) => v.trim()) : [];
                             const isChecked = currentValue.includes(option);
@@ -201,11 +208,11 @@ const ContactCustomFields: React.FC<ContactCustomFieldsProps> = React.memo(({
                           })}
                         </div>
                       ) : (
-                        <ModernInput 
-                          disabled 
-                          placeholder={t('form_placeholders.unknown_field_type_placeholder')} 
-                          variant="glass" 
-                          className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400" 
+                        <ModernInput
+                          disabled
+                          placeholder={t('form_placeholders.unknown_field_type_placeholder')}
+                          variant="glass"
+                          className={GLASS_INPUT_CLASSES}
                         />
                       )}
                     </FormControl>
@@ -218,12 +225,6 @@ const ContactCustomFields: React.FC<ContactCustomFieldsProps> = React.memo(({
         </div>
       )}
     </div>
-  );
-}, (prevProps, nextProps) => {
-  // Custom comparison function for React.memo
-  return (
-    prevProps.loadingTemplates === nextProps.loadingTemplates &&
-    JSON.stringify(prevProps.availableTemplates) === JSON.stringify(nextProps.availableTemplates)
   );
 });
 

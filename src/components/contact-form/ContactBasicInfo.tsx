@@ -6,6 +6,12 @@ import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/comp
 import { ContactFormValues } from '@/types/contact';
 import { useTranslation } from 'react-i18next';
 
+// Common glass styling classes
+const GLASS_INPUT_CLASSES = "bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-primary/50";
+const GLASS_SELECT_TRIGGER_CLASSES = "w-full bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30";
+const GLASS_SELECT_CONTENT_CLASSES = "bg-white/80 dark:bg-gray-800/80 border border-white/30 dark:border-gray-600/30";
+const GLASS_SELECT_ITEM_CLASSES = "hover:bg-white/20 dark:hover:bg-gray-700/50";
+
 const ContactBasicInfo: React.FC = React.memo(() => {
   const { t } = useTranslation();
   const form = useFormContext<ContactFormValues>();
@@ -29,11 +35,11 @@ const ContactBasicInfo: React.FC = React.memo(() => {
               <span className="text-red-500 ms-1">*</span>
             </FormLabel>
             <FormControl>
-              <ModernInput 
-                placeholder={t('form_placeholders.first_name')} 
-                variant="glass" 
-                className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-primary/50" 
-                {...field} 
+              <ModernInput
+                placeholder={t('form_placeholders.first_name')}
+                variant="glass"
+                className={GLASS_INPUT_CLASSES}
+                {...field}
               />
             </FormControl>
             <FormMessage />
@@ -50,11 +56,11 @@ const ContactBasicInfo: React.FC = React.memo(() => {
               <span className="text-red-500 ms-1">*</span>
             </FormLabel>
             <FormControl>
-              <ModernInput 
-                placeholder={t('form_placeholders.last_name')} 
-                variant="glass" 
-                className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-primary/50" 
-                {...field} 
+              <ModernInput
+                placeholder={t('form_placeholders.last_name')}
+                variant="glass"
+                className={GLASS_INPUT_CLASSES}
+                {...field}
               />
             </FormControl>
             <FormMessage />
@@ -71,12 +77,12 @@ const ContactBasicInfo: React.FC = React.memo(() => {
             </FormLabel>
             <FormControl>
               <ModernSelect onValueChange={field.onChange} value={field.value}>
-                <ModernSelectTrigger variant="glass" className="w-full bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30">
+                <ModernSelectTrigger variant="glass" className={GLASS_SELECT_TRIGGER_CLASSES}>
                   <ModernSelectValue placeholder={t('form_placeholders.select_gender')} />
                 </ModernSelectTrigger>
-                <ModernSelectContent variant="glass" className="bg-white/80 dark:bg-gray-800/80 border border-white/30 dark:border-gray-600/30">
+                <ModernSelectContent variant="glass" className={GLASS_SELECT_CONTENT_CLASSES}>
                   {genderOptions.map(option => (
-                    <ModernSelectItem key={option.value} value={option.value} className="hover:bg-white/20 dark:hover:bg-gray-700/50">
+                    <ModernSelectItem key={option.value} value={option.value} className={GLASS_SELECT_ITEM_CLASSES}>
                       {option.label}
                     </ModernSelectItem>
                   ))}
@@ -96,11 +102,11 @@ const ContactBasicInfo: React.FC = React.memo(() => {
               {t('form_labels.position')}
             </FormLabel>
             <FormControl>
-              <ModernInput 
-                placeholder={t('form_placeholders.position')} 
-                variant="glass" 
-                className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-primary/50" 
-                {...field} 
+              <ModernInput
+                placeholder={t('form_placeholders.position')}
+                variant="glass"
+                className={GLASS_INPUT_CLASSES}
+                {...field}
               />
             </FormControl>
             <FormMessage />
@@ -116,11 +122,11 @@ const ContactBasicInfo: React.FC = React.memo(() => {
               {t('form_labels.company')}
             </FormLabel>
             <FormControl>
-              <ModernInput 
-                placeholder={t('form_placeholders.company')} 
-                variant="glass" 
-                className="bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-primary/50" 
-                {...field} 
+              <ModernInput
+                placeholder={t('form_placeholders.company')}
+                variant="glass"
+                className={GLASS_INPUT_CLASSES}
+                {...field}
               />
             </FormControl>
             <FormMessage />
@@ -129,9 +135,6 @@ const ContactBasicInfo: React.FC = React.memo(() => {
       />
     </div>
   );
-}, (prevProps, nextProps) => {
-  // Custom comparison function for React.memo - always return true to prevent re-renders
-  return true;
 });
 
 ContactBasicInfo.displayName = 'ContactBasicInfo';

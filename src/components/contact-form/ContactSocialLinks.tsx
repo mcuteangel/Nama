@@ -116,9 +116,6 @@ const ContactSocialLinks: React.FC = React.memo(() => {
       </div>
     </div>
   );
-}, (prevProps, nextProps) => {
-  // Custom comparison function for React.memo - prevent re-renders unless necessary
-  return false;
 });
 
 ContactSocialLinks.displayName = 'ContactSocialLinks';

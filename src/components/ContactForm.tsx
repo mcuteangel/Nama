@@ -118,12 +118,10 @@ const ContactForm: React.FC<ContactFormProps> = React.memo(({ initialData, conta
   // Add this useEffect to reset the form when initialData changes, but only if content is different
   useEffect(() => {
     if (initialData && JSON.stringify(initialData) !== JSON.stringify(lastInitialDataRef.current)) {
-      console.log("ContactForm: initialData changed, resetting form.");
       form.reset(initialData);
       lastInitialDataRef.current = initialData;
     } else if (!initialData && lastInitialDataRef.current) {
       // If initialData becomes undefined (e.g., navigating from edit to add), reset to default
-      console.log("ContactForm: initialData became undefined, resetting form to defaults.");
       form.reset(defaultValues);
       lastInitialDataRef.current = undefined;
     }
@@ -185,9 +183,7 @@ const ContactForm: React.FC<ContactFormProps> = React.memo(({ initialData, conta
   const lastSetCustomFieldsRef = useRef<string>(''); 
 
   useEffect(() => {
-    console.log("ContactForm: Custom fields useEffect triggered.");
     if (loadingTemplates || !session?.user) {
-      console.log("ContactForm: Custom fields useEffect skipped due to loadingTemplates or no session user.");
       return;
     }
 
@@ -217,25 +213,17 @@ const ContactForm: React.FC<ContactFormProps> = React.memo(({ initialData, conta
     const sortedCurrentFormCustomFields = [...currentFormCustomFields].sort(sortFn);
     const currentFormJson = JSON.stringify(sortedCurrentFormCustomFields);
 
-    console.log("ContactForm: Desired custom fields JSON:", desiredJson);
-    console.log("ContactForm: Current form custom fields JSON:", currentFormJson);
-    console.log("ContactForm: Last set custom fields JSON (ref):", lastSetCustomFieldsRef.current);
-
     // 3. Compare desired state with the current form state AND with what was last set by this effect
     // Only update if the desired state is different from the current form state
     // AND if the desired state is different from what this effect last set (to prevent redundant setValue calls if form state is already correct)
     if (desiredJson !== currentFormJson) {
-      console.log("ContactForm: Current form custom fields are different from desired. Updating form values.");
       form.setValue("customFields", sortedDesired, { shouldValidate: true, shouldDirty: true });
       lastSetCustomFieldsRef.current = desiredJson; // Update ref to reflect what was just set
     } else if (desiredJson !== lastSetCustomFieldsRef.current) {
       // This case handles when the form's state *already matches* the desired state,
       // but our ref hasn't been updated yet (e.g., if initialData directly set it).
       // We still update the ref to prevent future redundant checks.
-      console.log("ContactForm: Current form custom fields already match desired. Updating ref only.");
       lastSetCustomFieldsRef.current = desiredJson;
-    } else {
-      console.log("ContactForm: Custom fields are the same as last set, no update needed.");
     }
 
   }, [availableTemplates, initialData, loadingTemplates, form, session?.user]); // Dependencies
@@ -440,12 +428,6 @@ const ContactForm: React.FC<ContactFormProps> = React.memo(({ initialData, conta
         </ModernCardContent>
       </ModernCard>
     </KeyboardNavigationHandler>
-  );
-}, (prevProps, nextProps) => {
-  // Custom comparison function for React.memo
-  return (
-    prevProps.contactId === nextProps.contactId &&
-    JSON.stringify(prevProps.initialData) === JSON.stringify(nextProps.initialData)
   );
 });
 

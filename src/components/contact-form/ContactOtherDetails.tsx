@@ -263,9 +263,6 @@ const ContactOtherDetails: React.FC = React.memo(() => {
       </div>
     </>
   );
-}, (prevProps, nextProps) => {
-  // Custom comparison function for React.memo - prevent re-renders unless necessary
-  return true;
 });
 
 ContactOtherDetails.displayName = 'ContactOtherDetails';

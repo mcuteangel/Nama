@@ -728,7 +728,12 @@
     "error": "خطا",
     "success": "موفقیت",
     "skip_to_content": "رفتن به محتوای اصلی",
-    "skip_to_navigation": "رفتن به ناوبری"
+    "skip_to_navigation": "رفتن به ناوبری",
+    "form_cancelled": "فرم لغو شد",
+    "retry_save": "تلاش مجدد برای ذخیره",
+    "remove_email_address": "حذف آدرس ایمیل",
+    "remove_phone_number": "حذف شماره تلفن",
+    "remove_social_link": "حذف لینک شبکه اجتماعی"
   },
   "theme_options": {
     "light": "روشن",
