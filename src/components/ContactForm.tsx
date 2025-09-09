@@ -386,7 +386,7 @@ const ContactForm: React.FC<ContactFormProps> = React.memo(({ initialData, conta
                   aria-describedby="form-error-message"
                   aria-label={t('accessibility.retry_save', 'تلاش مجدد برای ذخیره فرم')}
                 >
-                  {t('common.retry')} ({retryCount} {t('common.of')} ۳)
+                  {t('common.retry')} ({retryCount} {t('common.of')} {t('common.max_retry_count')})
                 </GlassButton>
               )}
             </div>
@@ -406,11 +406,11 @@ const ContactForm: React.FC<ContactFormProps> = React.memo(({ initialData, conta
           )}
         </ModernCardHeader>
 
-        <ModernCardContent className="p-8 space-y-8">
+        <ModernCardContent className="p-6 space-y-4">
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(onSubmit)}
-              className="space-y-8"
+              className="space-y-4"
               role="form"
               aria-labelledby="contact-form-title"
               aria-describedby="contact-form-description"
@@ -442,7 +442,7 @@ const ContactForm: React.FC<ContactFormProps> = React.memo(({ initialData, conta
                 )}
               </div>
               
-              <fieldset disabled={isSubmitting} className="space-y-8">
+              <fieldset disabled={isSubmitting} className="space-y-4">
                 <legend className="sr-only">
                   {t('accessibility.contact_information', 'Contact Information')}
                 </legend>
@@ -455,7 +455,7 @@ const ContactForm: React.FC<ContactFormProps> = React.memo(({ initialData, conta
                     </h3>
                     {section.component}
                     {index < formSections.length - 2 && (
-                      <div className="my-8 h-px bg-gradient-to-r from-transparent via-white/20 dark:via-gray-700/50 to-transparent"></div>
+                      <div className="my-4 h-px bg-gradient-to-r from-transparent via-white/20 dark:via-gray-700/50 to-transparent"></div>
                     )}
                   </div>
                 ))}

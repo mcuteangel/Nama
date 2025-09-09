@@ -109,7 +109,7 @@ const ContactImportantDates: React.FC = React.memo(() => {
               {field.value && !fieldState.error && (
                 <p className="mt-4 text-sm text-green-600 dark:text-green-400 flex items-center gap-2 animate-slide-in">
                   <UserCheck size={16} />
-                  <span>تولد ثبت شد! 🎂</span>
+                  <span>{t('common.birthday_registered')}</span>
               </p>
               )}
             </FormItem>
