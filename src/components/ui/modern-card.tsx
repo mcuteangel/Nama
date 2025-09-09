@@ -3,8 +3,8 @@ import { cn } from '@/lib/utils';
 import { getGradient, getShadow, getSpacing, getBorderRadius, getColor, designTokens } from '@/lib/design-tokens';
 
 export interface ModernCardProps extends React.HTMLAttributes<HTMLDivElement> {
-  variant?: 'glass' | 'neomorphism' | 'gradient-primary' | 'gradient-ocean' | 'gradient-sunset' | 'gradient-success' | 'gradient-info' | 'minimal' | 'glass-3d';
-  hover?: 'lift' | 'glow' | 'scale' | 'none' | 'glass-3d';
+  variant?: 'glass' | 'neomorphism' | 'gradient-primary' | 'gradient-ocean' | 'gradient-sunset' | 'gradient-forest' | 'gradient-purple' | 'gradient-pink' | 'minimal' | 'glass-3d' | '3d-card';
+  hover?: 'lift' | 'glow' | 'scale' | 'rotate' | 'none' | 'glass-3d' | 'bounce';
   children?: React.ReactNode;
 }
 
@@ -20,19 +20,25 @@ export const ModernCard = React.forwardRef<HTMLDivElement, ModernCardProps>(
     const variants = {
       glass: `backdrop-blur-lg border border-white/30 dark:border-gray-600/30 ${getShadow('glass')}`,
       neomorphism: getShadow('neomorphism'),
-      'gradient-primary': getGradient('primary'),
-      'gradient-ocean': getGradient('ocean'),
-      'gradient-sunset': getGradient('sunset'),
-      'gradient-success': getGradient('success'),
-      'gradient-info': getGradient('info'),
+      'gradient-primary': `bg-gradient-to-br ${getGradient('primary')} text-white rounded-2xl p-6 shadow-lg`,
+      'gradient-ocean': `bg-gradient-to-br ${getGradient('ocean')} text-white rounded-2xl p-6 shadow-lg`,
+      'gradient-sunset': `bg-gradient-to-br ${getGradient('sunset')} text-white rounded-2xl p-6 shadow-lg`,
+      'gradient-forest': `bg-gradient-to-br ${getGradient('forest')} text-white rounded-2xl p-6 shadow-lg`,
+      'gradient-purple': `bg-gradient-to-br ${getGradient('purple')} text-white rounded-2xl p-6 shadow-lg`,
+      'gradient-pink': `bg-gradient-to-br ${getGradient('pink')} text-white rounded-2xl p-6 shadow-lg`,
+      'gradient-success': `bg-gradient-to-br ${getGradient('success')} text-white rounded-2xl p-6 shadow-lg`,
+      'gradient-info': `bg-gradient-to-br ${getGradient('info')} text-white rounded-2xl p-6 shadow-lg`,
       minimal: 'bg-background border border-border shadow-sm',
       'glass-3d': `backdrop-blur-xl border border-white/20 dark:border-gray-500/30 ${getShadow('glass3d')} transform-gpu`,
+      '3d-card': `relative perspective-1000 ${getShadow('glass3d')} transform-gpu rounded-3xl p-8 bg-white/10 dark:bg-gray-900/20`,
     };
 
     const hoverEffects = {
       lift: 'hover-lift transition-all duration-300',
       glow: 'hover-glow transition-all duration-300',
       scale: 'hover:scale-105 transition-all duration-300',
+      rotate: 'hover:rotate-3 transition-all duration-500 ease-out',
+      bounce: 'hover:animate-bounce hover:scale-110 transition-all duration-500',
       none: '',
       'glass-3d': 'hover:shadow-glass3dHover hover:transform hover:scale-[1.02] hover:-translate-y-1 transition-all duration-500 ease-out',
     };

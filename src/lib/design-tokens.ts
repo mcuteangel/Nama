@@ -10,10 +10,40 @@ export const designTokens = {
     primary: {
       50: '#f0f9ff',
       100: '#e0f2fe',
+      200: '#bae6fd',
+      300: '#7dd3fc',
+      400: '#38bdf8',
       500: '#0ea5e9',
       600: '#0284c7',
       700: '#0369a1',
+      800: '#075985',
       900: '#0c4a6e',
+    },
+    // Secondary Colors
+    secondary: {
+      50: '#fdf4ff',
+      100: '#fae8ff',
+      200: '#f5d0fe',
+      300: '#f0abfc',
+      400: '#e879f9',
+      500: '#d946ef',
+      600: '#c026d3',
+      700: '#a21caf',
+      800: '#86198f',
+      900: '#701a75',
+    },
+    // Accent Colors
+    accent: {
+      50: '#fef7ff',
+      100: '#fdf2ff',
+      200: '#fce7ff',
+      300: '#f3d5fa',
+      400: '#e879f9',
+      500: '#c026d3',
+      600: '#a21caf',
+      700: '#86198f',
+      800: '#701a75',
+      900: '#5b0f5b',
     },
 
     // Semantic Colors
@@ -59,10 +89,12 @@ export const designTokens = {
     ocean: 'linear-gradient(135deg, #667eea 0%, #64b3f4 100%)',
     sunset: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
     forest: 'linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%)',
-    success: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
-    warning: 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)',
-    danger: 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)',
-    info: 'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)',
+    purple: 'linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%)',
+    pink: 'linear-gradient(135deg, #ec4899 0%, #f472b6 100%)',
+    success: 'linear-gradient(135deg, #10b981 0%, #34d399 100%)',
+    warning: 'linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)',
+    danger: 'linear-gradient(135deg, #ef4444 0%, #f87171 100%)',
+    info: 'linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%)',
   },
 
   // ===== TYPOGRAPHY =====
@@ -145,6 +177,21 @@ export const designTokens = {
     '2xl': '1rem',    // 16px
     '3xl': '1.5rem',  // 24px
     full: '9999px',
+  },
+  // ===== TRANSITIONS =====
+  transitions: {
+    duration: {
+      fast: '150ms',
+      normal: '300ms',
+      slow: '500ms',
+      slower: '700ms',
+    },
+    easing: {
+      easeIn: 'cubic-bezier(0.4, 0, 1, 1)',
+      easeOut: 'cubic-bezier(0, 0, 0.2, 1)',
+      easeInOut: 'cubic-bezier(0.4, 0, 0.2, 1)',
+      bounce: 'cubic-bezier(0.68, -0.55, 0.265, 1.55)',
+    },
   },
 
   // ===== SHADOWS =====
