@@ -53,16 +53,16 @@ const ContactForm: React.FC<ContactFormProps> = React.memo(({ initialData, conta
   const { t } = useTranslation();
   const { getAriaLabel, setAriaLabel } = useAccessibility();
   const announce = useAnnouncement();
-  
+
   // Set up ARIA labels for form
   useEffect(() => {
-    const formTitle = contactId 
+    const formTitle = contactId
       ? t('accessibility.edit_contact_form', 'Edit Contact Form')
       : t('accessibility.add_contact_form', 'Add Contact Form');
-    
+
     setAriaLabel('contact-form', formTitle);
-    setAriaLabel('contact-form-description', 
-      contactId 
+    setAriaLabel('contact-form-description',
+      contactId
         ? t('accessibility.edit_contact_description', 'Edit contact information and details')
         : t('accessibility.add_contact_description', 'Add new contact information and details')
     );
@@ -133,7 +133,7 @@ const ContactForm: React.FC<ContactFormProps> = React.memo(({ initialData, conta
   // Announce form state changes
   useEffect(() => {
     if (isSubmitting) {
-      announce(contactId 
+      announce(contactId
         ? t('accessibility.updating_contact', 'Updating contact...')
         : t('accessibility.creating_contact', 'Creating contact...'), 'polite'
       );
@@ -149,10 +149,10 @@ const ContactForm: React.FC<ContactFormProps> = React.memo(({ initialData, conta
   // Optimize template fetching with useCallback
   const fetchTemplates = useCallback(async () => {
     if (!session?.user) return;
-    
+
     setLoadingTemplates(true);
     const cacheKey = `custom_field_templates_${session.user.id}`;
-    
+
     try {
       const { data, error } = await fetchWithCache<CustomFieldTemplate[]>(
         cacheKey,
@@ -161,7 +161,7 @@ const ContactForm: React.FC<ContactFormProps> = React.memo(({ initialData, conta
           return { data: result.data, error: result.error };
         }
       );
-      
+
       if (error) {
         console.error("Error fetching custom field templates:", error);
         setAvailableTemplates([]);
@@ -181,7 +181,7 @@ const ContactForm: React.FC<ContactFormProps> = React.memo(({ initialData, conta
   }, [fetchTemplates]);
 
   // Ref to store the JSON string of the last customFields value that was successfully set to the form by this effect
-  const lastSetCustomFieldsRef = useRef<string>(''); 
+  const lastSetCustomFieldsRef = useRef<string>('');
 
   useEffect(() => {
     if (loadingTemplates || !session?.user) {
@@ -244,7 +244,7 @@ const ContactForm: React.FC<ContactFormProps> = React.memo(({ initialData, conta
           initialAvatarUrl={form.watch('avatarUrl')}
           onAvatarChange={(url) => {
             form.setValue('avatarUrl', url);
-            announce(url 
+            announce(url
               ? t('accessibility.avatar_updated', 'Avatar updated')
               : t('accessibility.avatar_removed', 'Avatar removed'), 'polite'
             );
@@ -332,7 +332,7 @@ const ContactForm: React.FC<ContactFormProps> = React.memo(({ initialData, conta
       )
     }
   ], [
-    t, form, isSubmitting, announce, availableTemplates, loadingTemplates, 
+    t, form, isSubmitting, announce, availableTemplates, loadingTemplates,
     fetchTemplates, handleCancel, contactId
   ]);
 
@@ -386,7 +386,7 @@ const ContactForm: React.FC<ContactFormProps> = React.memo(({ initialData, conta
                   aria-describedby="form-error-message"
                   aria-label={t('accessibility.retry_save', 'تلاش مجدد برای ذخیره فرم')}
                 >
-                  {t('common.retry')} ({retryCount} {t('common.of')} {t('common.max_retry_count')})
+                  {t('common.retry')} ({retryCount} {t('common.of')} ۳)
                 </GlassButton>
               )}
             </div>
@@ -425,7 +425,7 @@ const ContactForm: React.FC<ContactFormProps> = React.memo(({ initialData, conta
                   {getAriaLabel('contact-form-description', 'Fill out the form to manage contact information')}
                 </p>
               </div>
-              
+
               {/* Form progress indicator for screen readers */}
               <div
                 className="sr-only"
@@ -441,12 +441,12 @@ const ContactForm: React.FC<ContactFormProps> = React.memo(({ initialData, conta
                   </span>
                 )}
               </div>
-              
+
               <fieldset disabled={isSubmitting} className="space-y-4">
                 <legend className="sr-only">
                   {t('accessibility.contact_information', 'Contact Information')}
                 </legend>
-                
+
                 {/* Render sections without individual borders, use subtle dividers */}
                 {formSections.slice(0, -1).map((section, index) => (
                   <div key={section.id} role="group" aria-labelledby={`${section.id}-section-title`}>
@@ -459,7 +459,7 @@ const ContactForm: React.FC<ContactFormProps> = React.memo(({ initialData, conta
                     )}
                   </div>
                 ))}
-                
+
                 {/* Actions as last section without divider */}
                 <div role="group" aria-labelledby="actions-section-title">
                   <h3 id="actions-section-title" className="sr-only">
