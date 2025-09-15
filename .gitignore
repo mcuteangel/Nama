@@ -245,3 +245,5 @@ dist-electron/
 .local
 *.local
 .kilocode/mcp.json
+.qoder/rules/language.md
+.qoder/rules/rules.md
