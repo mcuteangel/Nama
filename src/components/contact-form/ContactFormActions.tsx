@@ -20,7 +20,7 @@ const ContactFormActions: React.FC<ContactFormActionsProps> = React.memo(({ isSu
   }), [contactId, t]);
 
   return (
-    <div className="flex flex-col sm:flex-row justify-end gap-3 mt-6">
+    <div className="flex flex-col sm:flex-row justify-end gap-3 mt-8 pt-6 border-t border-border/50">
       <CancelButton 
         onClick={onCancel} 
         disabled={isSubmitting} 
@@ -30,7 +30,7 @@ const ContactFormActions: React.FC<ContactFormActionsProps> = React.memo(({ isSu
         type="submit" 
         variant="gradient-primary"
         effect="lift"
-        className="px-6 py-2 font-semibold shadow-lg hover:shadow-xl" 
+        className="px-6 py-2 font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5" 
         disabled={isSubmitting}
       >
         {isSubmitting && <ModernLoader variant="spinner" size="sm" className="me-2" />}

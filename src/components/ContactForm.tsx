@@ -341,29 +341,32 @@ const ContactForm: React.FC<ContactFormProps> = React.memo(({ initialData, conta
       <ModernCard
         variant="glass"
         className={`
-          w-full rounded-3xl shadow-2xl overflow-hidden
-          border-2 border-white/40 dark:border-gray-600/40
+          w-full rounded-3xl overflow-hidden
+          border-2 border-opacity-40 dark:border-opacity-40
           backdrop-blur-xl
           bg-gradient-to-br from-white/60 via-white/40 to-white/30
-          dark:from-gray-800/60 dark:via-gray-800/40 dark:to-gray-800/30
-          transition-all duration-500 ease-out
-          hover:shadow-3xl hover:shadow-purple-500/20 dark:hover:shadow-purple-900/30
-          hover:border-purple-300/50 dark:hover:border-purple-600/50
-          ${error ? 'ring-4 ring-red-400/50' : ''}
-          ${isSubmitting ? 'ring-4 ring-blue-400/50 animate-pulse' : ''}
+          dark:from-neutral-800/60 dark:via-neutral-800/40 dark:to-neutral-800/30
+          transition-all duration-300 ease-out
+          shadow-md hover:shadow-lg
+          hover:shadow-primary-500/20 dark:hover:shadow-primary-900/30
+          border-primary-300/50 hover:border-primary-400/60
+          dark:border-primary-600/50 dark:hover:border-primary-500/60
+          ${error ? 'ring-2 ring-error-500' : ''}
+          ${isSubmitting ? 'ring-2 ring-primary-500 animate-pulse' : ''}
         `}
       >
         {/* Enhanced Header */}
         <ModernCardHeader className="pb-6 border-b border-white/30 dark:border-gray-700/50 relative">
           <div className="flex items-center justify-center gap-3 mb-4">
             <div className={`
-              w-12 h-12 rounded-2xl flex items-center justify-center
-              bg-gradient-to-br from-purple-500 to-blue-600
-              shadow-lg transform transition-all duration-300 hover:scale-110
+              w-14 h-14 rounded-2xl flex items-center justify-center
+              bg-gradient-to-br from-primary-500 to-primary-700
+              shadow-md transform transition-all duration-300 hover:scale-105
+              hover:shadow-lg hover:shadow-primary-500/20
             `}>
               <Users size={24} className="text-white" />
             </div>
-            <ModernCardTitle className="text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+            <ModernCardTitle className="text-2xl font-bold bg-gradient-to-r from-neutral-900 to-neutral-700 dark:from-white dark:to-neutral-300 bg-clip-text text-transparent transition-colors duration-300">
               {contactId
                 ? t('contact_form.edit_title', 'ویرایش مخاطب')
                 : t('contact_form.add_title', 'افزودن مخاطب')
@@ -373,7 +376,8 @@ const ContactForm: React.FC<ContactFormProps> = React.memo(({ initialData, conta
 
           {/* Enhanced Error Display */}
           {error && (
-            <div className="flex items-center justify-center gap-2 text-red-500 dark:text-red-400 mb-4 animate-bounce">
+            <div
+              className="flex items-center justify-center gap-2 text-error-600 dark:text-error-400 mb-4 animate-bounce bg-error-50 dark:bg-error-900/30 px-4 py-2 rounded-lg">
               <AlertCircle size={20} />
               <span className="font-medium">{errorMessage}</span>
               {retryCount > 0 && (
@@ -396,7 +400,8 @@ const ContactForm: React.FC<ContactFormProps> = React.memo(({ initialData, conta
           {isSubmitting && (
             <div className="space-y-3 mb-4">
               <ModernProgress value={75} className="w-full" variant="gradient" />
-              <p className="text-sm text-blue-600 dark:text-blue-400 text-center animate-pulse font-medium">
+              <p
+                className="text-sm text-primary-600 dark:text-primary-400 text-center animate-pulse font-medium">
                 {contactId
                   ? t('accessibility.updating_contact', 'در حال به‌روزرسانی مخاطب...')
                   : t('accessibility.creating_contact', 'در حال ایجاد مخاطب...')
@@ -455,7 +460,8 @@ const ContactForm: React.FC<ContactFormProps> = React.memo(({ initialData, conta
                     </h3>
                     {section.component}
                     {index < formSections.length - 2 && (
-                      <div className="my-4 h-px bg-gradient-to-r from-transparent via-white/20 dark:via-gray-700/50 to-transparent"></div>
+                      <div
+                        className="my-6 h-[1px] bg-gradient-to-r from-transparent via-neutral-200/70 dark:via-neutral-700/50 to-transparent transition-colors duration-300"></div>
                     )}
                   </div>
                 ))}

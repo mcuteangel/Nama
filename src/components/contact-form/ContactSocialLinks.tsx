@@ -1,10 +1,10 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { useFormContext, useFieldArray } from 'react-hook-form';
 import { ModernInput } from '@/components/ui/modern-input';
 import { ModernSelect, ModernSelectContent, ModernSelectItem, ModernSelectTrigger, ModernSelectValue } from '@/components/ui/modern-select';
 import { GlassButton } from "@/components/ui/glass-button";
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
-import { Plus, X, Link, UserCheck, AlertCircle } from 'lucide-react';
+import { FormField, FormItem, FormLabel, FormControl } from '@/components/ui/form';
+import { Plus, X, Link } from 'lucide-react';
 import { ContactFormValues } from '@/types/contact';
 import { useTranslation } from 'react-i18next';
 
@@ -27,34 +27,33 @@ const ContactSocialLinks: React.FC = React.memo(() => {
   ], [t]);
 
   return (
-    <div className="space-y-6 pt-6 border-t border-gray-200/50 dark:border-gray-700/50">
-      {/* Enhanced Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 p-4 rounded-xl bg-gradient-to-r from-cyan-50/50 to-blue-50/50 dark:from-cyan-900/20 dark:to-blue-900/20 border border-cyan-200/30 dark:border-cyan-800/30">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg">
-            <Link size={20} className="text-white" />
+    <div className="space-y-4 pt-4 border-t border-border/30">
+      {/* Compact Header */}
+      <div className="flex flex-row justify-between items-center gap-2 p-2.5 rounded-lg bg-muted/30 dark:bg-muted/10 border border-border/30">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary/90 to-primary/70 flex items-center justify-center shadow-sm">
+            <Link size={16} className="text-white" />
           </div>
-          <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100">
+          <h3 className="text-base font-semibold text-foreground">
             {t('section_titles.social_links')}
           </h3>
         </div>
         <GlassButton
           type="button"
-          variant="gradient-ocean"
-          effect="lift"
+          variant="ghost"
           size="sm"
           onClick={() => append({ type: "other", url: "" })}
-          className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5"
+          className="h-8 px-3 text-xs font-medium rounded-md hover:bg-accent/50 transition-colors"
         >
-          <Plus size={18} className="me-2" />
+          <Plus size={16} className="me-1.5" />
           {t('button_labels.add_social_link')}
         </GlassButton>
       </div>
 
-      {/* Enhanced Social Links Container */}
-      <div className="space-y-4">
+      {/* Social Links Container */}
+      <div className="space-y-3">
         {fields.map((item, index) => (
-          <div key={item.id} className="group/social-item p-4 rounded-2xl bg-gradient-to-br from-white/60 to-white/30 dark:from-gray-800/60 dark:to-gray-900/30 border-2 border-white/40 dark:border-gray-700/40 backdrop-blur-sm hover:border-cyan-300/50 dark:hover:border-cyan-600/50 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/20">
+          <div key={item.id} className="group/social-item p-3 rounded-lg bg-muted/10 dark:bg-muted/10 border border-border/20 hover:border-primary/40 transition-colors duration-200">
             <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
               <div className="md:col-span-4">
                 <FormField
@@ -64,8 +63,8 @@ const ContactSocialLinks: React.FC = React.memo(() => {
                     <FormItem>
                       <div className="space-y-2">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500/20 to-blue-600/20 border border-cyan-200/50 dark:border-cyan-800/50 flex items-center justify-center transition-all duration-300">
-                            <Link size={16} className="text-cyan-600 dark:text-cyan-400" />
+                          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-info-100/80 to-info-50/80 dark:from-info-900/30 dark:to-info-800/20 border border-info-200/50 dark:border-info-800/50 flex items-center justify-center transition-all duration-300">
+                            <Link size={16} className="text-info-600 dark:text-info-400" />
                           </div>
                           <FormLabel className="text-sm font-semibold text-gray-700 dark:text-gray-300">
                             {t('form_labels.social_network_type')}
@@ -76,7 +75,7 @@ const ContactSocialLinks: React.FC = React.memo(() => {
                             <ModernSelect onValueChange={field.onChange} defaultValue={field.value}>
                               <ModernSelectTrigger
                                 variant="glass"
-                                className="w-full px-4 py-3 text-sm rounded-xl border-2 bg-white/50 dark:bg-gray-700/50 backdrop-blur-sm transition-all duration-300 ease-out focus:ring-3 focus:ring-cyan-500/30 focus:border-cyan-400 hover:bg-white/70 dark:hover:bg-gray-600/70 hover:shadow-md hover:shadow-cyan-500/20"
+                                className="w-full px-4 py-3 text-sm rounded-xl border-2 bg-white/50 dark:bg-gray-700/50 backdrop-blur-sm transition-all duration-300 ease-out focus:ring-3 focus:ring-primary-500/30 focus:border-primary-400 hover:bg-white/70 dark:hover:bg-gray-600/70 hover:shadow-md hover:shadow-primary-500/20"
                               >
                                 <ModernSelectValue placeholder={t('form_placeholders.select_type')} />
                               </ModernSelectTrigger>
@@ -90,7 +89,6 @@ const ContactSocialLinks: React.FC = React.memo(() => {
                             </ModernSelect>
                           </FormControl>
                         </div>
-                        <FormMessage />
                       </div>
                     </FormItem>
                   )}
@@ -104,8 +102,8 @@ const ContactSocialLinks: React.FC = React.memo(() => {
                     <FormItem>
                       <div className="space-y-2">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500/20 to-blue-600/20 border border-cyan-200/50 dark:border-cyan-800/50 flex items-center justify-center transition-all duration-300">
-                            <Link size={16} className="text-cyan-600 dark:text-cyan-400" />
+                          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-info-100/80 to-info-50/80 dark:from-info-900/30 dark:to-info-800/20 border border-info-200/50 dark:border-info-800/50 flex items-center justify-center transition-all duration-300">
+                            <Link size={16} className="text-info-600 dark:text-info-400" />
                           </div>
                           <FormLabel className="text-sm font-semibold text-gray-700 dark:text-gray-300">
                             {t('form_labels.url_address')}
@@ -117,12 +115,11 @@ const ContactSocialLinks: React.FC = React.memo(() => {
                               type="url"
                               placeholder={t('form_placeholders.url_example')}
                               variant="glass"
-                              className="w-full px-4 py-3 text-sm rounded-xl border-2 bg-white/50 dark:bg-gray-700/50 backdrop-blur-sm transition-all duration-300 ease-out focus:ring-3 focus:ring-cyan-500/30 focus:border-cyan-400 hover:bg-white/70 dark:hover:bg-gray-600/70 hover:shadow-md hover:shadow-cyan-500/20"
+                              className="w-full px-4 py-3 text-sm rounded-xl border-2 bg-white/50 dark:bg-gray-700/50 backdrop-blur-sm transition-all duration-300 ease-out focus:ring-3 focus:ring-primary-500/30 focus:border-primary-400 hover:bg-white/70 dark:hover:bg-gray-600/70 hover:shadow-md hover:shadow-primary-500/20"
                               {...field}
                             />
                           </FormControl>
                         </div>
-                        <FormMessage />
                       </div>
                     </FormItem>
                   )}
@@ -134,7 +131,7 @@ const ContactSocialLinks: React.FC = React.memo(() => {
                   variant="ghost"
                   size="icon"
                   onClick={() => remove(index)}
-                  className="text-red-500 hover:bg-red-100/30 dark:hover:bg-red-900/20 h-10 w-10 rounded-full transition-all duration-300 hover:scale-110 group-hover/social-item:scale-110"
+                  className="text-error-500 hover:bg-error-100/30 dark:hover:bg-error-900/20 h-10 w-10 rounded-full transition-all duration-300 hover:scale-110 group-hover/social-item:scale-110"
                   aria-label={t('accessibility.remove_social_link', 'Remove social link')}
                 >
                   <X size={16} className="transition-transform duration-200 group-hover/social-item:rotate-90" />

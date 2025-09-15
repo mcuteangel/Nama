@@ -1,11 +1,11 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { ModernInput } from '@/components/ui/modern-input';
 import { ModernSelect, ModernSelectContent, ModernSelectItem, ModernSelectTrigger, ModernSelectValue } from '@/components/ui/modern-select';
 import { ModernPopover, ModernPopoverContent, ModernPopoverTrigger } from '@/components/ui/modern-popover';
 import { GlassButton } from "@/components/ui/glass-button";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
-import { CalendarIcon, Plus, Settings, UserCheck, AlertCircle } from 'lucide-react';
+import { CalendarIcon, Plus, Settings } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { JalaliCalendar } from '@/components/JalaliCalendar';
 import { cn } from '@/lib/utils';
@@ -17,10 +17,10 @@ import { useJalaliCalendar } from '@/hooks/use-jalali-calendar';
 import { ControllerRenderProps } from 'react-hook-form';
 
 // Common glass styling classes
-const GLASS_INPUT_CLASSES = "bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-primary/50";
+const GLASS_INPUT_CLASSES = "bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-foreground placeholder-muted-foreground focus:ring-2 focus:ring-primary/50";
 const GLASS_SELECT_TRIGGER_CLASSES = "w-full bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30";
-const GLASS_SELECT_CONTENT_CLASSES = "bg-white/80 dark:bg-gray-800/80 border border-white/30 dark:border-gray-600/30";
-const GLASS_SELECT_ITEM_CLASSES = "hover:bg-white/20 dark:hover:bg-gray-700/50";
+const GLASS_SELECT_CONTENT_CLASSES = "bg-popover/80 dark:bg-popover/80 border border-border/30";
+const GLASS_SELECT_ITEM_CLASSES = "hover:bg-accent hover:text-accent-foreground";
 
 interface ContactCustomFieldsProps {
   availableTemplates: CustomFieldTemplate[];
@@ -35,7 +35,7 @@ const ContactCustomFields: React.FC<ContactCustomFieldsProps> = React.memo(({
   fetchTemplates,
 }) => {
   const { t } = useTranslation();
-  const { control, watch, setValue } = useFormContext<ContactFormValues>();
+  const { control, watch } = useFormContext<ContactFormValues>();
   const { formatDate } = useJalaliCalendar();
 
   // Memoize custom fields to prevent unnecessary re-renders
@@ -67,30 +67,29 @@ const ContactCustomFields: React.FC<ContactCustomFieldsProps> = React.memo(({
   };
 
   return (
-    <div className="space-y-6 pt-6 border-t border-gray-200/50 dark:border-gray-700/50">
-      {/* Enhanced Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 p-4 rounded-xl bg-gradient-to-r from-cyan-50/50 to-blue-50/50 dark:from-cyan-900/20 dark:to-blue-900/20 border border-cyan-200/30 dark:border-cyan-800/30">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg">
-            <Settings size={20} className="text-white" />
+    <div className="space-y-4 pt-4 border-t border-border/30">
+      {/* Compact Header */}
+      <div className="flex flex-row justify-between items-center gap-2 p-2.5 rounded-lg bg-muted/30 dark:bg-muted/10 border border-border/30">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary/90 to-primary/70 flex items-center justify-center shadow-sm">
+            <Settings size={16} className="text-white" />
           </div>
-          <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100">
+          <h3 className="text-base font-semibold text-foreground">
             {t('section_titles.custom_fields')}
           </h3>
         </div>
         <Dialog>
           <DialogTrigger asChild>
             <GlassButton
-              variant="gradient-ocean"
-              effect="lift"
+              variant="ghost"
               size="sm"
-              className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5"
+              className="h-8 px-3 text-xs font-medium rounded-md hover:bg-accent/50 transition-colors"
             >
               <Plus size={18} className="me-2" />
               {t('actions.add_new_field')}
             </GlassButton>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[500px] p-0 border-none bg-transparent shadow-none">
+          <DialogContent className="w-full p-0 border-none bg-transparent shadow-none max-h-[80vh] overflow-y-auto">
             <DialogHeader className="sr-only">
               <DialogTitle>{t('custom_field_template.add_title')}</DialogTitle>
             </DialogHeader>
@@ -115,16 +114,16 @@ const ContactCustomFields: React.FC<ContactCustomFieldsProps> = React.memo(({
           <Dialog>
             <DialogTrigger asChild>
               <GlassButton
-                variant="gradient-ocean"
+                variant="gradient-primary"
                 effect="lift"
                 size="sm"
-                className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 mx-auto"
+                className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5"
               >
                 <Plus size={18} className="me-2" />
                 {t('actions.create_first_field')}
               </GlassButton>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[500px] p-0 border-none bg-transparent shadow-none">
+            <DialogContent className="w-full p-0 border-none bg-transparent shadow-none max-h-[80vh] overflow-y-auto">
               <DialogHeader className="sr-only">
                 <DialogTitle>{t('custom_field_template.add_title')}</DialogTitle>
               </DialogHeader>
@@ -149,8 +148,8 @@ const ContactCustomFields: React.FC<ContactCustomFieldsProps> = React.memo(({
                     <FormItem>
                       <div className="space-y-3">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500/20 to-blue-600/20 border border-cyan-200/50 dark:border-cyan-800/50 flex items-center justify-center transition-all duration-300">
-                            <Settings size={16} className="text-cyan-600 dark:text-cyan-400" />
+                          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-info-100/80 to-info-50/80 dark:from-info-900/30 dark:to-info-800/20 border border-info-200/50 dark:border-info-800/50 flex items-center justify-center transition-all duration-300">
+                            <Settings size={16} className="text-info-600 dark:text-info-400" />
                           </div>
                           <FormLabel className="text-sm font-semibold text-gray-700 dark:text-gray-300">
                             {template.name}
@@ -234,7 +233,9 @@ const ContactCustomFields: React.FC<ContactCustomFieldsProps> = React.memo(({
                                       id={field.name + '-' + option}
                                       checked={isChecked}
                                       onChange={(e) => handleChecklistChange(field, option, e.target.checked)}
-                                      className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                                      className={`w-full px-4 py-2 text-sm rounded-lg border-2 bg-white/50 dark:bg-gray-700/50 backdrop-blur-sm transition-all duration-300 ease-out focus:ring-3 focus:ring-info-500/30 focus:border-info-400 hover:bg-white/70 dark:hover:bg-gray-600/70 hover:shadow-md hover:shadow-info-500/20 ${
+                          fieldState.error ? 'border-error-400 focus:ring-error-500/30' : 'border-white/40 dark:border-gray-600/40'
+                        } ${field.value && !fieldState.error ? 'border-success-400' : ''}`}
                                     />
                                     <label
                                       htmlFor={field.name + '-' + option}

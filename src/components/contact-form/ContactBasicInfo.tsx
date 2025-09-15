@@ -58,7 +58,7 @@ const ContactBasicInfo: React.FC = React.memo(() => {
   return (
     <>
       <div className="space-y-6">
-        <div className="p-6 rounded-2xl bg-gradient-to-br from-white/40 to-white/20 dark:from-gray-700/40 dark:to-gray-800/20 border-2 border-white/30 dark:border-gray-600/30 backdrop-blur-sm">
+        <div className="p-6 rounded-2xl bg-gradient-to-br from-white/50 to-white/30 dark:from-neutral-800/50 dark:to-neutral-900/30 border-2 border-white/40 dark:border-neutral-700/40 backdrop-blur-sm shadow-sm hover:shadow-md transition-shadow duration-300">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <FormField
               control={form.control}
@@ -69,12 +69,12 @@ const ContactBasicInfo: React.FC = React.memo(() => {
                     <div className="flex items-center gap-3">
                       <div className={`
                         w-10 h-10 rounded-xl flex items-center justify-center
-                        bg-gradient-to-br from-blue-500/20 to-indigo-600/20
-                        border border-blue-200/50 dark:border-blue-800/50
+                        bg-gradient-to-br from-primary-100 to-primary-50 dark:from-primary-900/30 dark:to-primary-800/20
+                        border border-primary-200/50 dark:border-primary-800/50
                         transition-all duration-300
-                        ${focusedField === 'firstName' ? 'scale-110 shadow-lg shadow-blue-500/30' : ''}
+                        ${focusedField === 'firstName' ? 'scale-105 shadow-lg shadow-primary-500/20' : ''}
                       `}>
-                        <User size={20} className="text-blue-600 dark:text-blue-400" />
+                        <User size={20} className="text-primary-600 dark:text-primary-400" />
                       </div>
                       <FormLabel className="text-lg font-semibold text-gray-700 dark:text-gray-300">
                         {t('form_labels.first_name')}
@@ -89,15 +89,15 @@ const ContactBasicInfo: React.FC = React.memo(() => {
                           variant="glass"
                           className={`
                             w-full px-6 py-4 text-lg rounded-2xl
-                            border-2 bg-white/60 dark:bg-gray-700/60
+                            border-2 bg-white/70 dark:bg-neutral-800/70
                             backdrop-blur-sm
                             transition-all duration-300 ease-out
-                            focus:ring-4 focus:ring-blue-500/30 focus:border-blue-400
-                            hover:bg-white/80 dark:hover:bg-gray-600/80
-                            hover:shadow-lg hover:shadow-blue-500/20
-                            ${fieldState.error ? 'border-red-400 focus:ring-red-500/30' : 'border-white/50 dark:border-gray-600/50'}
+                            focus:ring-4 focus:ring-primary-500/20 focus:border-primary-400
+                            hover:bg-white/90 dark:hover:bg-neutral-800/90
+                            hover:shadow-lg hover:shadow-primary-500/10
+                            ${fieldState.error ? 'border-error-400 focus:ring-error-500/20' : 'border-white/50 dark:border-neutral-600/50'}
                             ${focusedField === 'firstName' ? 'scale-[1.02] shadow-xl' : ''}
-                            ${field.value && !fieldState.error ? 'border-green-400' : ''}
+                            ${field.value && !fieldState.error ? 'border-success-400' : ''}
                           `}
                           {...field}
                           onFocus={() => setFocusedField('firstName')}
@@ -107,7 +107,7 @@ const ContactBasicInfo: React.FC = React.memo(() => {
 
                       {field.value && !fieldState.error && (
                         <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
-                          <UserCheck size={20} className="text-green-500 animate-pulse" />
+                          <UserCheck size={20} className="text-success-500 animate-pulse" />
                         </div>
                       )}
 
@@ -137,12 +137,12 @@ const ContactBasicInfo: React.FC = React.memo(() => {
                     <div className="flex items-center gap-3">
                       <div className={`
                         w-10 h-10 rounded-xl flex items-center justify-center
-                        bg-gradient-to-br from-purple-500/20 to-pink-600/20
-                        border border-purple-200/50 dark:border-purple-800/50
+                        bg-gradient-to-br from-secondary-100 to-secondary-50 dark:from-secondary-900/30 dark:to-secondary-800/20
+                        border border-secondary-200/50 dark:border-secondary-800/50
                         transition-all duration-300
-                        ${focusedField === 'lastName' ? 'scale-110 shadow-lg shadow-purple-500/30' : ''}
+                        ${focusedField === 'lastName' ? 'scale-105 shadow-lg shadow-secondary-500/20' : ''}
                       `}>
-                        <User2 size={20} className="text-purple-600 dark:text-purple-400" />
+                        <User2 size={20} className="text-secondary-600 dark:text-secondary-400" />
                       </div>
                       <FormLabel className="text-lg font-semibold text-gray-700 dark:text-gray-300">
                         {t('form_labels.last_name')}
@@ -160,12 +160,12 @@ const ContactBasicInfo: React.FC = React.memo(() => {
                             border-2 bg-white/60 dark:bg-gray-700/60
                             backdrop-blur-sm
                             transition-all duration-300 ease-out
-                            focus:ring-4 focus:ring-purple-500/30 focus:border-purple-400
-                            hover:bg-white/80 dark:hover:bg-gray-600/80
-                            hover:shadow-lg hover:shadow-purple-500/20
+                            focus:ring-4 focus:ring-secondary-500/20 focus:border-secondary-400
+                            hover:bg-white/90 dark:hover:bg-neutral-800/90
+                            hover:shadow-lg hover:shadow-secondary-500/10
                             ${fieldState.error ? 'border-red-400 focus:ring-red-500/30' : 'border-white/50 dark:border-gray-600/50'}
                             ${focusedField === 'lastName' ? 'scale-[1.02] shadow-xl' : ''}
-                            ${field.value && !fieldState.error ? 'border-green-400' : ''}
+                            ${field.value && !fieldState.error ? 'border-success-400' : ''}
                           `}
                           {...field}
                           onFocus={() => setFocusedField('lastName')}
@@ -175,7 +175,7 @@ const ContactBasicInfo: React.FC = React.memo(() => {
 
                       {field.value && !fieldState.error && (
                         <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
-                          <UserCheck size={20} className="text-green-500 animate-pulse" />
+                          <UserCheck size={20} className="text-success-500 animate-pulse" />
                         </div>
                       )}
 
@@ -205,12 +205,12 @@ const ContactBasicInfo: React.FC = React.memo(() => {
                     <div className="flex items-center gap-3">
                       <div className={`
                         w-10 h-10 rounded-xl flex items-center justify-center
-                        bg-gradient-to-br from-orange-500/20 to-amber-600/20
-                        border border-orange-200/50 dark:border-orange-800/50
+                        bg-gradient-to-br from-warning-100 to-warning-50 dark:from-warning-900/30 dark:to-warning-800/20
+                        border border-warning-200/50 dark:border-warning-800/50
                         transition-all duration-300
-                        ${focusedField === 'position' ? 'scale-110 shadow-lg shadow-orange-500/30' : ''}
+                        ${focusedField === 'position' ? 'scale-105 shadow-lg shadow-warning-500/20' : ''}
                       `}>
-                        <Briefcase size={20} className="text-orange-600 dark:text-orange-400" />
+                        <Briefcase size={20} className="text-warning-600 dark:text-warning-400" />
                       </div>
                       <FormLabel className="text-lg font-semibold text-gray-700 dark:text-gray-300">
                         {t('form_labels.position')}
@@ -227,12 +227,12 @@ const ContactBasicInfo: React.FC = React.memo(() => {
                             border-2 bg-white/60 dark:bg-gray-700/60
                             backdrop-blur-sm
                             transition-all duration-300 ease-out
-                            focus:ring-4 focus:ring-orange-500/30 focus:border-orange-400
-                            hover:bg-white/80 dark:hover:bg-gray-600/80
-                            hover:shadow-lg hover:shadow-orange-500/20
+                            focus:ring-4 focus:ring-warning-500/20 focus:border-warning-400
+                            hover:bg-white/90 dark:hover:bg-neutral-800/90
+                            hover:shadow-lg hover:shadow-warning-500/10
                             ${fieldState.error ? 'border-red-400 focus:ring-red-500/30' : 'border-white/50 dark:border-gray-600/50'}
                             ${focusedField === 'position' ? 'scale-[1.02] shadow-xl' : ''}
-                            ${field.value && !fieldState.error ? 'border-green-400' : ''}
+                            ${field.value && !fieldState.error ? 'border-success-400' : ''}
                           `}
                           {...field}
                           value={field.value || ''}
@@ -243,7 +243,7 @@ const ContactBasicInfo: React.FC = React.memo(() => {
 
                       {field.value && !fieldState.error && (
                         <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
-                          <UserCheck size={20} className="text-green-500 animate-pulse" />
+                          <UserCheck size={20} className="text-success-500 animate-pulse" />
                         </div>
                       )}
 
@@ -273,12 +273,12 @@ const ContactBasicInfo: React.FC = React.memo(() => {
                     <div className="flex items-center gap-3">
                       <div className={`
                         w-10 h-10 rounded-xl flex items-center justify-center
-                        bg-gradient-to-br from-teal-500/20 to-cyan-600/20
-                        border border-teal-200/50 dark:border-teal-800/50
+                        bg-gradient-to-br from-success-100 to-success-50 dark:from-success-900/30 dark:to-success-800/20
+                        border border-success-200/50 dark:border-success-800/50
                         transition-all duration-300
-                        ${focusedField === 'company' ? 'scale-110 shadow-lg shadow-teal-500/30' : ''}
+                        ${focusedField === 'company' ? 'scale-105 shadow-lg shadow-success-500/20' : ''}
                       `}>
-                        <Building2 size={20} className="text-teal-600 dark:text-teal-400" />
+                        <Building2 size={20} className="text-success-600 dark:text-success-400" />
                       </div>
                       <FormLabel className="text-lg font-semibold text-gray-700 dark:text-gray-300">
                         {t('form_labels.company')}
@@ -295,12 +295,12 @@ const ContactBasicInfo: React.FC = React.memo(() => {
                             border-2 bg-white/60 dark:bg-gray-700/60
                             backdrop-blur-sm
                             transition-all duration-300 ease-out
-                            focus:ring-4 focus:ring-teal-500/30 focus:border-teal-400
-                            hover:bg-white/80 dark:hover:bg-gray-600/80
-                            hover:shadow-lg hover:shadow-teal-500/20
+                            focus:ring-4 focus:ring-success-500/20 focus:border-success-400
+                            hover:bg-white/90 dark:hover:bg-neutral-800/90
+                            hover:shadow-lg hover:shadow-success-500/10
                             ${fieldState.error ? 'border-red-400 focus:ring-red-500/30' : 'border-white/50 dark:border-gray-600/50'}
                             ${focusedField === 'company' ? 'scale-[1.02] shadow-xl' : ''}
-                            ${field.value && !fieldState.error ? 'border-green-400' : ''}
+                            ${field.value && !fieldState.error ? 'border-success-400' : ''}
                           `}
                           {...field}
                           value={field.value || ''}
@@ -311,7 +311,7 @@ const ContactBasicInfo: React.FC = React.memo(() => {
 
                       {field.value && !fieldState.error && (
                         <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
-                          <UserCheck size={20} className="text-green-500 animate-pulse" />
+                          <UserCheck size={20} className="text-success-500 animate-pulse" />
                         </div>
                       )}
 
@@ -341,12 +341,12 @@ const ContactBasicInfo: React.FC = React.memo(() => {
                     <div className="flex items-center gap-3">
                       <div className={`
                         w-10 h-10 rounded-xl flex items-center justify-center
-                        bg-gradient-to-br from-indigo-500/20 to-purple-600/20
-                        border border-indigo-200/50 dark:border-indigo-800/50
+                        bg-gradient-to-br from-secondary-100/80 to-secondary-50/80 dark:from-secondary-900/30 dark:to-secondary-800/20
+                        border border-secondary-200/50 dark:border-secondary-800/50
                         transition-all duration-300
-                        ${focusedField === 'gender' ? 'scale-110 shadow-lg shadow-indigo-500/30' : ''}
+                        ${focusedField === 'gender' ? 'scale-105 shadow-lg shadow-secondary-500/20' : ''}
                       `}>
-                        <UserCheck size={20} className="text-indigo-600 dark:text-indigo-400" />
+                        <UserCheck size={20} className="text-secondary-600 dark:text-secondary-400" />
                       </div>
                       <FormLabel className="text-lg font-semibold text-gray-700 dark:text-gray-300">
                         {t('form_labels.gender')}
@@ -363,12 +363,12 @@ const ContactBasicInfo: React.FC = React.memo(() => {
                               border-2 bg-white/60 dark:bg-gray-700/60
                               backdrop-blur-sm
                               transition-all duration-300 ease-out
-                              focus:ring-4 focus:ring-indigo-500/30 focus:border-indigo-400
-                              hover:bg-white/80 dark:hover:bg-gray-600/80
-                              hover:shadow-lg hover:shadow-indigo-500/20
+                              focus:ring-4 focus:ring-secondary-500/20 focus:border-secondary-400
+                              hover:bg-white/90 dark:hover:bg-neutral-800/90
+                              hover:shadow-lg hover:shadow-secondary-500/10
                               ${fieldState.error ? 'border-red-400 focus:ring-red-500/30' : 'border-white/50 dark:border-gray-600/50'}
                               ${focusedField === 'gender' ? 'scale-[1.02] shadow-xl' : ''}
-                              ${field.value && !fieldState.error ? 'border-green-400' : ''}
+                              ${field.value && !fieldState.error ? 'border-success-400' : ''}
                             `}
                             onFocus={() => setFocusedField('gender')}
                             onBlur={() => setFocusedField(null)}
@@ -405,12 +405,12 @@ const ContactBasicInfo: React.FC = React.memo(() => {
                     <div className="flex items-center gap-3">
                       <div className={`
                         w-10 h-10 rounded-xl flex items-center justify-center
-                        bg-gradient-to-br from-green-500/20 to-emerald-600/20
-                        border border-green-200/50 dark:border-green-800/50
+                        bg-gradient-to-br from-success-100/80 to-success-50/80 dark:from-success-900/30 dark:to-success-800/20
+                        border border-success-200/50 dark:border-success-800/50
                         transition-all duration-300
-                        ${focusedField === 'groupId' ? 'scale-110 shadow-lg shadow-green-500/30' : ''}
+                        ${focusedField === 'groupId' ? 'scale-105 shadow-lg shadow-success-500/20' : ''}
                       `}>
-                        <Users size={20} className="text-green-600 dark:text-green-400" />
+                        <Users size={20} className="text-success-600 dark:text-success-400" />
                       </div>
                       <FormLabel className="text-lg font-semibold text-gray-700 dark:text-gray-300">
                         {t('contact_form.group')}
@@ -430,12 +430,12 @@ const ContactBasicInfo: React.FC = React.memo(() => {
                               border-2 bg-white/60 dark:bg-gray-700/60
                               backdrop-blur-sm
                               transition-all duration-300 ease-out
-                              focus:ring-4 focus:ring-green-500/30 focus:border-green-400
-                              hover:bg-white/80 dark:hover:bg-gray-600/80
-                              hover:shadow-lg hover:shadow-green-500/20
+                              focus:ring-4 focus:ring-success-500/20 focus:border-success-400
+                              hover:bg-white/90 dark:hover:bg-neutral-800/90
+                              hover:shadow-lg hover:shadow-success-500/10
                               ${fieldState.error ? 'border-red-400 focus:ring-red-500/30' : 'border-white/50 dark:border-gray-600/50'}
                               ${focusedField === 'groupId' ? 'scale-[1.02] shadow-xl' : ''}
-                              ${field.value && !fieldState.error ? 'border-green-400' : ''}
+                              ${field.value && !fieldState.error ? 'border-success-400' : ''}
                             `}
                             onFocus={() => setFocusedField('groupId')}
                             onBlur={() => setFocusedField(null)}
@@ -450,7 +450,7 @@ const ContactBasicInfo: React.FC = React.memo(() => {
                               </ModernSelectItem>
                             ))}
                             <Separator className="my-1" />
-                            <ModernSelectItem value="__ADD_NEW_GROUP__" className="text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/50 px-4 py-3 rounded-lg">
+                            <ModernSelectItem value="__ADD_NEW_GROUP__" className="text-primary-600 dark:text-primary-400 hover:bg-primary-100/50 dark:hover:bg-primary-900/30 px-4 py-3 rounded-lg">
                               <div className="flex items-center gap-2">
                                 <PlusCircle size={16} />
                                 {t('contact_form.add_new_group')}
@@ -462,7 +462,7 @@ const ContactBasicInfo: React.FC = React.memo(() => {
 
                       {field.value && !fieldState.error && (
                         <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
-                          <UserCheck size={20} className="text-green-500 animate-pulse" />
+                          <UserCheck size={20} className="text-success-500 animate-pulse" />
                         </div>
                       )}
 

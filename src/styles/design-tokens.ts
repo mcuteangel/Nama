@@ -1,4 +1,4 @@
-// رنگ‌های پایه
+// Base color palette interface
 export interface ColorPalette {
   50: string;
   100: string;
@@ -12,8 +12,34 @@ export interface ColorPalette {
   900: string;
 }
 
+// Avatar specific tokens
+export const avatar = {
+  size: {
+    xs: '1.5rem',    // 24px
+    sm: '2rem',      // 32px
+    md: '3rem',      // 48px
+    lg: '4rem',      // 64px
+    xl: '6rem',      // 96px
+  },
+  border: {
+    width: '2px',
+    style: 'solid',
+    color: 'rgba(255, 255, 255, 0.3)',
+    hover: 'rgba(14, 165, 233, 0.5)'
+  },
+  shadow: {
+    sm: '0 1px 3px rgba(0, 0, 0, 0.1)',
+    md: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+    lg: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)'
+  },
+  placeholder: {
+    bg: 'rgba(0, 0, 0, 0.05)',
+    icon: 'rgba(0, 0, 0, 0.4)'
+  }
+};
+
 export const colors = {
-  // رنگ‌های اصلی
+  // Primary colors
   primary: {
     50: '#f0f9ff',
     100: '#e0f2fe',
@@ -99,8 +125,32 @@ export const colors = {
   } as const,
 };
 
-// سایه‌ها
+// Shadow types and utilities
+export interface ButtonShadows {
+  default: string;
+  hover: string;
+  active: string;
+  focus: string;
+}
+
+export interface CardShadows {
+  sm: string;
+  md: string;
+  lg: string;
+  xl: string;
+}
+
+export interface DepthShadows {
+  1: string;
+  2: string;
+  3: string;
+  4: string;
+  5: string;
+}
+
 export interface Shadows {
+  // Base shadows
+  none: string;
   xs: string;
   sm: string;
   md: string;
@@ -108,18 +158,61 @@ export interface Shadows {
   xl: string;
   '2xl': string;
   inner: string;
-  none: string;
+  
+  // Focus states
+  focus: string;
+  'focus-error': string;
+  'focus-success': string;
+  'focus-warning': string;
+  
+  // Component shadows
+  button: ButtonShadows;
+  card: CardShadows;
+  depth: DepthShadows;
 }
 
+// Shadow implementations
 export const shadows: Shadows = {
-  xs: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
-  sm: '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
-  md: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
-  lg: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
-  xl: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)',
+  // Base shadows
+  none: 'none',
+  xs: '0 1px 2px 0 rgb(0 0 0 / 0.02)',
+  sm: '0 1px 3px 0 rgb(0 0 0 / 0.05), 0 1px 2px -1px rgb(0 0 0 / 0.05)',
+  md: '0 2px 4px -1px rgb(0 0 0 / 0.05), 0 1px 3px -1px rgb(0 0 0 / 0.1)',
+  lg: '0 4px 6px -2px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
+  xl: '0 10px 8px -4px rgb(0 0 0 / 0.04), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
   '2xl': '0 25px 50px -12px rgb(0 0 0 / 0.25)',
   inner: 'inset 0 2px 4px 0 rgb(0 0 0 / 0.05)',
-  none: 'none',
+  
+  // Focus states
+  focus: '0 0 0 3px rgba(14, 165, 233, 0.3)',
+  'focus-error': '0 0 0 3px rgba(239, 68, 68, 0.3)',
+  'focus-success': '0 0 0 3px rgba(16, 185, 129, 0.3)',
+  'focus-warning': '0 0 0 3px rgba(245, 158, 11, 0.3)',
+  
+  // Button shadows
+  button: {
+    default: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
+    hover: '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
+    active: 'inset 0 2px 4px 0 rgb(0 0 0 / 0.05)',
+    focus: '0 0 0 3px rgba(14, 165, 233, 0.3)'
+  },
+  
+  // Card shadows
+  card: {
+    sm: '0 1px 3px 0 rgb(0 0 0 / 0.05), 0 1px 2px -1px rgb(0 0 0 / 0.05)',
+    md: '0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
+    lg: '0 10px 15px -3px rgb(0 0 0 / 0.05), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
+    xl: '0 20px 25px -5px rgb(0 0 0 / 0.05), 0 8px 10px -6px rgb(0 0 0 / 0.1)'
+  },
+  
+  // Depth shadows
+  depth: {
+    1: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
+    2: '0 2px 4px -1px rgb(0 0 0 / 0.1)',
+    3: '0 4px 6px -2px rgb(0 0 0 / 0.1)',
+    4: '0 10px 15px -3px rgb(0 0 0 / 0.1)',
+    5: '0 20px 25px -5px rgb(0 0 0 / 0.1)'
+  }
 } as const;
 
 // انیمیشن‌ها
@@ -200,6 +293,25 @@ export const typography = {
 };
 
 // فاصله‌ها (اسپیسینگ)
+// Compact spacing scale for form elements
+export const compactSpacing = {
+  0: '0',
+  0.5: '0.125rem',  // 2px
+  1: '0.25rem',     // 4px
+  1.5: '0.375rem',  // 6px
+  2: '0.5rem',      // 8px
+  2.5: '0.625rem',  // 10px
+  3: '0.75rem',     // 12px
+  3.5: '0.875rem',  // 14px
+  4: '1rem',        // 16px
+  5: '1.25rem',     // 20px
+  6: '1.5rem',      // 24px
+  7: '1.75rem',     // 28px
+  8: '2rem',        // 32px
+  9: '2.25rem',     // 36px
+  10: '2.5rem',     // 40px
+};
+
 export const spacing = {
   px: '1px',
   0: '0',
@@ -239,16 +351,18 @@ export const spacing = {
 };
 
 // شعاع گوشه‌ها (Border Radius)
+// Compact border radius scale
 export const borderRadius = {
   none: '0',
-  sm: '0.125rem',  // 2px
-  DEFAULT: '0.25rem',  // 4px
-  md: '0.375rem',  // 6px
-  lg: '0.5rem',    // 8px
-  xl: '0.75rem',   // 12px
-  '2xl': '1rem',   // 16px
-  '3xl': '1.5rem', // 24px
+  xs: '0.125rem',   // 2px
+  sm: '0.25rem',    // 4px
+  md: '0.375rem',   // 6px
+  lg: '0.5rem',     // 8px
+  xl: '0.75rem',    // 12px
+  '2xl': '1rem',    // 16px
+  '3xl': '1.5rem',  // 24px
   full: '9999px',
+  DEFAULT: '0.25rem',  // 4px
 };
 
 // ابعاد (Sizing)

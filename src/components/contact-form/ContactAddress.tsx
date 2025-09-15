@@ -2,7 +2,7 @@ import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { ModernInput } from '@/components/ui/modern-input';
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
+import { FormField, FormItem, FormLabel, FormControl } from '@/components/ui/form';
 import { ContactFormValues } from '@/types/contact';
 import { MapPin, UserCheck, AlertCircle } from 'lucide-react';
 
@@ -11,19 +11,19 @@ const ContactAddress: React.FC = React.memo(() => {
   const { t } = useTranslation();
 
   return (
-    <div className="space-y-6 pt-6 border-t border-gray-200/50 dark:border-gray-700/50">
-      {/* Address Section */}
-      <div className="flex items-center gap-3 p-4 rounded-xl bg-gradient-to-r from-orange-50/50 to-amber-50/50 dark:from-orange-900/20 dark:to-amber-900/20 border border-orange-200/30 dark:border-orange-800/30">
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-amber-600 flex items-center justify-center shadow-lg">
-          <MapPin size={20} className="text-white" />
+    <div className="space-y-4 pt-4 border-t border-border/30">
+      {/* Compact Header */}
+      <div className="flex items-center gap-2 p-2.5 rounded-lg bg-muted/30 dark:bg-muted/10 border border-border/30">
+        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary/90 to-primary/70 flex items-center justify-center shadow-sm">
+          <MapPin size={16} className="text-white" />
         </div>
-        <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100">
+        <h3 className="text-base font-semibold text-foreground">
           {t('section_titles.address')}
         </h3>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 rounded-xl glass">
-        <div className="group/field p-4 rounded-2xl bg-gradient-to-br from-white/60 to-white/30 dark:from-gray-800/60 dark:to-gray-900/30 border-2 border-white/40 dark:border-gray-700/40 backdrop-blur-sm hover:border-orange-300/50 dark:hover:border-orange-600/50 transition-all duration-300 hover:shadow-lg hover:shadow-orange-500/20">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div className="group/field p-3 rounded-lg bg-muted/10 dark:bg-muted/10 border border-border/20 hover:border-primary/40 transition-colors duration-200">
           <FormField
             control={form.control}
             name="street"
@@ -31,8 +31,8 @@ const ContactAddress: React.FC = React.memo(() => {
               <FormItem>
                 <div className="space-y-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-500/20 to-amber-600/20 border border-orange-200/50 dark:border-orange-800/50 flex items-center justify-center transition-all duration-300">
-                      <MapPin size={16} className="text-orange-600 dark:text-orange-400" />
+                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-warning-100/80 to-warning-50/80 dark:from-warning-900/30 dark:to-warning-800/20 border border-warning-200/50 dark:border-warning-800/50 flex items-center justify-center transition-all duration-300">
+                      <MapPin size={16} className="text-warning-600 dark:text-warning-400" />
                     </div>
                     <FormLabel className="text-sm font-semibold text-gray-700 dark:text-gray-300">
                       {t('contact_form.street')}
@@ -49,11 +49,11 @@ const ContactAddress: React.FC = React.memo(() => {
                           border-2 bg-white/50 dark:bg-gray-700/50
                           backdrop-blur-sm
                           transition-all duration-300 ease-out
-                          focus:ring-3 focus:ring-orange-500/30 focus:border-orange-400
+                          focus:ring-3 focus:ring-warning-500/30 focus:border-warning-400
                           hover:bg-white/70 dark:hover:bg-gray-600/70
-                          hover:shadow-md hover:shadow-orange-500/20
-                          ${fieldState.error ? 'border-red-400 focus:ring-red-500/30' : 'border-white/40 dark:border-gray-600/40'}
-                          ${field.value && !fieldState.error ? 'border-green-400' : ''}
+                          hover:shadow-md hover:shadow-warning-500/20
+                          ${fieldState.error ? 'border-error-400 focus:ring-error-500/30' : 'border-white/40 dark:border-gray-600/40'}
+                          ${field.value && !fieldState.error ? 'border-success-400' : ''}
                         `}
                         {...field}
                         value={field.value || ''}
@@ -62,19 +62,19 @@ const ContactAddress: React.FC = React.memo(() => {
 
                     {field.value && !fieldState.error && (
                       <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                        <UserCheck size={16} className="text-green-500 animate-pulse" />
+                        <UserCheck size={16} className="text-success-500 animate-pulse" />
                       </div>
                     )}
 
                     {fieldState.error && (
                       <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                        <AlertCircle size={16} className="text-red-500" />
+                        <AlertCircle size={16} className="text-error-500" />
                       </div>
                     )}
                   </div>
 
                   {fieldState.error && (
-                    <p className="text-xs text-red-500 dark:text-red-400 flex items-center gap-1 mt-1">
+                    <p className="text-xs text-error-500 dark:text-error-400 flex items-center gap-1 mt-1">
                       <AlertCircle size={12} />
                       {fieldState.error.message}
                     </p>
@@ -85,7 +85,7 @@ const ContactAddress: React.FC = React.memo(() => {
           />
         </div>
 
-        <div className="group/field p-4 rounded-2xl bg-gradient-to-br from-white/60 to-white/30 dark:from-gray-800/60 dark:to-gray-900/30 border-2 border-white/40 dark:border-gray-700/40 backdrop-blur-sm hover:border-orange-300/50 dark:hover:border-orange-600/50 transition-all duration-300 hover:shadow-lg hover:shadow-orange-500/20">
+        <div className="group/field p-3 rounded-lg bg-muted/10 dark:bg-muted/10 border border-border/20 hover:border-primary/40 transition-colors duration-200">
           <FormField
             control={form.control}
             name="city"
@@ -93,8 +93,8 @@ const ContactAddress: React.FC = React.memo(() => {
               <FormItem>
                 <div className="space-y-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-500/20 to-amber-600/20 border border-orange-200/50 dark:border-orange-800/50 flex items-center justify-center transition-all duration-300">
-                      <MapPin size={16} className="text-orange-600 dark:text-orange-400" />
+                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-warning-100/80 to-warning-50/80 dark:from-warning-900/30 dark:to-warning-800/20 border border-warning-200/50 dark:border-warning-800/50 flex items-center justify-center transition-all duration-300">
+                      <MapPin size={16} className="text-warning-600 dark:text-warning-400" />
                     </div>
                     <FormLabel className="text-sm font-semibold text-gray-700 dark:text-gray-300">
                       {t('contact_form.city')}
@@ -111,11 +111,11 @@ const ContactAddress: React.FC = React.memo(() => {
                           border-2 bg-white/50 dark:bg-gray-700/50
                           backdrop-blur-sm
                           transition-all duration-300 ease-out
-                          focus:ring-3 focus:ring-orange-500/30 focus:border-orange-400
+                          focus:ring-3 focus:ring-warning-500/30 focus:border-warning-400
                           hover:bg-white/70 dark:hover:bg-gray-600/70
-                          hover:shadow-md hover:shadow-orange-500/20
-                          ${fieldState.error ? 'border-red-400 focus:ring-red-500/30' : 'border-white/40 dark:border-gray-600/40'}
-                          ${field.value && !fieldState.error ? 'border-green-400' : ''}
+                          hover:shadow-md hover:shadow-warning-500/20
+                          ${fieldState.error ? 'border-error-400 focus:ring-error-500/30' : 'border-white/40 dark:border-gray-600/40'}
+                          ${field.value && !fieldState.error ? 'border-success-400' : ''}
                         `}
                         {...field}
                         value={field.value || ''}
@@ -124,19 +124,19 @@ const ContactAddress: React.FC = React.memo(() => {
 
                     {field.value && !fieldState.error && (
                       <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                        <UserCheck size={16} className="text-green-500 animate-pulse" />
+                        <UserCheck size={16} className="text-success-500 animate-pulse" />
                       </div>
                     )}
 
                     {fieldState.error && (
                       <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                        <AlertCircle size={16} className="text-red-500" />
+                        <AlertCircle size={16} className="text-error-500" />
                       </div>
                     )}
                   </div>
 
                   {fieldState.error && (
-                    <p className="text-xs text-red-500 dark:text-red-400 flex items-center gap-1 mt-1">
+                    <p className="text-xs text-error-500 dark:text-error-400 flex items-center gap-1 mt-1">
                       <AlertCircle size={12} />
                       {fieldState.error.message}
                     </p>
@@ -147,7 +147,7 @@ const ContactAddress: React.FC = React.memo(() => {
           />
         </div>
 
-        <div className="group/field p-4 rounded-2xl bg-gradient-to-br from-white/60 to-white/30 dark:from-gray-800/60 dark:to-gray-900/30 border-2 border-white/40 dark:border-gray-700/40 backdrop-blur-sm hover:border-orange-300/50 dark:hover:border-orange-600/50 transition-all duration-300 hover:shadow-lg hover:shadow-orange-500/20">
+        <div className="group/field p-3 rounded-lg bg-muted/10 dark:bg-muted/10 border border-border/20 hover:border-primary/40 transition-colors duration-200">
           <FormField
             control={form.control}
             name="state"
@@ -155,8 +155,8 @@ const ContactAddress: React.FC = React.memo(() => {
               <FormItem>
                 <div className="space-y-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-500/20 to-amber-600/20 border border-orange-200/50 dark:border-orange-800/50 flex items-center justify-center transition-all duration-300">
-                      <MapPin size={16} className="text-orange-600 dark:text-orange-400" />
+                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-warning-100/80 to-warning-50/80 dark:from-warning-900/30 dark:to-warning-800/20 border border-warning-200/50 dark:border-warning-800/50 flex items-center justify-center transition-all duration-300">
+                      <MapPin size={16} className="text-warning-600 dark:text-warning-400" />
                     </div>
                     <FormLabel className="text-sm font-semibold text-gray-700 dark:text-gray-300">
                       {t('contact_form.state')}
@@ -173,11 +173,11 @@ const ContactAddress: React.FC = React.memo(() => {
                           border-2 bg-white/50 dark:bg-gray-700/50
                           backdrop-blur-sm
                           transition-all duration-300 ease-out
-                          focus:ring-3 focus:ring-orange-500/30 focus:border-orange-400
+                          focus:ring-3 focus:ring-warning-500/30 focus:border-warning-400
                           hover:bg-white/70 dark:hover:bg-gray-600/70
-                          hover:shadow-md hover:shadow-orange-500/20
-                          ${fieldState.error ? 'border-red-400 focus:ring-red-500/30' : 'border-white/40 dark:border-gray-600/40'}
-                          ${field.value && !fieldState.error ? 'border-green-400' : ''}
+                          hover:shadow-md hover:shadow-warning-500/20
+                          ${fieldState.error ? 'border-error-400 focus:ring-error-500/30' : 'border-white/40 dark:border-gray-600/40'}
+                          ${field.value && !fieldState.error ? 'border-success-400' : ''}
                         `}
                         {...field}
                         value={field.value || ''}
@@ -186,19 +186,19 @@ const ContactAddress: React.FC = React.memo(() => {
 
                     {field.value && !fieldState.error && (
                       <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                        <UserCheck size={16} className="text-green-500 animate-pulse" />
+                        <UserCheck size={16} className="text-success-500 animate-pulse" />
                       </div>
                     )}
 
                     {fieldState.error && (
                       <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                        <AlertCircle size={16} className="text-red-500" />
+                        <AlertCircle size={16} className="text-error-500" />
                       </div>
                     )}
                   </div>
 
                   {fieldState.error && (
-                    <p className="text-xs text-red-500 dark:text-red-400 flex items-center gap-1 mt-1">
+                    <p className="text-xs text-error-500 dark:text-error-400 flex items-center gap-1 mt-1">
                       <AlertCircle size={12} />
                       {fieldState.error.message}
                     </p>
@@ -209,7 +209,7 @@ const ContactAddress: React.FC = React.memo(() => {
           />
         </div>
 
-        <div className="group/field p-4 rounded-2xl bg-gradient-to-br from-white/60 to-white/30 dark:from-gray-800/60 dark:to-gray-900/30 border-2 border-white/40 dark:border-gray-700/40 backdrop-blur-sm hover:border-orange-300/50 dark:hover:border-orange-600/50 transition-all duration-300 hover:shadow-lg hover:shadow-orange-500/20">
+        <div className="group/field p-3 rounded-lg bg-muted/10 dark:bg-muted/10 border border-border/20 hover:border-primary/40 transition-colors duration-200">
           <FormField
             control={form.control}
             name="zipCode"
@@ -217,8 +217,8 @@ const ContactAddress: React.FC = React.memo(() => {
               <FormItem>
                 <div className="space-y-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-500/20 to-amber-600/20 border border-orange-200/50 dark:border-orange-800/50 flex items-center justify-center transition-all duration-300">
-                      <MapPin size={16} className="text-orange-600 dark:text-orange-400" />
+                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-warning-100/80 to-warning-50/80 dark:from-warning-900/30 dark:to-warning-800/20 border border-warning-200/50 dark:border-warning-800/50 flex items-center justify-center transition-all duration-300">
+                      <MapPin size={16} className="text-warning-600 dark:text-warning-400" />
                     </div>
                     <FormLabel className="text-sm font-semibold text-gray-700 dark:text-gray-300">
                       {t('contact_form.zip_code')}
@@ -235,11 +235,11 @@ const ContactAddress: React.FC = React.memo(() => {
                           border-2 bg-white/50 dark:bg-gray-700/50
                           backdrop-blur-sm
                           transition-all duration-300 ease-out
-                          focus:ring-3 focus:ring-orange-500/30 focus:border-orange-400
+                          focus:ring-3 focus:ring-warning-500/30 focus:border-warning-400
                           hover:bg-white/70 dark:hover:bg-gray-600/70
-                          hover:shadow-md hover:shadow-orange-500/20
-                          ${fieldState.error ? 'border-red-400 focus:ring-red-500/30' : 'border-white/40 dark:border-gray-600/40'}
-                          ${field.value && !fieldState.error ? 'border-green-400' : ''}
+                          hover:shadow-md hover:shadow-warning-500/20
+                          ${fieldState.error ? 'border-error-400 focus:ring-error-500/30' : 'border-white/40 dark:border-gray-600/40'}
+                          ${field.value && !fieldState.error ? 'border-success-400' : ''}
                         `}
                         {...field}
                         value={field.value || ''}
@@ -248,19 +248,19 @@ const ContactAddress: React.FC = React.memo(() => {
 
                     {field.value && !fieldState.error && (
                       <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                        <UserCheck size={16} className="text-green-500 animate-pulse" />
+                        <UserCheck size={16} className="text-success-500 animate-pulse" />
                       </div>
                     )}
 
                     {fieldState.error && (
                       <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                        <AlertCircle size={16} className="text-red-500" />
+                        <AlertCircle size={16} className="text-error-500" />
                       </div>
                     )}
                   </div>
 
                   {fieldState.error && (
-                    <p className="text-xs text-red-500 dark:text-red-400 flex items-center gap-1 mt-1">
+                    <p className="text-xs text-error-500 dark:text-error-400 flex items-center gap-1 mt-1">
                       <AlertCircle size={12} />
                       {fieldState.error.message}
                     </p>
@@ -271,7 +271,7 @@ const ContactAddress: React.FC = React.memo(() => {
           />
         </div>
 
-        <div className="group/field p-4 rounded-2xl bg-gradient-to-br from-white/60 to-white/30 dark:from-gray-800/60 dark:to-gray-900/30 border-2 border-white/40 dark:border-gray-700/40 backdrop-blur-sm hover:border-orange-300/50 dark:hover:border-orange-600/50 transition-all duration-300 hover:shadow-lg hover:shadow-orange-500/20 md:col-span-2">
+        <div className="group/field p-3 rounded-lg bg-muted/10 dark:bg-muted/10 border border-border/20 hover:border-primary/40 transition-colors duration-200 md:col-span-2">
           <FormField
             control={form.control}
             name="country"
@@ -279,8 +279,8 @@ const ContactAddress: React.FC = React.memo(() => {
               <FormItem>
                 <div className="space-y-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-500/20 to-amber-600/20 border border-orange-200/50 dark:border-orange-800/50 flex items-center justify-center transition-all duration-300">
-                      <MapPin size={16} className="text-orange-600 dark:text-orange-400" />
+                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-warning-100/80 to-warning-50/80 dark:from-warning-900/30 dark:to-warning-800/20 border border-warning-200/50 dark:border-warning-800/50 flex items-center justify-center transition-all duration-300">
+                      <MapPin size={16} className="text-warning-600 dark:text-warning-400" />
                     </div>
                     <FormLabel className="text-sm font-semibold text-gray-700 dark:text-gray-300">
                       {t('contact_form.country')}
@@ -297,11 +297,11 @@ const ContactAddress: React.FC = React.memo(() => {
                           border-2 bg-white/50 dark:bg-gray-700/50
                           backdrop-blur-sm
                           transition-all duration-300 ease-out
-                          focus:ring-3 focus:ring-orange-500/30 focus:border-orange-400
+                          focus:ring-3 focus:ring-warning-500/30 focus:border-warning-400
                           hover:bg-white/70 dark:hover:bg-gray-600/70
-                          hover:shadow-md hover:shadow-orange-500/20
-                          ${fieldState.error ? 'border-red-400 focus:ring-red-500/30' : 'border-white/40 dark:border-gray-600/40'}
-                          ${field.value && !fieldState.error ? 'border-green-400' : ''}
+                          hover:shadow-md hover:shadow-warning-500/20
+                          ${fieldState.error ? 'border-error-400 focus:ring-error-500/30' : 'border-white/40 dark:border-gray-600/40'}
+                          ${field.value && !fieldState.error ? 'border-success-400' : ''}
                         `}
                         {...field}
                         value={field.value || ''}
@@ -310,19 +310,19 @@ const ContactAddress: React.FC = React.memo(() => {
 
                     {field.value && !fieldState.error && (
                       <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                        <UserCheck size={16} className="text-green-500 animate-pulse" />
+                        <UserCheck size={16} className="text-success-500 animate-pulse" />
                       </div>
                     )}
 
                     {fieldState.error && (
                       <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                        <AlertCircle size={16} className="text-red-500" />
+                        <AlertCircle size={16} className="text-error-500" />
                       </div>
                     )}
                   </div>
 
                   {fieldState.error && (
-                    <p className="text-xs text-red-500 dark:text-red-400 flex items-center gap-1 mt-1">
+                    <p className="text-xs text-error-500 dark:text-error-400 flex items-center gap-1 mt-1">
                       <AlertCircle size={12} />
                       {fieldState.error.message}
                     </p>

@@ -3,7 +3,7 @@ import { useFormContext, useFieldArray } from 'react-hook-form';
 import { ModernInput } from '@/components/ui/modern-input';
 import { ModernSelect, ModernSelectContent, ModernSelectItem, ModernSelectTrigger, ModernSelectValue } from '@/components/ui/modern-select';
 import { GlassButton } from "@/components/ui/glass-button";
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
+import { FormField, FormItem, FormLabel, FormControl } from '@/components/ui/form';
 import { Plus, X, Phone, UserCheck, AlertCircle } from 'lucide-react';
 import { ContactFormValues } from '@/types/contact';
 import { useTranslation } from 'react-i18next';
@@ -42,32 +42,31 @@ const ContactPhoneNumbers: React.FC = React.memo(() => {
   };
 
   return (
-    <div className="space-y-6 pt-6 border-t border-gray-200/50 dark:border-gray-700/50">
-      {/* Enhanced Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 p-4 rounded-xl bg-gradient-to-r from-blue-50/50 to-indigo-50/50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200/30 dark:border-blue-800/30">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg">
-            <Phone size={20} className="text-white" />
+    <div className="space-y-4 pt-4 border-t border-border/30">
+      {/* Compact Header */}
+      <div className="flex flex-row justify-between items-center gap-2 p-2.5 rounded-lg bg-muted/30 dark:bg-muted/10 border border-border/30">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary/90 to-primary/70 flex items-center justify-center shadow-sm">
+            <Phone size={16} className="text-white" />
           </div>
-          <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100">
+          <h3 className="text-base font-semibold text-foreground">
             {t('section_titles.phone_numbers')}
           </h3>
         </div>
         <GlassButton
           type="button"
-          variant="gradient-ocean"
-          effect="lift"
+          variant="ghost"
           size="sm"
           onClick={() => append({ phone_type: "mobile", phone_number: "", extension: null })}
-          className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5"
+          className="h-8 px-3 text-xs font-medium rounded-md hover:bg-accent/50 transition-colors"
         >
-          <Plus size={18} className="me-2" />
+          <Plus size={16} className="me-1.5" />
           {t('button_labels.add_phone_number')}
         </GlassButton>
       </div>
       
-      {/* Enhanced Phone Numbers Container */}
-      <div className="space-y-4">
+      {/* Phone Numbers Container */}
+      <div className="space-y-3">
         {fields.map((item, index) => {
           const fieldId = item.id;
           const isPhoneNumberField = focusedFields[fieldId] === 'phone_number';
@@ -75,7 +74,7 @@ const ContactPhoneNumbers: React.FC = React.memo(() => {
           const isExtensionField = focusedFields[fieldId] === 'extension';
           
           return (
-            <div key={item.id} className="group/phone-item p-4 rounded-2xl bg-gradient-to-br from-white/60 to-white/30 dark:from-gray-800/60 dark:to-gray-900/30 border-2 border-white/40 dark:border-gray-700/40 backdrop-blur-sm hover:border-blue-300/50 dark:hover:border-blue-600/50 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/20">
+            <div key={item.id} className="group/phone-item p-3 rounded-lg bg-muted/10 dark:bg-muted/10 border border-border/20 hover:border-primary/40 transition-colors duration-200">
               <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
                 {/* Phone Type */}
                 <div className="md:col-span-4">
@@ -88,12 +87,12 @@ const ContactPhoneNumbers: React.FC = React.memo(() => {
                           <div className="flex items-center gap-3">
                             <div className={`
                               w-8 h-8 rounded-lg flex items-center justify-center
-                              bg-gradient-to-br from-indigo-500/20 to-purple-600/20
-                              border border-indigo-200/50 dark:border-indigo-800/50
+                              bg-gradient-to-br from-secondary-100/80 to-secondary-50/80 dark:from-secondary-900/30 dark:to-secondary-800/20
+                              border border-secondary-200/50 dark:border-secondary-800/50
                               transition-all duration-300
-                              ${isTypeField ? 'scale-110 shadow-lg shadow-indigo-500/30' : ''}
+                              ${isTypeField ? 'scale-105 shadow-lg shadow-secondary-500/20' : ''}
                             `}>
-                              <Phone size={16} className="text-indigo-600 dark:text-indigo-400" />
+                              <Phone size={16} className="text-secondary-600 dark:text-secondary-400" />
                             </div>
                             <FormLabel className="text-sm font-semibold text-gray-700 dark:text-gray-300">
                               {t('form_labels.phone_type')}
@@ -110,12 +109,12 @@ const ContactPhoneNumbers: React.FC = React.memo(() => {
                                     border-2 bg-white/50 dark:bg-gray-700/50
                                     backdrop-blur-sm
                                     transition-all duration-300 ease-out
-                                    focus:ring-3 focus:ring-indigo-500/30 focus:border-indigo-400
+                                    focus:ring-3 focus:ring-secondary-500/30 focus:border-secondary-400
                                     hover:bg-white/70 dark:hover:bg-gray-600/70
-                                    hover:shadow-md hover:shadow-indigo-500/20
-                                    ${fieldState.error ? 'border-red-400 focus:ring-red-500/30' : 'border-white/40 dark:border-gray-600/40'}
+                                    hover:shadow-md hover:shadow-secondary-500/20
+                                    ${fieldState.error ? 'border-error-400 focus:ring-error-500/30' : 'border-white/40 dark:border-gray-600/40'}
                                     ${isTypeField ? 'scale-[1.01] shadow-lg' : ''}
-                                    ${field.value && !fieldState.error ? 'border-green-400' : ''}
+                                    ${field.value && !fieldState.error ? 'border-success-400' : ''}
                                   `}
                                   onFocus={() => handleFieldFocus(fieldId, 'phone_type')}
                                   onBlur={() => handleFieldBlur(fieldId)}
@@ -134,7 +133,7 @@ const ContactPhoneNumbers: React.FC = React.memo(() => {
                           </div>
 
                           {fieldState.error && (
-                            <p className="text-xs text-red-500 dark:text-red-400 flex items-center gap-1 mt-1">
+                            <p className="text-xs text-error-500 dark:text-error-400 flex items-center gap-1 mt-1">
                               <AlertCircle size={12} />
                               {fieldState.error.message}
                             </p>
@@ -156,12 +155,12 @@ const ContactPhoneNumbers: React.FC = React.memo(() => {
                           <div className="flex items-center gap-3">
                             <div className={`
                               w-8 h-8 rounded-lg flex items-center justify-center
-                              bg-gradient-to-br from-blue-500/20 to-cyan-600/20
-                              border border-blue-200/50 dark:border-blue-800/50
+                              bg-gradient-to-br from-primary-100/80 to-primary-50/80 dark:from-primary-900/30 dark:to-primary-800/20
+                              border border-primary-200/50 dark:border-primary-800/50
                               transition-all duration-300
-                              ${isPhoneNumberField ? 'scale-110 shadow-lg shadow-blue-500/30' : ''}
+                              ${isPhoneNumberField ? 'scale-105 shadow-lg shadow-primary-500/20' : ''}
                             `}>
-                              <Phone size={16} className="text-blue-600 dark:text-blue-400" />
+                              <Phone size={16} className="text-primary-600 dark:text-primary-400" />
                             </div>
                             <FormLabel className="text-sm font-semibold text-gray-700 dark:text-gray-300">
                               {t('form_labels.phone_number')}
@@ -178,12 +177,12 @@ const ContactPhoneNumbers: React.FC = React.memo(() => {
                                   border-2 bg-white/50 dark:bg-gray-700/50
                                   backdrop-blur-sm
                                   transition-all duration-300 ease-out
-                                  focus:ring-3 focus:ring-blue-500/30 focus:border-blue-400
+                                  focus:ring-3 focus:ring-primary-500/30 focus:border-primary-400
                                   hover:bg-white/70 dark:hover:bg-gray-600/70
-                                  hover:shadow-md hover:shadow-blue-500/20
-                                  ${fieldState.error ? 'border-red-400 focus:ring-red-500/30' : 'border-white/40 dark:border-gray-600/40'}
+                                  hover:shadow-md hover:shadow-primary-500/20
+                                  ${fieldState.error ? 'border-error-400 focus:ring-error-500/30' : 'border-white/40 dark:border-gray-600/40'}
                                   ${isPhoneNumberField ? 'scale-[1.01] shadow-lg' : ''}
-                                  ${field.value && !fieldState.error ? 'border-green-400' : ''}
+                                  ${field.value && !fieldState.error ? 'border-success-400' : ''}
                                 `}
                                 {...field}
                                 onFocus={() => handleFieldFocus(fieldId, 'phone_number')}
@@ -193,19 +192,19 @@ const ContactPhoneNumbers: React.FC = React.memo(() => {
 
                             {field.value && !fieldState.error && (
                               <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                                <UserCheck size={16} className="text-green-500 animate-pulse" />
+                                <UserCheck size={16} className="text-success-500 animate-pulse" />
                               </div>
                             )}
 
                             {fieldState.error && (
                               <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                                <AlertCircle size={16} className="text-red-500" />
+                                <AlertCircle size={16} className="text-error-500" />
                               </div>
                             )}
                           </div>
 
                           {fieldState.error && (
-                            <p className="text-xs text-red-500 dark:text-red-400 flex items-center gap-1 mt-1">
+                            <p className="text-xs text-error-500 dark:text-error-400 flex items-center gap-1 mt-1">
                               <AlertCircle size={12} />
                               {fieldState.error.message}
                             </p>
@@ -227,12 +226,12 @@ const ContactPhoneNumbers: React.FC = React.memo(() => {
                           <div className="flex items-center gap-3">
                             <div className={`
                               w-8 h-8 rounded-lg flex items-center justify-center
-                              bg-gradient-to-br from-green-500/20 to-emerald-600/20
-                              border border-green-200/50 dark:border-green-800/50
+                              bg-gradient-to-br from-info-100/80 to-info-50/80 dark:from-info-900/30 dark:to-info-800/20
+                              border border-info-200/50 dark:border-info-800/50
                               transition-all duration-300
-                              ${isExtensionField ? 'scale-110 shadow-lg shadow-green-500/30' : ''}
+                              ${isExtensionField ? 'scale-105 shadow-lg shadow-info-500/20' : ''}
                             `}>
-                              <Phone size={16} className="text-green-600 dark:text-green-400" />
+                              <Phone size={16} className="text-info-600 dark:text-info-400" />
                             </div>
                             <FormLabel className="text-xs font-semibold text-gray-700 dark:text-gray-300">
                               {t('form_labels.extension_optional')}
@@ -252,9 +251,9 @@ const ContactPhoneNumbers: React.FC = React.memo(() => {
                                   focus:ring-3 focus:ring-green-500/30 focus:border-green-400
                                   hover:bg-white/70 dark:hover:bg-gray-600/70
                                   hover:shadow-md hover:shadow-green-500/20
-                                  ${fieldState.error ? 'border-red-400 focus:ring-red-500/30' : 'border-white/40 dark:border-gray-600/40'}
+                                  ${fieldState.error ? 'border-error-400 focus:ring-error-500/30' : 'border-white/40 dark:border-gray-600/40'}
                                   ${isExtensionField ? 'scale-[1.01] shadow-lg' : ''}
-                                  ${field.value && !fieldState.error ? 'border-green-400' : ''}
+                                  ${field.value && !fieldState.error ? 'border-success-400' : ''}
                                 `}
                                 {...field}
                                 value={field.value || ''}
@@ -265,19 +264,19 @@ const ContactPhoneNumbers: React.FC = React.memo(() => {
 
                             {field.value && !fieldState.error && (
                               <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                                <UserCheck size={16} className="text-green-500 animate-pulse" />
+                                <UserCheck size={16} className="text-success-500 animate-pulse" />
                               </div>
                             )}
 
                             {fieldState.error && (
                               <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                                <AlertCircle size={16} className="text-red-500" />
+                                <AlertCircle size={16} className="text-error-500" />
                               </div>
                             )}
                           </div>
 
                           {fieldState.error && (
-                            <p className="text-xs text-red-500 dark:text-red-400 flex items-center gap-1 mt-1">
+                            <p className="text-xs text-error-500 dark:text-error-400 flex items-center gap-1 mt-1">
                               <AlertCircle size={12} />
                               {fieldState.error.message}
                             </p>
@@ -295,7 +294,7 @@ const ContactPhoneNumbers: React.FC = React.memo(() => {
                     variant="ghost"
                     size="icon"
                     onClick={() => remove(index)}
-                    className="text-red-500 hover:bg-red-100/30 dark:hover:bg-red-900/20 h-10 w-10 rounded-full transition-all duration-300 hover:scale-110 group-hover/phone-item:scale-110"
+                    className="text-error-500 hover:bg-error-100/30 dark:hover:bg-error-900/20 h-10 w-10 rounded-full transition-all duration-300 hover:scale-110 group-hover/phone-item:scale-110"
                     aria-label={t('accessibility.remove_phone_number', 'Remove phone number')}
                   >
                     <X size={16} className="transition-transform duration-200 group-hover/phone-item:rotate-90" />
