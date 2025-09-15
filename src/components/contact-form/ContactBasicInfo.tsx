@@ -2,7 +2,7 @@ import React, { useMemo, useState, useCallback } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { ModernInput } from '@/components/ui/modern-input';
 import { ModernSelect, ModernSelectContent, ModernSelectItem, ModernSelectTrigger, ModernSelectValue } from '@/components/ui/modern-select';
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
+import { FormField, FormItem, FormLabel, FormControl } from '@/components/ui/form';
 import { ContactFormValues } from '@/types/contact';
 import { useTranslation } from 'react-i18next';
 import { useGroups } from '@/hooks/use-groups';
@@ -26,7 +26,6 @@ const ContactBasicInfo: React.FC = React.memo(() => {
 
   // Use the custom hook for color management
   const {
-    memoizedInitialColor,
     isLoading: isFetchingColors,
     error: fetchColorsError,
     fetchColorsWhenNeeded,

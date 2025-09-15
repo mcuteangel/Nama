@@ -190,6 +190,12 @@
   }
 }
 
+@layer utilities {
+  .text-foreground {
+    color: hsl(var(--foreground));
+  }
+}
+
 @layer base {
   * {
     @apply border-border;

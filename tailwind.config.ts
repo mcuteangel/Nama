@@ -1,9 +1,12 @@
 import tailwindcssAnimate from "tailwindcss-animate";
-
+import { designTokens } from "./src/styles/design-tokens";
 import type { Config } from "tailwindcss";
 
+// Extract only the required tokens
+const { colors, typography, spacing, borderRadius, shadows } = designTokens;
+
 export default {
-  darkMode: ["class"],
+  darkMode: ["class", '[data-theme="dark"]'],
   content: [
     "./pages/**/*.{ts,tsx}",
     "./components/**/*.{ts,tsx}",
@@ -14,153 +17,178 @@ export default {
   theme: {
     container: {
       center: true,
-      padding: "2rem",
+      padding: spacing[4],
       screens: {
-        "2xl": "1400px",
+        sm: designTokens.breakpoints.sm,
+        md: designTokens.breakpoints.md,
+        lg: designTokens.breakpoints.lg,
+        xl: designTokens.breakpoints.xl,
+        '2xl': designTokens.breakpoints['2xl'],
       },
     },
     extend: {
       colors: {
-        border: "hsl(var(--border))",
-        input: "hsl(var(--input))",
-        ring: "hsl(var(--ring))",
-        background: "hsl(var(--background))",
-        foreground: "hsl(var(--foreground))",
+        // رنگ‌های اصلی
         primary: {
-          DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
+          DEFAULT: 'var(--color-primary, #0ea5e9)',
+          hover: 'var(--color-primary-hover, #0284c7)',
+          active: 'var(--color-primary-active, #0369a1)',
+          light: 'var(--color-primary-light, #bae6fd)',
+          lightHover: 'var(--color-primary-light-hover, #7dd3fc)',
+          ...colors.primary
         },
-        secondary: {
-          DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondary-foreground))",
-        },
-        destructive: {
-          DEFAULT: "hsl(var(--destructive))",
-          foreground: "hsl(var(--destructive-foreground))",
-        },
-        muted: {
-          DEFAULT: "hsl(var(--muted))",
-          foreground: "hsl(var(--muted-foreground))",
-        },
-        accent: {
-          DEFAULT: "hsl(var(--accent))",
-          foreground: "hsl(var(--accent-foreground))",
-        },
-        popover: {
-          DEFAULT: "hsl(var(--popover))",
-          foreground: "hsl(var(--popover-foreground))",
-        },
-        card: {
-          DEFAULT: "hsl(var(--card))",
-          foreground: "hsl(var(--card-foreground))",
-        },
-        sidebar: {
-          DEFAULT: "hsl(var(--sidebar-background))",
-          foreground: "hsl(var(--sidebar-foreground))",
-          primary: "hsl(var(--sidebar-primary))",
-          "primary-foreground": "hsl(var(--sidebar-primary-foreground))",
-          accent: "hsl(var(--sidebar-accent))",
-          "accent-foreground": "hsl(var(--sidebar-accent-foreground))",
-          border: "hsl(var(--sidebar-border))",
-          ring: "hsl(var(--sidebar-ring))",
-        },
+        // پس‌زمینه‌ها
+        background: 'var(--color-background, #ffffff)',
         surface: {
-          1: "hsl(var(--surface-1))",
-          2: "hsl(var(--surface-2))",
-          3: "hsl(var(--surface-3))",
-          4: "hsl(var(--surface-4))",
+          DEFAULT: 'var(--color-surface, #f8fafc)',
+          hover: 'var(--color-surface-hover, #f1f5f9)',
+          active: 'var(--color-surface-active, #e2e8f0)'
         },
+        // متون
+        text: {
+          DEFAULT: 'hsl(var(--foreground))',
+          primary: 'var(--color-text-primary, #0f172a)',
+          secondary: 'var(--color-text-secondary, #475569)',
+          tertiary: 'var(--color-text-tertiary, #94a3b8)',
+          inverted: 'var(--color-text-inverted, #ffffff)',
+          foreground: 'hsl(var(--foreground))'
+        },
+        // حاشیه‌ها
+        border: 'var(--color-border, #e2e8f0)',
+        borderHover: 'var(--color-border-hover, #cbd5e1)',
+        // وضعیت‌ها
+        success: {
+          DEFAULT: 'var(--color-success, #22c55e)',
+          ...colors.success
+        },
+        warning: {
+          DEFAULT: 'var(--color-warning, #f59e0b)',
+          ...colors.warning
+        },
+        error: {
+          DEFAULT: 'var(--color-error, #ef4444)',
+          ...colors.error
+        },
+        info: {
+          DEFAULT: 'var(--color-info, #0ea5e9)',
+          ...colors.primary
+        },
+        // شیشه‌ای
+        glass: 'var(--glass, rgba(255, 255, 255, 0.1))',
+        glassBorder: 'var(--glass-border, rgba(255, 255, 255, 0.2))',
+        // گرادیانت‌ها
+        gradient: {
+          primary: 'var(--gradient-primary, linear-gradient(135deg, #0ea5e9 0%, #3b82f6 100%))',
+          surface: 'var(--gradient-surface, linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%))'
+        }
       },
+      // تایپوگرافی
       fontFamily: {
+        sans: typography.fontFamily.sans,
+        mono: typography.fontFamily.mono,
         'display': ['Poppins', 'sans-serif'],
         'persian': ['Vazirmatn', 'sans-serif'],
         'english': ['Inter', 'sans-serif'],
       },
+      fontSize: typography.fontSize,
+      fontWeight: typography.fontWeight,
+      lineHeight: typography.lineHeight,
+      letterSpacing: typography.letterSpacing,
+      // شعاع گوشه‌ها
       borderRadius: {
+        ...borderRadius,
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
+      // سایه‌ها
+      boxShadow: (() => {
+        // ادغام سایه‌های سفارشی با مقادیر پیش‌فرض
+        const defaultShadows = {
+          sm: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
+          DEFAULT: '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
+          md: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
+          lg: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
+          xl: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)',
+          '2xl': '0 25px 50px -12px rgb(0 0 0 / 0.25)',
+          inner: 'inset 0 2px 4px 0 rgb(0 0 0 / 0.05)',
+          none: '0 0 #0000'
+        };
+
+        // اضافه کردن سایه‌های سفارشی که در پیش‌فرض‌ها وجود ندارند
+        const customShadows = Object.entries(shadows || {})
+          .filter(([key]) => !(key in defaultShadows))
+          .reduce((acc, [key, value]) => ({
+            ...acc,
+            [key]: value
+          }), {});
+
+        return {
+          ...defaultShadows,
+          ...customShadows
+        };
+      })(),
       keyframes: {
-        "accordion-down": {
+        'accordion-down': {
+          from: { height: '0', opacity: '0' },
+          to: { height: 'var(--radix-accordion-content-height)', opacity: '1' }
+        },
+        'accordion-up': {
+          from: { height: 'var(--radix-accordion-content-height)', opacity: '1' },
+          to: { height: '0', opacity: '0' }
+        },
+        'fade-in': {
+          from: { opacity: '0' },
+          to: { opacity: '1' }
+        },
+        'fade-out': {
+          from: { opacity: '1' },
+          to: { opacity: '0' }
+        },
+        'slide-down': {
+          from: { height: '0' },
+          to: { height: 'var(--radix-collapsible-content-height)' }
+        },
+        'slide-up': {
+          from: { height: 'var(--radix-collapsible-content-height)' },
+          to: { height: '0' }
+        },
+        'slide-left': {
+          from: { transform: 'translateX(100%)' },
+          to: { transform: 'translateX(0)' }
+        },
+        'slide-right': {
+          from: { transform: 'translateX(-100%)' },
+          to: { transform: 'translateX(0)' }
+        },
+        'spin': {
+          to: { transform: 'rotate(360deg)' }
+        },
+        'pulse': {
+          '0%, 100%': { opacity: '1' },
+          '50%': { opacity: '.5' }
+        },
+        'bounce': {
+          '0%, 100%': {
+            transform: 'translateY(-25%)',
+            animationTimingFunction: 'cubic-bezier(0.8,0,1,1)'
+          },
+          '50%': {
+            transform: 'none',
+            animationTimingFunction: 'cubic-bezier(0,0,0.2,1)'
+          }
+        },
+        'fadeInUp': {
           from: {
-            height: "0",
-            opacity: "0",
+            opacity: '0',
+            transform: 'translateY(30px)'
           },
           to: {
-            height: "var(--radix-accordion-content-height)",
-            opacity: "1",
-          },
+            opacity: '1',
+            transform: 'translateY(0)'
+          }
         },
-        "accordion-up": {
-          from: {
-            height: "var(--radix-accordion-content-height)",
-            opacity: "1",
-          },
-          to: {
-            height: "0",
-            opacity: "0",
-          },
-        },
-        "tabShow": {
-          from: {
-            opacity: "0",
-            transform: "translateY(8px)",
-          },
-          to: {
-            opacity: "1",
-            transform: "translateY(0)",
-          },
-        },
-        "tabHide": {
-          to: {
-            opacity: "0",
-            transform: "translateY(-8px)",
-          },
-        },
-        "collapsible-down": {
-          from: {
-            height: "0",
-            opacity: "0",
-            overflow: "hidden",
-          },
-          to: {
-            height: "var(--radix-collapsible-content-height)",
-            opacity: "1",
-            overflow: "hidden",
-          },
-        },
-        "collapsible-up": {
-          from: {
-            height: "var(--radix-collapsible-content-height)",
-            opacity: "1",
-            overflow: "hidden",
-          },
-          to: {
-            height: "0",
-            opacity: "0",
-            overflow: "hidden",
-          },
-        },
-        "floating": {
-          "0%, 100%": {
-            transform: "translateY(0px)",
-          },
-          "50%": {
-            transform: "translateY(-10px)",
-          },
-        },
-        "fadeInUp": {
-          from: {
-            opacity: "0",
-            transform: "translateY(30px)",
-          },
-          to: {
-            opacity: "1",
-            transform: "translateY(0)",
-          },
-        },
-        "fadeInDown": {
+        'fadeInDown': {
           from: {
             opacity: "0",
             transform: "translateY(-30px)",
@@ -201,6 +229,7 @@ export default {
           },
         },
       },
+      // انیمیشن‌های سفارشی
       animation: {
         "accordion-down": "accordion-down 0.3s ease-out forwards",
         "accordion-up": "accordion-up 0.2s ease-in forwards",
@@ -217,5 +246,9 @@ export default {
       },
     },
   },
-  plugins: [tailwindcssAnimate],
+  // پلاگین‌ها
+  plugins: [
+    tailwindcssAnimate,
+    // پلاگین‌های سفارشی می‌توانند اینجا اضافه شوند
+  ],
 } satisfies Config;
