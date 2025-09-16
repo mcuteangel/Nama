@@ -128,7 +128,7 @@ const ContactForm: React.FC<ContactFormProps> = React.memo(({ initialData, conta
     }
   }, [initialData, form, defaultValues]);
 
-  const { onSubmit, isSubmitting, error, errorMessage, retrySave, retryCount } = useContactFormLogic(contactId, navigate, session, form, availableTemplates);
+  const { onSubmit, isSubmitting, error, errorMessage, retrySave, retryCount, isLoading } = useContactFormLogic(contactId, navigate, session, form, availableTemplates);
 
   // Announce form state changes
   useEffect(() => {
@@ -258,7 +258,7 @@ const ContactForm: React.FC<ContactFormProps> = React.memo(({ initialData, conta
       title: t('accessibility.basic_info_section', 'Basic Information Section'),
       component: (
         <Suspense fallback={<SectionLoader />}>
-          <ContactBasicInfo />
+          <ContactBasicInfo isLoading={isLoading} />
         </Suspense>
       )
     },

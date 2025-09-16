@@ -114,5 +114,16 @@ export const useContactFormLogic = (
     console.log("useContactFormLogic: onSubmit finished.");
   };
 
-  return { onSubmit, isSubmitting, error, errorMessage, retrySave, retryCount };
+  // Add a simple loading state based on whether we're submitting or have an initial load
+  const isLoading = isSubmitting || (contactId && !form.getValues('firstName'));
+
+  return { 
+    onSubmit, 
+    isSubmitting, 
+    isLoading,
+    error, 
+    errorMessage, 
+    retrySave, 
+    retryCount 
+  };
 };
