@@ -2,7 +2,7 @@ import { UseFormReturn } from "react-hook-form";
 import { Session } from "@supabase/supabase-js";
 import { NavigateFunction } from "react-router-dom";
 import { CustomFieldTemplate } from "@/domain/schemas/custom-field-template";
-import { ContactFormValues, CustomFieldFormData } from "../types/contact.ts";
+import { ContactFormValues } from "../types/contact.ts";
 import { invalidateCache } from "@/utils/cache-helpers";
 import { useErrorHandler } from "./use-error-handler";
 import { ErrorManager } from "@/lib/error-manager";
@@ -15,7 +15,7 @@ export const useContactFormLogic = (
   navigate: NavigateFunction,
   session: Session | null,
   form: UseFormReturn<ContactFormValues>,
-  availableTemplates: CustomFieldTemplate[]
+  availableTemplates: CustomFieldTemplate[] = []
 ) => {
   // Use a ref to prevent multiple submissions
   const isSubmittingRef = useRef(false);
@@ -42,85 +42,82 @@ export const useContactFormLogic = (
     navigate("/"); // Navigate back to contacts list after success
   }, [contactId, form, session, navigate]);
 
-  const onErrorCallback = useCallback((err: Error) => {
-    console.error("useContactFormLogic: onErrorCallback triggered.", err);
-    ErrorManager.logError(err, { component: "useContactFormLogic", action: contactId ? "updateContact" : "createContact" });
+  const onErrorCallback = useCallback((error: Error) => {
+    console.error("useContactFormLogic: onErrorCallback triggered.", error);
+    ErrorManager.logError(error, { component: "useContactFormLogic", action: contactId ? "updateContact" : "createContact" });
   }, [contactId]);
 
   const {
+    executeAsync: executeSave,
     isLoading: isSubmitting,
     error,
     errorMessage,
     retry: retrySave,
-    executeAsync: executeSave,
     retryCount,
   } = useErrorHandler(null, {
     maxRetries: 3,
     retryDelay: 1000,
     showToast: true,
-    customErrorMessage: contactId ? "خطایی در به‌روزرسانی مخاطب رخ داد" : "خطایی در ذخیره مخاطب رخ داد",
+    customErrorMessage: contactId ? 'خطایی در به‌روزرسانی مخاطب رخ داد' : 'خطایی در ذخیره مخاطب رخ داد',
     onSuccess: onSuccessCallback,
     onError: onErrorCallback,
   });
 
-  const onSubmit = async (values: ContactFormValues) => {
-    console.log("useContactFormLogic: onSubmit started. isSubmitting:", isSubmitting);
-    
-    // Prevent multiple submissions
-    if (isSubmittingRef.current) {
-      console.log("useContactFormLogic: Submission already in progress, ignoring.");
-      return;
-    }
-    
+  const onSubmit = useCallback(async (data: ContactFormValues) => {
+    if (isSubmittingRef.current) return;
     isSubmittingRef.current = true;
-    
-    const user = session?.user;
 
-    if (!user) {
-      ErrorManager.notifyUser("برای افزودن/ویرایش مخاطب باید وارد شوید.", 'error');
-      navigate("/login");
-      isSubmittingRef.current = false;
-      return;
-    }
-
-    await executeSave(async () => {
-      console.log("useContactFormLogic: executeSave async function started.");
-      let res;
-      if (contactId) {
-        console.log("useContactFormLogic: Calling ContactCrudService.updateContact...");
-        res = await ContactCrudService.updateContact(contactId, values); // Updated service call
-        if (res.error) {
-          console.error("useContactFormLogic: ContactCrudService.updateContact returned error:", res.error);
-          throw new Error(res.error);
-        }
-        console.log("useContactFormLogic: ContactCrudService.updateContact successful.");
-      } else {
-        console.log("useContactFormLogic: Calling ContactCrudService.addContact...");
-        res = await ContactCrudService.addContact(values); // Updated service call
-        if (res.error) {
-          console.error("useContactFormLogic: ContactCrudService.addContact returned error:", res.error);
-          throw new Error(res.error);
-        }
-        console.log("useContactFormLogic: ContactCrudService.addContact successful.");
+    try {
+      // Validate custom fields against templates if available
+      if (data.customFields && availableTemplates?.length > 0) {
+        const customFields = data.customFields.map(field => {
+          const template = availableTemplates.find(t => t.id === field.template_id);
+          if (template) {
+            // Convert value to appropriate type based on template
+            let value = field.value;
+            if (template.type === 'number' && value) {
+              value = String(Number(value));
+            } else if (template.type === 'date' && value) {
+              value = new Date(value).toISOString();
+            }
+            return { ...field, value };
+          }
+          return field;
+        });
+        data = { ...data, customFields };
       }
-      console.log("useContactFormLogic: executeSave async function finished successfully.");
-      // Fix the return value to match the expected type
-      return res && 'data' in res ? res.data : null; // Return data for onSuccess callback if needed
-    }).finally(() => {
-      // Reset submission flag when done
-      isSubmittingRef.current = false;
-    });
-    
-    console.log("useContactFormLogic: onSubmit finished.");
-  };
 
-  // Add a simple loading state based on whether we're submitting or have an initial load
-  const isLoading = isSubmitting || (contactId && !form.getValues('firstName'));
+      return await executeSave(async () => {
+        console.log("useContactFormLogic: executeSave async function started.");
+        let res;
+        if (contactId) {
+          console.log("useContactFormLogic: Calling ContactCrudService.updateContact...");
+          res = await ContactCrudService.updateContact(contactId, data);
+          if (res.error) {
+            console.error("useContactFormLogic: ContactCrudService.updateContact returned error:", res.error);
+            throw new Error(res.error);
+          }
+          console.log("useContactFormLogic: ContactCrudService.updateContact successful.");
+        } else {
+          console.log("useContactFormLogic: Calling ContactCrudService.addContact...");
+          res = await ContactCrudService.addContact(data);
+          if (res.error) {
+            console.error("useContactFormLogic: ContactCrudService.addContact returned error:", res.error);
+            throw new Error(res.error);
+          }
+          console.log("useContactFormLogic: ContactCrudService.addContact successful.");
+        }
+        console.log("useContactFormLogic: executeSave async function finished successfully.");
+        return res && 'data' in res ? res.data : null;
+      });
+    } finally {
+      isSubmittingRef.current = false;
+    }
+  }, [availableTemplates, contactId, executeSave]);
 
   return { 
     onSubmit, 
     isSubmitting, 
-    isLoading,
     error, 
     errorMessage, 
     retrySave, 

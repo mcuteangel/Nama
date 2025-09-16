@@ -33,10 +33,29 @@ const ContactImportantDates = lazy(() => import("./contact-form/ContactImportant
 const ContactOtherDetails = lazy(() => import("./contact-form/ContactOtherDetails.tsx"));
 const ContactCustomFields = lazy(() => import("./contact-form/ContactCustomFields.tsx"));
 
-// Loading component for lazy-loaded sections
+// Loading components
 const SectionLoader = () => (
   <div className="flex justify-center items-center p-4">
     <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 animate-pulse"></div>
+  </div>
+);
+
+const FormSkeleton = () => (
+  <div className="space-y-6 p-6">
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <div className="h-8 w-48 bg-muted rounded animate-pulse"></div>
+        <div className="h-10 w-24 bg-muted rounded animate-pulse"></div>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} className="space-y-2">
+            <div className="h-4 w-32 bg-muted rounded animate-pulse"></div>
+            <div className="h-10 w-full bg-muted rounded animate-pulse"></div>
+          </div>
+        ))}
+      </div>
+    </div>
   </div>
 );
 
@@ -50,6 +69,8 @@ const ContactForm: React.FC<ContactFormProps> = React.memo(({ initialData, conta
   const { session } = useSession();
   const [availableTemplates, setAvailableTemplates] = useState<CustomFieldTemplate[]>([]);
   const [loadingTemplates, setLoadingTemplates] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
   const { t } = useTranslation();
   const { getAriaLabel, setAriaLabel } = useAccessibility();
   const announce = useAnnouncement();
@@ -128,7 +149,26 @@ const ContactForm: React.FC<ContactFormProps> = React.memo(({ initialData, conta
     }
   }, [initialData, form, defaultValues]);
 
-  const { onSubmit, isSubmitting, error, errorMessage, retrySave, retryCount, isLoading } = useContactFormLogic(contactId, navigate, session, form, availableTemplates);
+  const { 
+    onSubmit: handleSubmitContact, 
+    error, 
+    errorMessage, 
+    retrySave, 
+    retryCount 
+  } = useContactFormLogic(contactId, navigate, session, form, availableTemplates);
+
+  const onSubmit = async (data: ContactFormValues) => {
+    try {
+      setIsSubmitting(true);
+      setFormError(null);
+      await handleSubmitContact(data);
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      setFormError(error instanceof Error ? error.message : 'An unknown error occurred');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   // Announce form state changes
   useEffect(() => {
@@ -258,7 +298,7 @@ const ContactForm: React.FC<ContactFormProps> = React.memo(({ initialData, conta
       title: t('accessibility.basic_info_section', 'Basic Information Section'),
       component: (
         <Suspense fallback={<SectionLoader />}>
-          <ContactBasicInfo isLoading={isLoading} />
+          <ContactBasicInfo />
         </Suspense>
       )
     },
@@ -336,6 +376,17 @@ const ContactForm: React.FC<ContactFormProps> = React.memo(({ initialData, conta
     fetchTemplates, handleCancel, contactId
   ]);
 
+  if (loadingTemplates) {
+    return (
+      <ModernCard
+        variant="glass"
+        className="w-full rounded-3xl overflow-hidden"
+      >
+        <FormSkeleton />
+      </ModernCard>
+    );
+  }
+
   return (
     <KeyboardNavigationHandler scope="forms">
       <ModernCard
@@ -355,6 +406,24 @@ const ContactForm: React.FC<ContactFormProps> = React.memo(({ initialData, conta
           ${isSubmitting ? 'ring-2 ring-primary-500 animate-pulse' : ''}
         `}
       >
+        {isSubmitting && (
+          <div className="absolute inset-0 bg-black/10 dark:bg-white/5 z-10 flex items-center justify-center">
+            <div className="flex flex-col items-center gap-2">
+              <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary-500 border-t-transparent"></div>
+              <p className="text-sm text-muted-foreground">در حال ذخیره تغییرات...</p>
+            </div>
+          </div>
+        )}
+
+        {formError && (
+          <div className="bg-destructive/10 border-l-4 border-destructive text-destructive p-4 mb-4">
+            <div className="flex items-center gap-2">
+              <AlertCircle className="h-5 w-5" />
+              <p>{formError}</p>
+            </div>
+          </div>
+        )}
+
         {/* Enhanced Header */}
         <ModernCardHeader className="pb-6 border-b border-white/30 dark:border-gray-700/50 relative">
           <div className="flex items-center justify-center gap-3 mb-4">

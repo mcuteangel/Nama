@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useCallback, useEffect } from 'react';
+import React, { useMemo, useState, useCallback } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { ModernInput } from '@/components/ui/modern-input';
 import { ModernSelect, ModernSelectContent, ModernSelectItem, ModernSelectTrigger, ModernSelectValue } from '@/components/ui/modern-select';
@@ -16,13 +16,8 @@ import { Dialog } from '@/components/ui/dialog';
 import LoadingMessage from '@/components/common/LoadingMessage';
 import { GlassButton } from "@/components/ui/glass-button";
 import { ModernCard } from '@/components/ui/modern-card';
-import { FormSectionSkeleton, FormFieldSkeleton } from './skeletons/FormSectionSkeleton';
 
-interface ContactBasicInfoProps {
-  isLoading?: boolean;
-}
-
-const ContactBasicInfo: React.FC<ContactBasicInfoProps> = React.memo(({ isLoading = false }) => {
+const ContactBasicInfo: React.FC = React.memo(() => {
   const { t } = useTranslation();
   const form = useFormContext<ContactFormValues>();
   const [focusedField, setFocusedField] = useState<string | null>(null);
@@ -59,10 +54,6 @@ const ContactBasicInfo: React.FC<ContactBasicInfoProps> = React.memo(({ isLoadin
       form.setValue('groupId', value === "no-group-selected" ? null : value);
     }
   }, [form, fetchColorsWhenNeeded]);
-
-  if (isLoading) {
-    return <FormSectionSkeleton />;
-  }
 
   return (
     <>

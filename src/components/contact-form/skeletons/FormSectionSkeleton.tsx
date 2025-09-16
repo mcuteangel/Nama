@@ -1,28 +1,39 @@
-import React from 'react';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
 
-export const FormSectionSkeleton = () => {
+interface FormSectionSkeletonProps {
+  title?: boolean;
+  description?: boolean;
+  fields?: number;
+  className?: string;
+}
+
+export function FormSectionSkeleton({
+  title = true,
+  description = true,
+  fields = 3,
+  className,
+}: FormSectionSkeletonProps) {
   return (
-    <div className="p-6 rounded-2xl bg-gradient-to-br from-white/50 to-white/30 dark:from-neutral-800/50 dark:to-neutral-900/30 border-2 border-white/40 dark:border-neutral-700/40 backdrop-blur-sm shadow-sm">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {[...Array(6)].map((_, i) => (
+    <div className={cn("space-y-6 p-6 bg-card rounded-lg border border-border/50 shadow-sm", className)}>
+      <div className="space-y-2">
+        {title && <Skeleton className="h-6 w-48" />}
+        {description && <Skeleton className="h-4 w-64" />}
+      </div>
+      
+      <div className="space-y-4">
+        {Array.from({ length: fields }).map((_, i) => (
           <div key={i} className="space-y-2">
-            <Skeleton className="h-4 w-24 rounded-full" />
-            <Skeleton className="h-10 w-full rounded-lg" />
+            <Skeleton className="h-4 w-32" />
+            <Skeleton className="h-10 w-full" />
           </div>
         ))}
       </div>
+      
+      <div className="flex justify-end space-x-2 pt-2">
+        <Skeleton className="h-9 w-24" />
+        <Skeleton className="h-9 w-24" />
+      </div>
     </div>
   );
-};
-
-export const FormFieldSkeleton = () => {
-  return (
-    <div className="space-y-2">
-      <Skeleton className="h-4 w-24 rounded-full" />
-      <Skeleton className="h-10 w-full rounded-lg" />
-    </div>
-  );
-};
-
-export default FormSectionSkeleton;
+}
