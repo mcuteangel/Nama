@@ -5,23 +5,18 @@ import { ModernInput } from '@/components/ui/modern-input';
 import { FormField, FormItem, FormLabel, FormControl } from '@/components/ui/form';
 import { ContactFormValues } from '@/types/contact';
 import { MapPin, UserCheck, AlertCircle } from 'lucide-react';
+import { CollapsibleSection } from '@/components/ui/collapsible-section';
 
 const ContactAddress: React.FC = React.memo(() => {
   const form = useFormContext<ContactFormValues>();
   const { t } = useTranslation();
 
   return (
-    <div className="space-y-4 pt-4 border-t border-border/30">
-      {/* Compact Header */}
-      <div className="flex items-center gap-2 p-2.5 rounded-lg bg-muted/30 dark:bg-muted/10 border border-border/30">
-        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary/90 to-primary/70 flex items-center justify-center shadow-sm">
-          <MapPin size={16} className="text-white" />
-        </div>
-        <h3 className="text-base font-semibold text-foreground">
-          {t('section_titles.address')}
-        </h3>
-      </div>
-
+    <CollapsibleSection 
+      title={t('section_titles.address')} 
+      icon={<MapPin size={16} className="text-white" />}
+      defaultOpen={false}
+    >
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         <div className="group/field p-3 rounded-lg bg-muted/10 dark:bg-muted/10 border border-border/20 hover:border-primary/40 transition-colors duration-200">
           <FormField
@@ -333,7 +328,7 @@ const ContactAddress: React.FC = React.memo(() => {
           />
         </div>
       </div>
-    </div>
+    </CollapsibleSection>
   );
 });
 

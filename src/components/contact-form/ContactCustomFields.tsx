@@ -15,6 +15,8 @@ import { ContactFormValues } from '@/types/contact';
 import { useTranslation } from 'react-i18next';
 import { useJalaliCalendar } from '@/hooks/use-jalali-calendar';
 import { ControllerRenderProps } from 'react-hook-form';
+import { CollapsibleSection } from '@/components/ui/collapsible-section';
+import { SmartSearchSelect } from '@/components/ui/smart-search-select';
 
 // Common glass styling classes
 const GLASS_INPUT_CLASSES = "bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-foreground placeholder-muted-foreground focus:ring-2 focus:ring-primary/50";
@@ -67,37 +69,11 @@ const ContactCustomFields: React.FC<ContactCustomFieldsProps> = React.memo(({
   };
 
   return (
-    <div className="space-y-4 pt-4 border-t border-border/30">
-      {/* Compact Header */}
-      <div className="flex flex-row justify-between items-center gap-2 p-2.5 rounded-lg bg-muted/30 dark:bg-muted/10 border border-border/30">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary/90 to-primary/70 flex items-center justify-center shadow-sm">
-            <Settings size={16} className="text-white" />
-          </div>
-          <h3 className="text-base font-semibold text-foreground">
-            {t('section_titles.custom_fields')}
-          </h3>
-        </div>
-        <Dialog>
-          <DialogTrigger asChild>
-            <GlassButton
-              variant="ghost"
-              size="sm"
-              className="h-8 px-3 text-xs font-medium rounded-md hover:bg-accent/50 transition-colors"
-            >
-              <Plus size={18} className="me-2" />
-              {t('actions.add_new_field')}
-            </GlassButton>
-          </DialogTrigger>
-          <DialogContent className="w-full p-0 border-none bg-transparent shadow-none max-h-[80vh] overflow-y-auto">
-            <DialogHeader className="sr-only">
-              <DialogTitle>{t('custom_field_template.add_title')}</DialogTitle>
-            </DialogHeader>
-            <CustomFieldForm onSuccess={fetchTemplates} onCancel={() => {}} />
-          </DialogContent>
-        </Dialog>
-      </div>
-
+    <CollapsibleSection 
+      title={t('section_titles.custom_fields')} 
+      icon={<Settings size={16} className="text-white" />}
+      defaultOpen={false}
+    >
       {loadingTemplates ? (
         <div className="p-8 rounded-2xl bg-gradient-to-br from-white/60 to-white/30 dark:from-gray-800/60 dark:to-gray-900/30 border-2 border-white/40 dark:border-gray-700/40 backdrop-blur-sm text-center">
           <div className="animate-spin w-8 h-8 border-4 border-cyan-500 border-t-transparent rounded-full mx-auto mb-4"></div>
@@ -202,24 +178,18 @@ const ContactCustomFields: React.FC<ContactCustomFieldsProps> = React.memo(({
                               </ModernPopoverContent>
                             </ModernPopover>
                           ) : template.type === 'list' ? (
-                            <ModernSelect
+                            <SmartSearchSelect
                               onValueChange={field.onChange}
                               value={field.value || ''}
+                              options={template.options?.map(option => ({ value: option, label: option })) || []}
+                              placeholder={!template.options || template.options.length === 0 ? t('form_placeholders.no_options_found') : t('form_placeholders.select_field', { name: template.name })}
+                              searchPlaceholder={t('form_placeholders.search_options')}
+                              noResultsText={t('form_placeholders.no_options_found')}
                               disabled={!template.options || template.options.length === 0}
-                            >
-                              <FormControl>
-                                <ModernSelectTrigger variant="glass" className={GLASS_SELECT_TRIGGER_CLASSES}>
-                                  <ModernSelectValue placeholder={!template.options || template.options.length === 0 ? t('form_placeholders.no_options_found') : t('form_placeholders.select_field', { name: template.name })} />
-                                </ModernSelectTrigger>
-                              </FormControl>
-                              <ModernSelectContent variant="glass" className={GLASS_SELECT_CONTENT_CLASSES}>
-                                {template.options && template.options.map((option) => (
-                                  <ModernSelectItem key={option} value={option} className={GLASS_SELECT_ITEM_CLASSES}>
-                                    {option}
-                                  </ModernSelectItem>
-                                ))}
-                              </ModernSelectContent>
-                            </ModernSelect>
+                              triggerClassName={GLASS_SELECT_TRIGGER_CLASSES}
+                              contentClassName={GLASS_SELECT_CONTENT_CLASSES}
+                              itemClassName={GLASS_SELECT_ITEM_CLASSES}
+                            />
                           ) : template.type === 'checklist' ? (
                             <div className="space-y-2 p-3 rounded-lg border border-white/30 dark:border-gray-600/30 bg-white/20 dark:bg-gray-700/20">
                               {template.options && template.options.map((option) => {
@@ -266,7 +236,7 @@ const ContactCustomFields: React.FC<ContactCustomFieldsProps> = React.memo(({
           })}
         </div>
       )}
-    </div>
+    </CollapsibleSection>
   );
 });
 

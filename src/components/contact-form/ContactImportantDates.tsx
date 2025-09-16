@@ -10,26 +10,21 @@ import { ContactFormValues } from '@/types/contact';
 import { useTranslation } from 'react-i18next';
 import { useAppSettings } from '@/hooks/use-app-settings';
 import { useJalaliCalendar } from '@/hooks/use-jalali-calendar';
+import { CollapsibleSection } from '@/components/ui/collapsible-section';
 
 const ContactImportantDates: React.FC = React.memo(() => {
   const { t } = useTranslation();
   const form = useFormContext<ContactFormValues>();
-  const {} = useAppSettings();
+  useAppSettings(); // Just call the hook without destructuring
   const { formatDate } = useJalaliCalendar();
   const [isCalendarFocused, setIsCalendarFocused] = useState(false);
 
   return (
-    <div className="space-y-4 pt-4 border-t border-border/30">
-      {/* Compact Header */}
-      <div className="flex items-center gap-2 p-2.5 rounded-lg bg-muted/30 dark:bg-muted/10 border border-border/30">
-        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-warning/90 to-warning/70 flex items-center justify-center shadow-sm">
-          <Cake size={16} className="text-white" />
-        </div>
-        <h3 className="text-base font-semibold text-foreground">
-          {t('section_titles.important_dates')}
-        </h3>
-      </div>
-
+    <CollapsibleSection 
+      title={t('section_titles.important_dates')} 
+      icon={<Cake size={16} className="text-white" />}
+      defaultOpen={false}
+    >
       {/* Enhanced Dates Container */}
       <div className="p-4 rounded-lg bg-muted/10 dark:bg-muted/10 border border-border/20 hover:border-warning/40 transition-colors duration-200">
         <FormField
@@ -110,14 +105,14 @@ const ContactImportantDates: React.FC = React.memo(() => {
                 <p className="mt-4 text-sm text-green-600 dark:text-green-400 flex items-center gap-2 animate-slide-in">
                   <UserCheck size={16} />
                   <span>{t('common.birthday_registered')}</span>
-              </p>
+                </p>
               )}
             </FormItem>
           )}
         />
         {/* You can add other date fields here, e.g., anniversary */}
       </div>
-    </div>
+    </CollapsibleSection>
   );
 });
 
