@@ -1,10 +1,11 @@
 import React from 'react';
 import { ContactFormValues } from '@/types/contact';
 import { useTranslation } from 'react-i18next';
-import { User, Phone, Mail, Building, MapPin, Calendar, Users } from 'lucide-react';
+import { User, Phone, Mail, Building, MapPin, Calendar, Users, Tag } from 'lucide-react';
 import { ModernCard } from '@/components/ui/modern-card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { Tag as TagComponent } from '@/components/ui/tag';
 import { cn } from '@/lib/utils';
 
 interface ContactPreviewCardProps {
@@ -159,15 +160,44 @@ const ContactPreviewCard: React.FC<ContactPreviewCardProps> = ({ contact, classN
           )}
         </div>
         
+        {/* Tags */}
+        {contact.tags && contact.tags.length > 0 && (
+          <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <div className="flex items-center gap-2 mb-3">
+              <Tag size={16} className="text-gray-500 dark:text-gray-400" />
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                {t('contact_form.tags', 'تگ‌ها')}
+              </span>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {contact.tags.map((tag) => (
+                <TagComponent
+                  key={tag.id}
+                  tag={{
+                    id: tag.id,
+                    name: tag.name,
+                    color: tag.color,
+                    user_id: tag.user_id || 'temp-user',
+                    created_at: tag.created_at || new Date().toISOString(),
+                    updated_at: tag.updated_at || new Date().toISOString()
+                  }}
+                  size="sm"
+                  className="text-xs"
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Gender badge */}
         {contact.gender && contact.gender !== 'not_specified' && (
-          <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
-            <Badge 
+          <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <Badge
               variant={contact.gender === 'male' ? 'default' : 'secondary'}
               className={cn(
                 "px-3 py-1 text-xs font-medium rounded-full",
-                contact.gender === 'male' 
-                  ? "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300" 
+                contact.gender === 'male'
+                  ? "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300"
                   : "bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-300"
               )}
             >

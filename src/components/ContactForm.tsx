@@ -425,7 +425,14 @@ const ContactForm: React.FC<ContactFormProps> = React.memo(({ initialData, conta
           <Suspense fallback={<SectionLoader />}>
             <ContactTags
               contactId={contactId}
-              selectedTags={form.watch('tags') || []}
+              selectedTags={(form.watch('tags') || []).map(tag => ({
+                id: tag.id,
+                name: tag.name,
+                color: tag.color,
+                user_id: tag.user_id || 'temp-user',
+                created_at: tag.created_at || new Date().toISOString(),
+                updated_at: tag.updated_at || new Date().toISOString()
+              }))}
               onTagsChange={(tags) => {
                 form.setValue('tags', tags, { shouldValidate: true, shouldDirty: true });
               }}
@@ -459,14 +466,7 @@ const ContactForm: React.FC<ContactFormProps> = React.memo(({ initialData, conta
           defaultOpen={false}
         >
           <Suspense fallback={<SectionLoader />}>
-            {contactId ? (
-              <ContactHistory contactId={contactId} />
-            ) : (
-              <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-                <History size={48} className="mx-auto mb-4 opacity-50" />
-                <p>{t('contact_form.history_not_available', 'تاریخچه برای مخاطبین جدید در دسترس نیست')}</p>
-              </div>
-            )}
+            <ContactHistory contactId={contactId || 'new'} />
           </Suspense>
         </CollapsibleSection>
       )
