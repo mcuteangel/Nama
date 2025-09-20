@@ -17,12 +17,13 @@ import { useTranslation } from "react-i18next";
 import { useAccessibility } from './accessibilityHooks';
 import { useAnnouncement } from './accessibilityHooks';
 import KeyboardNavigationHandler from './KeyboardNavigationHandler';
+import { CollapsibleSection } from './ui/collapsible-section';
 
 // Import new modular components with lazy loading
 import { lazy, Suspense } from "react";
 import ContactFormActions from "./contact-form/ContactFormActions.tsx";
 import ContactAvatarUpload from "./ContactAvatarUpload.tsx";
-import { AlertCircle, Users } from 'lucide-react';
+import { AlertCircle, Users, Eye, History } from 'lucide-react';
 
 // Lazy load form sections to improve initial loading performance
 const ContactBasicInfo = lazy(() => import("./contact-form/ContactBasicInfo.tsx"));
@@ -32,6 +33,8 @@ const ContactSocialLinks = lazy(() => import("./contact-form/ContactSocialLinks.
 const ContactImportantDates = lazy(() => import("./contact-form/ContactImportantDates.tsx"));
 const ContactOtherDetails = lazy(() => import("./contact-form/ContactOtherDetails.tsx"));
 const ContactCustomFields = lazy(() => import("./contact-form/ContactCustomFields.tsx"));
+const ContactPreviewCard = lazy(() => import("./contact-form/ContactPreviewCard.tsx"));
+const ContactHistory = lazy(() => import("./contact-form/ContactHistory.tsx"));
 
 // Loading components
 const SectionLoader = () => (
@@ -280,84 +283,169 @@ const ContactForm: React.FC<ContactFormProps> = React.memo(({ initialData, conta
       id: 'avatar',
       title: t('accessibility.avatar_section', 'Avatar Section'),
       component: (
-        <ContactAvatarUpload
-          initialAvatarUrl={form.watch('avatarUrl')}
-          onAvatarChange={(url) => {
-            form.setValue('avatarUrl', url);
-            announce(url
-              ? t('accessibility.avatar_updated', 'Avatar updated')
-              : t('accessibility.avatar_removed', 'Avatar removed'), 'polite'
-            );
-          }}
-          disabled={isSubmitting}
-        />
+        <CollapsibleSection
+          title={t('contact_form.avatar_section', 'تصویر پروفایل')}
+          icon={<Users size={18} />}
+          defaultOpen={true}
+        >
+          <ContactAvatarUpload
+            initialAvatarUrl={form.watch('avatarUrl')}
+            onAvatarChange={(url) => {
+              form.setValue('avatarUrl', url);
+              announce(url
+                ? t('accessibility.avatar_updated', 'Avatar updated')
+                : t('accessibility.avatar_removed', 'Avatar removed'), 'polite'
+              );
+            }}
+            disabled={isSubmitting}
+          />
+        </CollapsibleSection>
       )
     },
     {
       id: 'basic-info',
       title: t('accessibility.basic_info_section', 'Basic Information Section'),
       component: (
-        <Suspense fallback={<SectionLoader />}>
-          <ContactBasicInfo />
-        </Suspense>
+        <CollapsibleSection
+          title={t('contact_form.basic_info_section', 'اطلاعات پایه')}
+          icon={<Users size={18} />}
+          defaultOpen={true}
+        >
+          <Suspense fallback={<SectionLoader />}>
+            <ContactBasicInfo />
+          </Suspense>
+        </CollapsibleSection>
       )
     },
     {
       id: 'phone',
       title: t('accessibility.phone_section', 'Phone Numbers Section'),
       component: (
-        <Suspense fallback={<SectionLoader />}>
-          <ContactPhoneNumbers />
-        </Suspense>
+        <CollapsibleSection
+          title={t('contact_form.phone_section', 'شماره‌های تلفن')}
+          icon={<Users size={18} />}
+          defaultOpen={false}
+        >
+          <Suspense fallback={<SectionLoader />}>
+            <ContactPhoneNumbers />
+          </Suspense>
+        </CollapsibleSection>
       )
     },
     {
       id: 'email',
       title: t('accessibility.email_section', 'Email Addresses Section'),
       component: (
-        <Suspense fallback={<SectionLoader />}>
-          <ContactEmailAddresses />
-        </Suspense>
+        <CollapsibleSection
+          title={t('contact_form.email_section', 'آدرس‌های ایمیل')}
+          icon={<Users size={18} />}
+          defaultOpen={false}
+        >
+          <Suspense fallback={<SectionLoader />}>
+            <ContactEmailAddresses />
+          </Suspense>
+        </CollapsibleSection>
       )
     },
     {
       id: 'social',
       title: t('accessibility.social_section', 'Social Links Section'),
       component: (
-        <Suspense fallback={<SectionLoader />}>
-          <ContactSocialLinks />
-        </Suspense>
+        <CollapsibleSection
+          title={t('contact_form.social_section', 'لینک‌های اجتماعی')}
+          icon={<Users size={18} />}
+          defaultOpen={false}
+        >
+          <Suspense fallback={<SectionLoader />}>
+            <ContactSocialLinks />
+          </Suspense>
+        </CollapsibleSection>
       )
     },
     {
       id: 'dates',
       title: t('accessibility.dates_section', 'Important Dates Section'),
       component: (
-        <Suspense fallback={<SectionLoader />}>
-          <ContactImportantDates />
-        </Suspense>
+        <CollapsibleSection
+          title={t('contact_form.dates_section', 'تاریخ‌های مهم')}
+          icon={<Users size={18} />}
+          defaultOpen={false}
+        >
+          <Suspense fallback={<SectionLoader />}>
+            <ContactImportantDates />
+          </Suspense>
+        </CollapsibleSection>
       )
     },
     {
       id: 'other-details',
       title: t('accessibility.other_details_section', 'Other Details Section'),
       component: (
-        <Suspense fallback={<SectionLoader />}>
-          <ContactOtherDetails />
-        </Suspense>
+        <CollapsibleSection
+          title={t('contact_form.other_details_section', 'جزئیات دیگر')}
+          icon={<Users size={18} />}
+          defaultOpen={false}
+        >
+          <Suspense fallback={<SectionLoader />}>
+            <ContactOtherDetails />
+          </Suspense>
+        </CollapsibleSection>
       )
     },
     {
       id: 'custom-fields',
       title: t('accessibility.custom_fields_section', 'Custom Fields Section'),
       component: (
-        <Suspense fallback={<SectionLoader />}>
-          <ContactCustomFields
-            availableTemplates={availableTemplates}
-            loadingTemplates={loadingTemplates}
-            fetchTemplates={fetchTemplates}
-          />
-        </Suspense>
+        <CollapsibleSection
+          title={t('contact_form.custom_fields_section', 'فیلدهای سفارشی')}
+          icon={<Users size={18} />}
+          defaultOpen={false}
+        >
+          <Suspense fallback={<SectionLoader />}>
+            <ContactCustomFields
+              availableTemplates={availableTemplates}
+              loadingTemplates={loadingTemplates}
+              fetchTemplates={fetchTemplates}
+            />
+          </Suspense>
+        </CollapsibleSection>
+      )
+    },
+    {
+      id: 'preview',
+      title: t('accessibility.preview_section', 'Preview Section'),
+      component: (
+        <CollapsibleSection
+          title={t('contact_form.preview_section', 'پیش‌نمایش مخاطب')}
+          icon={<Eye size={18} />}
+          defaultOpen={false}
+        >
+          <Suspense fallback={<SectionLoader />}>
+            <ContactPreviewCard contact={form.getValues()} />
+          </Suspense>
+        </CollapsibleSection>
+      )
+    },
+    {
+      id: 'history',
+      title: t('accessibility.history_section', 'History Section'),
+      component: (
+        <CollapsibleSection
+          title={t('contact_form.history_section', 'تاریخچه تغییرات')}
+          icon={<History size={18} />}
+          defaultOpen={false}
+        >
+          <Suspense fallback={<SectionLoader />}>
+            {contactId ? (
+              <ContactHistory contactId={contactId} />
+            ) : (
+              <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                <History size={48} className="mx-auto mb-4 opacity-50" />
+                <p>{t('contact_form.history_not_available', 'تاریخچه برای مخاطبین جدید در دسترس نیست')}</p>
+              </div>
+            )}
+          </Suspense>
+        </CollapsibleSection>
       )
     },
     {
@@ -521,27 +609,15 @@ const ContactForm: React.FC<ContactFormProps> = React.memo(({ initialData, conta
                   {t('accessibility.contact_information', 'Contact Information')}
                 </legend>
 
-                {/* Render sections without individual borders, use subtle dividers */}
-                {formSections.slice(0, -1).map((section, index) => (
+                {/* Render sections with collapsible organization */}
+                {formSections.map((section) => (
                   <div key={section.id} role="group" aria-labelledby={`${section.id}-section-title`}>
                     <h3 id={`${section.id}-section-title`} className="sr-only">
                       {section.title}
                     </h3>
                     {section.component}
-                    {index < formSections.length - 2 && (
-                      <div
-                        className="my-6 h-[1px] bg-gradient-to-r from-transparent via-neutral-200/70 dark:via-neutral-700/50 to-transparent transition-colors duration-300"></div>
-                    )}
                   </div>
                 ))}
-
-                {/* Actions as last section without divider */}
-                <div role="group" aria-labelledby="actions-section-title">
-                  <h3 id="actions-section-title" className="sr-only">
-                    {formSections[formSections.length - 1].title}
-                  </h3>
-                  {formSections[formSections.length - 1].component}
-                </div>
               </fieldset>
             </form>
           </Form>
