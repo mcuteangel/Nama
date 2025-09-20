@@ -1,9 +1,23 @@
 import { supabase } from "@/integrations/supabase/client";
-import { Tag } from "@/types/tag";
+import { Tag, TagWithCount } from "@/types/tag";
 
 export const TagsService = {
-  // Get all tags for a user
-  async getAllTags(userId: string): Promise<{ data: Tag[] | null; error: string | null }> {
+  // Get all tags for a user with contact count
+  async getAllTags(userId: string): Promise<{ data: TagWithCount[] | null; error: string | null }> {
+    try {
+      const { data, error } = await supabase
+        .rpc('get_tags_with_contact_count', { user_uuid: userId });
+
+      if (error) throw error;
+      return { data: data as TagWithCount[], error: null };
+    } catch (error) {
+      console.error('Error fetching tags:', error);
+      return { data: null, error: (error as Error).message };
+    }
+  },
+
+  // Get all tags for a user (legacy method for backward compatibility)
+  async getAllTagsLegacy(userId: string): Promise<{ data: Tag[] | null; error: string | null }> {
     try {
       const { data, error } = await supabase
         .from('tags')
@@ -74,12 +88,26 @@ export const TagsService = {
   async getContactTags(contactId: string): Promise<{ data: Tag[] | null; error: string | null }> {
     try {
       const { data, error } = await supabase
+        .rpc('get_contact_tags', { contact_uuid: contactId });
+
+      if (error) throw error;
+      return { data: data as Tag[], error: null };
+    } catch (error) {
+      console.error('Error fetching contact tags:', error);
+      return { data: null, error: (error as Error).message };
+    }
+  },
+
+  // Get tags for a specific contact (legacy method for backward compatibility)
+  async getContactTagsLegacy(contactId: string): Promise<{ data: Tag[] | null; error: string | null }> {
+    try {
+      const { data, error } = await supabase
         .from('contact_tags')
         .select('tags (*)')
         .eq('contact_id', contactId);
 
       if (error) throw error;
-      
+
       // Extract tags from the join result
       const tags = data.map((item: any) => item.tags) as Tag[];
       return { data: tags, error: null };

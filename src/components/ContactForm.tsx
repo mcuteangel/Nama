@@ -23,7 +23,7 @@ import { CollapsibleSection } from './ui/collapsible-section';
 import { lazy, Suspense } from "react";
 import ContactFormActions from "./contact-form/ContactFormActions.tsx";
 import ContactAvatarUpload from "./ContactAvatarUpload.tsx";
-import { AlertCircle, Users, Eye, History } from 'lucide-react';
+import { AlertCircle, Users, Eye, History, Tag } from 'lucide-react';
 
 // Lazy load form sections to improve initial loading performance
 const ContactBasicInfo = lazy(() => import("./contact-form/ContactBasicInfo.tsx"));
@@ -35,6 +35,7 @@ const ContactOtherDetails = lazy(() => import("./contact-form/ContactOtherDetail
 const ContactCustomFields = lazy(() => import("./contact-form/ContactCustomFields.tsx"));
 const ContactPreviewCard = lazy(() => import("./contact-form/ContactPreviewCard.tsx"));
 const ContactHistory = lazy(() => import("./contact-form/ContactHistory.tsx"));
+const ContactTags = lazy(() => import("./contact-form/ContactTags.tsx"));
 
 // Loading components
 const SectionLoader = () => (
@@ -129,6 +130,7 @@ const ContactForm: React.FC<ContactFormProps> = React.memo(({ initialData, conta
     emailAddresses: [],
     socialLinks: [],
     customFields: [],
+    tags: [],
   }), []);
 
   const form = useForm<ContactFormValues>({
@@ -406,6 +408,27 @@ const ContactForm: React.FC<ContactFormProps> = React.memo(({ initialData, conta
               availableTemplates={availableTemplates}
               loadingTemplates={loadingTemplates}
               fetchTemplates={fetchTemplates}
+            />
+          </Suspense>
+        </CollapsibleSection>
+      )
+    },
+    {
+      id: 'tags',
+      title: t('accessibility.tags_section', 'Tags Section'),
+      component: (
+        <CollapsibleSection
+          title={t('contact_form.tags_section', 'تگ‌ها')}
+          icon={<Tag size={18} />}
+          defaultOpen={false}
+        >
+          <Suspense fallback={<SectionLoader />}>
+            <ContactTags
+              contactId={contactId}
+              selectedTags={form.watch('tags') || []}
+              onTagsChange={(tags) => {
+                form.setValue('tags', tags, { shouldValidate: true, shouldDirty: true });
+              }}
             />
           </Suspense>
         </CollapsibleSection>

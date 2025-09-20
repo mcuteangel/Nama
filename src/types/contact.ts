@@ -1,5 +1,6 @@
 import * as z from "zod";
 import { CustomFieldTemplate } from "@/domain/schemas/custom-field-template";
+import { Tag } from "@/types/tag";
 
 export const contactFormSchema = z.object({
   firstName: z.string().min(1, { message: "نام الزامی است." }),
@@ -40,6 +41,14 @@ export const contactFormSchema = z.object({
     template_id: z.string(),
     value: z.string(),
   })).optional(),
+  tags: z.array(z.object({
+    id: z.string(),
+    name: z.string(),
+    color: z.string(),
+    user_id: z.string().optional(),
+    created_at: z.string().optional(),
+    updated_at: z.string().optional(),
+  })).optional().default([]),
 });
 
 export type ContactFormValues = z.infer<typeof contactFormSchema>;

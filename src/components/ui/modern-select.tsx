@@ -444,5 +444,3 @@ export const ModernSearchSelect = React.forwardRef<
 });
 
 ModernSearchSelect.displayName = "ModernSearchSelect";
-
-export { ModernSearchSelect };
