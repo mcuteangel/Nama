@@ -1,6 +1,6 @@
 import * as React from "react";
 import * as SelectPrimitive from "@radix-ui/react-select";
-import { Check, ChevronDown, ChevronUp } from "lucide-react";
+import { Check, ChevronDown, ChevronUp, Search } from "lucide-react";
 
 import { cn, applyGlassEffect, applyGradientEffect } from "@/lib/utils";
 
@@ -267,3 +267,182 @@ export {
   ModernSelectScrollUpButton,
   ModernSelectScrollDownButton,
 };
+
+// Modern Search Select Component
+
+export interface ModernSearchSelectProps {
+  options: { value: string; label: string; icon?: React.ReactNode }[];
+  value?: string;
+  onValueChange: (value: string) => void;
+  placeholder?: string;
+  searchPlaceholder?: string;
+  emptyMessage?: string;
+  className?: string;
+  disabled?: boolean;
+  variant?: "glass" | "neomorphism" | "gradient";
+  gradientType?: "primary" | "ocean" | "sunset" | "success" | "warning" | "danger" | "info" | "forest";
+}
+
+export const ModernSearchSelect = React.forwardRef<
+  HTMLButtonElement,
+  ModernSearchSelectProps
+>(({
+  options,
+  value,
+  onValueChange,
+  placeholder = "انتخاب کنید...",
+  searchPlaceholder = "جستجو...",
+  emptyMessage = "نتیجه‌ای یافت نشد",
+  className,
+  disabled = false,
+  variant = "glass",
+  gradientType = "primary",
+  ...props
+}, ref) => {
+  const [open, setOpen] = React.useState(false);
+  const [searchTerm, setSearchTerm] = React.useState("");
+
+  const filteredOptions = React.useMemo(() => {
+    if (!searchTerm) return options;
+    return options.filter(option =>
+      option.label.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      option.value.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [options, searchTerm]);
+
+  const selectedOption = options.find(option => option.value === value);
+
+  const getVariantClasses = () => {
+    switch (variant) {
+      case "glass":
+        return "border-2 bg-white/60 dark:bg-gray-700/60 backdrop-blur-sm transition-all duration-300 ease-out focus:ring-4 focus:ring-primary-500/20 focus:border-primary-400 hover:bg-white/90 dark:hover:bg-neutral-800/90 hover:shadow-lg hover:shadow-primary-500/10 border-white/50 dark:border-gray-600/50";
+      case "neomorphism":
+        return "neomorphism transition-all duration-300 ease-out focus:ring-4 focus:ring-primary-500/20 focus:border-primary-400 hover:shadow-lg hover:shadow-primary-500/10";
+      case "gradient":
+        return `bg-gradient-to-r ${getGradientClasses()} text-white border-0 transition-all duration-300 ease-out focus:ring-4 focus:ring-white/50 focus:ring-offset-0 hover:shadow-lg hover:shadow-white/20`;
+      default:
+        return "";
+    }
+  };
+
+  const getGradientClasses = () => {
+    const gradients = {
+      primary: "from-primary-500 to-primary-700",
+      ocean: "from-blue-500 to-cyan-600",
+      sunset: "from-orange-500 to-red-600",
+      success: "from-green-500 to-emerald-600",
+      warning: "from-yellow-500 to-orange-600",
+      danger: "from-red-500 to-pink-600",
+      info: "from-cyan-500 to-blue-600",
+      forest: "from-green-600 to-teal-700"
+    };
+    return gradients[gradientType] || gradients.primary;
+  };
+
+  return (
+    <div className="relative">
+      <button
+        ref={ref}
+        type="button"
+        onClick={() => !disabled && setOpen(!open)}
+        disabled={disabled}
+        className={cn(
+          "flex h-12 w-full items-center justify-between rounded-2xl px-6 py-4 text-left text-base font-medium",
+          getVariantClasses(),
+          disabled && "opacity-50 cursor-not-allowed",
+          className
+        )}
+        {...props}
+      >
+        <div className="flex items-center gap-3 flex-1 min-w-0">
+          {selectedOption?.icon && (
+            <div className="flex-shrink-0">
+              {selectedOption.icon}
+            </div>
+          )}
+          <span className={cn(
+            "truncate",
+            !selectedOption && "text-muted-foreground"
+          )}>
+            {selectedOption ? selectedOption.label : placeholder}
+          </span>
+        </div>
+        <ChevronDown
+          size={20}
+          className={cn(
+            "flex-shrink-0 transition-transform duration-200",
+            open && "rotate-180"
+          )}
+        />
+      </button>
+
+      {open && (
+        <>
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 z-40"
+            onClick={() => setOpen(false)}
+          />
+
+          {/* Search Input */}
+          <div className="absolute top-full left-0 right-0 z-50 mt-2">
+            <div className="relative">
+              <Search
+                size={18}
+                className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground"
+              />
+              <input
+                type="text"
+                placeholder={searchPlaceholder}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-12 pr-4 py-3 rounded-xl border-2 bg-background/80 backdrop-blur-sm border-border focus:border-primary-400 focus:ring-2 focus:ring-primary-500/20 transition-all duration-200"
+                onClick={(e) => e.stopPropagation()}
+                autoFocus
+              />
+            </div>
+
+            {/* Options List */}
+            <div className="mt-2 max-h-60 overflow-y-auto rounded-xl border-2 bg-background/90 backdrop-blur-sm border-border shadow-lg">
+              {filteredOptions.length === 0 ? (
+                <div className="p-4 text-center text-muted-foreground">
+                  {emptyMessage}
+                </div>
+              ) : (
+                filteredOptions.map((option) => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => {
+                      onValueChange(option.value);
+                      setOpen(false);
+                      setSearchTerm("");
+                    }}
+                    className={cn(
+                      "flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-accent/50 transition-colors duration-200",
+                      value === option.value && "bg-primary/10 text-primary"
+                    )}
+                  >
+                    {option.icon && (
+                      <div className="flex-shrink-0">
+                        {option.icon}
+                      </div>
+                    )}
+                    <span className="flex-1 truncate">{option.label}</span>
+                    {value === option.value && (
+                      <Check size={16} className="flex-shrink-0 text-primary" />
+                    )}
+                  </button>
+                ))
+              )}
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  );
+});
+
+ModernSearchSelect.displayName = "ModernSearchSelect";
+
+export { ModernSearchSelect };

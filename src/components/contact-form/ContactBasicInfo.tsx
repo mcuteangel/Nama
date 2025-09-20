@@ -1,7 +1,7 @@
 import React, { useMemo, useState, useCallback, useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { ModernInput } from '@/components/ui/modern-input';
-import { ModernSelect, ModernSelectContent, ModernSelectItem, ModernSelectTrigger, ModernSelectValue } from '@/components/ui/modern-select';
+import { ModernSelect, ModernSelectContent, ModernSelectItem, ModernSelectTrigger, ModernSelectValue, ModernSearchSelect } from '@/components/ui/modern-select';
 import { FormField, FormItem, FormLabel, FormControl } from '@/components/ui/form';
 import { ContactFormValues } from '@/types/contact';
 import { useTranslation } from 'react-i18next';
@@ -47,6 +47,16 @@ const ContactBasicInfo: React.FC = React.memo(() => {
     { value: "not_specified", label: t('gender.not_specified') },
   ], [t]);
 
+  // Memoize group options for search select
+  const groupOptions = useMemo(() => [
+    { value: "no-group-selected", label: t('contact_form.no_group') },
+    ...groups.map((group) => ({
+      value: group.id,
+      label: group.name,
+    })),
+    { value: "__ADD_NEW_GROUP__", label: t('contact_form.add_new_group') },
+  ], [groups, t]);
+
   const handleGroupAdded = useCallback(async (newGroupId?: string) => {
     await fetchGroups();
     if (newGroupId) {
@@ -60,7 +70,7 @@ const ContactBasicInfo: React.FC = React.memo(() => {
       await fetchColorsWhenNeeded();
       setIsAddGroupDialogOpen(true);
     } else {
-      form.setValue('groupId', value === "no-group-selected" ? null : value);
+      form.setValue('groupId', value === "no-group-selected" ? null : value, { shouldDirty: true, shouldValidate: true });
     }
   }, [form, fetchColorsWhenNeeded]);
 
@@ -298,6 +308,12 @@ const ContactBasicInfo: React.FC = React.memo(() => {
                           </div>
                         )}
 
+                        {validationStatus.isValidating && (
+                          <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
+                            <Loader2 size={20} className="text-warning-500 animate-spin" />
+                          </div>
+                        )}
+
                         {validationStatus.isValid && !validationStatus.isValidating && (
                           <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
                             <CheckCircle size={20} className="text-success-500 animate-pulse" />
@@ -494,46 +510,22 @@ const ContactBasicInfo: React.FC = React.memo(() => {
 
                       <div className="relative group">
                         <FormControl>
-                          <ModernSelect
-                            onValueChange={handleGroupSelection}
+                          <ModernSearchSelect
+                            options={groupOptions}
                             value={field.value === null ? "no-group-selected" : field.value}
-                          >
-                            <ModernSelectTrigger
-                              variant="glass"
-                              className={`
-                                w-full px-6 py-4 text-lg rounded-2xl
-                                border-2 bg-white/60 dark:bg-gray-700/60
-                                backdrop-blur-sm
-                                transition-all duration-300 ease-out
-                                focus:ring-4 focus:ring-success-500/20 focus:border-success-400
-                                hover:bg-white/90 dark:hover:bg-neutral-800/90
-                                hover:shadow-lg hover:shadow-success-500/10
-                                ${fieldState.error ? 'border-red-400 focus:ring-red-500/30' : 'border-white/50 dark:border-gray-600/50'}
-                                ${focusedField === 'groupId' ? 'scale-[1.02] shadow-xl' : ''}
-                                ${validationStatus.isValid ? 'border-success-400' : ''}
-                                ${validationStatus.isValidating ? 'border-warning-400' : ''}
-                              `}
-                              onFocus={() => setFocusedField('groupId')}
-                              onBlur={() => handleFieldBlur('groupId')}
-                            >
-                              <ModernSelectValue placeholder={t('contact_form.select_group')} />
-                            </ModernSelectTrigger>
-                            <ModernSelectContent variant="glass" className="bg-white/80 dark:bg-gray-800/80 border border-white/30 dark:border-gray-600/30 rounded-2xl">
-                              <ModernSelectItem value="no-group-selected">{t('contact_form.no_group')}</ModernSelectItem>
-                              {groups.map((group) => (
-                                <ModernSelectItem key={group.id} value={group.id} className="hover:bg-white/20 dark:hover:bg-gray-700/50 px-4 py-3 rounded-lg">
-                                  {group.name}
-                                </ModernSelectItem>
-                              ))}
-                              <Separator className="my-1" />
-                              <ModernSelectItem value="__ADD_NEW_GROUP__" className="text-primary-600 dark:text-primary-400 hover:bg-primary-100/50 dark:hover:bg-primary-900/30 px-4 py-3 rounded-lg">
-                                <div className="flex items-center gap-2">
-                                  <PlusCircle size={16} />
-                                  {t('contact_form.add_new_group')}
-                                </div>
-                              </ModernSelectItem>
-                            </ModernSelectContent>
-                          </ModernSelect>
+                            onValueChange={handleGroupSelection}
+                            placeholder={t('contact_form.select_group')}
+                            searchPlaceholder={t('contact_form.search_groups')}
+                            emptyMessage={t('contact_form.no_groups_found')}
+                            variant="glass"
+                            className={`
+                              w-full
+                              ${fieldState.error ? 'border-red-400 focus:ring-red-500/30' : ''}
+                              ${focusedField === 'groupId' ? 'scale-[1.02] shadow-xl' : ''}
+                              ${validationStatus.isValid ? 'border-success-400' : ''}
+                              ${validationStatus.isValidating ? 'border-warning-400' : ''}
+                            `}
+                          />
                         </FormControl>
 
                         {validationStatus.isValid && !validationStatus.isValidating && (
