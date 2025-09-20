@@ -8,8 +8,6 @@ import { useTranslation } from 'react-i18next';
 import { useGroups } from '@/hooks/use-groups';
 import { useGroupColorManagement } from '@/hooks/use-group-color-management';
 import { User, User2, UserCheck, Users, AlertCircle, Briefcase, Building2, CheckCircle, XCircle, Loader2 } from 'lucide-react';
-import { Separator } from '@/components/ui/separator';
-import { PlusCircle } from 'lucide-react';
 import GroupForm from '@/components/groups/GroupForm';
 import FormDialogWrapper from '@/components/common/FormDialogWrapper';
 import { Dialog } from '@/components/ui/dialog';
@@ -25,6 +23,20 @@ const ContactBasicInfo: React.FC = React.memo(() => {
   const [focusedField, setFocusedField] = useState<string | null>(null);
   const { groups, fetchGroups } = useGroups();
   const [isAddGroupDialogOpen, setIsAddGroupDialogOpen] = useState(false);
+
+  // Debug: Log when component mounts and when groups change
+  useEffect(() => {
+    console.log('ContactBasicInfo mounted, fetching groups...');
+    fetchGroups();
+  }, [fetchGroups]);
+
+  useEffect(() => {
+    console.log('Groups updated:', groups);
+  }, [groups]);
+
+  // Test function to manually fetch groups
+  
+  // Test function to check if we can create a group
 
   // Use the real-time validation hook
   const { 
@@ -48,14 +60,21 @@ const ContactBasicInfo: React.FC = React.memo(() => {
   ], [t]);
 
   // Memoize group options for search select
-  const groupOptions = useMemo(() => [
-    { value: "no-group-selected", label: t('contact_form.no_group') },
-    ...groups.map((group) => ({
-      value: group.id,
-      label: group.name,
-    })),
-    { value: "__ADD_NEW_GROUP__", label: t('contact_form.add_new_group') },
-  ], [groups, t]);
+  const groupOptions = useMemo(() => {
+    // Ensure groups is an array before mapping
+    const safeGroups = Array.isArray(groups) ? groups : [];
+    
+    const options: { value: string; label: string }[] = [
+      { value: "no-group-selected", label: t('contact_form.no_group') },
+      ...safeGroups.map((group) => ({
+        value: group.id,
+        label: group.name,
+      })),
+      { value: "__ADD_NEW_GROUP__", label: t('contact_form.add_new_group') },
+    ];
+    
+    return options;
+  }, [groups, t]);
 
   const handleGroupAdded = useCallback(async (newGroupId?: string) => {
     await fetchGroups();
@@ -75,10 +94,34 @@ const ContactBasicInfo: React.FC = React.memo(() => {
   }, [form, fetchColorsWhenNeeded]);
 
   // Handle field change with real-time validation
-  const handleFieldChange = useCallback((fieldName: FieldPath<ContactFormValues>, value: unknown) => {
-    form.setValue(fieldName, value, { shouldDirty: true });
-    validateField(fieldName, value);
+
+  // Specialized handler for gender field to ensure proper typing
+  const handleGenderChange = useCallback((value: "male" | "female" | "not_specified") => {
+    form.setValue('gender', value, { shouldDirty: true });
+    validateField('gender', value);
   }, [form, validateField]);
+  
+  // Specialized handlers for other fields to avoid typing issues
+  const handleFirstNameChange = useCallback((value: string) => {
+    form.setValue('firstName', value, { shouldDirty: true });
+    validateField('firstName', value);
+  }, [form, validateField]);
+  
+  const handleLastNameChange = useCallback((value: string) => {
+    form.setValue('lastName', value, { shouldDirty: true });
+    validateField('lastName', value);
+  }, [form, validateField]);
+  
+  const handlePositionChange = useCallback((value: string) => {
+    form.setValue('position', value, { shouldDirty: true });
+    validateField('position', value);
+  }, [form, validateField]);
+  
+  const handleCompanyChange = useCallback((value: string) => {
+    form.setValue('company', value, { shouldDirty: true });
+    validateField('company', value);
+  }, [form, validateField]);
+  
 
   // Handle field blur with validation
   const handleFieldBlur = useCallback((fieldName: FieldPath<ContactFormValues>) => {
@@ -137,7 +180,7 @@ const ContactBasicInfo: React.FC = React.memo(() => {
                             `}
                             {...field}
                             value={field.value || ''}
-                            onChange={(e) => handleFieldChange('firstName', e.target.value)}
+                            onChange={(e) => handleFirstNameChange(e.target.value)}
                             onFocus={() => setFocusedField('firstName')}
                             onBlur={() => handleFieldBlur('firstName')}
                           />
@@ -217,7 +260,7 @@ const ContactBasicInfo: React.FC = React.memo(() => {
                             `}
                             {...field}
                             value={field.value || ''}
-                            onChange={(e) => handleFieldChange('lastName', e.target.value)}
+                            onChange={(e) => handleLastNameChange(e.target.value)}
                             onFocus={() => setFocusedField('lastName')}
                             onBlur={() => handleFieldBlur('lastName')}
                           />
@@ -296,7 +339,7 @@ const ContactBasicInfo: React.FC = React.memo(() => {
                             `}
                             {...field}
                             value={field.value || ''}
-                            onChange={(e) => handleFieldChange('position', e.target.value)}
+                            onChange={(e) => handlePositionChange(e.target.value)}
                             onFocus={() => setFocusedField('position')}
                             onBlur={() => handleFieldBlur('position')}
                           />
@@ -381,7 +424,7 @@ const ContactBasicInfo: React.FC = React.memo(() => {
                             `}
                             {...field}
                             value={field.value || ''}
-                            onChange={(e) => handleFieldChange('company', e.target.value)}
+                            onChange={(e) => handleCompanyChange(e.target.value)}
                             onFocus={() => setFocusedField('company')}
                             onBlur={() => handleFieldBlur('company')}
                           />
@@ -442,7 +485,7 @@ const ContactBasicInfo: React.FC = React.memo(() => {
 
                       <div className="relative group">
                         <FormControl>
-                          <ModernSelect onValueChange={(value) => handleFieldChange('gender', value)} value={field.value}>
+                          <ModernSelect onValueChange={handleGenderChange} value={field.value}>
                             <ModernSelectTrigger
                               variant="glass"
                               className={`

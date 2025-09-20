@@ -1,2 +1,2 @@
 ALTER TABLE public.contacts
-ADD COLUMN birthday DATE;
+ADD COLUMN IF NOT EXISTS birthday DATE;

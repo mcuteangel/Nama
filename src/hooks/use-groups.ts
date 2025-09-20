@@ -41,7 +41,9 @@ export const useGroups = () => {
 
   // Memoize the cache key to prevent unnecessary re-renders
   const cacheKey = useMemo(() => {
-    return `user_groups_${session?.user?.id}`;
+    const key = `user_groups_${session?.user?.id}`;
+    console.log('Cache key generated:', key);
+    return key;
   }, [session?.user?.id]);
 
   const fetchGroups = useCallback(async () => {

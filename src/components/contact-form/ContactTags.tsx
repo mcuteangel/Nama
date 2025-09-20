@@ -7,6 +7,7 @@ import { TagInput, TagList } from '@/components/ui/tag';
 import { CollapsibleSection } from '@/components/ui/collapsible-section';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
+import { useSession } from '@/integrations/supabase/auth';
 
 export interface ContactTagsProps {
   contactId?: string;
@@ -16,13 +17,13 @@ export interface ContactTagsProps {
 }
 
 const ContactTags: React.FC<ContactTagsProps> = ({
-  contactId,
   selectedTags,
   onTagsChange,
   className
 }) => {
   const { t } = useTranslation();
   const { toast } = useToast();
+  const { session } = useSession(); // Get session from useSession hook
   const [availableTags, setAvailableTags] = useState<TagWithCount[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -30,11 +31,17 @@ const ContactTags: React.FC<ContactTagsProps> = ({
   // Load available tags
   useEffect(() => {
     const loadTags = async () => {
+      // Don't load if user is not authenticated
+      if (!session?.user?.id) {
+        setError('User not authenticated');
+        return;
+      }
+
       setLoading(true);
       setError(null);
 
       try {
-        const { data, error } = await TagsService.getAllTags('current-user-id'); // TODO: Get actual user ID
+        const { data, error } = await TagsService.getAllTags(session.user.id); // Use actual user ID
 
         if (error) {
           setError(error);
@@ -55,15 +62,25 @@ const ContactTags: React.FC<ContactTagsProps> = ({
     };
 
     loadTags();
-  }, [t, toast]);
+  }, [t, toast, session]);
 
   // Handle adding a new tag
   const handleAddTag = async (tagName: string, color: string) => {
+    // Don't create tag if user is not authenticated
+    if (!session?.user?.id) {
+      toast({
+        title: t('common.error'),
+        description: t('contact_form.tags.create_error'),
+        variant: 'destructive'
+      });
+      return;
+    }
+
     try {
       const { data, error } = await TagsService.createTag({
         name: tagName,
         color: color,
-        user_id: 'current-user-id' // TODO: Get actual user ID
+        user_id: session.user.id // Use actual user ID
       });
 
       if (error) {

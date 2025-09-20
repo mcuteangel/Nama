@@ -1,5 +1,5 @@
 -- Create custom_field_templates table
-CREATE TABLE public.custom_field_templates (
+CREATE TABLE IF NOT EXISTS public.custom_field_templates (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   name TEXT NOT NULL,
@@ -13,6 +13,15 @@ CREATE TABLE public.custom_field_templates (
 
 -- Enable RLS (REQUIRED for security)
 ALTER TABLE public.custom_field_templates ENABLE ROW LEVEL SECURITY;
+
+-- Drop policies if they exist and recreate them
+DO $$
+BEGIN
+  DROP POLICY IF EXISTS "custom_field_templates_select_policy" ON public.custom_field_templates;
+  DROP POLICY IF EXISTS "custom_field_templates_insert_policy" ON public.custom_field_templates;
+  DROP POLICY IF EXISTS "custom_field_templates_update_policy" ON public.custom_field_templates;
+  DROP POLICY IF EXISTS "custom_field_templates_delete_policy" ON public.custom_field_templates;
+END $$;
 
 -- Create secure policies for each operation
 CREATE POLICY "custom_field_templates_select_policy" ON public.custom_field_templates 
@@ -28,6 +37,7 @@ CREATE POLICY "custom_field_templates_delete_policy" ON public.custom_field_temp
 FOR DELETE TO authenticated USING (auth.uid() = user_id);
 
 -- Add trigger for updated_at
+DROP TRIGGER IF EXISTS handle_custom_field_templates_updated_at ON public.custom_field_templates;
 CREATE TRIGGER handle_custom_field_templates_updated_at
 BEFORE UPDATE ON public.custom_field_templates
 FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();

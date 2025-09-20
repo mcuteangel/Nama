@@ -1,2 +1,2 @@
 ALTER TABLE public.phone_numbers
-ADD COLUMN extension TEXT;
+ADD COLUMN IF NOT EXISTS extension TEXT;

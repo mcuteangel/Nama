@@ -1,5 +1,5 @@
 -- Create ai_suggestions table
-CREATE TABLE public.ai_suggestions (
+CREATE TABLE IF NOT EXISTS public.ai_suggestions (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
   extracted_data JSONB NOT NULL, -- Stores the JSON output from AI
@@ -11,6 +11,12 @@ CREATE TABLE public.ai_suggestions (
 
 -- Enable RLS (REQUIRED)
 ALTER TABLE public.ai_suggestions ENABLE ROW LEVEL SECURITY;
+
+-- Drop existing policies if they exist
+DROP POLICY IF EXISTS "Users can view their own AI suggestions" ON public.ai_suggestions;
+DROP POLICY IF EXISTS "Users can insert their own AI suggestions" ON public.ai_suggestions;
+DROP POLICY IF EXISTS "Users can update their own AI suggestions" ON public.ai_suggestions;
+DROP POLICY IF EXISTS "Users can delete their own AI suggestions" ON public.ai_suggestions;
 
 -- Policies for ai_suggestions
 CREATE POLICY "Users can view their own AI suggestions" ON public.ai_suggestions

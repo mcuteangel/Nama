@@ -1,5 +1,5 @@
 -- Create user_settings table
-CREATE TABLE public.user_settings (
+CREATE TABLE IF NOT EXISTS public.user_settings (
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
   gemini_api_key TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -8,6 +8,11 @@ CREATE TABLE public.user_settings (
 
 -- Enable RLS (REQUIRED for security)
 ALTER TABLE public.user_settings ENABLE ROW LEVEL SECURITY;
+
+-- Drop existing policies if they exist
+DROP POLICY IF EXISTS "Users can view their own settings" ON public.user_settings;
+DROP POLICY IF EXISTS "Users can insert their own settings" ON public.user_settings;
+DROP POLICY IF EXISTS "Users can update their own settings" ON public.user_settings;
 
 -- Create secure policies for each operation
 CREATE POLICY "Users can view their own settings" ON public.user_settings

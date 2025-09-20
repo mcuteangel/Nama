@@ -1,5 +1,5 @@
 -- Create ai_processing_queue table
-CREATE TABLE public.ai_processing_queue (
+CREATE TABLE IF NOT EXISTS public.ai_processing_queue (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
   raw_text TEXT NOT NULL,
@@ -12,6 +12,12 @@ CREATE TABLE public.ai_processing_queue (
 
 -- Enable RLS (REQUIRED)
 ALTER TABLE public.ai_processing_queue ENABLE ROW LEVEL SECURITY;
+
+-- Drop existing policies if they exist
+DROP POLICY IF EXISTS "Users can view their own processing queue" ON public.ai_processing_queue;
+DROP POLICY IF EXISTS "Users can insert into their own processing queue" ON public.ai_processing_queue;
+DROP POLICY IF EXISTS "Users can update their own processing queue" ON public.ai_processing_queue;
+DROP POLICY IF EXISTS "Users can delete from their own processing queue" ON public.ai_processing_queue;
 
 -- Policies for ai_processing_queue
 CREATE POLICY "Users can view their own processing queue" ON public.ai_processing_queue

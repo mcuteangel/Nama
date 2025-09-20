@@ -62,7 +62,7 @@ const Contacts = React.memo(() => {
   const handleAddContactClick = useCallback(() => {
     toast.info(t('notifications.navigating_to_add_contact'));
     navigate("/add-contact");
-  }, [navigate, toast]);
+  }, [navigate, t, toast]);
 
   const handleSearchChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
@@ -100,7 +100,7 @@ const Contacts = React.memo(() => {
     } finally {
       setIsExporting(false);
     }
-  }, [session, filterValues, toast]);
+  }, [session, toast, t, filterValues]);
 
   return (
     <div className="flex flex-col items-stretch justify-center p-0 sm:p-4 h-full w-full">

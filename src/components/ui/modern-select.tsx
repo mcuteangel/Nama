@@ -384,8 +384,25 @@ export const ModernSearchSelect = React.forwardRef<
             onClick={() => setOpen(false)}
           />
 
-          {/* Search Input */}
-          <div className="absolute top-full left-0 right-0 z-50 mt-2">
+          {/* Dropdown Container */}
+          <div 
+            className="absolute top-full left-0 right-0 z-50 mt-2"
+            ref={(el) => {
+              if (el) {
+                // Ensure dropdown is visible in viewport
+                const rect = el.getBoundingClientRect();
+                const viewportHeight = window.innerHeight;
+                
+                // If dropdown would extend below viewport, position it above
+                if (rect.bottom > viewportHeight && rect.height <= rect.top) {
+                  el.style.top = 'auto';
+                  el.style.bottom = '100%';
+                  el.style.marginTop = '0';
+                  el.style.marginBottom = '0.5rem';
+                }
+              }
+            }}
+          >
             <div className="relative">
               <Search
                 size={18}
@@ -414,6 +431,7 @@ export const ModernSearchSelect = React.forwardRef<
                     key={option.value}
                     type="button"
                     onClick={() => {
+                      console.log('Option selected:', option);
                       onValueChange(option.value);
                       setOpen(false);
                       setSearchTerm("");

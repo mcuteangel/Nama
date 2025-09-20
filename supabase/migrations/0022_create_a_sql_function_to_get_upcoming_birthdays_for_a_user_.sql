@@ -1,3 +1,7 @@
+-- Drop the function if it exists with any signature
+DROP FUNCTION IF EXISTS public.get_upcoming_birthdays(uuid);
+
+-- Create the function with the older signature
 CREATE OR REPLACE FUNCTION public.get_upcoming_birthdays(user_id_param uuid)
 RETURNS TABLE(first_name text, last_name text, birthday date)
 LANGUAGE plpgsql

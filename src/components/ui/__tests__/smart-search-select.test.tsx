@@ -1,9 +1,11 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import '@testing-library/jest-dom';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { SmartSearchSelect } from '../smart-search-select';
 
 // Mock the useTranslation hook
-jest.mock('react-i18next', () => ({
+vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string, fallback: string) => fallback || key,
   }),
@@ -16,7 +18,7 @@ describe('SmartSearchSelect', () => {
     { value: '3', label: 'Option 3', keywords: ['three', 'third'] },
   ];
 
-  const mockOnValueChange = jest.fn();
+  const mockOnValueChange = vi.fn();
 
   beforeEach(() => {
     mockOnValueChange.mockClear();

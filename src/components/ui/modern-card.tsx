@@ -1,6 +1,6 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { getGradient, getShadow, getSpacing, getBorderRadius, getColor, designTokens } from '@/lib/design-tokens';
+import { getGradient, getShadow, getSpacing, getBorderRadius, designTokens } from '@/lib/design-tokens';
 
 export interface ModernCardProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: 'glass' | 'neomorphism' | 'gradient-primary' | 'gradient-ocean' | 'gradient-sunset' | 'gradient-forest' | 'gradient-purple' | 'gradient-pink' | 'minimal' | 'glass-3d' | '3d-card';

@@ -7,9 +7,10 @@ interface CancelButtonProps {
   onClick?: (e?: React.MouseEvent<HTMLButtonElement>) => void;
   disabled?: boolean;
   text?: string;
+  className?: string; // Added className prop
 }
 
-const CancelButton: React.FC<CancelButtonProps> = ({ onClick, disabled, text }) => {
+const CancelButton: React.FC<CancelButtonProps> = ({ onClick, disabled, text, className }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
@@ -26,7 +27,7 @@ const CancelButton: React.FC<CancelButtonProps> = ({ onClick, disabled, text }) 
       type="button"
       variant="glass"
       effect="lift"
-      className="px-6 py-2 font-medium"
+      className={`px-6 py-2 font-medium ${className || ''}`} // Apply className prop
       onClick={handleClick}
       disabled={disabled}
     >

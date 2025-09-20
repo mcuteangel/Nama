@@ -30,13 +30,12 @@ const SmartSearchSelect = React.forwardRef<
   placeholder,
   searchPlaceholder,
   noResultsText,
-  className,
   triggerClassName,
   contentClassName,
   itemClassName,
   disabled = false,
   maxVisibleItems = 10,
-}, ref) => {
+}, _ref) => {
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState("");
   const [isOpen, setIsOpen] = useState(false);

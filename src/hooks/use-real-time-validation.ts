@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef } from 'react';
-import { UseFormReturn, FieldPath, FieldErrors } from 'react-hook-form';
+import { UseFormReturn, FieldPath } from 'react-hook-form';
 import { ContactFormValues } from '@/types/contact';
 
 interface UseRealTimeValidationProps {
@@ -25,7 +25,7 @@ export const useRealTimeValidation = ({
   });
 
   // Debounced validation function
-  const validateField = useCallback(async (fieldName: FieldPath<ContactFormValues>, value: unknown) => {
+  const validateField = useCallback(async (fieldName: FieldPath<ContactFormValues>) => {
     // Clear any existing timeout
     if (validationTimeoutRef.current) {
       clearTimeout(validationTimeoutRef.current);
