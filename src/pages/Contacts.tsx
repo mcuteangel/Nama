@@ -1,10 +1,3 @@
-import { 
-  ModernCard, 
-  ModernCardContent, 
-  ModernCardDescription, 
-  ModernCardHeader, 
-  ModernCardTitle 
-} from "@/components/ui/modern-card";
 import { GradientButton, GlassButton } from "@/components/ui/glass-button";
 import { ModernLoader } from "@/components/ui/modern-loader";
 import { useToast } from "@/components/ui/use-toast";
@@ -16,10 +9,14 @@ import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useDebounce } from '@/hooks/use-performance';
 import SuspenseWrapper from '@/components/common/SuspenseWrapper';
 import { ModernSelect, ModernSelectContent, ModernSelectItem, ModernSelectTrigger, ModernSelectValue } from "@/components/ui/modern-select";
+import { ModernTooltip, ModernTooltipContent, ModernTooltipTrigger } from "@/components/ui/modern-tooltip";
 import { useGroups } from "@/hooks/use-groups";
 import { exportContactsToCsv } from "@/utils/export-contacts";
 import { useSession } from "@/integrations/supabase/auth";
 import { useTranslation } from 'react-i18next';
+import { useAppSettings } from '@/hooks/use-app-settings';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { designTokens } from '@/lib/design-tokens';
 
 const Contacts = React.memo(() => {
   const navigate = useNavigate();
@@ -27,6 +24,8 @@ const Contacts = React.memo(() => {
   const { session } = useSession();
   const { t } = useTranslation();
   const { toast } = useToast();
+  const { settings } = useAppSettings();
+  const isMobile = useIsMobile();
 
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedGroup, setSelectedGroup] = useState<string>("");
@@ -89,7 +88,7 @@ const Contacts = React.memo(() => {
       toast.error(t('errors.auth_required'));
       return;
     }
-    
+
     setIsExporting(true);
     toast.info(t('notifications.export_started'));
     try {
@@ -103,146 +102,343 @@ const Contacts = React.memo(() => {
   }, [session, toast, t, filterValues]);
 
   return (
-    <div className="flex flex-col items-stretch justify-center p-0 sm:p-4 h-full w-full">
-      <ModernCard 
-        variant="glass" 
-        className="w-full sm:max-w-4xl sm:mx-auto rounded-none sm:rounded-xl p-2 sm:p-6 fade-in-up border border-white/20"
-      >
-        <ModernCardHeader className="text-center p-4 sm:p-6">
-          <ModernCardTitle gradient className="heading-1 mb-2">
+    <div
+      className={`min-h-screen w-full ${settings.theme === 'dark' ? 'dark' : ''}`}
+      style={{
+        background: designTokens.gradients.ocean,
+        padding: designTokens.spacing[6]
+      }}
+    >
+      <div className="max-w-7xl mx-auto space-y-6">
+        {/* Compact Header Section */}
+        <div
+          className="text-center py-8 px-6 rounded-2xl"
+          style={{
+            background: designTokens.colors.glass.background,
+            border: `1px solid ${designTokens.colors.glass.border}`,
+            backdropFilter: 'blur(15px)',
+            boxShadow: designTokens.shadows.glass
+          }}
+        >
+          <h1
+            className="text-3xl md:text-4xl font-bold mb-3"
+            style={{
+              background: designTokens.gradients.primary,
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+              fontFamily: designTokens.typography.fonts.primary
+            }}
+          >
             {t('pages.contacts.management')}
-          </ModernCardTitle>
-          <ModernCardDescription className="body-large">
+          </h1>
+          <p
+            className="text-base text-gray-600 dark:text-gray-300 max-w-2xl mx-auto"
+            style={{
+              fontFamily: designTokens.typography.fonts.secondary
+            }}
+          >
             {t('pages.contacts.management_description')}
-          </ModernCardDescription>
-        </ModernCardHeader>
-        <ModernCardContent className="space-y-4 sm:space-y-6 p-4 sm:p-6 pt-0">
-          <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 justify-between items-center">
-            <div className="relative flex-grow w-full sm:w-auto">
-              <ModernInput
-                type="text"
-                placeholder={t('pages.contacts.search_placeholder')}
-                variant="glass"
-                className="w-full ps-10 pe-4 py-2 rounded-lg bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all duration-300 rtl:pr-10 rtl:pl-4"
-                value={searchTerm}
-                onChange={handleSearchChange}
-              />
-              <Search className="absolute inset-inline-start-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 rtl:right-3 rtl:left-auto" size={20} />
-            </div>
-            <div className="flex gap-1 sm:gap-2 w-full sm:w-auto">
-              <GradientButton
-                gradientType="primary"
-                onClick={handleAddContactClick}
-                className="flex items-center gap-2 sm:gap-2 px-4 sm:px-6 py-3 sm:py-2 text-base sm:text-base flex-grow sm:flex-grow-0 font-persian neomorphism"
-              >
-                <PlusCircle size={18} className="sm:w-5 sm:h-5" />
-                <span className="hidden sm:inline">{t('actions.add_contact')}</span>
-                <span className="sm:hidden">{t('actions.new')}</span>
-              </GradientButton>
-              <GlassButton
-                variant="glass"
-                onClick={handleExportClick}
-                disabled={isExporting || !session?.user}
-                className="flex items-center gap-2 sm:gap-2 px-4 sm:px-6 py-3 sm:py-2 text-base sm:text-base flex-grow sm:flex-grow-0 font-persian backdrop-blur-md border border-white/20 hover:bg-white/10 dark:hover:bg-white/5"
-              >
-                {isExporting ? (
-                  <ModernLoader variant="spinner" size="sm" className="me-2" />
-                ) : (
-                  <Download size={18} className="sm:w-5 sm:h-5" />
-                )}
-                <span className="hidden sm:inline">{t('actions.export')}</span>
-                <span className="sm:hidden">{t('actions.export')}</span>
-              </GlassButton>
-            </div>
-          </div>
+          </p>
+        </div>
 
-          {/* Compact filter and sorting section */}
-          <div className="bg-white/20 dark:bg-gray-700/20 rounded-lg p-3 border border-white/30 dark:border-gray-600/30 backdrop-blur-sm">
-            <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 items-end">
-              <div>
-                <label htmlFor="group-filter" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">{t('contact_form.group')}:</label>
-                <ModernSelect onValueChange={handleGroupChange} value={selectedGroup || "all"}>
-                  <ModernSelectTrigger id="group-filter" variant="glass" className="w-full backdrop-blur-md border border-white/20 hover:bg-white/10 dark:hover:bg-white/5">
-                    <ModernSelectValue placeholder={t('groups.all_groups')} />
-                  </ModernSelectTrigger>
-                  <ModernSelectContent variant="glass" className="backdrop-blur-md border border-white/20">
-                    <ModernSelectItem value="all">{t('groups.all_groups')}</ModernSelectItem>
-                    {groups.map((group) => (
-                      <ModernSelectItem key={group.id} value={group.id}>
-                        {group.name}
-                      </ModernSelectItem>
-                    ))}
-                  </ModernSelectContent>
-                </ModernSelect>
-              </div>
+        <div
+          className="rounded-3xl overflow-hidden"
+          style={{
+            background: designTokens.colors.glass.background,
+            border: `1px solid ${designTokens.colors.glass.border}`,
+            backdropFilter: 'blur(15px)',
+            boxShadow: designTokens.shadows.glass
+          }}
+        >
+          {/* Compact Search and Actions Section */}
+          <div
+            className="px-8 py-6 border-b"
+            style={{
+              borderColor: designTokens.colors.glass.border,
+              background: 'rgba(255,255,255,0.05)',
+              backdropFilter: 'blur(10px)'
+            }}
+          >
+            <div className="flex items-center justify-between gap-6">
+              <div className="flex items-center gap-4 flex-grow">
+                {/* Search Input */}
+                <div className="relative flex-grow max-w-md">
+                  <ModernInput
+                    type="text"
+                    placeholder={t('pages.contacts.search_placeholder')}
+                    className="w-full pl-12 pr-4 py-3 rounded-xl focus:ring-4 focus:ring-blue-500/30"
+                    style={{
+                      background: 'rgba(255,255,255,0.1)',
+                      border: `2px solid ${designTokens.colors.glass.border}`,
+                      backdropFilter: 'blur(10px)',
+                      fontSize: designTokens.typography.sizes.base,
+                      fontFamily: designTokens.typography.fonts.primary,
+                      boxShadow: designTokens.shadows.glass,
+                      transition: `all ${designTokens.transitions.duration.normal} ${designTokens.transitions.easing.easeOut}`
+                    }}
+                    value={searchTerm}
+                    onChange={handleSearchChange}
+                  />
+                  <Search
+                    className="absolute left-4 top-1/2 transform -translate-y-1/2"
+                    size={18}
+                    style={{ color: designTokens.colors.gray[500] }}
+                  />
+                </div>
 
-              <div>
-                <label htmlFor="company-filter" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">{t('contact_form.company')}:</label>
-                <ModernInput
-                  id="company-filter"
-                  type="text"
-                  placeholder={t('pages.contacts.company_placeholder')}
-                  variant="glass"
-                  className="w-full bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 backdrop-blur-md"
-                  value={companyFilter}
-                  onChange={handleCompanyChange}
-                />
-              </div>
+                {/* Action Buttons */}
+                <div className="flex items-center gap-3">
+                  <ModernTooltip>
+                    <ModernTooltipTrigger asChild>
+                      <GradientButton
+                        gradientType="primary"
+                        onClick={handleAddContactClick}
+                        className="flex items-center gap-2 px-6 py-3 font-semibold rounded-xl"
+                        style={{
+                          background: designTokens.gradients.primary,
+                          boxShadow: designTokens.shadows.primary,
+                          fontFamily: designTokens.typography.fonts.primary,
+                          transition: `all ${designTokens.transitions.duration.normal} ${designTokens.transitions.easing.easeOut}`
+                        }}
+                      >
+                        <PlusCircle size={20} />
+                        <span className="hidden sm:inline">{t('actions.add_contact')}</span>
+                      </GradientButton>
+                    </ModernTooltipTrigger>
+                    <ModernTooltipContent>
+                      <p>{t('actions.add_contact')}</p>
+                    </ModernTooltipContent>
+                  </ModernTooltip>
 
-              <div>
-                <label htmlFor="sort-option" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">{t('actions.sort')}:</label>
-                <ModernSelect onValueChange={handleSortChange} value={sortOption}>
-                  <ModernSelectTrigger id="sort-option" variant="glass" className="w-full backdrop-blur-md border border-white/20 hover:bg-white/10 dark:hover:bg-white/5">
-                    <ModernSelectValue placeholder={t('sorting.sort_by')} />
-                  </ModernSelectTrigger>
-                  <ModernSelectContent variant="glass" className="backdrop-blur-md border border-white/20">
-                    <ModernSelectItem value="first_name_asc">{t('sorting.first_name_asc')}</ModernSelectItem>
-                    <ModernSelectItem value="first_name_desc">{t('sorting.first_name_desc')}</ModernSelectItem>
-                    <ModernSelectItem value="last_name_asc">{t('sorting.last_name_asc')}</ModernSelectItem>
-                    <ModernSelectItem value="last_name_desc">{t('sorting.last_name_desc')}</ModernSelectItem>
-                    <ModernSelectItem value="created_at_desc">{t('sorting.created_at_desc')}</ModernSelectItem>
-                    <ModernSelectItem value="created_at_asc">{t('sorting.created_at_asc')}</ModernSelectItem>
-                  </ModernSelectContent>
-                </ModernSelect>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">نمایش:</label>
-                <div className="flex rounded-lg bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30 p-1">
-                  <GlassButton
-                    variant={displayMode === 'grid' ? "default" : "ghost"}
-                    size="sm"
-                    className={`flex-1 flex items-center justify-center gap-2 ${displayMode === 'grid' ? 'bg-blue-500 text-white' : 'text-gray-700 dark:text-gray-300'}`}
-                    onClick={() => handleDisplayModeChange('grid')}
-                  >
-                    <Grid size={16} />
-                    <span className="hidden sm:inline">کارتی</span>
-                  </GlassButton>
-                  <GlassButton
-                    variant={displayMode === 'list' ? "default" : "ghost"}
-                    size="sm"
-                    className={`flex-1 flex items-center justify-center gap-2 ${displayMode === 'list' ? 'bg-blue-500 text-white' : 'text-gray-700 dark:text-gray-300'}`}
-                    onClick={() => handleDisplayModeChange('list')}
-                  >
-                    <List size={16} />
-                    <span className="hidden sm:inline">لیستی</span>
-                  </GlassButton>
+                  <ModernTooltip>
+                    <ModernTooltipTrigger asChild>
+                      <GlassButton
+                        onClick={handleExportClick}
+                        disabled={isExporting || !session?.user}
+                        className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold"
+                        style={{
+                          background: designTokens.colors.glass.background,
+                          border: `2px solid ${designTokens.colors.glass.border}`,
+                          backdropFilter: 'blur(10px)',
+                          boxShadow: designTokens.shadows.glass,
+                          fontFamily: designTokens.typography.fonts.primary,
+                          transition: `all ${designTokens.transitions.duration.normal} ${designTokens.transitions.easing.easeOut}`
+                        }}
+                      >
+                        {isExporting ? (
+                          <ModernLoader variant="spinner" size="sm" />
+                        ) : (
+                          <Download size={20} />
+                        )}
+                        <span className="hidden sm:inline">{t('actions.export')}</span>
+                      </GlassButton>
+                    </ModernTooltipTrigger>
+                    <ModernTooltipContent>
+                      <p>{t('actions.export')}</p>
+                    </ModernTooltipContent>
+                  </ModernTooltip>
                 </div>
               </div>
             </div>
           </div>
 
-          <SuspenseWrapper>
-            <ContactList
-              searchTerm={filterValues.searchTerm}
-              selectedGroup={filterValues.selectedGroup}
-              companyFilter={filterValues.companyFilter}
-              sortOption={filterValues.sortOption}
-              displayMode={displayMode}
-            />
-          </SuspenseWrapper>
-        </ModernCardContent>
-      </ModernCard>
+          {/* Compact Filters Section */}
+          <div
+            className="px-8 py-4"
+            style={{
+              background: designTokens.colors.glass.background,
+              borderBottom: `1px solid ${designTokens.colors.glass.border}`,
+              backdropFilter: 'blur(15px)'
+            }}
+          >
+            <div className={`flex ${isMobile ? 'flex-col' : 'flex-row'} items-stretch ${isMobile ? '' : 'lg:items-center'} gap-4 ${isMobile ? '' : 'lg:justify-between'}`}>
+              <div className={`flex ${isMobile ? 'flex-col' : 'flex-row'} items-stretch ${isMobile ? '' : 'sm:items-center'} gap-4`}>
+                {/* Group Filter */}
+                <ModernTooltip>
+                  <ModernTooltipTrigger asChild>
+                    <div className="flex items-center gap-2">
+                      <ModernSelect onValueChange={handleGroupChange} value={selectedGroup || "all"}>
+                        <ModernSelectTrigger
+                          className="w-full sm:w-48 rounded-xl focus:ring-4 focus:ring-blue-500/30 text-gray-800 dark:text-gray-100 rtl:text-right ltr:text-left"
+                          style={{
+                            background: 'rgba(255,255,255,0.1)',
+                            border: `2px solid ${designTokens.colors.glass.border}`,
+                            backdropFilter: 'blur(10px)',
+                            fontSize: designTokens.typography.sizes.sm,
+                            boxShadow: designTokens.shadows.glass
+                          }}
+                        >
+                          <ModernSelectValue placeholder={t('groups.all_groups')} />
+                        </ModernSelectTrigger>
+                        <ModernSelectContent
+                          className="rtl:text-right ltr:text-left"
+                          style={{
+                            background: designTokens.colors.glass.background,
+                            border: `1px solid ${designTokens.colors.glass.border}`,
+                            backdropFilter: 'blur(15px)'
+                          }}
+                        >
+                          <ModernSelectItem value="all">{t('groups.all_groups')}</ModernSelectItem>
+                          {groups.map((group) => (
+                            <ModernSelectItem key={group.id} value={group.id}>
+                              {group.name}
+                            </ModernSelectItem>
+                          ))}
+                        </ModernSelectContent>
+                      </ModernSelect>
+                    </div>
+                  </ModernTooltipTrigger>
+                  <ModernTooltipContent>
+                    <p>{t('contact_form.group')}</p>
+                  </ModernTooltipContent>
+                </ModernTooltip>
+
+                {/* Company Filter */}
+                <ModernTooltip>
+                  <ModernTooltipTrigger asChild>
+                    <div className="flex items-center gap-2">
+                      <ModernInput
+                        type="text"
+                        placeholder={t('pages.contacts.company_placeholder')}
+                        className="w-full sm:w-48 rounded-xl focus:ring-4 focus:ring-blue-500/30 text-gray-800 dark:text-gray-100 rtl:text-right ltr:text-left"
+                        style={{
+                          background: 'rgba(255,255,255,0.1)',
+                          border: `2px solid ${designTokens.colors.glass.border}`,
+                          backdropFilter: 'blur(10px)',
+                          fontSize: designTokens.typography.sizes.sm,
+                          boxShadow: designTokens.shadows.glass
+                        }}
+                        value={companyFilter}
+                        onChange={handleCompanyChange}
+                      />
+                    </div>
+                  </ModernTooltipTrigger>
+                  <ModernTooltipContent>
+                    <p>{t('contact_form.company')}</p>
+                  </ModernTooltipContent>
+                </ModernTooltip>
+
+                {/* Sort Filter */}
+                <ModernTooltip>
+                  <ModernTooltipTrigger asChild>
+                    <div className="flex items-center gap-2">
+                      <ModernSelect onValueChange={handleSortChange} value={sortOption}>
+                        <ModernSelectTrigger
+                          className="w-full sm:w-48 rounded-xl focus:ring-4 focus:ring-blue-500/30 text-gray-800 dark:text-gray-100 rtl:text-right ltr:text-left"
+                          style={{
+                            background: 'rgba(255,255,255,0.1)',
+                            border: `2px solid ${designTokens.colors.glass.border}`,
+                            backdropFilter: 'blur(10px)',
+                            fontSize: designTokens.typography.sizes.sm,
+                            boxShadow: designTokens.shadows.glass
+                          }}
+                        >
+                          <ModernSelectValue placeholder={t('sorting.sort_by')} />
+                        </ModernSelectTrigger>
+                        <ModernSelectContent
+                          className="rtl:text-right ltr:text-left"
+                          style={{
+                            background: designTokens.colors.glass.background,
+                            border: `1px solid ${designTokens.colors.glass.border}`,
+                            backdropFilter: 'blur(15px)'
+                          }}
+                        >
+                          <ModernSelectItem value="first_name_asc">{t('sorting.first_name_asc')}</ModernSelectItem>
+                          <ModernSelectItem value="first_name_desc">{t('sorting.first_name_desc')}</ModernSelectItem>
+                          <ModernSelectItem value="last_name_asc">{t('sorting.last_name_asc')}</ModernSelectItem>
+                          <ModernSelectItem value="last_name_desc">{t('sorting.last_name_desc')}</ModernSelectItem>
+                          <ModernSelectItem value="created_at_desc">{t('sorting.created_at_desc')}</ModernSelectItem>
+                          <ModernSelectItem value="created_at_asc">{t('sorting.created_at_asc')}</ModernSelectItem>
+                        </ModernSelectContent>
+                      </ModernSelect>
+                    </div>
+                  </ModernTooltipTrigger>
+                  <ModernTooltipContent>
+                    <p>{t('actions.sort')}</p>
+                  </ModernTooltipContent>
+                </ModernTooltip>
+              </div>
+
+              {/* Display Mode Toggle */}
+              <div className={`flex items-center ${isMobile ? 'justify-center' : 'justify-end'} gap-2`}>
+                <div
+                  className="flex rounded-xl overflow-hidden border-2"
+                  style={{
+                    borderColor: designTokens.colors.glass.border,
+                    background: 'rgba(255,255,255,0.1)',
+                    backdropFilter: 'blur(10px)',
+                    boxShadow: designTokens.shadows.glass
+                  }}
+                >
+                  <ModernTooltip>
+                    <ModernTooltipTrigger asChild>
+                      <GlassButton
+                        variant={displayMode === 'grid' ? "default" : "ghost"}
+                        size="sm"
+                        className="flex items-center justify-center p-3"
+                        style={{
+                          background: displayMode === 'grid' ? designTokens.colors.primary[500] : 'transparent',
+                          color: displayMode === 'grid' ? 'white' : 'gray',
+                          borderRadius: 0,
+                          transition: `all ${designTokens.transitions.duration.normal} ${designTokens.transitions.easing.easeOut}`
+                        }}
+                        onClick={() => handleDisplayModeChange('grid')}
+                      >
+                        <Grid size={18} />
+                      </GlassButton>
+                    </ModernTooltipTrigger>
+                    <ModernTooltipContent>
+                      <p>نمایش کارتی</p>
+                    </ModernTooltipContent>
+                  </ModernTooltip>
+
+                  <ModernTooltip>
+                    <ModernTooltipTrigger asChild>
+                      <GlassButton
+                        variant={displayMode === 'list' ? "default" : "ghost"}
+                        size="sm"
+                        className="flex items-center justify-center p-3"
+                        style={{
+                          background: displayMode === 'list' ? designTokens.colors.primary[500] : 'transparent',
+                          color: displayMode === 'list' ? 'white' : designTokens.colors.gray[600],
+                          borderRadius: 0,
+                          transition: `all ${designTokens.transitions.duration.normal} ${designTokens.transitions.easing.easeOut}`
+                        }}
+                        onClick={() => handleDisplayModeChange('list')}
+                      >
+                        <List size={18} />
+                      </GlassButton>
+                    </ModernTooltipTrigger>
+                    <ModernTooltipContent>
+                      <p>نمایش لیستی</p>
+                    </ModernTooltipContent>
+                  </ModernTooltip>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Contact List Section */}
+          <div
+            className="p-8"
+            style={{
+              background: 'rgba(255,255,255,0.05)',
+              minHeight: '500px'
+            }}
+          >
+            <SuspenseWrapper>
+              <ContactList
+                searchTerm={filterValues.searchTerm}
+                selectedGroup={filterValues.selectedGroup}
+                companyFilter={filterValues.companyFilter}
+                sortOption={filterValues.sortOption}
+                displayMode={displayMode}
+              />
+            </SuspenseWrapper>
+          </div>
+        </div>
+      </div>
     </div>
   );
 });

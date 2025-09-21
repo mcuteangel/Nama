@@ -1,17 +1,16 @@
 import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { GlassButton } from "@/components/ui/glass-button";
-import { ModernCard } from "@/components/ui/modern-card";
-import { 
-  ModernAlertDialog, 
-  ModernAlertDialogAction, 
-  ModernAlertDialogCancel, 
-  ModernAlertDialogContent, 
-  ModernAlertDialogDescription, 
-  ModernAlertDialogFooter, 
-  ModernAlertDialogHeader, 
-  ModernAlertDialogTitle, 
-  ModernAlertDialogTrigger 
+import {
+  ModernAlertDialog,
+  ModernAlertDialogAction,
+  ModernAlertDialogCancel,
+  ModernAlertDialogContent,
+  ModernAlertDialogDescription,
+  ModernAlertDialogFooter,
+  ModernAlertDialogHeader,
+  ModernAlertDialogTitle,
+  ModernAlertDialogTrigger
 } from "@/components/ui/modern-alert-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Edit, Trash2, Phone, Mail } from "lucide-react";
@@ -23,6 +22,7 @@ import LoadingSpinner from './LoadingSpinner';
 import TouchGestureHandler from '../TouchGestureHandler';
 import { GestureCallbacks } from '../TouchGestureHandler.types';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { designTokens } from '@/lib/design-tokens';
 
 // Shared type definitions
 interface PhoneNumber {
@@ -76,11 +76,11 @@ interface ContactItemProps {
   className?: string;
 }
 
-export const ContactItem = React.memo<ContactItemProps>(({ 
-  contact, 
-  onContactDeleted, 
-  onContactEdited, 
-  style, 
+export const ContactItem = React.memo<ContactItemProps>(({
+  contact,
+  onContactDeleted,
+  onContactEdited,
+  style,
   enableGestures = false,
   className = ""
 }) => {
@@ -129,20 +129,32 @@ export const ContactItem = React.memo<ContactItemProps>(({
 
   // Memoize display values to prevent unnecessary re-calculations
   const displayPhoneNumber = useMemo(() => {
-    return contact.phone_numbers.length > 0 
-      ? contact.phone_numbers[0].phone_number 
+    return contact.phone_numbers.length > 0
+      ? contact.phone_numbers[0].phone_number
       : t('contact_list.no_phone', 'No phone number');
   }, [contact.phone_numbers, t]);
 
   const displayEmail = useMemo(() => {
-    return contact.email_addresses.length > 0 
-      ? contact.email_addresses[0].email_address 
+    return contact.email_addresses.length > 0
+      ? contact.email_addresses[0].email_address
       : undefined;
   }, [contact.email_addresses]);
 
   const avatarFallback = useMemo(() => {
-    return contact?.first_name ? contact.first_name[0] : "?";
-  }, [contact?.first_name]);
+    const firstInitial = contact?.first_name ? contact.first_name[0] : "?";
+    const lastInitial = contact?.last_name ? contact.last_name[0] : "";
+    return lastInitial ? `${firstInitial} ${lastInitial}` : firstInitial;
+  }, [contact?.first_name, contact?.last_name]);
+
+  const displayGender = useMemo(() => {
+    if (contact.gender === 'male') {
+      return { icon: '♂', color: designTokens.colors.primary[500] };
+    } else if (contact.gender === 'female') {
+      return { icon: '♀', color: designTokens.colors.secondary[500] };
+    } else {
+      return { icon: '⚲', color: designTokens.colors.gray[500] };
+    }
+  }, [contact.gender]);
 
   // Touch gesture callbacks for mobile
   const gestureCallbacks = useMemo(() => {
@@ -162,76 +174,218 @@ export const ContactItem = React.memo<ContactItemProps>(({
   }, [handleContactClick, handleDelete, handleEditClick, isMobile]);
 
   const cardContent = useMemo(() => (
-    <ModernCard
-      variant="glass"
-      hover="lift"
-      className={`flex items-center justify-between p-3 sm:p-4 rounded-lg cursor-pointer w-full ${className} border border-white/20 backdrop-blur-md`}
+    <div
+      className={`group relative overflow-hidden rounded-2xl cursor-pointer ${className}`}
       onClick={handleContactClick}
+      style={{
+        background: designTokens.colors.glass.background,
+        border: `1px solid ${designTokens.colors.glass.border}`,
+        backdropFilter: 'blur(15px)',
+        boxShadow: designTokens.shadows.glass,
+        padding: designTokens.spacing[3],
+        transition: `all ${designTokens.transitions.duration.normal} ${designTokens.transitions.easing.easeOut}`,
+        width: '100%'
+      }}
     >
-      <div className="flex items-center gap-4">
-        <Avatar className="h-12 w-12 border border-white/50 dark:border-gray-600/50">
-          <AvatarImage src={contact?.avatar_url || undefined} alt={contact?.first_name} />
-          <AvatarFallback className="bg-blue-500 text-white dark:bg-blue-700">
-            {avatarFallback}
-          </AvatarFallback>
-        </Avatar>
-        <div>
-          <p className="font-semibold text-lg text-gray-800 dark:text-gray-100">
-            {contact?.first_name} {contact?.last_name}
-          </p>
-          <p className="text-sm text-gray-600 dark:text-gray-300 flex items-center gap-1">
-            <Phone size={14} /> {displayPhoneNumber}
-          </p>
-          {displayEmail && (
-            <p className="text-sm text-gray-600 dark:text-gray-300 flex items-center gap-1">
-              <Mail size={14} /> {displayEmail}
-            </p>
-          )}
+      {/* Background gradient overlay */}
+      <div
+        className="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-300"
+        style={{
+          background: designTokens.gradients.primary,
+          borderRadius: designTokens.borderRadius.xl
+        }}
+      />
+
+      <div className="relative z-10 flex items-center justify-between">
+        <div className="flex items-center gap-6 flex-grow min-w-0">
+          <div className="relative">
+            <Avatar className="h-16 w-16 ring-2 transition-all duration-300 group-hover:ring-4"
+              style={{
+                border: `2px solid ${designTokens.colors.primary[300]}`,
+                boxShadow: designTokens.shadows.lg
+              }}
+            >
+              <AvatarImage src={contact?.avatar_url || undefined} alt={contact?.first_name} />
+              <AvatarFallback
+                style={{
+                  background: designTokens.gradients.primary,
+                  color: 'white',
+                  fontSize: designTokens.typography.sizes.xl,
+                  fontWeight: designTokens.typography.weights.bold
+                }}
+              >
+                {avatarFallback}
+              </AvatarFallback>
+            </Avatar>
+            {/* Gender indicator */}
+            <div
+              className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full border-2 border-white flex items-center justify-center text-xs font-bold"
+              style={{
+                background: displayGender.color,
+                boxShadow: designTokens.shadows.md
+              }}
+            >
+              {displayGender.icon}
+            </div>
+          </div>
+
+          <div className="min-w-0 flex-grow">
+            <h3
+              className="font-semibold text-base mb-1 truncate"
+              style={{
+                fontFamily: designTokens.typography.fonts.primary,
+                color: designTokens.colors.gray[800],
+                marginBottom: designTokens.spacing[1]
+              }}
+            >
+              {contact?.first_name} {contact?.last_name}
+            </h3>
+
+            <div className="grid grid-cols-1 gap-2">
+              <div
+                className="flex items-center gap-3 p-2 rounded-xl"
+                style={{
+                  background: 'rgba(59, 130, 246, 0.1)',
+                  border: `1px solid rgba(59, 130, 246, 0.2)`
+                }}
+              >
+                <Phone size={16} style={{ color: designTokens.colors.primary[600] }} />
+                <span
+                  className="text-sm font-medium truncate"
+                  style={{ color: designTokens.colors.gray[700] }}
+                >
+                  {displayPhoneNumber}
+                </span>
+              </div>
+
+              {displayEmail && (
+                <div
+                  className="flex items-center gap-3 p-2 rounded-xl"
+                  style={{
+                    background: 'rgba(139, 92, 246, 0.1)',
+                    border: `1px solid rgba(139, 92, 246, 0.2)`
+                  }}
+                >
+                  <Mail size={16} style={{ color: designTokens.colors.secondary[600] }} />
+                  <span
+                    className="text-sm font-medium truncate"
+                    style={{ color: designTokens.colors.gray[700] }}
+                  >
+                    {displayEmail}
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="absolute top-2 left-2 flex flex-col gap-1">
+          <GlassButton
+            variant="ghost"
+            size="icon"
+            className="opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110 rounded-lg shadow-md"
+            style={{
+              background: 'rgba(59, 130, 246, 0.9)',
+              border: `1px solid ${designTokens.colors.primary[300]}`,
+              width: '32px',
+              height: '32px',
+              backdropFilter: 'blur(10px)'
+            }}
+            onClick={handleEditClick}
+          >
+            <Edit size={14} style={{ color: 'white' }} />
+          </GlassButton>
+
+          <ModernAlertDialog>
+            <ModernAlertDialogTrigger asChild>
+              <GlassButton
+                variant="ghost"
+                size="icon"
+                className="opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110 rounded-lg shadow-md"
+                style={{
+                  background: 'rgba(239, 68, 68, 0.9)',
+                  border: `1px solid ${designTokens.colors.error[300]}`,
+                  width: '32px',
+                  height: '32px',
+                  backdropFilter: 'blur(10px)'
+                }}
+                onClick={(e) => e.stopPropagation()}
+                disabled={isDeleting}
+              >
+                {isDeleting ? (
+                  <LoadingSpinner size={20} />
+                ) : (
+                  <Trash2 size={14} style={{ color: 'white' }} />
+                )}
+              </GlassButton>
+            </ModernAlertDialogTrigger>
+            <ModernAlertDialogContent
+              className="glass rounded-2xl"
+              style={{
+                background: designTokens.colors.glass.background,
+                border: `1px solid ${designTokens.colors.glass.border}`,
+                backdropFilter: 'blur(20px)',
+                boxShadow: designTokens.shadows.glass3d,
+                padding: designTokens.spacing[6]
+              }}
+            >
+              <ModernAlertDialogHeader>
+                <ModernAlertDialogTitle
+                  style={{
+                    color: designTokens.colors.gray[800],
+                    fontSize: designTokens.typography.sizes.xl,
+                    fontWeight: designTokens.typography.weights.bold,
+                    fontFamily: designTokens.typography.fonts.primary
+                  }}
+                >
+                  {t('contact_list.confirm_delete_title', 'Are you sure you want to delete this contact?')}
+                </ModernAlertDialogTitle>
+                <ModernAlertDialogDescription
+                  style={{
+                    color: designTokens.colors.gray[600],
+                    fontSize: designTokens.typography.sizes.base,
+                    marginTop: designTokens.spacing[2]
+                  }}
+                >
+                  {t('contact_list.confirm_delete_description', 'This action cannot be undone. This contact will be permanently deleted.')}
+                </ModernAlertDialogDescription>
+              </ModernAlertDialogHeader>
+              <ModernAlertDialogFooter style={{ gap: designTokens.spacing[3], marginTop: designTokens.spacing[6] }}>
+                <ModernAlertDialogCancel
+                  style={{
+                    padding: `${designTokens.spacing[3]} ${designTokens.spacing[5]}`,
+                    borderRadius: designTokens.borderRadius.xl,
+                    background: designTokens.colors.gray[200],
+                    color: designTokens.colors.gray[800],
+                    fontWeight: designTokens.typography.weights.semibold,
+                    border: 'none',
+                    transition: `all ${designTokens.transitions.duration.normal} ${designTokens.transitions.easing.easeOut}`
+                  }}
+                >
+                  {t('common.cancel', 'Cancel')}
+                </ModernAlertDialogCancel>
+                <ModernAlertDialogAction
+                  onClick={handleDelete}
+                  disabled={isDeleting}
+                  style={{
+                    padding: `${designTokens.spacing[3]} ${designTokens.spacing[5]}`,
+                    borderRadius: designTokens.borderRadius.xl,
+                    background: designTokens.colors.error[600],
+                    color: 'white',
+                    fontWeight: designTokens.typography.weights.semibold,
+                    border: 'none',
+                    transition: `all ${designTokens.transitions.duration.normal} ${designTokens.transitions.easing.easeOut}`
+                  }}
+                >
+                  {isDeleting && <LoadingSpinner size={18} className="me-2" />}
+                  {t('common.delete', 'Delete')}
+                </ModernAlertDialogAction>
+              </ModernAlertDialogFooter>
+            </ModernAlertDialogContent>
+          </ModernAlertDialog>
         </div>
       </div>
-      <div className="flex gap-2">
-        <GlassButton 
-          variant="ghost" 
-          size="icon" 
-          className="text-blue-600 hover:bg-blue-100 dark:text-blue-400 dark:hover:bg-gray-600/50 transition-all duration-200" 
-          onClick={handleEditClick}
-        >
-          <Edit size={20} />
-        </GlassButton>
-        <ModernAlertDialog>
-          <ModernAlertDialogTrigger asChild>
-            <GlassButton 
-              variant="ghost" 
-              size="icon" 
-              className="text-red-600 hover:bg-red-100 dark:text-red-400 dark:hover:bg-gray-600/50 transition-all duration-200" 
-              onClick={(e) => e.stopPropagation()} 
-              disabled={isDeleting}
-            >
-              {isDeleting ? <LoadingSpinner size={20} /> : <Trash2 size={20} />}
-            </GlassButton>
-          </ModernAlertDialogTrigger>
-          <ModernAlertDialogContent className="glass rounded-xl p-6 border border-white/20 backdrop-blur-md">
-            <ModernAlertDialogHeader>
-              <ModernAlertDialogTitle className="text-gray-800 dark:text-gray-100">
-                {t('contact_list.confirm_delete_title', 'Are you sure you want to delete this contact?')}
-              </ModernAlertDialogTitle>
-              <ModernAlertDialogDescription className="text-gray-600 dark:text-gray-300">
-                {t('contact_list.confirm_delete_description', 'This action cannot be undone. This contact will be permanently deleted.')}
-              </ModernAlertDialogDescription>
-            </ModernAlertDialogHeader>
-            <ModernAlertDialogFooter>
-              <ModernAlertDialogCancel className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-100">
-                {t('common.cancel', 'Cancel')}
-              </ModernAlertDialogCancel>
-              <ModernAlertDialogAction onClick={handleDelete} className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold" disabled={isDeleting}>
-                {isDeleting && <LoadingSpinner size={16} className="me-2" />}
-                {t('common.delete', 'Delete')}
-              </ModernAlertDialogAction>
-            </ModernAlertDialogFooter>
-          </ModernAlertDialogContent>
-        </ModernAlertDialog>
-      </div>
-    </ModernCard>
+    </div>
   ), [
     className,
     handleContactClick,
@@ -265,5 +419,3 @@ export const ContactItem = React.memo<ContactItemProps>(({
 ContactItem.displayName = 'ContactItem';
 
 export default ContactItem;
-
-
