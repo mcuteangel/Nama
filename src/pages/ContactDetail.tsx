@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { showError, showSuccess } from "@/utils/toast";
-import { ModernGrid, GridItem } from "@/components/ui/modern-grid";
+import { designTokens } from "@/lib/design-tokens";
 import { fetchWithCache } from "@/utils/cache-helpers";
 import LoadingMessage from "@/components/common/LoadingMessage";
 import CancelButton from "@/components/common/CancelButton";
@@ -196,64 +196,117 @@ const ContactDetail = () => {
 
   // Main content
   return (
-    <div className="flex flex-col items-center justify-center p-4 md:p-6 h-full w-full fade-in-up">
-      <ContactHeader contact={contact} />
-      
-      {/* Main Content Grid */}
-      <ModernGrid 
-        variant="dynamic" 
-        minWidth="300px" 
-        gap="lg" 
-        className="w-full max-w-4xl mx-auto"
-      >
-        <GridItem>
-          <BasicInfoCard 
-            contact={contact} 
-            getGenderLabel={(gender) => getGenderLabel(gender, t)}
-            getPreferredContactMethodLabel={(method) => getPreferredContactMethodLabel(method, t)}
-          />
-        </GridItem>
-        
-        {(contact.street || contact.city || contact.state || contact.zip_code || contact.country) && (
-          <GridItem>
-            <AddressCard contact={contact} />
-          </GridItem>
-        )}
-        
-        {(contact.phone_numbers.length > 0 || contact.email_addresses.length > 0) && (
-          <GridItem>
-            <ContactMethodsCard 
-              phone_numbers={contact.phone_numbers} 
-              email_addresses={contact.email_addresses} 
+    <div className="relative min-h-screen w-full overflow-hidden">
+      {/* Animated Background */}
+      <div className="absolute inset-0">
+        {/* Gradient Background */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background: `linear-gradient(135deg,
+              ${designTokens.colors.primary[900]} 0%,
+              ${designTokens.colors.primary[800]} 25%,
+              ${designTokens.colors.secondary[900]} 50%,
+              ${designTokens.colors.secondary[800]} 75%,
+              ${designTokens.colors.accent[900]} 100%)`,
+          }}
+        />
+
+        {/* Floating Particles */}
+        <div className="absolute inset-0">
+          {[...Array(20)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute rounded-full opacity-10 animate-pulse"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                width: `${Math.random() * 4 + 2}px`,
+                height: `${Math.random() * 4 + 2}px`,
+                background: designTokens.colors.primary[400],
+                animationDelay: `${Math.random() * 3}s`,
+                animationDuration: `${Math.random() * 3 + 2}s`,
+              }}
             />
-          </GridItem>
-        )}
-        
-        {contact.social_links.length > 0 && (
-          <GridItem>
-            <SocialLinksCard social_links={contact.social_links} />
-          </GridItem>
-        )}
-        
-        {contact.custom_fields.length > 0 && (
-          <GridItem>
-            <CustomFieldsCard custom_fields={contact.custom_fields} />
-          </GridItem>
-        )}
-        
-        {contact.notes && (
-          <GridItem>
-            <NotesCard notes={contact.notes} />
-          </GridItem>
-        )}
-        
-        <GridItem>
-          <TimestampsCard 
-            created_at={contact.created_at} 
-            updated_at={contact.updated_at} 
-          />
-        </GridItem>
-      </ModernGrid>
+          ))}
+        </div>
+
+        {/* Grid Pattern Overlay */}
+        <div
+          className="absolute inset-0 opacity-5"
+          style={{
+            backgroundImage: `
+              linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)
+            `,
+            backgroundSize: '50px 50px',
+          }}
+        />
+      </div>
+
+      {/* Content Container */}
+      <div className="relative z-10 flex flex-col items-center justify-start min-h-screen w-full py-8 px-4 md:px-8">
+        <ContactHeader contact={contact} />
+
+        {/* Cards Grid - Auto-fill */}
+        <div className="w-full max-w-6xl mt-6">
+          <div
+            className="grid gap-4 md:gap-6"
+            style={{
+              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+              gridAutoRows: 'minmax(160px, auto)',
+            }}
+          >
+            {/* Basic Info - Always shown */}
+            <BasicInfoCard
+              contact={contact}
+              getGenderLabel={(gender) => getGenderLabel(gender, t)}
+              getPreferredContactMethodLabel={(method) => getPreferredContactMethodLabel(method, t)}
+            />
+
+            {/* Contact Methods */}
+            {(contact.phone_numbers.length > 0 || contact.email_addresses.length > 0) && (
+              <ContactMethodsCard
+                phone_numbers={contact.phone_numbers}
+                email_addresses={contact.email_addresses}
+              />
+            )}
+
+            {/* Address */}
+            {(contact.street || contact.city || contact.state || contact.zip_code || contact.country) && (
+              <AddressCard contact={contact} />
+            )}
+
+            {/* Social Links */}
+            {contact.social_links.length > 0 && (
+              <SocialLinksCard social_links={contact.social_links} />
+            )}
+
+            {/* Custom Fields */}
+            {contact.custom_fields.length > 0 && (
+              <CustomFieldsCard custom_fields={contact.custom_fields} />
+            )}
+
+            {/* Notes - Full Width when present */}
+            {contact.notes && (
+              <div
+                className="col-span-full"
+                style={{
+                  gridColumn: '1 / -1',
+                }}
+              >
+                <NotesCard notes={contact.notes} />
+              </div>
+            )}
+
+            {/* Timestamps - Always shown */}
+            <TimestampsCard
+              created_at={contact.created_at}
+              updated_at={contact.updated_at}
+            />
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

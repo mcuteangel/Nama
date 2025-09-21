@@ -1,16 +1,13 @@
-import { ModernCard } from "@/components/ui/modern-card";
-import { GlassButton } from "@/components/ui/glass-button";
-import { ModernAvatar, ModernAvatarFallback, ModernAvatarImage } from "@/components/ui/modern-avatar";
-import { ModernBadge } from "@/components/ui/modern-badge";
-import { 
-  Users, 
-  Building, 
+import {
+  Users,
+  Building,
   Briefcase,
   Edit,
   ArrowLeft
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { designTokens } from "@/lib/design-tokens";
 
 interface GroupData {
   name: string;
@@ -41,98 +38,176 @@ export const ContactHeader = ({ contact }: ContactHeaderProps) => {
   const getAvatarInitials = () => {
     const firstInitial = contact.first_name ? contact.first_name[0] : "?";
     const lastInitial = contact.last_name ? contact.last_name[0] : "";
-    
+
     // Add space between initials if both exist
     if (contact.first_name && contact.last_name) {
       return `${firstInitial} ${lastInitial}`;
     }
-    
+
     return firstInitial + lastInitial;
   };
 
   return (
-    <ModernCard 
-      variant="glass" 
-      hover="lift" 
-      className="w-full max-w-4xl mx-auto mb-6"
-    >
-      <div className="flex flex-col md:flex-row items-center md:items-start gap-6 p-6">
-        <ModernAvatar 
-          glassEffect="advanced"
-          className="h-24 w-24 ring-4 ring-primary/30"
-        >
-          <ModernAvatarImage 
-            src={contact.avatar_url || undefined} 
-            alt={`${contact.first_name} ${contact.last_name}`} 
-          />
-          <ModernAvatarFallback 
-            glassEffect="advanced"
-            className="text-2xl font-bold"
-          >
-            {getAvatarInitials()}
-          </ModernAvatarFallback>
-        </ModernAvatar>
-        
-        <div className="flex-1 text-center md:text-right">
-          <h1 className="text-3xl font-bold text-gradient mb-2">
-            {contact.first_name} {contact.last_name}
-          </h1>
-          <div className="flex flex-wrap justify-center md:justify-start gap-2 mb-4">
-            {contact.position && (
-              <ModernBadge 
-                variant="glass"
-                glassEffect="advanced"
-                className="text-sm"
+    <div className="relative w-full max-w-5xl mx-auto mb-6">
+      {/* Compact Header Card */}
+      <div
+        className="relative rounded-2xl overflow-hidden"
+        style={{
+          background: `linear-gradient(135deg,
+            rgba(255, 255, 255, 0.1) 0%,
+            rgba(255, 255, 255, 0.05) 50%,
+            rgba(255, 255, 255, 0.02) 100%)`,
+          backdropFilter: 'blur(20px)',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          boxShadow: `0 20px 40px -12px rgba(0, 0, 0, 0.2),
+                     0 8px 16px -8px rgba(0, 0, 0, 0.1),
+                     inset 0 1px 0 0 rgba(255, 255, 255, 0.1)`,
+        }}
+      >
+        <div className="relative z-10 p-4">
+          <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
+
+            {/* Avatar Section - Smaller */}
+            <div className="flex-shrink-0">
+              <div className="relative">
+                {/* Avatar */}
+                <div
+                  className="relative h-20 w-20 rounded-full flex items-center justify-center text-xl font-bold overflow-hidden"
+                  style={{
+                    background: `linear-gradient(135deg, ${designTokens.colors.primary[500]}, ${designTokens.colors.secondary[500]})`,
+                    boxShadow: `0 8px 24px -4px rgba(0, 0, 0, 0.3),
+                               inset 0 1px 0 0 rgba(255, 255, 255, 0.2)`,
+                    border: `3px solid rgba(255, 255, 255, 0.1)`,
+                  }}
+                >
+                  {contact.avatar_url ? (
+                    <img
+                      src={contact.avatar_url}
+                      alt={`${contact.first_name} ${contact.last_name}`}
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <span
+                      style={{
+                        color: 'white',
+                        textShadow: '0 1px 2px rgba(0, 0, 0, 0.3)',
+                      }}
+                    >
+                      {getAvatarInitials()}
+                    </span>
+                  )}
+                </div>
+
+                {/* Status Indicator - Smaller */}
+                <div
+                  className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full border-2 border-white"
+                  style={{
+                    background: designTokens.colors.success[500],
+                    boxShadow: '0 1px 4px rgba(0, 0, 0, 0.2)',
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* Content Section - Compact */}
+            <div className="flex-1 text-center sm:text-right min-w-0">
+              {/* Name - Smaller */}
+              <h1
+                className="text-2xl md:text-3xl font-bold mb-2 tracking-tight"
+                style={{
+                  background: 'linear-gradient(135deg, white 0%, rgba(255,255,255,0.9) 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                }}
               >
-                <Briefcase size={14} className="ml-1" />
-                {contact.position}
-              </ModernBadge>
-            )}
-            {contact.company && (
-              <ModernBadge 
-                variant="glass"
-                glassEffect="advanced"
-                className="text-sm"
+                {contact.first_name} {contact.last_name}
+              </h1>
+
+              {/* Badges - Compact */}
+              <div className="flex flex-wrap justify-center sm:justify-start gap-2 mb-3">
+                {contact.position && (
+                  <div
+                    className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium backdrop-blur-sm"
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.1)',
+                      border: '1px solid rgba(255, 255, 255, 0.2)',
+                    }}
+                  >
+                    <Briefcase size={12} style={{ color: 'white' }} />
+                    <span style={{ color: 'white' }}>{contact.position}</span>
+                  </div>
+                )}
+
+                {contact.company && (
+                  <div
+                    className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium backdrop-blur-sm"
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.1)',
+                      border: '1px solid rgba(255, 255, 255, 0.2)',
+                    }}
+                  >
+                    <Building size={12} style={{ color: 'white' }} />
+                    <span style={{ color: 'white' }}>{contact.company}</span>
+                  </div>
+                )}
+
+                {assignedGroup && (
+                  <div
+                    className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium"
+                    style={{
+                      background: designTokens.gradients.primary,
+                      boxShadow: '0 2px 8px rgba(59, 130, 246, 0.2)',
+                    }}
+                  >
+                    <Users size={12} />
+                    <span>{assignedGroup.name}</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Description - Smaller */}
+              <p
+                className="text-sm opacity-80"
+                style={{
+                  color: 'rgba(255, 255, 255, 0.7)',
+                }}
               >
-                <Building size={14} className="ml-1" />
-                {contact.company}
-              </ModernBadge>
-            )}
-            {assignedGroup && (
-              <ModernBadge 
-                variant="gradient"
-                gradientType="primary"
-                className="text-sm"
+                {t('contact_detail.contact_details')}
+              </p>
+            </div>
+
+            {/* Action Buttons - Compact */}
+            <div className="flex gap-2">
+              <button
+                onClick={() => navigate(-1)}
+                className="group p-2 rounded-xl backdrop-blur-md transition-all duration-200 hover:scale-105"
+                style={{
+                  background: 'rgba(255, 255, 255, 0.1)',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+                }}
               >
-                <Users size={14} className="ml-1" />
-                {assignedGroup.name}
-              </ModernBadge>
-            )}
+                <ArrowLeft size={18} style={{ color: 'white' }} />
+              </button>
+
+              <button
+                onClick={() => navigate(`/contacts/edit/${contact.id}`)}
+                className="group flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all duration-200 hover:scale-105"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.1))',
+                  border: '1px solid rgba(255, 255, 255, 0.3)',
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+                  color: 'white',
+                }}
+              >
+                <Edit size={16} />
+                {t('contact_detail.edit')}
+              </button>
+            </div>
           </div>
-          <p className="text-muted-foreground">
-            {t('contact_detail.contact_details')}
-          </p>
-        </div>
-        
-        <div className="flex gap-2">
-          <GlassButton
-            onClick={() => navigate(-1)}
-            variant="glass"
-            size="icon"
-            className="rounded-full glass-advanced border border-white/30 hover:bg-white/20 dark:hover:bg-white/10 backdrop-blur-md"
-          >
-            <ArrowLeft size={20} />
-          </GlassButton>
-          <GlassButton
-            onClick={() => navigate(`/contacts/edit/${contact.id}`)}
-            variant="glass"
-            className="rounded-full glass-advanced border border-white/30 hover:bg-white/20 dark:hover:bg-white/10 backdrop-blur-md !bg-gradient-to-br !from-blue-500/20 !via-blue-600/15 !to-purple-600/20 !border !border-blue-400/30 dark:!from-blue-600/20 dark:!via-blue-700/15 dark:!to-purple-800/20 dark:!border-blue-500/30"
-          >
-            <Edit size={20} className="ml-1" />
-            {t('contact_detail.edit')}
-          </GlassButton>
         </div>
       </div>
-    </ModernCard>
+    </div>
   );
 };
