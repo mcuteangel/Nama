@@ -1,334 +1,453 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { ModernInput } from '@/components/ui/modern-input';
-import { FormField, FormItem, FormLabel, FormControl } from '@/components/ui/form';
+import { FormField, FormLabel, FormControl } from '@/components/ui/form';
 import { ContactFormValues } from '@/types/contact';
-import { MapPin, UserCheck, AlertCircle } from 'lucide-react';
-import { CollapsibleSection } from '@/components/ui/collapsible-section';
+import { MapPin, AlertCircle, CheckCircle, XCircle, Home, Building, Globe } from 'lucide-react';
+import { designTokens } from '@/lib/design-tokens';
 
 const ContactAddress: React.FC = React.memo(() => {
   const form = useFormContext<ContactFormValues>();
-  const { t } = useTranslation();
+  useTranslation();
+  const [focusedField, setFocusedField] = useState<string | null>(null);
 
   return (
-    <CollapsibleSection 
-      title={t('section_titles.address')} 
-      icon={<MapPin size={16} className="text-white" />}
-      defaultOpen={false}
-    >
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        <div className="group/field p-3 rounded-lg bg-muted/10 dark:bg-muted/10 border border-border/20 hover:border-primary/40 transition-colors duration-200">
-          <FormField
-            control={form.control}
-            name="street"
-            render={({ field, fieldState }) => (
-              <FormItem>
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-warning-100/80 to-warning-50/80 dark:from-warning-900/30 dark:to-warning-800/20 border border-warning-200/50 dark:border-warning-800/50 flex items-center justify-center transition-all duration-300">
-                      <MapPin size={16} className="text-warning-600 dark:text-warning-400" />
+    <div className="space-y-4 sm:space-y-6">
+      {/* Header Section with New Design */}
+      <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl"
+           style={{
+             background: designTokens.gradients.forest,
+             boxShadow: designTokens.shadows.glass3d
+           }}>
+        <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/20 to-teal-500/20"></div>
+        <div className="relative p-4 sm:p-6 lg:p-8">
+          <div className="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
+            <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 rounded-xl sm:rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center shadow-lg">
+              <MapPin size={24} className="sm:w-8 text-white animate-pulse" />
+            </div>
+            <div>
+              <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-1 sm:mb-2"
+                  style={{ fontFamily: designTokens.typography.fonts.primary }}>
+                آدرس
+              </h2>
+              <p className="text-white/80 text-sm sm:text-base lg:text-lg">
+                اطلاعات آدرس مخاطب را وارد کنید
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+            {/* Street Field */}
+            <FormField
+              control={form.control}
+              name="street"
+              render={({ field, fieldState }) => (
+                <div className="group relative">
+                  <div className="absolute -inset-1 bg-gradient-to-r from-emerald-600 to-teal-600 rounded-xl sm:rounded-2xl blur opacity-25 group-hover:opacity-75 transition duration-1000 group-hover:duration-200"></div>
+                  <div className="relative bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-white/20 dark:border-gray-700/20 shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-[1.01] sm:hover:scale-[1.02]">
+                    <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4">
+                      <div className="relative">
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center shadow-lg">
+                          <Home size={20} className="sm:w-6 text-white" />
+                        </div>
+                        {focusedField === 'street' && (
+                          <div className="absolute -inset-1 bg-gradient-to-r from-emerald-600 to-teal-600 rounded-lg sm:rounded-xl animate-pulse"></div>
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <FormLabel className="text-lg sm:text-xl font-bold text-gray-800 dark:text-white mb-1 block"
+                                   style={{ fontFamily: designTokens.typography.fonts.primary }}>
+                          خیابان
+                        </FormLabel>
+                        <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">آدرس خیابان را وارد کنید</p>
+                      </div>
                     </div>
-                    <FormLabel className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                      {t('contact_form.street')}
-                    </FormLabel>
-                  </div>
 
-                  <div className="relative">
-                    <FormControl>
-                      <ModernInput
-                        placeholder={t('contact_form.street_placeholder')}
-                        variant="glass"
-                        className={`
-                          w-full px-4 py-3 text-sm rounded-xl
-                          border-2 bg-white/50 dark:bg-gray-700/50
-                          backdrop-blur-sm
-                          transition-all duration-300 ease-out
-                          focus:ring-3 focus:ring-warning-500/30 focus:border-warning-400
-                          hover:bg-white/70 dark:hover:bg-gray-600/70
-                          hover:shadow-md hover:shadow-warning-500/20
-                          ${fieldState.error ? 'border-error-400 focus:ring-error-500/30' : 'border-white/40 dark:border-gray-600/40'}
-                          ${field.value && !fieldState.error ? 'border-success-400' : ''}
-                        `}
-                        {...field}
-                        value={field.value || ''}
-                      />
-                    </FormControl>
+                    <div className="relative">
+                      <FormControl>
+                        <ModernInput
+                          placeholder="مثال: خیابان ولیعصر، پلاک ۱۲۳"
+                          variant="glass"
+                          className={`
+                            w-full px-4 sm:px-6 py-3 sm:py-4 text-base sm:text-lg rounded-lg sm:rounded-xl
+                            bg-white/80 dark:bg-gray-700/80
+                            border-2 border-white/30 dark:border-gray-600/30
+                            backdrop-blur-md
+                            transition-all duration-500 ease-out
+                            focus:ring-4 focus:ring-emerald-500/30 focus:border-emerald-400
+                            hover:bg-white/95 dark:hover:bg-gray-600/95
+                            hover:shadow-xl hover:shadow-emerald-500/20
+                            hover:scale-[1.005] sm:hover:scale-[1.01]
+                            ${fieldState.error ? 'border-red-400 focus:ring-red-500/30' : ''}
+                            ${focusedField === 'street' ? 'scale-105 shadow-2xl ring-4 ring-emerald-500/20' : ''}
+                            ${field.value && !fieldState.error ? 'border-green-400 shadow-green-500/20' : ''}
+                          `}
+                          style={{
+                            fontFamily: designTokens.typography.fonts.secondary,
+                            fontSize: '16px' // Prevents zoom on iOS
+                          }}
+                          {...field}
+                          value={field.value || ''}
+                          onFocus={() => setFocusedField('street')}
+                          onBlur={() => setFocusedField(null)}
+                        />
+                      </FormControl>
 
-                    {field.value && !fieldState.error && (
-                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                        <UserCheck size={16} className="text-success-500 animate-pulse" />
+                      {/* Status Icons */}
+                      <div className="absolute right-3 sm:right-4 top-1/2 transform -translate-y-1/2 flex items-center gap-2">
+                        {field.value && !fieldState.error && (
+                          <CheckCircle size={18} className="sm:w-5 text-green-500 animate-bounce" />
+                        )}
+                        {fieldState.error && (
+                          <XCircle size={18} className="sm:w-5 text-red-500 animate-pulse" />
+                        )}
                       </div>
-                    )}
 
-                    {fieldState.error && (
-                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                        <AlertCircle size={16} className="text-error-500" />
-                      </div>
-                    )}
-                  </div>
-
-                  {fieldState.error && (
-                    <p className="text-xs text-error-500 dark:text-error-400 flex items-center gap-1 mt-1">
-                      <AlertCircle size={12} />
-                      {fieldState.error.message}
-                    </p>
-                  )}
-                </div>
-              </FormItem>
-            )}
-          />
-        </div>
-
-        <div className="group/field p-3 rounded-lg bg-muted/10 dark:bg-muted/10 border border-border/20 hover:border-primary/40 transition-colors duration-200">
-          <FormField
-            control={form.control}
-            name="city"
-            render={({ field, fieldState }) => (
-              <FormItem>
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-warning-100/80 to-warning-50/80 dark:from-warning-900/30 dark:to-warning-800/20 border border-warning-200/50 dark:border-warning-800/50 flex items-center justify-center transition-all duration-300">
-                      <MapPin size={16} className="text-warning-600 dark:text-warning-400" />
+                      {/* Error Message */}
+                      {fieldState.error && (
+                        <div className="mt-3 sm:mt-4 p-2 sm:p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/30">
+                          <p className="text-xs sm:text-sm text-red-600 dark:text-red-400 flex items-center gap-2">
+                            <AlertCircle size={14} className="sm:w-4" />
+                            {fieldState.error.message}
+                          </p>
+                        </div>
+                      )}
                     </div>
-                    <FormLabel className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                      {t('contact_form.city')}
-                    </FormLabel>
                   </div>
-
-                  <div className="relative">
-                    <FormControl>
-                      <ModernInput
-                        placeholder={t('contact_form.city_placeholder')}
-                        variant="glass"
-                        className={`
-                          w-full px-4 py-3 text-sm rounded-xl
-                          border-2 bg-white/50 dark:bg-gray-700/50
-                          backdrop-blur-sm
-                          transition-all duration-300 ease-out
-                          focus:ring-3 focus:ring-warning-500/30 focus:border-warning-400
-                          hover:bg-white/70 dark:hover:bg-gray-600/70
-                          hover:shadow-md hover:shadow-warning-500/20
-                          ${fieldState.error ? 'border-error-400 focus:ring-error-500/30' : 'border-white/40 dark:border-gray-600/40'}
-                          ${field.value && !fieldState.error ? 'border-success-400' : ''}
-                        `}
-                        {...field}
-                        value={field.value || ''}
-                      />
-                    </FormControl>
-
-                    {field.value && !fieldState.error && (
-                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                        <UserCheck size={16} className="text-success-500 animate-pulse" />
-                      </div>
-                    )}
-
-                    {fieldState.error && (
-                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                        <AlertCircle size={16} className="text-error-500" />
-                      </div>
-                    )}
-                  </div>
-
-                  {fieldState.error && (
-                    <p className="text-xs text-error-500 dark:text-error-400 flex items-center gap-1 mt-1">
-                      <AlertCircle size={12} />
-                      {fieldState.error.message}
-                    </p>
-                  )}
                 </div>
-              </FormItem>
-            )}
-          />
-        </div>
+              )}
+            />
 
-        <div className="group/field p-3 rounded-lg bg-muted/10 dark:bg-muted/10 border border-border/20 hover:border-primary/40 transition-colors duration-200">
-          <FormField
-            control={form.control}
-            name="state"
-            render={({ field, fieldState }) => (
-              <FormItem>
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-warning-100/80 to-warning-50/80 dark:from-warning-900/30 dark:to-warning-800/20 border border-warning-200/50 dark:border-warning-800/50 flex items-center justify-center transition-all duration-300">
-                      <MapPin size={16} className="text-warning-600 dark:text-warning-400" />
+            {/* City Field */}
+            <FormField
+              control={form.control}
+              name="city"
+              render={({ field, fieldState }) => (
+                <div className="group relative">
+                  <div className="absolute -inset-1 bg-gradient-to-r from-cyan-600 to-blue-600 rounded-xl sm:rounded-2xl blur opacity-25 group-hover:opacity-75 transition duration-1000 group-hover:duration-200"></div>
+                  <div className="relative bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-white/20 dark:border-gray-700/20 shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-[1.01] sm:hover:scale-[1.02]">
+                    <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4">
+                      <div className="relative">
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center shadow-lg">
+                          <Building size={20} className="sm:w-6 text-white" />
+                        </div>
+                        {focusedField === 'city' && (
+                          <div className="absolute -inset-1 bg-gradient-to-r from-cyan-600 to-blue-600 rounded-lg sm:rounded-xl animate-pulse"></div>
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <FormLabel className="text-lg sm:text-xl font-bold text-gray-800 dark:text-white mb-1 block"
+                                   style={{ fontFamily: designTokens.typography.fonts.primary }}>
+                          شهر
+                        </FormLabel>
+                        <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">نام شهر را وارد کنید</p>
+                      </div>
                     </div>
-                    <FormLabel className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                      {t('contact_form.state')}
-                    </FormLabel>
-                  </div>
 
-                  <div className="relative">
-                    <FormControl>
-                      <ModernInput
-                        placeholder={t('contact_form.state_placeholder')}
-                        variant="glass"
-                        className={`
-                          w-full px-4 py-3 text-sm rounded-xl
-                          border-2 bg-white/50 dark:bg-gray-700/50
-                          backdrop-blur-sm
-                          transition-all duration-300 ease-out
-                          focus:ring-3 focus:ring-warning-500/30 focus:border-warning-400
-                          hover:bg-white/70 dark:hover:bg-gray-600/70
-                          hover:shadow-md hover:shadow-warning-500/20
-                          ${fieldState.error ? 'border-error-400 focus:ring-error-500/30' : 'border-white/40 dark:border-gray-600/40'}
-                          ${field.value && !fieldState.error ? 'border-success-400' : ''}
-                        `}
-                        {...field}
-                        value={field.value || ''}
-                      />
-                    </FormControl>
+                    <div className="relative">
+                      <FormControl>
+                        <ModernInput
+                          placeholder="مثال: تهران"
+                          variant="glass"
+                          className={`
+                            w-full px-4 sm:px-6 py-3 sm:py-4 text-base sm:text-lg rounded-lg sm:rounded-xl
+                            bg-white/80 dark:bg-gray-700/80
+                            border-2 border-white/30 dark:border-gray-600/30
+                            backdrop-blur-md
+                            transition-all duration-500 ease-out
+                            focus:ring-4 focus:ring-cyan-500/30 focus:border-cyan-400
+                            hover:bg-white/95 dark:hover:bg-gray-600/95
+                            hover:shadow-xl hover:shadow-cyan-500/20
+                            hover:scale-[1.005] sm:hover:scale-[1.01]
+                            ${fieldState.error ? 'border-red-400 focus:ring-red-500/30' : ''}
+                            ${focusedField === 'city' ? 'scale-105 shadow-2xl ring-4 ring-cyan-500/20' : ''}
+                            ${field.value && !fieldState.error ? 'border-green-400 shadow-green-500/20' : ''}
+                          `}
+                          style={{
+                            fontFamily: designTokens.typography.fonts.secondary,
+                            fontSize: '16px' // Prevents zoom on iOS
+                          }}
+                          {...field}
+                          value={field.value || ''}
+                          onFocus={() => setFocusedField('city')}
+                          onBlur={() => setFocusedField(null)}
+                        />
+                      </FormControl>
 
-                    {field.value && !fieldState.error && (
-                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                        <UserCheck size={16} className="text-success-500 animate-pulse" />
+                      {/* Status Icons */}
+                      <div className="absolute right-3 sm:right-4 top-1/2 transform -translate-y-1/2 flex items-center gap-2">
+                        {field.value && !fieldState.error && (
+                          <CheckCircle size={18} className="sm:w-5 text-green-500 animate-bounce" />
+                        )}
+                        {fieldState.error && (
+                          <XCircle size={18} className="sm:w-5 text-red-500 animate-pulse" />
+                        )}
                       </div>
-                    )}
 
-                    {fieldState.error && (
-                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                        <AlertCircle size={16} className="text-error-500" />
-                      </div>
-                    )}
-                  </div>
-
-                  {fieldState.error && (
-                    <p className="text-xs text-error-500 dark:text-error-400 flex items-center gap-1 mt-1">
-                      <AlertCircle size={12} />
-                      {fieldState.error.message}
-                    </p>
-                  )}
-                </div>
-              </FormItem>
-            )}
-          />
-        </div>
-
-        <div className="group/field p-3 rounded-lg bg-muted/10 dark:bg-muted/10 border border-border/20 hover:border-primary/40 transition-colors duration-200">
-          <FormField
-            control={form.control}
-            name="zipCode"
-            render={({ field, fieldState }) => (
-              <FormItem>
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-warning-100/80 to-warning-50/80 dark:from-warning-900/30 dark:to-warning-800/20 border border-warning-200/50 dark:border-warning-800/50 flex items-center justify-center transition-all duration-300">
-                      <MapPin size={16} className="text-warning-600 dark:text-warning-400" />
+                      {/* Error Message */}
+                      {fieldState.error && (
+                        <div className="mt-3 sm:mt-4 p-2 sm:p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/30">
+                          <p className="text-xs sm:text-sm text-red-600 dark:text-red-400 flex items-center gap-2">
+                            <AlertCircle size={14} className="sm:w-4" />
+                            {fieldState.error.message}
+                          </p>
+                        </div>
+                      )}
                     </div>
-                    <FormLabel className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                      {t('contact_form.zip_code')}
-                    </FormLabel>
                   </div>
-
-                  <div className="relative">
-                    <FormControl>
-                      <ModernInput
-                        placeholder={t('contact_form.zip_code_placeholder')}
-                        variant="glass"
-                        className={`
-                          w-full px-4 py-3 text-sm rounded-xl
-                          border-2 bg-white/50 dark:bg-gray-700/50
-                          backdrop-blur-sm
-                          transition-all duration-300 ease-out
-                          focus:ring-3 focus:ring-warning-500/30 focus:border-warning-400
-                          hover:bg-white/70 dark:hover:bg-gray-600/70
-                          hover:shadow-md hover:shadow-warning-500/20
-                          ${fieldState.error ? 'border-error-400 focus:ring-error-500/30' : 'border-white/40 dark:border-gray-600/40'}
-                          ${field.value && !fieldState.error ? 'border-success-400' : ''}
-                        `}
-                        {...field}
-                        value={field.value || ''}
-                      />
-                    </FormControl>
-
-                    {field.value && !fieldState.error && (
-                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                        <UserCheck size={16} className="text-success-500 animate-pulse" />
-                      </div>
-                    )}
-
-                    {fieldState.error && (
-                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                        <AlertCircle size={16} className="text-error-500" />
-                      </div>
-                    )}
-                  </div>
-
-                  {fieldState.error && (
-                    <p className="text-xs text-error-500 dark:text-error-400 flex items-center gap-1 mt-1">
-                      <AlertCircle size={12} />
-                      {fieldState.error.message}
-                    </p>
-                  )}
                 </div>
-              </FormItem>
-            )}
-          />
-        </div>
+              )}
+            />
 
-        <div className="group/field p-3 rounded-lg bg-muted/10 dark:bg-muted/10 border border-border/20 hover:border-primary/40 transition-colors duration-200 md:col-span-2">
-          <FormField
-            control={form.control}
-            name="country"
-            render={({ field, fieldState }) => (
-              <FormItem>
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-warning-100/80 to-warning-50/80 dark:from-warning-900/30 dark:to-warning-800/20 border border-warning-200/50 dark:border-warning-800/50 flex items-center justify-center transition-all duration-300">
-                      <MapPin size={16} className="text-warning-600 dark:text-warning-400" />
+            {/* State Field */}
+            <FormField
+              control={form.control}
+              name="state"
+              render={({ field, fieldState }) => (
+                <div className="group relative">
+                  <div className="absolute -inset-1 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl sm:rounded-2xl blur opacity-25 group-hover:opacity-75 transition duration-1000 group-hover:duration-200"></div>
+                  <div className="relative bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-white/20 dark:border-gray-700/20 shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-[1.01] sm:hover:scale-[1.02]">
+                    <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4">
+                      <div className="relative">
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center shadow-lg">
+                          <MapPin size={20} className="sm:w-6 text-white" />
+                        </div>
+                        {focusedField === 'state' && (
+                          <div className="absolute -inset-1 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-lg sm:rounded-xl animate-pulse"></div>
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <FormLabel className="text-lg sm:text-xl font-bold text-gray-800 dark:text-white mb-1 block"
+                                   style={{ fontFamily: designTokens.typography.fonts.primary }}>
+                          استان
+                        </FormLabel>
+                        <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">نام استان را وارد کنید</p>
+                      </div>
                     </div>
-                    <FormLabel className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                      {t('contact_form.country')}
-                    </FormLabel>
-                  </div>
 
-                  <div className="relative">
-                    <FormControl>
-                      <ModernInput
-                        placeholder={t('contact_form.country_placeholder')}
-                        variant="glass"
-                        className={`
-                          w-full px-4 py-3 text-sm rounded-xl
-                          border-2 bg-white/50 dark:bg-gray-700/50
-                          backdrop-blur-sm
-                          transition-all duration-300 ease-out
-                          focus:ring-3 focus:ring-warning-500/30 focus:border-warning-400
-                          hover:bg-white/70 dark:hover:bg-gray-600/70
-                          hover:shadow-md hover:shadow-warning-500/20
-                          ${fieldState.error ? 'border-error-400 focus:ring-error-500/30' : 'border-white/40 dark:border-gray-600/40'}
-                          ${field.value && !fieldState.error ? 'border-success-400' : ''}
-                        `}
-                        {...field}
-                        value={field.value || ''}
-                      />
-                    </FormControl>
+                    <div className="relative">
+                      <FormControl>
+                        <ModernInput
+                          placeholder="مثال: تهران"
+                          variant="glass"
+                          className={`
+                            w-full px-4 sm:px-6 py-3 sm:py-4 text-base sm:text-lg rounded-lg sm:rounded-xl
+                            bg-white/80 dark:bg-gray-700/80
+                            border-2 border-white/30 dark:border-gray-600/30
+                            backdrop-blur-md
+                            transition-all duration-500 ease-out
+                            focus:ring-4 focus:ring-indigo-500/30 focus:border-indigo-400
+                            hover:bg-white/95 dark:hover:bg-gray-600/95
+                            hover:shadow-xl hover:shadow-indigo-500/20
+                            hover:scale-[1.005] sm:hover:scale-[1.01]
+                            ${fieldState.error ? 'border-red-400 focus:ring-red-500/30' : ''}
+                            ${focusedField === 'state' ? 'scale-105 shadow-2xl ring-4 ring-indigo-500/20' : ''}
+                            ${field.value && !fieldState.error ? 'border-green-400 shadow-green-500/20' : ''}
+                          `}
+                          style={{
+                            fontFamily: designTokens.typography.fonts.secondary,
+                            fontSize: '16px' // Prevents zoom on iOS
+                          }}
+                          {...field}
+                          value={field.value || ''}
+                          onFocus={() => setFocusedField('state')}
+                          onBlur={() => setFocusedField(null)}
+                        />
+                      </FormControl>
 
-                    {field.value && !fieldState.error && (
-                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                        <UserCheck size={16} className="text-success-500 animate-pulse" />
+                      {/* Status Icons */}
+                      <div className="absolute right-3 sm:right-4 top-1/2 transform -translate-y-1/2 flex items-center gap-2">
+                        {field.value && !fieldState.error && (
+                          <CheckCircle size={18} className="sm:w-5 text-green-500 animate-bounce" />
+                        )}
+                        {fieldState.error && (
+                          <XCircle size={18} className="sm:w-5 text-red-500 animate-pulse" />
+                        )}
                       </div>
-                    )}
 
-                    {fieldState.error && (
-                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                        <AlertCircle size={16} className="text-error-500" />
-                      </div>
-                    )}
+                      {/* Error Message */}
+                      {fieldState.error && (
+                        <div className="mt-3 sm:mt-4 p-2 sm:p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/30">
+                          <p className="text-xs sm:text-sm text-red-600 dark:text-red-400 flex items-center gap-2">
+                            <AlertCircle size={14} className="sm:w-4" />
+                            {fieldState.error.message}
+                          </p>
+                        </div>
+                      )}
+                    </div>
                   </div>
-
-                  {fieldState.error && (
-                    <p className="text-xs text-error-500 dark:text-error-400 flex items-center gap-1 mt-1">
-                      <AlertCircle size={12} />
-                      {fieldState.error.message}
-                    </p>
-                  )}
                 </div>
-              </FormItem>
-            )}
-          />
+              )}
+            />
+
+            {/* Zip Code Field */}
+            <FormField
+              control={form.control}
+              name="zipCode"
+              render={({ field, fieldState }) => (
+                <div className="group relative">
+                  <div className="absolute -inset-1 bg-gradient-to-r from-violet-600 to-purple-600 rounded-xl sm:rounded-2xl blur opacity-25 group-hover:opacity-75 transition duration-1000 group-hover:duration-200"></div>
+                  <div className="relative bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-white/20 dark:border-gray-700/20 shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-[1.01] sm:hover:scale-[1.02]">
+                    <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4">
+                      <div className="relative">
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-gradient-to-br from-violet-500 to-purple-500 flex items-center justify-center shadow-lg">
+                          <MapPin size={20} className="sm:w-6 text-white" />
+                        </div>
+                        {focusedField === 'zipCode' && (
+                          <div className="absolute -inset-1 bg-gradient-to-r from-violet-600 to-purple-600 rounded-lg sm:rounded-xl animate-pulse"></div>
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <FormLabel className="text-lg sm:text-xl font-bold text-gray-800 dark:text-white mb-1 block"
+                                   style={{ fontFamily: designTokens.typography.fonts.primary }}>
+                          کد پستی
+                        </FormLabel>
+                        <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">کد پستی را وارد کنید</p>
+                      </div>
+                    </div>
+
+                    <div className="relative">
+                      <FormControl>
+                        <ModernInput
+                          placeholder="مثال: ۱۲۳۴۵۶۷۸۹۰"
+                          variant="glass"
+                          className={`
+                            w-full px-4 sm:px-6 py-3 sm:py-4 text-base sm:text-lg rounded-lg sm:rounded-xl
+                            bg-white/80 dark:bg-gray-700/80
+                            border-2 border-white/30 dark:border-gray-600/30
+                            backdrop-blur-md
+                            transition-all duration-500 ease-out
+                            focus:ring-4 focus:ring-violet-500/30 focus:border-violet-400
+                            hover:bg-white/95 dark:hover:bg-gray-600/95
+                            hover:shadow-xl hover:shadow-violet-500/20
+                            hover:scale-[1.005] sm:hover:scale-[1.01]
+                            ${fieldState.error ? 'border-red-400 focus:ring-red-500/30' : ''}
+                            ${focusedField === 'zipCode' ? 'scale-105 shadow-2xl ring-4 ring-violet-500/20' : ''}
+                            ${field.value && !fieldState.error ? 'border-green-400 shadow-green-500/20' : ''}
+                          `}
+                          style={{
+                            fontFamily: designTokens.typography.fonts.secondary,
+                            fontSize: '16px' // Prevents zoom on iOS
+                          }}
+                          {...field}
+                          value={field.value || ''}
+                          onFocus={() => setFocusedField('zipCode')}
+                          onBlur={() => setFocusedField(null)}
+                        />
+                      </FormControl>
+
+                      {/* Status Icons */}
+                      <div className="absolute right-3 sm:right-4 top-1/2 transform -translate-y-1/2 flex items-center gap-2">
+                        {field.value && !fieldState.error && (
+                          <CheckCircle size={18} className="sm:w-5 text-green-500 animate-bounce" />
+                        )}
+                        {fieldState.error && (
+                          <XCircle size={18} className="sm:w-5 text-red-500 animate-pulse" />
+                        )}
+                      </div>
+
+                      {/* Error Message */}
+                      {fieldState.error && (
+                        <div className="mt-3 sm:mt-4 p-2 sm:p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/30">
+                          <p className="text-xs sm:text-sm text-red-600 dark:text-red-400 flex items-center gap-2">
+                            <AlertCircle size={14} className="sm:w-4" />
+                            {fieldState.error.message}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+            />
+
+            {/* Country Field - Full Width */}
+            <div className="sm:col-span-2">
+              <FormField
+                control={form.control}
+                name="country"
+                render={({ field, fieldState }) => (
+                  <div className="group relative">
+                    <div className="absolute -inset-1 bg-gradient-to-r from-slate-600 to-gray-600 rounded-xl sm:rounded-2xl blur opacity-25 group-hover:opacity-75 transition duration-1000 group-hover:duration-200"></div>
+                    <div className="relative bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-white/20 dark:border-gray-700/20 shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-[1.01] sm:hover:scale-[1.02]">
+                      <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4">
+                        <div className="relative">
+                          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-gradient-to-br from-slate-500 to-gray-500 flex items-center justify-center shadow-lg">
+                            <Globe size={20} className="sm:w-6 text-white" />
+                          </div>
+                          {focusedField === 'country' && (
+                            <div className="absolute -inset-1 bg-gradient-to-r from-slate-600 to-gray-600 rounded-lg sm:rounded-xl animate-pulse"></div>
+                          )}
+                        </div>
+                        <div className="flex-1">
+                          <FormLabel className="text-lg sm:text-xl font-bold text-gray-800 dark:text-white mb-1 block"
+                                     style={{ fontFamily: designTokens.typography.fonts.primary }}>
+                            کشور
+                          </FormLabel>
+                          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">نام کشور را وارد کنید</p>
+                        </div>
+                      </div>
+
+                      <div className="relative">
+                        <FormControl>
+                          <ModernInput
+                            placeholder="مثال: ایران"
+                            variant="glass"
+                            className={`
+                              w-full px-4 sm:px-6 py-3 sm:py-4 text-base sm:text-lg rounded-lg sm:rounded-xl
+                              bg-white/80 dark:bg-gray-700/80
+                              border-2 border-white/30 dark:border-gray-600/30
+                              backdrop-blur-md
+                              transition-all duration-500 ease-out
+                              focus:ring-4 focus:ring-slate-500/30 focus:border-slate-400
+                              hover:bg-white/95 dark:hover:bg-gray-600/95
+                              hover:shadow-xl hover:shadow-slate-500/20
+                              hover:scale-[1.005] sm:hover:scale-[1.01]
+                              ${fieldState.error ? 'border-red-400 focus:ring-red-500/30' : ''}
+                              ${focusedField === 'country' ? 'scale-105 shadow-2xl ring-4 ring-slate-500/20' : ''}
+                              ${field.value && !fieldState.error ? 'border-green-400 shadow-green-500/20' : ''}
+                            `}
+                            style={{
+                              fontFamily: designTokens.typography.fonts.secondary,
+                              fontSize: '16px' // Prevents zoom on iOS
+                            }}
+                            {...field}
+                            value={field.value || ''}
+                            onFocus={() => setFocusedField('country')}
+                            onBlur={() => setFocusedField(null)}
+                          />
+                        </FormControl>
+
+                        {/* Status Icons */}
+                        <div className="absolute right-3 sm:right-4 top-1/2 transform -translate-y-1/2 flex items-center gap-2">
+                          {field.value && !fieldState.error && (
+                            <CheckCircle size={18} className="sm:w-5 text-green-500 animate-bounce" />
+                          )}
+                          {fieldState.error && (
+                            <XCircle size={18} className="sm:w-5 text-red-500 animate-pulse" />
+                          )}
+                        </div>
+
+                        {/* Error Message */}
+                        {fieldState.error && (
+                          <div className="mt-3 sm:mt-4 p-2 sm:p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/30">
+                            <p className="text-xs sm:text-sm text-red-600 dark:text-red-400 flex items-center gap-2">
+                              <AlertCircle size={14} className="sm:w-4" />
+                              {fieldState.error.message}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              />
+            </div>
+          </div>
         </div>
       </div>
-    </CollapsibleSection>
+    </div>
   );
 });
 

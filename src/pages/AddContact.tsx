@@ -1,10 +1,4 @@
 import ContactForm from "@/components/ContactForm";
-import { 
-  ModernCard, 
-  ModernCardHeader, 
-  ModernCardTitle, 
-  ModernCardDescription 
-} from "@/components/ui/modern-card";
 import { useEffect, useState, useMemo, Suspense } from "react";
 import { ExtractedContactInfo } from "@/hooks/use-contact-extractor";
 import { ContactFormValues } from "@/types/contact";
@@ -19,7 +13,7 @@ const AddContact = () => {
   const [prefillData, setPrefillData] = useState<ContactFormValues | undefined>(undefined);
   const [formLoaded, setFormLoaded] = useState(false);
   const { session } = useSession();
-  const { t } = useTranslation();
+  useTranslation();
 
   const { executeAsync: executeUpdateSuggestionStatus } = useErrorHandler(null, {
     showToast: false,
@@ -50,6 +44,7 @@ const AddContact = () => {
           preferredContactMethod: null,
           street: null, city: null, state: null, zipCode: null, country: null,
           customFields: [],
+          tags: [],
         };
         
         // Clear local storage items after use
@@ -88,21 +83,6 @@ const AddContact = () => {
 
   return (
     <div className="flex flex-col items-center p-4 md:p-6 h-full w-full fade-in-up">
-      <ModernCard 
-        variant="glass" 
-        hover="lift" 
-        className="w-full max-w-4xl mb-6"
-      >
-        <ModernCardHeader className="text-center pb-4">
-          <ModernCardTitle className="text-2xl md:text-3xl font-bold text-gradient heading-2">
-            {t('contacts.add_new_contact')}
-          </ModernCardTitle>
-          <ModernCardDescription className="text-base md:text-lg mt-2">
-            {t('contacts.add_contact_description')}
-          </ModernCardDescription>
-        </ModernCardHeader>
-      </ModernCard>
-      
       <div className="w-full max-w-4xl">
         {formLoaded ? (
           <Suspense fallback={

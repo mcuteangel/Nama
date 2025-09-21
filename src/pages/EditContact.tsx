@@ -3,7 +3,6 @@ import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { showError, showSuccess } from "@/utils/toast";
 import ContactForm from "@/components/ContactForm";
-import { ModernCard, ModernCardHeader, ModernCardTitle, ModernCardDescription } from "@/components/ui/modern-card";
 import { fetchWithCache } from "@/utils/cache-helpers";
 import LoadingMessage from "@/components/common/LoadingMessage";
 import CancelButton from "@/components/common/CancelButton";
@@ -110,6 +109,7 @@ const mapContactDetailToFormValues = (contact: ContactDetailType): ContactFormVa
       template_id: cf.template_id,
       value: cf.field_value,
     })),
+    tags: [], // Tags will be loaded separately by the ContactTags component
   };
 };
 
@@ -265,17 +265,7 @@ const EditContact = () => {
 
   return (
     <div className="flex flex-col items-center justify-center p-4 h-full w-full">
-      <ModernCard variant="glass" className="w-full max-w-3xl rounded-xl p-4">
-        <ModernCardHeader className="text-center">
-          <ModernCardTitle className="text-2xl font-bold text-gray-800 dark:text-gray-100">
-            ویرایش مخاطب
-          </ModernCardTitle>
-          <ModernCardDescription className="text-gray-600 dark:text-gray-300">
-            اطلاعات مخاطب را ویرایش کنید.
-          </ModernCardDescription>
-        </ModernCardHeader>
-        <ContactForm initialData={initialContactData} contactId={id} />
-      </ModernCard>
+      <ContactForm initialData={initialContactData} contactId={id} />
     </div>
   );
 };
