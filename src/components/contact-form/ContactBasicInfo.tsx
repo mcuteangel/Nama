@@ -17,6 +17,7 @@ import { ModernCard } from '@/components/ui/modern-card';
 import { useRealTimeValidation } from '@/hooks/use-real-time-validation';
 import { FieldPath } from 'react-hook-form';
 import { designTokens } from '@/lib/design-tokens';
+import { ModernTooltip, ModernTooltipContent, ModernTooltipTrigger } from '@/components/ui/modern-tooltip';
 
 const ContactBasicInfo: React.FC = React.memo(() => {
   const { t, i18n } = useTranslation();
@@ -175,12 +176,18 @@ const ContactBasicInfo: React.FC = React.memo(() => {
                             )}
                           </div>
                           <div className="flex-1">
-                            <FormLabel className="text-lg sm:text-xl font-bold text-gray-800 dark:text-white mb-1 block"
-                                       style={{ fontFamily: designTokens.typography.fonts.primary }}>
-                              نام
-                              <span className="text-red-500 ml-1 sm:ml-2">*</span>
-                            </FormLabel>
-                            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">نام کوچک مخاطب را وارد کنید</p>
+                            <ModernTooltip>
+                              <ModernTooltipTrigger asChild>
+                                <FormLabel className="text-lg sm:text-xl font-bold text-gray-800 dark:text-white mb-1 block"
+                                           style={{ fontFamily: designTokens.typography.fonts.primary }}>
+                                  نام
+                                  <span className="text-red-500 ml-1 sm:ml-2">*</span>
+                                </FormLabel>
+                              </ModernTooltipTrigger>
+                              <ModernTooltipContent>
+                                <p>نام کوچک مخاطب را وارد کنید</p>
+                              </ModernTooltipContent>
+                            </ModernTooltip>
                           </div>
                         </div>
 
@@ -265,12 +272,18 @@ const ContactBasicInfo: React.FC = React.memo(() => {
                             )}
                           </div>
                           <div className="flex-1">
-                            <FormLabel className="text-lg sm:text-xl font-bold text-gray-800 dark:text-white mb-1 block"
-                                       style={{ fontFamily: designTokens.typography.fonts.primary }}>
-                              نام خانوادگی
-                              <span className="text-red-500 ml-1 sm:ml-2">*</span>
-                            </FormLabel>
-                            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">نام خانوادگی مخاطب را وارد کنید</p>
+                            <ModernTooltip>
+                              <ModernTooltipTrigger asChild>
+                                <FormLabel className="text-lg sm:text-xl font-bold text-gray-800 dark:text-white mb-1 block"
+                                           style={{ fontFamily: designTokens.typography.fonts.primary }}>
+                                  نام خانوادگی
+                                  <span className="text-red-500 ml-1 sm:ml-2">*</span>
+                                </FormLabel>
+                              </ModernTooltipTrigger>
+                              <ModernTooltipContent>
+                                <p>نام خانوادگی مخاطب را وارد کنید</p>
+                              </ModernTooltipContent>
+                            </ModernTooltip>
                           </div>
                         </div>
 
@@ -355,11 +368,17 @@ const ContactBasicInfo: React.FC = React.memo(() => {
                             )}
                           </div>
                           <div className="flex-1">
-                            <FormLabel className="text-lg sm:text-xl font-bold text-gray-800 dark:text-white mb-1 block"
-                                       style={{ fontFamily: designTokens.typography.fonts.primary }}>
-                              سمت
-                            </FormLabel>
-                            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">سمت شغلی مخاطب را وارد کنید</p>
+                            <ModernTooltip>
+                              <ModernTooltipTrigger asChild>
+                                <FormLabel className="text-lg sm:text-xl font-bold text-gray-800 dark:text-white mb-1 block"
+                                           style={{ fontFamily: designTokens.typography.fonts.primary }}>
+                                  سمت
+                                </FormLabel>
+                              </ModernTooltipTrigger>
+                              <ModernTooltipContent>
+                                <p>سمت شغلی مخاطب را وارد کنید</p>
+                              </ModernTooltipContent>
+                            </ModernTooltip>
                           </div>
                         </div>
 
@@ -444,11 +463,17 @@ const ContactBasicInfo: React.FC = React.memo(() => {
                             )}
                           </div>
                           <div className="flex-1">
-                            <FormLabel className="text-lg sm:text-xl font-bold text-gray-800 dark:text-white mb-1 block"
-                                       style={{ fontFamily: designTokens.typography.fonts.primary }}>
-                              شرکت
-                            </FormLabel>
-                            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">نام شرکت مخاطب را وارد کنید</p>
+                            <ModernTooltip>
+                              <ModernTooltipTrigger asChild>
+                                <FormLabel className="text-lg sm:text-xl font-bold text-gray-800 dark:text-white mb-1 block"
+                                           style={{ fontFamily: designTokens.typography.fonts.primary }}>
+                                  شرکت
+                                </FormLabel>
+                              </ModernTooltipTrigger>
+                              <ModernTooltipContent>
+                                <p>نام شرکت مخاطب را وارد کنید</p>
+                              </ModernTooltipContent>
+                            </ModernTooltip>
                           </div>
                         </div>
 
@@ -533,11 +558,17 @@ const ContactBasicInfo: React.FC = React.memo(() => {
                             )}
                           </div>
                           <div className="flex-1">
-                            <FormLabel className="text-lg sm:text-xl font-bold text-gray-800 dark:text-white mb-1 block"
-                                       style={{ fontFamily: designTokens.typography.fonts.primary }}>
-                              جنسیت
-                            </FormLabel>
-                            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">جنسیت مخاطب را انتخاب کنید</p>
+                            <ModernTooltip>
+                              <ModernTooltipTrigger asChild>
+                                <FormLabel className="text-lg sm:text-xl font-bold text-gray-800 dark:text-white mb-1 block"
+                                           style={{ fontFamily: designTokens.typography.fonts.primary }}>
+                                  جنسیت
+                                </FormLabel>
+                              </ModernTooltipTrigger>
+                              <ModernTooltipContent>
+                                <p>جنسیت مخاطب را انتخاب کنید</p>
+                              </ModernTooltipContent>
+                            </ModernTooltip>
                           </div>
                         </div>
 
@@ -630,11 +661,17 @@ const ContactBasicInfo: React.FC = React.memo(() => {
                             )}
                           </div>
                           <div className="flex-1">
-                            <FormLabel className="text-lg sm:text-xl font-bold text-gray-800 dark:text-white mb-1 block"
-                                       style={{ fontFamily: designTokens.typography.fonts.primary }}>
-                              گروه
-                            </FormLabel>
-                            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">گروه مخاطب را انتخاب کنید</p>
+                            <ModernTooltip>
+                              <ModernTooltipTrigger asChild>
+                                <FormLabel className="text-lg sm:text-xl font-bold text-gray-800 dark:text-white mb-1 block"
+                                           style={{ fontFamily: designTokens.typography.fonts.primary }}>
+                                  گروه
+                                </FormLabel>
+                              </ModernTooltipTrigger>
+                              <ModernTooltipContent>
+                                <p>گروه مخاطب را انتخاب کنید</p>
+                              </ModernTooltipContent>
+                            </ModernTooltip>
                           </div>
                         </div>
 

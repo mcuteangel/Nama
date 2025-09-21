@@ -6,6 +6,7 @@ import { FormField, FormLabel, FormControl } from '@/components/ui/form';
 import { ContactFormValues } from '@/types/contact';
 import { FileText, AlertCircle, CheckCircle, XCircle, PenTool } from 'lucide-react';
 import { designTokens } from '@/lib/design-tokens';
+import { ModernTooltip, ModernTooltipContent, ModernTooltipTrigger } from '@/components/ui/modern-tooltip';
 
 const ContactNotes: React.FC = React.memo(() => {
   const form = useFormContext<ContactFormValues>();
@@ -58,11 +59,17 @@ const ContactNotes: React.FC = React.memo(() => {
                       )}
                     </div>
                     <div className="flex-1">
-                      <FormLabel className="text-lg sm:text-xl font-bold text-gray-800 dark:text-white mb-1 block"
-                                 style={{ fontFamily: designTokens.typography.fonts.primary }}>
-                        یادداشت‌ها
-                      </FormLabel>
-                      <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">هر اطلاعاتی که می‌خواهید درباره این مخاطب یادداشت کنید</p>
+                      <ModernTooltip>
+                        <ModernTooltipTrigger asChild>
+                          <FormLabel className="text-lg sm:text-xl font-bold text-gray-800 dark:text-white mb-1 block"
+                                     style={{ fontFamily: designTokens.typography.fonts.primary }}>
+                            یادداشت‌ها
+                          </FormLabel>
+                        </ModernTooltipTrigger>
+                        <ModernTooltipContent>
+                          <p>هر اطلاعاتی که می‌خواهید درباره این مخاطب یادداشت کنید</p>
+                        </ModernTooltipContent>
+                      </ModernTooltip>
                     </div>
                   </div>
 
