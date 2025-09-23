@@ -15,7 +15,7 @@ export interface ModernCardProps extends React.HTMLAttributes<HTMLDivElement> {
  * @param children - محتوای کارت
  * @param className - کلاس‌های اضافی CSS
  */
-export const ModernCard = React.forwardRef<HTMLDivElement, ModernCardProps>(
+const ModernCard = React.forwardRef<HTMLDivElement, ModernCardProps>(
   ({ variant = 'glass', hover = 'lift', children, className, ...props }, ref) => {
     const variants = {
       glass: `backdrop-blur-lg border border-white/30 dark:border-gray-600/30 ${getShadow('glass')}`,
@@ -151,3 +151,5 @@ export const ModernCardFooter = React.forwardRef<HTMLDivElement, ModernCardFoote
 );
 
 ModernCardFooter.displayName = 'ModernCardFooter';
+
+export { ModernCard };

@@ -1,5 +1,5 @@
 import tailwindcssAnimate from "tailwindcss-animate";
-import { designTokens } from "./src/styles/design-tokens";
+import { designTokens } from "./src/lib/design-tokens";
 import type { Config } from "tailwindcss";
 
 // Extract only the required tokens
@@ -84,8 +84,8 @@ export default {
       },
       // تایپوگرافی
       fontFamily: {
-        sans: typography.fontFamily.sans,
-        mono: typography.fontFamily.mono,
+        sans: ["'Vazirmatn'", "'Inter'", 'sans-serif'],
+        mono: ["'JetBrains Mono'", 'monospace'],
         'display': ['Poppins', 'sans-serif'],
         'persian': ['Vazirmatn', 'sans-serif'],
         'english': ['Inter', 'sans-serif'],

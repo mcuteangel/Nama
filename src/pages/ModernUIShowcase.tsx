@@ -27,7 +27,9 @@ import {
   Bell, 
   Plus, 
   Heart,
-  Star} from 'lucide-react';
+  Star,
+  Palette} from 'lucide-react';
+import StyleGuideShowcase from '@/components/StyleGuideShowcase';
 
 /**
  * ModernUIShowcase - صفحه نمایش کامپوننت‌های مدرن
@@ -67,6 +69,12 @@ export default function ModernUIShowcase() {
       id: 'loaders', 
       label: 'لودرها', 
       content: <LoadersDemo isLoading={isLoading} setIsLoading={setIsLoading} /> 
+    },
+    {
+      id: 'styleguide',
+      label: 'راهنمای سبک',
+      icon: <Palette size={18} />,
+      content: <StyleGuideShowcase />
     }
   ];
 
