@@ -1,3 +1,4 @@
+import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   ModernCard, 
@@ -9,29 +10,140 @@ import {
 } from "@/components/ui/modern-card";
 import { GlassButton } from "@/components/ui/glass-button";
 import { ModernInput } from "@/components/ui/modern-input";
+import { ModernSelect } from "@/components/ui/modern-select";
 import { ModernCheckbox } from "@/components/ui/modern-checkbox";
 import { ModernBadge } from "@/components/ui/modern-badge";
+import { ModernAlertDialog } from "@/components/ui/modern-alert-dialog";
+import { ModernTooltip } from "@/components/ui/modern-tooltip";
 import { ModernSwitch } from "@/components/ui/modern-switch";
-import { 
-  ModernAvatar,
-  ModernAvatarImage as ModernAvatarImage,
-  ModernAvatarFallback as ModernAvatarFallback 
-} from "@/components/ui/modern-avatar";
+import { ModernAvatar } from "@/components/ui/modern-avatar";
 import { ModernProgress } from "@/components/ui/modern-progress";
+import { ModernSkeleton } from "@/components/ui/modern-skeleton";
+import { ModernTable } from "@/components/ui/modern-table";
+import { ModernAccordion } from "@/components/ui/modern-accordion";
+import { ModernDialog } from "@/components/ui/modern-dialog";
+import { ModernToast } from "@/components/ui/modern-toast";
+import { ModernDropdown } from "@/components/ui/modern-dropdown";
+import { ModernTabs } from "@/components/ui/modern-tabs";
+import { ModernToggle } from "@/components/ui/modern-toggle";
 import { ModernRadioGroup } from "@/components/ui/modern-radio-group";
+import { ModernCalendar } from "@/components/ui/modern-calendar";
+import { ModernDatePicker } from "@/components/ui/modern-date-picker";
+import { ModernTimePicker } from "@/components/ui/modern-time-picker";
+import { ModernFileUpload } from "@/components/ui/modern-file-upload";
+import { ModernRating } from "@/components/ui/modern-rating";
+import { ModernPagination } from "@/components/ui/modern-pagination";
+import { ModernBreadcrumb } from "@/components/ui/modern-breadcrumb";
+import { ModernNavbar } from "@/components/ui/modern-navbar";
+import { ModernSidebar } from "@/components/ui/modern-sidebar";
+import { ModernFooter } from "@/components/ui/modern-footer";
+import { ModernHero } from "@/components/ui/modern-hero";
+import { ModernFeature } from "@/components/ui/modern-feature";
+import { ModernTestimonial } from "@/components/ui/modern-testimonial";
+import { ModernPricing } from "@/components/ui/modern-pricing";
+import { ModernFAQ } from "@/components/ui/modern-faq";
+import { ModernCTA } from "@/components/ui/modern-cta";
+import { ModernStats } from "@/components/ui/modern-stats";
+import { ModernTimeline } from "@/components/ui/modern-timeline";
+import { ModernGallery } from "@/components/ui/modern-gallery";
+import { ModernVideo } from "@/components/ui/modern-video";
+import { ModernAudio } from "@/components/ui/modern-audio";
+import { ModernChart } from "@/components/ui/modern-chart";
+import { ModernMap } from "@/components/ui/modern-map";
+import { ModernKanban } from "@/components/ui/modern-kanban";
+import { ModernCalendarEvent } from "@/components/ui/modern-calendar-event";
+import { ModernEditor } from "@/components/ui/modern-editor";
+import { ModernCodeBlock } from "@/components/ui/modern-code-block";
+import { ModernMarkdown } from "@/components/ui/modern-markdown";
+import { ModernRichText } from "@/components/ui/modern-rich-text";
+import { ModernEmoji } from "@/components/ui/modern-emoji";
+import { ModernMention } from "@/components/ui/modern-mention";
+import { ModernTag } from "@/components/ui/modern-tag";
+import { ModernSearch } from "@/components/ui/modern-search";
+import { ModernFilter } from "@/components/ui/modern-filter";
+import { ModernSort } from "@/components/ui/modern-sort";
+import { ModernPagination } from "@/components/ui/modern-pagination";
+import { ModernInfiniteScroll } from "@/components/ui/modern-infinite-scroll";
+import { ModernVirtualList } from "@/components/ui/modern-virtual-list";
+import { ModernDragDrop } from "@/components/ui/modern-drag-drop";
+import { ModernResizable } from "@/components/ui/modern-resizable";
+import { ModernCollapsible } from "@/components/ui/modern-collapsible";
+import { ModernDrawer } from "@/components/ui/modern-drawer";
+import { ModernPopover } from "@/components/ui/modern-popover";
+import { ModernContextMenu } from "@/components/ui/modern-context-menu";
+import { ModernHoverCard } from "@/components/ui/modern-hover-card";
+import { ModernScrollArea } from "@/components/ui/modern-scroll-area";
+import { ModernSeparator } from "@/components/ui/modern-separator";
+import { ModernAspectRatio } from "@/components/ui/modern-aspect-ratio";
+import { ModernCommand } from "@/components/ui/modern-command";
+import { ModernSheet } from "@/components/ui/modern-sheet";
+import { ModernSkeleton } from "@/components/ui/modern-skeleton";
+import { ModernToast } from "@/components/ui/modern-toast";
+import { ModernTooltip } from "@/components/ui/modern-tooltip";
+import { ModernToggle } from "@/components/ui/modern-toggle";
+import { ModernToggleGroup } from "@/components/ui/modern-toggle-group";
+import { ModernCarousel } from "@/components/ui/modern-carousel";
+import { ModernCombobox } from "@/components/ui/modern-combobox";
+import { ModernCommand } from "@/components/ui/modern-command";
+import { ModernContextMenu } from "@/components/ui/modern-context-menu";
+import { ModernDialog } from "@/components/ui/modern-dialog";
+import { ModernDropdownMenu } from "@/components/ui/modern-dropdown-menu";
+import { ModernHoverCard } from "@/components/ui/modern-hover-card";
+import { ModernPopover } from "@/components/ui/modern-popover";
+import { ModernResizable } from "@/components/ui/modern-resizable";
+import { ModernScrollArea } from "@/components/ui/modern-scroll-area";
+import { ModernSelect } from "@/components/ui/modern-select";
+import { ModernSeparator } from "@/components/ui/modern-separator";
+import { ModernSheet } from "@/components/ui/modern-sheet";
+import { ModernSkeleton } from "@/components/ui/modern-skeleton";
 import { ModernSlider } from "@/components/ui/modern-slider";
-import { ModernSelectItem, 
-  ModernSelect, 
-  ModernSelectTrigger, 
-  ModernSelectValue, 
-  ModernSelectContent
-} from "@/components/ui/modern-select";
+import { ModernSwitch } from "@/components/ui/modern-switch";
+import { ModernTable } from "@/components/ui/modern-table";
+import { ModernTabs } from "@/components/ui/modern-tabs";
 import { ModernTextarea } from "@/components/ui/modern-textarea";
-import { 
-  ModernTooltip, 
-  ModernTooltipTrigger, 
-  ModernTooltipContent 
-} from "@/components/ui/modern-tooltip";
+import { ModernToast } from "@/components/ui/modern-toast";
+import { ModernToggle } from "@/components/ui/modern-toggle";
+import { ModernTooltip } from "@/components/ui/modern-tooltip";
+import { ModernNavigationMenu } from "@/components/ui/modern-navigation-menu";
+import { ModernMenubar } from "@/components/ui/modern-menubar";
+import { ModernRadioGroup } from "@/components/ui/modern-radio-group";
+import { ModernSelect } from "@/components/ui/modern-select";
+import { ModernSwitch } from "@/components/ui/modern-switch";
+import { ModernTextarea } from "@/components/ui/modern-textarea";
+import { ModernTooltip } from "@/components/ui/modern-tooltip";
+import { ModernToggle } from "@/components/ui/modern-toggle";
+import { ModernToggleGroup } from "@/components/ui/modern-toggle-group";
+import { ModernCarousel } from "@/components/ui/modern-carousel";
+import { ModernCombobox } from "@/components/ui/modern-combobox";
+import { ModernCommand } from "@/components/ui/modern-command";
+import { ModernContextMenu } from "@/components/ui/modern-context-menu";
+import { ModernDialog } from "@/components/ui/modern-dialog";
+import { ModernDropdownMenu } from "@/components/ui/modern-dropdown-menu";
+import { ModernHoverCard } from "@/components/ui/modern-hover-card";
+import { ModernPopover } from "@/components/ui/modern-popover";
+import { ModernResizable } from "@/components/ui/modern-resizable";
+import { ModernScrollArea } from "@/components/ui/modern-scroll-area";
+import { ModernSelect } from "@/components/ui/modern-select";
+import { ModernSeparator } from "@/components/ui/modern-separator";
+import { ModernSheet } from "@/components/ui/modern-sheet";
+import { ModernSkeleton } from "@/components/ui/modern-skeleton";
+import { ModernSlider } from "@/components/ui/modern-slider";
+import { ModernSwitch } from "@/components/ui/modern-switch";
+import { ModernTable } from "@/components/ui/modern-table";
+import { ModernTabs } from "@/components/ui/modern-tabs";
+import { ModernTextarea } from "@/components/ui/modern-textarea";
+import { ModernToast } from "@/components/ui/modern-toast";
+import { ModernToggle } from "@/components/ui/modern-toggle";
+import { ModernTooltip } from "@/components/ui/modern-tooltip";
+import { ModernNavigationMenu } from "@/components/ui/modern-navigation-menu";
+import { ModernMenubar } from "@/components/ui/modern-menubar";
+import { ModernRadioGroup } from "@/components/ui/modern-radio-group";
+import { ModernSelect } from "@/components/ui/modern-select";
+import { ModernSwitch } from "@/components/ui/modern-switch";
+import { ModernTextarea } from "@/components/ui/modern-textarea";
+import { ModernTooltip } from "@/components/ui/modern-tooltip";
+import { ModernToggle } from "@/components/ui/modern-toggle";
+import { ModernToggleGroup } from "@/components/ui/modern-toggle-group";
 
 /**
  * کامپوننت نمایش راهنمای سبک
@@ -85,7 +197,7 @@ export default function StyleGuideShowcase() {
                 </ModernCardFooter>
               </ModernCard>
 
-              <ModernCard variant="gradient-primary">
+              <ModernCard variant="gradient">
                 <ModernCardHeader>
                   <ModernCardTitle>کارت گرادیانت</ModernCardTitle>
                   <ModernCardDescription>با پس‌زمینه گرادیانت</ModernCardDescription>
@@ -94,7 +206,7 @@ export default function StyleGuideShowcase() {
                   <p>محتوای کارت گرادیانت</p>
                 </ModernCardContent>
                 <ModernCardFooter>
-                  <GlassButton variant="gradient-primary">دکمه</GlassButton>
+                  <GlassButton variant="gradient">دکمه</GlassButton>
                 </ModernCardFooter>
               </ModernCard>
             </div>
@@ -108,10 +220,10 @@ export default function StyleGuideShowcase() {
               <GlassButton variant="outline">دکمه خط‌دار</GlassButton>
               <GlassButton variant="ghost">دکمه شبح</GlassButton>
               <GlassButton variant="link">دکمه لینک</GlassButton>
-              <GlassButton variant="gradient-primary">دکمه گرادیانت</GlassButton>
-              <GlassButton variant="gradient-ocean">گرادیانت اقیانوس</GlassButton>
-              <GlassButton variant="gradient-sunset">گرادیانت غروب</GlassButton>
-              <GlassButton variant="gradient-forest">گرادیانت جنگل</GlassButton>
+              <GlassButton variant="gradient" gradientType="primary">دکمه گرادیانت</GlassButton>
+              <GlassButton variant="gradient" gradientType="secondary">گرادیانت ثانویه</GlassButton>
+              <GlassButton variant="gradient" gradientType="sunset">گرادیانت غروب</GlassButton>
+              <GlassButton variant="gradient" gradientType="ocean">گرادیانت اقیانوس</GlassButton>
             </div>
           </section>
 
@@ -124,35 +236,26 @@ export default function StyleGuideShowcase() {
                 </ModernCardHeader>
                 <ModernCardContent className="space-y-4">
                   <ModernInput placeholder="نام کاربری" />
-                  <ModernSelect>
-                    <ModernSelectTrigger className="w-full">
-                      <ModernSelectValue placeholder="انتخاب کنید" />
-                    </ModernSelectTrigger>
-                    <ModernSelectContent>
-                      <ModernSelectItem value="option1">گزینه ۱</ModernSelectItem>
-                      <ModernSelectItem value="option2">گزینه ۲</ModernSelectItem>
-                      <ModernSelectItem value="option3">گزینه ۳</ModernSelectItem>
-                    </ModernSelectContent>
-                  </ModernSelect>
-                  <div className="flex items-center space-x-2 rtl:space-x-reverse">
-                    <ModernCheckbox id="remember-me" />
-                    <label htmlFor="remember-me" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                      مرا به خاطر بسپار
-                    </label>
-                  </div>
-                  <div className="flex items-center space-x-2 rtl:space-x-reverse">
-                    <ModernSwitch id="toggle-active" />
-                    <label htmlFor="toggle-active" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                      فعال/غیرفعال
-                    </label>
-                  </div>
+                  <ModernSelect 
+                    options={[
+                      { value: 'option1', label: 'گزینه ۱' },
+                      { value: 'option2', label: 'گزینه ۲' },
+                      { value: 'option3', label: 'گزینه ۳' },
+                    ]} 
+                    placeholder="انتخاب کنید" 
+                  />
+                  <ModernCheckbox label="مرا به خاطر بسپار" />
+                  <ModernSwitch label="فعال/غیرفعال" />
                   <ModernRadioGroup 
                     options={[
                       { value: 'option1', label: 'گزینه ۱' },
                       { value: 'option2', label: 'گزینه ۲' },
                     ]}
                   />
-                  <ModernSlider min={0} max={100} defaultValue={[50]} />
+                  <div className="w-full py-4">
+                    <ModernProgress value={50} className="h-2" />
+                    <div className="text-xs text-muted-foreground mt-1 text-center">اسلایدر (غیرفعال)</div>
+                  </div>
                   <ModernTextarea placeholder="توضیحات..." />
                 </ModernCardContent>
               </ModernCard>
@@ -164,34 +267,20 @@ export default function StyleGuideShowcase() {
                 <ModernCardContent className="space-y-4">
                   <ModernBadge>نشان</ModernBadge>
                   <div className="flex gap-2">
-                    <ModernBadge variant="default">اصلی</ModernBadge>
+                    <ModernBadge variant="primary">اصلی</ModernBadge>
                     <ModernBadge variant="secondary">ثانویه</ModernBadge>
-                    <ModernBadge gradientType="success">موفق</ModernBadge>
-                    <ModernBadge gradientType="warning">هشدار</ModernBadge>
-                    <ModernBadge gradientType="danger">خطر</ModernBadge>
+                    <ModernBadge variant="success">موفق</ModernBadge>
+                    <ModernBadge variant="warning">هشدار</ModernBadge>
+                    <ModernBadge variant="danger">خطر</ModernBadge>
                   </div>
-                  <ModernTooltip>
-                    <ModernTooltipTrigger asChild>
-                      <GlassButton>نمایش راهنما</GlassButton>
-                    </ModernTooltipTrigger>
-                    <ModernTooltipContent>
-                      این یک راهنماست
-                    </ModernTooltipContent>
+                  <ModernTooltip content="این یک راهنماست">
+                    <GlassButton>نمایش راهنما</GlassButton>
                   </ModernTooltip>
                   <ModernProgress value={65} />
                   <div className="flex gap-2">
-                    <ModernAvatar>
-                      <ModernAvatarImage src="/avatars/01.png" alt="تصویر کاربر" />
-                      <ModernAvatarFallback>کاربر ۱</ModernAvatarFallback>
-                    </ModernAvatar>
-                    <ModernAvatar>
-                      <ModernAvatarImage src="/avatars/02.png" alt="تصویر کاربر" />
-                      <ModernAvatarFallback>کاربر ۲</ModernAvatarFallback>
-                    </ModernAvatar>
-                    <ModernAvatar>
-                      <ModernAvatarImage src="/avatars/03.png" alt="تصویر کاربر" />
-                      <ModernAvatarFallback>کاربر ۳</ModernAvatarFallback>
-                    </ModernAvatar>
+                    <ModernAvatar src="/avatars/01.png" alt="تصویر کاربر" />
+                    <ModernAvatar src="/avatars/02.png" alt="تصویر کاربر" />
+                    <ModernAvatar src="/avatars/03.png" alt="تصویر کاربر" />
                   </div>
                 </ModernCardContent>
               </ModernCard>
@@ -544,13 +633,7 @@ export default function StyleGuideShowcase() {
 }
 
 // کامپوننت نمایش رنگ
-interface ColorSwatchProps {
-  name: string;
-  color: string;
-  textColor: string;
-}
-
-function ColorSwatch({ name, color, textColor }: ColorSwatchProps) {
+function ColorSwatch({ name, color, textColor }) {
   return (
     <div className={`${color} ${textColor} p-4 rounded-lg`}>
       <div className="font-bold">{name}</div>

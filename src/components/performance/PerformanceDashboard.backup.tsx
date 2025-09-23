@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { Button } from '@/components/ui/button';
 import { 
   RefreshCw, 
   Download, 
   Zap, 
+  Clock, 
   MousePointer, 
   Image, 
   Server,
@@ -16,10 +19,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassButton } from '@/components/ui/glass-button';
-import { 
-  ModernCard,
-  ModernCardTitle, 
-  ModernCardContent} from '@/components/ui/modern-card';
+import { ModernCard, ModernCardHeader, ModernCardTitle, ModernCardContent, ModernCardDescription } from '@/components/ui/modern-card';
 import { useAppSettings } from '@/hooks/use-app-settings';
 
 // Types for performance metrics
@@ -109,7 +109,7 @@ const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({ className }
 
   return (
     <ModernCard className={className}>
-      <div className="p-6">
+      <ModernCardHeader>
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className={`p-2 rounded-full ${
@@ -152,11 +152,11 @@ const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({ className }
             </GlassButton>
           </div>
         </div>
-        <p className="text-sm text-gray-500 mt-2">
+        <ModernCardDescription>
           {t('performance.description', 'Real-time Web Vitals and performance metrics monitoring')}
-        </p>
-      </div>
-      <div className="p-6 pt-0">
+        </ModernCardDescription>
+      </ModernCardHeader>
+      <ModernCardContent>
         <div className="mb-4">
           <div className="flex items-center justify-between mb-2">
             <span className="font-medium">{t('performance.overall_health', 'Overall Performance Health')}</span>
@@ -174,147 +174,107 @@ const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({ className }
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
           {/* CLS Metric */}
           <ModernCard>
-            <div className="p-4">
+            <ModernCardContent className="p-4">
               <div className="flex items-center gap-2 mb-2">
                 <Layout className="h-4 w-4 text-purple-500" />
                 <span className="font-medium text-sm">CLS</span>
-              </div>
+              </ModernCardContent>
               <div className="text-2xl font-bold">
                 {isLoading ? '...' : metrics.cls !== null ? metrics.cls.toFixed(3) : 'N/A'}
               </div>
               <div className="text-xs text-gray-500 mt-1">
                 {t('performance.cls_description', 'Visual stability')}
               </div>
-              <div className="relative">
-                <Progress 
-                  value={metrics.cls !== null ? Math.min(metrics.cls * 400, 100) : 0} 
-                  className="h-1 mt-2"
-                />
-                <div 
-                  className={`absolute top-0 left-0 h-1 mt-2 rounded-full ${
-                    metrics.cls !== null && metrics.cls < 0.1 ? 'bg-green-500' : 
-                    metrics.cls !== null && metrics.cls < 0.25 ? 'bg-yellow-500' : 'bg-red-500'
-                  }`}
-                  style={{ width: `${metrics.cls !== null ? Math.min(metrics.cls * 400, 100) : 0}%` }}
-                />
-              </div>
-            </div>
+              <Progress 
+                value={metrics.cls !== null ? Math.min(metrics.cls * 400, 100) : 0} 
+                className="h-1 mt-2"
+                indicatorClassName={metrics.cls !== null && metrics.cls < 0.1 ? 'bg-green-500' : metrics.cls !== null && metrics.cls < 0.25 ? 'bg-yellow-500' : 'bg-red-500'}
+              />
+            </ModernCardContent>
           </ModernCard>
 
           {/* FCP Metric */}
           <ModernCard>
-            <div className="p-4">
+            <ModernCardContent className="p-4">
               <div className="flex items-center gap-2 mb-2">
                 <Zap className="h-4 w-4 text-blue-500" />
                 <span className="font-medium text-sm">FCP</span>
-              </div>
+              </ModernCardContent>
               <div className="text-2xl font-bold">
                 {isLoading ? '...' : metrics.fcp !== null ? `${Math.round(metrics.fcp)}ms` : 'N/A'}
               </div>
               <div className="text-xs text-gray-500 mt-1">
                 {t('performance.fcp_description', 'First content paint')}
               </div>
-              <div className="relative">
-                <Progress 
-                  value={metrics.fcp !== null ? Math.min((metrics.fcp / 30), 100) : 0} 
-                  className="h-1 mt-2"
-                />
-                <div 
-                  className={`absolute top-0 left-0 h-1 mt-2 rounded-full ${
-                    metrics.fcp !== null && metrics.fcp < 1800 ? 'bg-green-500' : 
-                    metrics.fcp !== null && metrics.fcp < 3000 ? 'bg-yellow-500' : 'bg-red-500'
-                  }`}
-                  style={{ width: `${metrics.fcp !== null ? Math.min((metrics.fcp / 30), 100) : 0}%` }}
-                />
-              </div>
-            </div>
+              <Progress 
+                value={metrics.fcp !== null ? Math.min((metrics.fcp / 50), 100) : 0} 
+                className="h-1 mt-2"
+                indicatorClassName={metrics.fcp !== null && metrics.fcp < 1800 ? 'bg-green-500' : metrics.fcp !== null && metrics.fcp < 3000 ? 'bg-yellow-500' : 'bg-red-500'}
+              />
+            </ModernCardContent>
           </ModernCard>
 
           {/* FID Metric */}
           <ModernCard>
-            <div className="p-4">
+            <ModernCardContent className="p-4">
               <div className="flex items-center gap-2 mb-2">
                 <MousePointer className="h-4 w-4 text-green-500" />
                 <span className="font-medium text-sm">FID</span>
-              </div>
+              </ModernCardContent>
               <div className="text-2xl font-bold">
                 {isLoading ? '...' : metrics.fid !== null ? `${Math.round(metrics.fid)}ms` : 'N/A'}
               </div>
               <div className="text-xs text-gray-500 mt-1">
                 {t('performance.fid_description', 'First input delay')}
               </div>
-              <div className="relative">
-                <Progress 
-                  value={metrics.fid !== null ? Math.min(metrics.fid, 100) : 0} 
-                  className="h-1 mt-2"
-                />
-                <div 
-                  className={`absolute top-0 left-0 h-1 mt-2 rounded-full ${
-                    metrics.fid !== null && metrics.fid < 100 ? 'bg-green-500' : 
-                    metrics.fid !== null && metrics.fid < 300 ? 'bg-yellow-500' : 'bg-red-500'
-                  }`}
-                  style={{ width: `${metrics.fid !== null ? Math.min(metrics.fid, 100) : 0}%` }}
-                />
-              </div>
-            </div>
+              <Progress 
+                value={metrics.fid !== null ? Math.min(metrics.fid, 100) : 0} 
+                className="h-1 mt-2"
+                indicatorClassName={metrics.fid !== null && metrics.fid < 100 ? 'bg-green-500' : metrics.fid !== null && metrics.fid < 300 ? 'bg-yellow-500' : 'bg-red-500'}
+              />
+            </ModernCardContent>
           </ModernCard>
 
           {/* LCP Metric */}
           <ModernCard>
-            <div className="p-4">
+            <ModernCardContent className="p-4">
               <div className="flex items-center gap-2 mb-2">
                 <Image className="h-4 w-4 text-orange-500" />
                 <span className="font-medium text-sm">LCP</span>
-              </div>
+              </ModernCardContent>
               <div className="text-2xl font-bold">
                 {isLoading ? '...' : metrics.lcp !== null ? `${Math.round(metrics.lcp)}ms` : 'N/A'}
               </div>
               <div className="text-xs text-gray-500 mt-1">
                 {t('performance.lcp_description', 'Largest content paint')}
               </div>
-              <div className="relative">
-                <Progress 
-                  value={metrics.lcp !== null ? Math.min((metrics.lcp / 40), 100) : 0} 
-                  className="h-1 mt-2"
-                />
-                <div 
-                  className={`absolute top-0 left-0 h-1 mt-2 rounded-full ${
-                    metrics.lcp !== null && metrics.lcp < 2500 ? 'bg-green-500' : 
-                    metrics.lcp !== null && metrics.lcp < 4000 ? 'bg-yellow-500' : 'bg-red-500'
-                  }`}
-                  style={{ width: `${metrics.lcp !== null ? Math.min((metrics.lcp / 40), 100) : 0}%` }}
-                />
-              </div>
-            </div>
+              <Progress 
+                value={metrics.lcp !== null ? Math.min((metrics.lcp / 50), 100) : 0} 
+                className="h-1 mt-2"
+                indicatorClassName={metrics.lcp !== null && metrics.lcp < 2500 ? 'bg-green-500' : metrics.lcp !== null && metrics.lcp < 4000 ? 'bg-yellow-500' : 'bg-red-500'}
+              />
+            </ModernCardContent>
           </ModernCard>
 
           {/* TTFB Metric */}
           <ModernCard>
-            <div className="p-4">
+            <ModernCardContent className="p-4">
               <div className="flex items-center gap-2 mb-2">
-                <Server className="h-4 w-4 text-cyan-500" />
+                <Server className="h-4 w-4 text-red-500" />
                 <span className="font-medium text-sm">TTFB</span>
-              </div>
+              </ModernCardContent>
               <div className="text-2xl font-bold">
                 {isLoading ? '...' : metrics.ttfb !== null ? `${Math.round(metrics.ttfb)}ms` : 'N/A'}
               </div>
               <div className="text-xs text-gray-500 mt-1">
                 {t('performance.ttfb_description', 'Time to first byte')}
               </div>
-              <div className="relative">
-                <Progress 
-                  value={metrics.ttfb !== null ? Math.min(metrics.ttfb / 5, 100) : 0} 
-                  className="h-1 mt-2"
-                />
-                <div 
-                  className={`absolute top-0 left-0 h-1 mt-2 rounded-full ${
-                    metrics.ttfb !== null && metrics.ttfb < 200 ? 'bg-green-500' : 
-                    metrics.ttfb !== null && metrics.ttfb < 500 ? 'bg-yellow-500' : 'bg-red-500'
-                  }`}
-                  style={{ width: `${metrics.ttfb !== null ? Math.min(metrics.ttfb / 5, 100) : 0}%` }}
-                />
-              </div>
-            </div>
+              <Progress 
+                value={metrics.ttfb !== null ? Math.min(metrics.ttfb / 5, 100) : 0} 
+                className="h-1 mt-2"
+                indicatorClassName={metrics.ttfb !== null && metrics.ttfb < 200 ? 'bg-green-500' : metrics.ttfb !== null && metrics.ttfb < 500 ? 'bg-yellow-500' : 'bg-red-500'}
+              />
+            </ModernCardContent>
           </ModernCard>
         </div>
 
@@ -395,7 +355,7 @@ const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({ className }
             </div>
           </ModernCardContent>
         </ModernCard>
-      </div>
+      </ModernCardContent>
     </ModernCard>
   );
 };
