@@ -2,30 +2,31 @@ import React from "react";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import {
-  ArrowLeft,
-  Sparkles,
-  Palette,
-  Moon,
-  Sun
-} from "lucide-react";
+import { ArrowLeft, Sparkles, Palette, Moon, Sun, Plus } from "lucide-react";
 import { GlassButton } from "@/components/ui/glass-button";
 import { ModernTabs, ModernTabsList, ModernTabsTrigger } from "@/components/ui/modern-tabs";
+import { ModernCard, ModernCardHeader, ModernCardTitle, ModernCardDescription } from "@/components/ui/modern-card";
 
 interface GroupsHeaderProps {
-  activeTab: 'overview' | 'manage';
-  setActiveTab: (tab: 'overview' | 'manage') => void;
+  title: string;
+  description: string;
+  onAddClick: () => void;
   isDarkMode: boolean;
   handleThemeToggle: () => void;
-  isRTL: boolean;
+  isRTL?: boolean;
+  activeTab?: 'overview' | 'manage';
+  setActiveTab?: (tab: 'overview' | 'manage') => void;
 }
 
 const GroupsHeader: React.FC<GroupsHeaderProps> = ({
-  activeTab,
-  setActiveTab,
+  title,
+  description,
+  onAddClick,
   isDarkMode,
   handleThemeToggle,
-  isRTL
+  isRTL = false,
+  activeTab = 'overview',
+  setActiveTab,
 }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -54,121 +55,101 @@ const GroupsHeader: React.FC<GroupsHeaderProps> = ({
   const activeTabData = tabs.find(tab => tab.id === activeTab);
 
   return (
-    <div className="space-y-6 sm:space-y-8">
-      {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.1 }}
-        className="flex items-center justify-between"
-      >
-        <div className="flex items-center gap-4">
-          <GlassButton
-            onClick={() => navigate(-1)}
-            variant="ghost"
-            size="sm"
-            className="p-2 hover:scale-110 transition-all duration-300"
-          >
-            <ArrowLeft size={20} />
-          </GlassButton>
-          <div>
-            <motion.h1
-              className="text-3xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-            >
-              {t('groups.title')}
-            </motion.h1>
-            <motion.p
-              className="text-gray-600 dark:text-gray-400 mt-1"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-            >
-              {t('groups.description')}
-            </motion.p>
-          </div>
-        </div>
-
-        {/* Enhanced Theme Toggle */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.3, delay: 0.4 }}
-        >
-          <GlassButton
-            onClick={handleThemeToggle}
-            variant="ghost"
-            size="sm"
-            className="p-3 rounded-2xl hover:scale-110 transition-all duration-300 group"
-            title={isDarkMode ? t('theme.switch_to_light', 'تغییر به تم روشن') : t('theme.switch_to_dark', 'تغییر به تم تاریک')}
-          >
-            <div className="relative">
-              {isDarkMode ? (
-                <Sun size={24} className="text-yellow-500 group-hover:rotate-180 transition-transform duration-500" />
-              ) : (
-                <Moon size={24} className="text-blue-500 group-hover:rotate-180 transition-transform duration-500" />
-              )}
-              <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/20 to-blue-400/20 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm"></div>
+    <motion.div 
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="mb-8"
+    >
+      <ModernCard variant="glass" className="backdrop-blur-lg bg-opacity-80 p-6 rounded-2xl shadow-lg">
+        <ModernCardHeader className="p-0">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
+            <div className="flex-1">
+              <div className="flex items-center gap-3 mb-3">
+                <GlassButton 
+                  onClick={() => navigate(-1)}
+                  size="icon"
+                  variant="ghost"
+                  className="rounded-full"
+                  aria-label={t('common.back', 'بازگشت')}
+                >
+                  <ArrowLeft className="w-5 h-5" />
+                </GlassButton>
+                <ModernCardTitle className="text-3xl font-bold bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent">
+                  {title}
+                </ModernCardTitle>
+              </div>
+              <ModernCardDescription className="text-lg text-gray-600 dark:text-gray-300">
+                {description}
+              </ModernCardDescription>
             </div>
-          </GlassButton>
-        </motion.div>
-      </motion.div>
+            
+            <div className="flex items-center gap-3">
+              <GlassButton 
+                onClick={handleThemeToggle}
+                size="icon"
+                variant="ghost"
+                className="rounded-full"
+                aria-label={t('common.toggle_theme', 'تغییر تم')}
+              >
+                {isDarkMode ? (
+                  <Sun className="w-5 h-5 text-yellow-400" />
+                ) : (
+                  <Moon className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+                )}
+              </GlassButton>
+              
+              <button
+                onClick={onAddClick}
+                className="inline-flex items-center justify-center whitespace-nowrap rounded-xl text-sm font-medium transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 glass-advanced text-foreground border border-white/20 hover:bg-white/10 dark:hover:bg-white/5 backdrop-blur-md h-10 px-4 py-2 hover-lift gap-2"
+                type="button"
+              >
+                <Plus className="h-4 w-4" />
+                {t('groups.create_group', 'افزودن گروه جدید')}
+              </button>
+            </div>
+          </div>
+        </ModernCardHeader>
 
-      {/* Tab Navigation */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.2 }}
-      >
-        <ModernTabs defaultValue="overview" className="w-full" dir={isRTL ? 'rtl' : 'ltr'}>
-          <ModernTabsList
-            className="grid w-full grid-cols-1 sm:grid-cols-2 mb-6 sm:mb-8 bg-white/10 dark:bg-gray-800/10 backdrop-blur-xl rounded-2xl p-2 border border-white/20 shadow-2xl"
-            glassEffect="default"
-            hoverEffect="lift"
+        {setActiveTab && (
+        <div className="mt-8">
+          <ModernTabs 
+            value={activeTab} 
+            onValueChange={(value) => setActiveTab(value as 'overview' | 'manage')}
+            className="w-full"
           >
-            {tabs.map((tab) => {
-              const Icon = tab.icon;
-              return (
-                <ModernTabsTrigger
+            <ModernTabsList className="w-full justify-start p-1 rounded-2xl bg-gray-100/50 dark:bg-gray-800/50 backdrop-blur-sm">
+              {tabs.map((tab) => (
+                <ModernTabsTrigger 
                   key={tab.id}
                   value={tab.id}
-                  className={`flex items-center gap-1 sm:gap-2 rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:${tab.gradient} data-[state=active]:text-white transition-all duration-300 hover:scale-105 text-xs sm:text-sm group`}
-                  hoverEffect="scale"
-                  onClick={() => setActiveTab(tab.id)}
+                  className={`px-6 py-3 rounded-xl text-sm font-medium transition-all duration-300 ${
+                    activeTab === tab.id 
+                      ? 'bg-white/80 dark:bg-gray-700/80 shadow-lg text-blue-600 dark:text-blue-400 backdrop-blur-sm' 
+                      : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-white/30 dark:hover:bg-gray-700/30'
+                  }`}
                 >
-                  <Icon size={14} className={`${isRTL ? 'rotate-180' : ''} group-hover:scale-110 transition-transform duration-300`} />
-                  <span className="hidden xs:inline">{tab.label}</span>
+                  <div className="flex items-center">
+                    <tab.icon className={`w-5 h-5 ml-2 transition-transform duration-300 ${
+                      activeTab === tab.id ? 'scale-110 ' + tab.color : 'text-gray-400 group-hover:scale-110'
+                    }`} />
+                    <span className="font-medium">{tab.label}</span>
+                  </div>
+                  {activeTab === tab.id && (
+                    <motion.div 
+                      layoutId="activeTabIndicator"
+                      className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full"
+                      transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
+                    />
+                  )}
                 </ModernTabsTrigger>
-              );
-            })}
-          </ModernTabsList>
-
-          {/* Active Tab Indicator */}
-          {activeTabData && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: 0.3 }}
-              className="flex items-center gap-3 mb-6"
-            >
-              <div className={`w-8 h-8 ${activeTabData.bgColor} rounded-lg flex items-center justify-center shadow-lg`}>
-                <activeTabData.icon size={16} className={activeTabData.color} />
-              </div>
-              <div>
-                <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
-                  {activeTabData.label}
-                </h2>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  {activeTabData.description}
-                </p>
-              </div>
-            </motion.div>
-          )}
-        </ModernTabs>
-      </motion.div>
-    </div>
+              ))}
+            </ModernTabsList>
+          </ModernTabs>
+        </div>
+      )}
+      </ModernCard>
+    </motion.div>
   );
 };
 

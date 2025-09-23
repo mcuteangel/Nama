@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
-import { Users, Plus, Grid, List, Filter, Search, X, Eye, EyeOff, Sparkles } from "lucide-react";
+import { Users, Plus, Grid, List, Filter, Search, X, Eye, EyeOff, Sparkles, ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+import { GlassButton } from "@/components/ui/glass-button";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -23,6 +23,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import EmptyState from "../common/EmptyState";
 import GroupItem from "./GroupItem";
 import AddGroupDialog from "./AddGroupDialog";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { ModernCard } from "@/components/ui/modern-card";
 
 // رنگ‌های پیش‌فرض برای فیلتر رنگ
 const colorOptions = [
@@ -105,25 +107,28 @@ const GroupsList: React.FC<GroupsListProps> = ({
   const hasActiveFilters = searchTerm || (colorFilter && colorFilter !== 'all');
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full space-y-6">
       {/* Header */}
-      <div className="flex flex-col space-y-4 pb-6">
-        <div className="flex items-center justify-between">
+      <ModernCard className="p-6 bg-gradient-to-br from-white/50 to-white/30 dark:from-gray-800/50 dark:to-gray-900/50 border border-white/20 shadow-lg">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">
+            <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
               {t('groups.existing_groups')}
             </h1>
-            <p className="text-muted-foreground">
+            <p className="text-muted-foreground mt-1">
               {t('groups.groups_list_description')}
             </p>
           </div>
           
           <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
             <DialogTrigger asChild>
-              <Button className="gap-2">
+              <button 
+                className="inline-flex items-center justify-center whitespace-nowrap rounded-xl text-sm font-medium transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 glass-advanced text-foreground border border-white/20 hover:bg-white/10 dark:hover:bg-white/5 backdrop-blur-md h-10 px-4 py-2 hover-lift gap-2"
+                onClick={() => storeTriggerElement()}
+              >
                 <Plus className="h-4 w-4" />
                 {t('groups.add_new')}
-              </Button>
+              </button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
@@ -139,112 +144,175 @@ const GroupsList: React.FC<GroupsListProps> = ({
         </div>
 
         {/* Search and Filters */}
-        <div className="flex flex-col space-y-3 md:flex-row md:items-center md:space-y-0 md:space-x-4">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              placeholder={t('groups.search_groups')}
-              className="pl-10"
-              value={searchTerm}
-              onChange={handleSearch}
-            />
-          </div>
-          
-          <div className="flex items-center space-x-2">
-            <Select value={colorFilter} onValueChange={handleColorFilterChange}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Filter by color" />
-              </SelectTrigger>
-              <SelectContent>
-                {colorOptions.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    <div className="flex items-center">
-                      {option.color && option.color !== 'all' && (
-                        <span 
-                          className="w-3 h-3 rounded-full mr-2" 
-                          style={{ backgroundColor: option.color }}
-                        />
-                      )}
-                      {option.label}
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+        <div className="mt-6">
+          <div className="flex flex-col space-y-4 md:flex-row md:items-center md:space-y-0 md:space-x-4">
+            <div className="relative flex-1 group">
+              <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                <Search className="h-4 w-4 text-gray-400 group-focus-within:text-indigo-500 transition-colors" />
+              </div>
+              <input
+                type="text"
+                placeholder={t('groups.search_groups')}
+                className="w-full pl-4 pr-10 py-2.5 rounded-xl bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-transparent focus:outline-none transition-all duration-200 backdrop-blur-sm text-gray-800 dark:text-gray-200 placeholder-gray-500 dark:placeholder-gray-400"
+                value={searchTerm}
+                onChange={handleSearch}
+              />
+            </div>
+            
+            <div className="flex items-center space-x-2">
+              <div className="relative group">
+                <Select value={colorFilter} onValueChange={handleColorFilterChange}>
+                  <SelectTrigger className="w-[180px] bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-white/70 dark:hover:bg-gray-700/50 transition-colors">
+                    <SelectValue placeholder={t('groups.filter_by_color')} />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg">
+                    {colorOptions.map((option) => (
+                      <SelectItem 
+                        key={option.value} 
+                        value={option.value}
+                        className="flex items-center px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                      >
+                        <div className="flex items-center">
+                          {option.color && option.color !== 'all' && (
+                            <span 
+                              className="w-3 h-3 rounded-full mr-2 shadow-sm" 
+                              style={{ backgroundColor: option.color }}
+                            />
+                          )}
+                          <span className="text-gray-800 dark:text-gray-200">
+                            {option.label}
+                          </span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
-            <Button 
-              variant="outline" 
-              size="icon" 
-              className="md:hidden"
-              onClick={() => setIsFilterOpen(!isFilterOpen)}
-            >
-              <Filter className="h-4 w-4" />
-            </Button>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button 
+                      className="inline-flex items-center justify-center p-2.5 rounded-xl bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 hover:bg-white/70 dark:hover:bg-gray-700/50 transition-colors md:hidden"
+                      onClick={() => setIsFilterOpen(!isFilterOpen)}
+                    >
+                      <Filter className="h-4 w-4 text-gray-600 dark:text-gray-300" />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">
+                    <p>{t('common.filters')}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
 
-            <div className="hidden md:flex items-center space-x-2">
-              <Button
-                variant={viewMode === 'grid' ? 'default' : 'outline'}
-                size="icon"
-                onClick={() => setViewMode('grid')}
-              >
-                <Grid className="h-4 w-4" />
-              </Button>
-              <Button
-                variant={viewMode === 'list' ? 'default' : 'outline'}
-                size="icon"
-                onClick={() => setViewMode('list')}
-              >
-                <List className="h-4 w-4" />
-              </Button>
+              <div className="hidden md:flex items-center space-x-2 bg-white/50 dark:bg-gray-800/50 p-1.5 rounded-xl border border-gray-200 dark:border-gray-700">
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        className={`p-2 rounded-lg transition-all duration-200 ${viewMode === 'grid' ? 'bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700/50'}`}
+                        onClick={() => setViewMode('grid')}
+                      >
+                        <Grid className="h-4 w-4" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom">
+                      <p>{t('groups.grid_view')}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+                
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        className={`p-2 rounded-lg transition-all duration-200 ${viewMode === 'list' ? 'bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700/50'}`}
+                        onClick={() => setViewMode('list')}
+                      >
+                        <List className="h-4 w-4" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom">
+                      <p>{t('groups.list_view')}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
             </div>
           </div>
-        </div>
 
+        </div>
         {/* Active filters */}
         {hasActiveFilters && (
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="text-sm text-muted-foreground">
+          <motion.div 
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2 }}
+            className="flex flex-wrap items-center gap-3 mt-4 p-3 bg-white/30 dark:bg-gray-800/30 backdrop-blur-sm rounded-xl border border-white/20 shadow-sm"
+          >
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300 flex-shrink-0">
               {t('common.filters')}:
             </span>
-            {searchTerm && (
-              <div className="inline-flex items-center bg-muted px-3 py-1 rounded-full text-sm">
-                <span className="mr-2">{t('common.search')}: {searchTerm}</span>
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="h-4 w-4 hover:bg-transparent"
-                  onClick={() => setSearchTerm('')}
+            
+            <div className="flex flex-wrap items-center gap-2">
+              {searchTerm && (
+                <motion.div 
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  className="inline-flex items-center bg-white/70 dark:bg-gray-800/70 px-3 py-1.5 rounded-lg text-sm border border-gray-200 dark:border-gray-700 shadow-sm"
                 >
-                  <X className="h-3 w-3" />
-                </Button>
-              </div>
-            )}
-            {colorFilter && colorFilter !== 'all' && (
-              <div className="inline-flex items-center bg-muted px-3 py-1 rounded-full text-sm">
-                <span className="mr-2">
-                  {t('groups.color')}: {colorOptions.find(c => c.value === colorFilter)?.label}
-                </span>
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="h-4 w-4 hover:bg-transparent"
-                  onClick={() => setColorFilter('all')}
+                  <span className="text-gray-800 dark:text-gray-200 mr-2">
+                    {t('common.search')}: <span className="font-medium">{searchTerm}</span>
+                  </span>
+                  <button 
+                    className="p-0.5 rounded-full hover:bg-gray-200/50 dark:hover:bg-gray-700/50 transition-colors"
+                    onClick={() => setSearchTerm('')}
+                    aria-label={t('actions.remove_filter')}
+                  >
+                    <X className="h-3.5 w-3.5 text-gray-500 dark:text-gray-400" />
+                  </button>
+                </motion.div>
+              )}
+              
+              {colorFilter && colorFilter !== 'all' && (
+                <motion.div 
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  className="inline-flex items-center bg-white/70 dark:bg-gray-800/70 px-3 py-1.5 rounded-lg text-sm border border-gray-200 dark:border-gray-700 shadow-sm"
                 >
-                  <X className="h-3 w-3" />
-                </Button>
-              </div>
-            )}
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="h-8 text-sm text-primary"
-              onClick={clearAllFilters}
-            >
-              {t('actions.clear_all')}
-            </Button>
-          </div>
+                  <span className="text-gray-800 dark:text-gray-200 mr-2">
+                    {t('groups.color')}: 
+                    <span className="font-medium inline-flex items-center">
+                      <span 
+                        className="w-2.5 h-2.5 rounded-full mr-1.5 inline-block"
+                        style={{ backgroundColor: colorFilter }}
+                      />
+                      {colorOptions.find(c => c.value === colorFilter)?.label}
+                    </span>
+                  </span>
+                  <button 
+                    className="p-0.5 rounded-full hover:bg-gray-200/50 dark:hover:bg-gray-700/50 transition-colors"
+                    onClick={() => setColorFilter('all')}
+                    aria-label={t('actions.remove_filter')}
+                  >
+                    <X className="h-3.5 w-3.5 text-gray-500 dark:text-gray-400" />
+                  </button>
+                </motion.div>
+              )}
+              
+              <motion.button
+                whileTap={{ scale: 0.95 }}
+                onClick={clearAllFilters}
+                className="text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors flex items-center px-2 py-1 rounded-lg hover:bg-indigo-50/50 dark:hover:bg-indigo-900/20"
+              >
+                <X className="h-3.5 w-3.5 ml-1" />
+                {t('actions.clear_all')}
+              </motion.button>
+            </div>
+          </motion.div>
         )}
-      </div>
+
+      </ModernCard>
 
       {/* Groups List */}
       <div className="flex-1 overflow-hidden">
@@ -270,22 +338,24 @@ const GroupsList: React.FC<GroupsListProps> = ({
                 }
               >
                 {(searchTerm || colorFilter !== 'all') && (
-                  <Button 
-                    variant="outline" 
+                  <button 
                     onClick={clearAllFilters}
-                    className="mt-4"
+                    className="mt-4 px-4 py-2 text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors flex items-center gap-1.5 rounded-lg hover:bg-indigo-50/50 dark:hover:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30"
                   >
+                    <X className="h-3.5 w-3.5" />
                     {t('actions.clear_filters')}
-                  </Button>
+                  </button>
                 )}
               </EmptyState>
             </motion.div>
           ) : (
-            <AnimatePresence>
+            <AnimatePresence mode="wait">
               <motion.div
+                key={viewMode}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.2 }}
                 className={cn(
                   viewMode === 'grid' 
                     ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-6'
@@ -301,7 +371,7 @@ const GroupsList: React.FC<GroupsListProps> = ({
                     exit={{ opacity: 0, scale: 0.9 }}
                     transition={{
                       duration: 0.3,
-                      delay: index * 0.05,
+                      delay: index * 0.03,
                       type: "spring",
                       stiffness: 100
                     }}
@@ -332,28 +402,34 @@ const GroupsList: React.FC<GroupsListProps> = ({
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-          className="flex items-center justify-center gap-6 p-4 bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 dark:from-indigo-900/20 dark:via-purple-900/20 dark:to-pink-900/20 rounded-xl border border-indigo-200/30 dark:border-indigo-800/30 backdrop-blur-sm"
+          transition={{ duration: 0.3, delay: 0.1 }}
+          className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 p-4 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-xl border border-white/20 shadow-sm"
         >
-          <div className="flex items-center gap-2">
-            <Eye size={16} className="text-indigo-500" />
+          <div className="flex items-center gap-2 bg-indigo-50/70 dark:bg-indigo-900/20 px-3 py-1.5 rounded-lg">
+            <div className="p-1.5 bg-indigo-100 dark:bg-indigo-800/50 rounded-lg">
+              <Eye size={16} className="text-indigo-600 dark:text-indigo-300" />
+            </div>
             <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-              {t('groups.showing')} {stats.filteredGroups} {t('groups.groups')}
+              {t('groups.showing')} <span className="font-bold text-indigo-700 dark:text-indigo-300">{stats.filteredGroups}</span> {t('groups.groups')}
             </span>
           </div>
 
           {stats.filteredGroups !== stats.totalGroups && (
-            <div className="flex items-center gap-2">
-              <EyeOff size={16} className="text-gray-500" />
-              <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
+            <div className="flex items-center gap-2 bg-amber-50/70 dark:bg-amber-900/20 px-3 py-1.5 rounded-lg">
+              <div className="p-1.5 bg-amber-100 dark:bg-amber-800/50 rounded-lg">
+                <EyeOff size={16} className="text-amber-600 dark:text-amber-300" />
+              </div>
+              <span className="text-sm font-medium text-amber-800 dark:text-amber-200">
                 {stats.totalGroups - stats.filteredGroups} {t('groups.hidden')}
               </span>
             </div>
           )}
 
-          <div className="flex items-center gap-2">
-            <Sparkles size={16} className="text-purple-500 animate-pulse" />
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+          <div className="flex items-center gap-2 bg-purple-50/70 dark:bg-purple-900/20 px-3 py-1.5 rounded-lg">
+            <div className="p-1.5 bg-purple-100 dark:bg-purple-800/50 rounded-lg">
+              <Sparkles size={16} className="text-purple-600 dark:text-purple-300" />
+            </div>
+            <span className="text-sm font-medium text-purple-700 dark:text-purple-300">
               {viewMode === 'grid' ? t('groups.grid_view') : t('groups.list_view')}
             </span>
           </div>

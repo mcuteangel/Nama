@@ -6,13 +6,11 @@ import {
   UserPlus,
   Users as UsersIcon,
   Clock,
-  Tag,
-} from "lucide-react";
+  Tag} from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
@@ -26,6 +24,7 @@ import { formatDistanceToNow } from "date-fns";
 import { faIR } from "date-fns/locale";
 import StandardizedDeleteDialog from "@/components/common/StandardizedDeleteDialog";
 import { useDialogFocus } from "@/hooks/use-dialog-focus";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "../ui/card";
 
 // تابع کمکی برای استخراج حروف اول نام گروه
 const getInitials = (name: string) => {
@@ -60,9 +59,9 @@ const GroupItem: React.FC<GroupItemProps> = ({
   isDeleting = false
 }) => {
   const { t, i18n } = useTranslation();
-  const [isHovered, setIsHovered] = useState(false);
+  const [, setIsHovered] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [, setIsMenuOpen] = useState(false);
   const { storeTriggerElement } = useDialogFocus();
 
   // Use provided member count or generate a random one
@@ -197,20 +196,24 @@ const GroupItem: React.FC<GroupItemProps> = ({
               )}
 
               {/* Progress Bar */}
-              <div className="space-y-1">
+              <div className="space-y-2">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="font-medium">{t('groups.completion')}</span>
-                  <span className="font-mono">{completionRate}%</span>
+                  <span className="font-medium text-gray-700 dark:text-gray-300">
+                    {t('groups.completion')}
+                  </span>
+                  <span className="font-mono font-bold text-gray-800 dark:text-white">
+                    {completionRate}%
+                  </span>
                 </div>
                 <Progress 
                   value={completionRate} 
-                  className="h-2 bg-muted"
-                  indicatorClassName={cn(
+                  className={cn(
+                    "h-2.5 bg-gray-100 dark:bg-gray-700/50 rounded-full overflow-hidden [&>div]:transition-all [&>div]:duration-500",
                     completionRate >= 100 
-                      ? "bg-green-500" 
+                      ? "[&>div]:bg-gradient-to-r [&>div]:from-green-500 [&>div]:to-emerald-400"
                       : completionRate >= 70 
-                        ? "bg-blue-500" 
-                        : "bg-yellow-500"
+                        ? "[&>div]:bg-gradient-to-r [&>div]:from-blue-500 [&>div]:to-sky-400"
+                        : "[&>div]:bg-gradient-to-r [&>div]:from-yellow-500 [&>div]:to-amber-400"
                   )}
                 />
               </div>

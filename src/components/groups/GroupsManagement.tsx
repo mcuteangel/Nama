@@ -1,26 +1,55 @@
 import React, { useState, useCallback, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, Palette } from "lucide-react";
+import { Sparkles, Users, BarChart2, Filter, Search, Grid, List } from "lucide-react";
+
+// Hooks
 import { useGroups } from "@/hooks/use-groups";
 import { useSession } from "@/integrations/supabase/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { invalidateCache } from "@/utils/cache-helpers";
 import { ErrorManager } from "@/lib/error-manager";
-import { GlassButton } from "@/components/ui/glass-button";
-import { ModernCard, ModernCardContent } from "@/components/ui/modern-card";
-import { ModernTabs, ModernTabsContent } from "@/components/ui/modern-tabs";
 import useAppSettings from '@/hooks/use-app-settings';
 import { useDialogFocus } from "@/hooks/use-dialog-focus";
-import StandardizedDeleteDialog from "@/components/common/StandardizedDeleteDialog";
+
+// Modern UI Components
+import { 
+  ModernCard, 
+  ModernCardHeader, 
+  ModernCardTitle, 
+  ModernCardContent,
+  ModernCardDescription} from "@/components/ui/modern-card";
+import { 
+  ModernButton, 
+  ModernButtonGroup,
+  ModernButtonIcon
+} from "@/components/ui/modern-button";
+import { 
+  ModernInput,
+  InputLeftElement,
+  InputGroup
+} from "@/components/ui/modern-input";
+import { 
+  ModernDialog,
+  ModernDialogContent,
+  ModernDialogHeader,
+  ModernDialogTitle,
+  ModernDialogDescription} from "@/components/ui/modern-dialog";
+import { 
+  ModernTooltip,
+  ModernTooltipContent,
+  ModernTooltipTrigger
+} from "@/components/ui/modern-tooltip";
+
+// Components
 import LoadingSpinner from "../common/LoadingSpinner";
 import GroupForm from "./GroupForm";
-import ParticleBackground from "./ParticleBackground";
-import GroupsHeader from "./GroupsHeader";
 import GroupsStats from "./GroupsStats";
-import GroupsFilters from "./GroupsFilters";
 import GroupsList from "./GroupsList";
 import GroupsSuggestions from "./GroupsSuggestions";
+import ParticleBackground from "./ParticleBackground";
+import GroupsHeader from "./GroupsHeader";
+import GroupsFilters from "./GroupsFilters";
+import StandardizedDeleteDialog from "../common/StandardizedDeleteDialog";
 
 interface Group {
   id: string;
@@ -63,10 +92,11 @@ const GroupsManagement = () => {
   const { storeTriggerElement } = useDialogFocus();
 
   // New states for enhanced functionality
-  const [activeTab, setActiveTab] = useState<'overview' | 'manage'>('overview');
+  const [] = useState<'overview' | 'manage'>('overview');
   const [searchTerm, setSearchTerm] = useState('');
   const [colorFilter, setColorFilter] = useState<string>('all');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   // Settings for theme and RTL support
   const { settings, updateSettings } = useAppSettings();
@@ -282,10 +312,10 @@ const GroupsManagement = () => {
 
   if (loadingGroups) {
     return (
-      <div className={`min-h-screen ${isDarkMode ? 'bg-gradient-to-br from-gray-900 via-slate-900 to-gray-900' : 'bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50'} transition-all duration-700 flex items-center justify-center p-4`}>
+      <div className={`min-h-screen bg-gradient-to-br from-background/50 to-muted/20 transition-all duration-700 flex items-center justify-center p-4`}>
         <div className="text-center space-y-6">
           <div className="relative">
-            <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center shadow-2xl animate-pulse">
+            <div className="w-20 h-20 bg-gradient-to-r from-primary to-accent rounded-full flex items-center justify-center shadow-2xl animate-pulse">
               <Sparkles className="w-10 h-10 text-white animate-spin" />
             </div>
             <div className="absolute -top-2 -right-2 w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center animate-bounce">
@@ -293,125 +323,207 @@ const GroupsManagement = () => {
             </div>
           </div>
           <div className="space-y-2">
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
+            <h3 className="text-2xl font-bold text-foreground">
               {t('groups.loading_title', 'در حال بارگذاری گروه‌ها...')}
             </h3>
-            <p className="text-gray-600 dark:text-gray-400">
+            <p className="text-muted-foreground">
               {t('groups.loading_description', 'لطفاً کمی صبر کنید')}
             </p>
           </div>
-          <LoadingSpinner size={48} className="text-blue-600" />
+          <LoadingSpinner size={48} className="text-primary" />
         </div>
       </div>
     );
   }
 
   return (
-    <div className={`min-h-screen ${isDarkMode ? 'bg-gradient-to-br from-gray-900 via-slate-900 to-gray-900' : 'bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50'} transition-all duration-700 p-2 xs:p-3 sm:p-4 md:p-6 lg:p-8 xl:p-12`} dir={isRTL ? 'rtl' : 'ltr'}>
+    <div className="min-h-screen bg-gradient-to-br from-background/50 to-muted/20 transition-all duration-700 p-4 sm:p-6 md:p-8 lg:p-10 xl:p-12" dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Particle Background */}
       <ParticleBackground isDarkMode={isDarkMode} />
 
-      <div className="max-w-7xl mx-auto space-y-4 xs:space-y-6 sm:space-y-8 relative z-10">
+      <div className="max-w-7xl mx-auto space-y-6 relative z-10">
         {/* Header */}
-        <GroupsHeader
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
+        <GroupsHeader 
+          title={t('groups.title')}
+          description={t('groups.description')}
+          onAddClick={() => setIsAddDialogOpen(true)}
           isDarkMode={isDarkMode}
           handleThemeToggle={handleThemeToggle}
           isRTL={isRTL}
         />
 
-        {/* Tab Content */}
-        <ModernTabs value={activeTab} className="w-full">
-          <AnimatePresence mode="wait">
-            <ModernTabsContent value={activeTab} className="space-y-4 xs:space-y-6 sm:space-y-8">
-              <ModernCard variant="glass" hover="lift" className="backdrop-blur-2xl border border-white/30 shadow-2xl">
-                <ModernCardContent className="p-3 xs:p-4 sm:p-6 md:p-8">
-                  <motion.div
-                    key={activeTab}
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -20 }}
-                    transition={{ duration: 0.3 }}
-                    className="animate-in fade-in duration-700"
+        {/* Search and Filter Bar */}
+        <div className="flex flex-col md:flex-row gap-4 md:items-center justify-between">
+          <div className="w-full md:w-96">
+            <InputGroup className="glass">
+              <InputLeftElement>
+                <Search className="w-4 h-4 text-muted-foreground" />
+              </InputLeftElement>
+              <ModernInput
+                placeholder={t('common.searchGroups', 'جستجوی گروه‌ها...')}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </InputGroup>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <ModernButton
+              variant="outline"
+              size="sm"
+              onClick={() => setIsFilterOpen(!isFilterOpen)}
+              className="glass"
+            >
+              <Filter className="w-4 h-4 ml-1" />
+              {t('common.filters', 'فیلترها')}
+            </ModernButton>
+            
+            <ModernButtonGroup className="glass">
+              <ModernTooltip>
+                <ModernTooltipTrigger asChild>
+                  <ModernButtonIcon
+                    variant={viewMode === 'grid' ? 'default' : 'ghost'}
+                    size="sm"
+                    onClick={() => setViewMode('grid')}
                   >
-                    {activeTab === 'overview' ? (
-                      <div className="space-y-6 xs:space-y-8">
-                        {/* Statistics */}
-                        <GroupsStats stats={stats} />
+                    <Grid className="w-4 h-4" />
+                  </ModernButtonIcon>
+                </ModernTooltipTrigger>
+                <ModernTooltipContent>{t('common.gridView', 'نمای شبکه‌ای')}</ModernTooltipContent>
+              </ModernTooltip>
+              
+              <ModernTooltip>
+                <ModernTooltipTrigger asChild>
+                  <ModernButtonIcon
+                    variant={viewMode === 'list' ? 'default' : 'ghost'}
+                    size="sm"
+                    onClick={() => setViewMode('list')}
+                  >
+                    <List className="w-4 h-4" />
+                  </ModernButtonIcon>
+                </ModernTooltipTrigger>
+                <ModernTooltipContent>{t('common.listView', 'نمای لیستی')}</ModernTooltipContent>
+              </ModernTooltip>
+            </ModernButtonGroup>
+          </div>
+        </div>
 
-                        {/* Filters */}
-                        <GroupsFilters
-                          searchTerm={searchTerm}
-                          setSearchTerm={setSearchTerm}
-                          colorFilter={colorFilter}
-                          setColorFilter={setColorFilter}
-                          availableColors={availableColors}
-                          clearFilters={clearFilters}
-                          isRTL={isRTL}
-                        />
+        {/* Main Content */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Groups List */}
+          <div className="lg:col-span-2 space-y-6">
+            <ModernCard variant="glass" hover="lift" className="h-full">
+              <ModernCardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <ModernCardTitle className="flex items-center gap-2">
+                    <Users className="w-5 h-5" />
+                    {t('groups.yourGroups', 'گروه‌های شما')}
+                  </ModernCardTitle>
+                  <span className="text-sm text-muted-foreground">
+                    {groups.length} {t('groups.groups', 'گروه')}
+                  </span>
+                </div>
+                {isFilterOpen && (
+                  <div className="mt-4">
+                    <GroupsFilters
+                      searchTerm={searchTerm}
+                      setSearchTerm={setSearchTerm}
+                      colorFilter={colorFilter}
+                      setColorFilter={setColorFilter}
+                      availableColors={availableColors}
+                      clearFilters={clearFilters}
+                      isRTL={isRTL}
+                    />
+                  </div>
+                )}
+              </ModernCardHeader>
+              <ModernCardContent>
+                <GroupsList
+                  filteredGroups={filteredGroups}
+                  stats={stats}
+                  searchTerm={searchTerm}
+                  colorFilter={colorFilter}
+                  clearFilters={clearFilters}
+                  handleEditGroup={handleEditGroup}
+                  handleDeleteGroup={handleDeleteGroup}
+                  isDeleting={isDeleting}
+                  storeTriggerElement={storeTriggerElement}
+                  isAddDialogOpen={isAddDialogOpen}
+                  setIsAddDialogOpen={setIsAddDialogOpen}
+                  handleGroupSuccess={handleGroupSuccess}
+                  viewMode={viewMode}
+                  setViewMode={setViewMode}
+                />
+              </ModernCardContent>
+            </ModernCard>
+          </div>
 
-                        {/* Groups List */}
-                        <GroupsList
-                          filteredGroups={filteredGroups}
-                          stats={stats}
-                          searchTerm={searchTerm}
-                          colorFilter={colorFilter}
-                          clearFilters={clearFilters}
-                          handleEditGroup={handleEditGroup}
-                          handleDeleteGroup={handleDeleteGroup}
-                          isDeleting={isDeleting}
-                          storeTriggerElement={storeTriggerElement}
-                          isAddDialogOpen={isAddDialogOpen}
-                          setIsAddDialogOpen={setIsAddDialogOpen}
-                          handleGroupSuccess={handleGroupSuccess}
-                          viewMode={viewMode}
-                          setViewMode={setViewMode}
-                        />
-                      </div>
-                    ) : (
-                      <div className="text-center py-12 xs:py-16">
-                        <motion.div
-                          initial={{ opacity: 0, scale: 0.8 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          transition={{ duration: 0.5 }}
-                        >
-                          <Palette className="w-12 h-12 xs:w-16 xs:h-16 mx-auto text-purple-500 mb-4" />
-                          <h3 className="text-xl xs:text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2">
-                            {t('groups.manage_advanced_title', 'مدیریت پیشرفته')}
-                          </h3>
-                          <p className="text-sm xs:text-base text-gray-600 dark:text-gray-400 mb-6">
-                            {t('groups.manage_advanced_description', 'ابزارهای پیشرفته مدیریت گروه‌ها به زودی اضافه خواهد شد')}
-                          </p>
-                          <GlassButton
-                            variant="glass"
-                            onClick={() => setActiveTab('overview')}
-                            className="px-4 py-2 xs:px-6 xs:py-3 text-sm xs:text-base"
-                          >
-                            {t('actions.back_to_overview', 'بازگشت به نمای کلی')}
-                          </GlassButton>
-                        </motion.div>
-                      </div>
-                    )}
-                  </motion.div>
-                </ModernCardContent>
-              </ModernCard>
-            </ModernTabsContent>
-          </AnimatePresence>
-        </ModernTabs>
+          {/* Sidebar */}
+          <div className="space-y-6">
+            {/* Statistics Card */}
+            <ModernCard variant="glass" hover="lift">
+              <ModernCardHeader>
+                <ModernCardTitle className="flex items-center gap-2">
+                  <BarChart2 className="w-5 h-5" />
+                  {t('groups.statistics', 'آمار')}
+                </ModernCardTitle>
+              </ModernCardHeader>
+              <ModernCardContent>
+                <GroupsStats stats={stats} />
+              </ModernCardContent>
+            </ModernCard>
 
-        {/* Smart Group Suggestions */}
-        <GroupsSuggestions
-          contactsWithoutGroup={contactsWithoutGroup}
-          groupSuggestions={groupSuggestions}
-          isLoadingSuggestions={isLoadingSuggestions}
-          generateSuggestions={generateSuggestions}
-          handleApplySuggestion={handleApplySuggestion}
-          handleDiscardSuggestion={handleDiscardSuggestion}
-          activeTab={activeTab}
-        />
+            {/* Suggestions Card */}
+            <ModernCard variant="glass" hover="lift">
+              <ModernCardHeader>
+                <ModernCardTitle className="flex items-center gap-2">
+                  <Sparkles className="w-5 h-5" />
+                  {t('groups.suggestions', 'پیشنهادات هوشمند')}
+                </ModernCardTitle>
+                <ModernCardDescription>
+                  {t('groups.suggestionsDescription', 'پیشنهادات هوشمند برای مدیریت بهتر مخاطبین')}
+                </ModernCardDescription>
+              </ModernCardHeader>
+              <ModernCardContent>
+                <GroupsSuggestions 
+                  contactsWithoutGroup={contactsWithoutGroup}
+                  groupSuggestions={groupSuggestions}
+                  isLoadingSuggestions={isLoadingSuggestions}
+                  generateSuggestions={generateSuggestions}
+                  handleApplySuggestion={handleApplySuggestion}
+                  handleDiscardSuggestion={handleDiscardSuggestion} activeTab={"overview"}                />
+              </ModernCardContent>
+            </ModernCard>
+          </div>
+        </div>
 
-        {/* Enhanced Delete Dialog */}
+        {/* Add/Edit Group Dialog */}
+        <ModernDialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+          <ModernDialogContent className="glass-dialog">
+            <ModernDialogHeader>
+              <ModernDialogTitle className="text-xl font-bold">
+                {editingGroup ? t('groups.editGroup') : t('groups.addGroup')}
+              </ModernDialogTitle>
+              <ModernDialogDescription>
+                {editingGroup 
+                  ? t('groups.editGroupDescription')
+                  : t('groups.addGroupDescription')}
+              </ModernDialogDescription>
+            </ModernDialogHeader>
+            <div className="py-4">
+              <GroupForm
+                initialData={editingGroup ? { ...editingGroup } : undefined}
+                onSuccess={handleGroupSuccess}
+                onCancel={() => {
+                  setIsAddDialogOpen(false);
+                  setEditingGroup(null);
+                }}
+              />
+            </div>
+          </ModernDialogContent>
+        </ModernDialog>
+
+        {/* Delete Confirmation Dialog */}
         {selectedGroup && (
           <StandardizedDeleteDialog
             open={deleteDialogOpen}
@@ -425,20 +537,6 @@ const GroupsManagement = () => {
             description={t('groups.delete_confirm_description', { name: selectedGroup.name })}
             isDeleting={isDeleting === selectedGroup?.id}
           />
-        )}
-
-        {/* Hidden form for editing */}
-        {editingGroup && (
-          <div className="hidden">
-            <GroupForm
-              initialData={editingGroup}
-              onSuccess={handleGroupSuccess}
-              onCancel={() => {
-                setEditingGroup(null);
-                setIsAddDialogOpen(false);
-              }}
-            />
-          </div>
         )}
       </div>
     </div>

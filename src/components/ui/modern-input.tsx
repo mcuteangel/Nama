@@ -2,7 +2,7 @@ import * as React from "react";
 
 import { cn, applyGlobalStyles, applyGlassEffect, applyGradientEffect } from "@/lib/utils";
 
-export interface ModernInputProps
+interface ModernInputProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
   variant?: "default" | "glass" | "neomorphism" | "gradient";
   gradientType?: "primary" | "ocean" | "sunset" | "success" | "info" | "warning" | "danger" | "forest";
@@ -70,4 +70,64 @@ const ModernInput = React.forwardRef<HTMLInputElement, ModernInputProps>(
 
 ModernInput.displayName = "ModernInput";
 
-export { ModernInput };
+// Input Group Component
+const InputGroup = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => {
+  return (
+    <div
+      ref={ref}
+      className={cn("flex items-center rounded-md border border-input bg-background", className)}
+      {...props}
+    />
+  )
+})
+InputGroup.displayName = "InputGroup"
+
+// Input Left Element Component
+const InputLeftElement = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => {
+  return (
+    <div
+      ref={ref}
+      className={cn(
+        "flex items-center justify-center text-muted-foreground pl-3",
+        className
+      )}
+      {...props}
+    />
+  )
+})
+InputLeftElement.displayName = "InputLeftElement"
+
+// Input Right Element Component
+const InputRightElement = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => {
+  return (
+    <div
+      ref={ref}
+      className={cn(
+        "flex items-center justify-center text-muted-foreground pr-3",
+        className
+      )}
+      {...props}
+    />
+  )
+})
+InputRightElement.displayName = "InputRightElement"
+
+export { 
+  ModernInput, 
+  InputGroup, 
+  InputLeftElement, 
+  InputRightElement 
+};
+
+export type { 
+  ModernInputProps 
+};
