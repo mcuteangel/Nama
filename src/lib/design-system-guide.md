@@ -61,45 +61,158 @@ import { ModernCheckbox } from "@/components/ui/modern-checkbox";
 <ModernCheckbox label="مرا به خاطر بسپار" />
 ```
 
-## افکت‌های بصری
+## افکت‌های بصری پیشرفته
 
-### گلس‌مورفیسم (شیشه‌ای)
+### گلس‌مورفیسم (Glassmorphism) - راهنمای پیشرفته
 
-برای افکت شیشه‌ای از کلاس `glass` یا `glass-advanced` استفاده کنید:
+#### اصول طراحی گلس‌مورفیسم
+
+1. **شفافیت (Blur)**: استفاده از backdrop-filter برای ایجاد افکت مات‌کننده
+2. **شفافیت لایه (Opacity)**: شفافیت بین 10% تا 40% برای حفظ خوانایی
+3. **سایه‌ها**: سایه‌های ملایم برای ایجاد عمق
+4. **حاشیه‌ها**: حاشیه‌های نازک با شفافیت کم برای جداکردن از پس‌زمینه
+5. **انیمیشن‌ها**: انتقال‌های نرم برای تعاملات
+
+#### کلاس‌های از پیش تعریف شده
 
 ```tsx
-<div className="glass p-4">
-  محتوای شیشه‌ای
+// شیشه‌ای پایه
+<div className="glass p-6 rounded-xl">
+  محتوای شیشه‌ای ساده
 </div>
 
-<div className="glass-advanced p-4">
+// شیشه‌ای پیشرفته با سایه و حاشیه
+<div className="glass-advanced p-6 rounded-2xl shadow-2xl border border-white/10">
   محتوای شیشه‌ای پیشرفته
 </div>
+
+// شیشه‌ای رنگی
+<div className="glass-primary p-6 rounded-xl">
+  شیشه‌ای با رنگ اصلی
+</div>
+
+// شیشه‌ای با انیمیشن
+<div className="glass-hover p-6 rounded-xl transition-all duration-300 hover:shadow-lg">
+  هاور کنید
+</div>
 ```
 
-### نئومورفیسم (سه‌بعدی نرم)
+#### تنظیمات سفارشی
 
-برای افکت نئومورفیسم از کلاس `neomorphism` استفاده کنید:
+برای تنظیمات پیشرفته‌تر می‌توانید از متغیرهای CSS استفاده کنید:
+
+```css
+.custom-glass {
+  --glass-opacity: 0.2;
+  --glass-blur: 12px;
+  --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+  --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  --glass-bg: rgba(255, 255, 255, var(--glass-opacity));
+  
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  border-radius: 1rem;
+}
+```
+
+#### نکات مهم در پیاده‌سازی
+
+1. **بهینه‌سازی عملکرد**:
+   - از `will-change: transform` برای المان‌های متحرک استفاده کنید
+   - `backdrop-filter` می‌تواند بر عملکرد تاثیر بگذارد، بنابراین استفاده بهینه داشته باشید
+
+2. **پشتیبانی مرورگرها**:
+   - برای مرورگرهای قدیمی از `@supports` استفاده کنید
+   - فیلترهای جایگزین برای مرورگرهایی که از backdrop-filter پشتیبانی نمی‌کنند
+
+3. **خوانایی**:
+   - تضاد رنگی مناسب بین متن و پس‌زمینه حفظ شود
+   - از شفافیت‌های خیلی کم خودداری کنید
+
+### نئومورفیسم (Neumorphism)
+
+برای افکت نئومورفیسم از کلاس‌های زیر استفاده کنید:
 
 ```tsx
-<div className="neomorphism p-4">
+// نئومورفیسم ساده
+<div className="neomorphism p-6 rounded-2xl">
   محتوای نئومورفیسم
 </div>
-```
 
-### گرادیانت‌ها
-
-برای استفاده از گرادیانت‌ها:
-
-```tsx
-<div className="bg-gradient-primary p-4">
-  محتوا با پس‌زمینه گرادیانت اصلی
+// نئومورفیسم فشرده
+<div className="neomorphism-inset p-6 rounded-2xl">
+  افکت فرورونده
 </div>
 
-<h2 className="text-gradient">
+// نئومورفیسم رنگی
+<div className="neomorphism-primary p-6 rounded-2xl">
+  نئومورفیسم رنگی
+</div>
+```
+
+### ترکیب گلس‌مورفیسم و نئومورفیسم
+
+برای افکت‌های ترکیبی جذاب:
+
+```tsx
+// ترکیب گلس و نئو
+<div className="glass-neo p-6 rounded-2xl transition-all duration-300 hover:shadow-xl">
+  <h3 className="text-xl font-bold mb-2">عنوان ترکیبی</h3>
+  <p>ترکیب افکت‌های شیشه‌ای و سه‌بعدی</p>
+  <button className="glass-button mt-4 px-4 py-2 rounded-lg">
+    دکمه تعاملی
+  </button>
+</div>
+```
+
+### انیمیشن‌های پیشرفته
+
+برای اضافه کردن انیمیشن‌های جذاب:
+
+```tsx
+// انیمیشن شناور
+<div className="glass p-6 rounded-2xl animate-float">
+  کارت شناور
+</div>
+
+// انیمیشن درخشش
+<button className="glass-button px-6 py-3 rounded-xl animate-pulse">
+  دکمه درخشان
+</button>
+```
+
+### گرادیانت‌های پیشرفته
+
+برای گرادیانت‌های حرفه‌ای‌تر:
+
+```tsx
+// گرادیانت خطی
+<div className="bg-gradient-to-r from-primary to-secondary p-6 rounded-2xl">
+  گرادیانت افقی
+</div>
+
+// گرادیانت زاویه‌دار
+<div className="bg-gradient-45 from-primary via-secondary to-accent p-6 rounded-2xl">
+  گرادیانت ۴۵ درجه
+</div>
+
+// گرادیانت شیشه‌ای
+<div className="glass-gradient p-6 rounded-2xl">
+  ترکیب گرادیانت و افکت شیشه‌ای
+</div>
+
+// گرادیانت متحرک
+<div className="animate-gradient bg-gradient-to-r from-primary via-secondary to-accent bg-300% p-6 rounded-2xl">
+  گرادیانت متحرک
+</div>
+
+// متن با گرادیانت
+<h2 className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">
   متن با گرادیانت
 </h2>
-```
 
 ## رنگ‌ها
 
