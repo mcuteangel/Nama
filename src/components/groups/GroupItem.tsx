@@ -58,7 +58,7 @@ const GroupItem: React.FC<GroupItemProps> = ({
   // تاریخ ایجاد گروه
   const createdAt = group.created_at
     ? new Date(group.created_at)
-    : new Date(Date.now() - Math.floor(Math.random() * 30) * 24 * 60 * 60 * 1000);
+    : new Date();
 
   const formattedDate = formatDistanceToNow(createdAt, {
     addSuffix: true,

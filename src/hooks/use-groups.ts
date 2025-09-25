@@ -10,6 +10,7 @@ interface Group {
   id: string;
   name: string;
   color?: string;
+  created_at?: string;
 }
 
 export const useGroups = () => {
@@ -58,7 +59,7 @@ export const useGroups = () => {
         async () => {
           const { data, error } = await supabase
             .from("groups")
-            .select("id, name, color")
+            .select("id, name, color, created_at")
             .eq("user_id", session.user.id)
             .order("name", { ascending: true });
 
