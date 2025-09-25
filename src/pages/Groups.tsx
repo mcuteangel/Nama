@@ -82,7 +82,7 @@ const Groups = React.memo(() => {
     <div
       className={`min-h-screen w-full ${settings.theme === 'dark' ? 'dark' : ''}`}
       style={{
-        background: designTokens.gradients.ocean,
+        background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
         padding: designTokens.spacing[6]
       }}
     >

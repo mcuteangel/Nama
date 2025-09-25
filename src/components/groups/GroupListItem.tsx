@@ -1,22 +1,19 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   Edit,
   Trash2,
-  MoreVertical,
   Clock
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { formatDistanceToNow } from "date-fns";
 import { faIR } from "date-fns/locale";
+import { useAppSettings } from '@/hooks/use-app-settings';
+import {
+  ModernCard
+} from "@/components/ui/modern-card";
 
 // تابع کمکی برای استخراج حروف اول نام گروه
 const getInitials = (name: string) => {
@@ -47,8 +44,11 @@ const GroupListItem: React.FC<GroupListItemProps> = ({
   onEdit,
   onDelete
 }) => {
-  const { t, i18n } = useTranslation();
-  const [isHovered, setIsHovered] = useState(false);
+  const { i18n } = useTranslation();
+  const { settings } = useAppSettings();
+
+  // تشخیص زبان برای موقعیت دکمه‌ها
+  const isRTL = settings.language === 'fa';
 
   // تاریخ ایجاد گروه
   const createdAt = group.created_at
@@ -71,16 +71,21 @@ const GroupListItem: React.FC<GroupListItemProps> = ({
   };
 
   return (
-    <div
-      className={cn(
-        "flex items-center justify-between p-4 rounded-xl border transition-all duration-300",
-        "hover:shadow-md hover:border-primary/30",
-        isHovered ? "bg-muted/20" : "bg-card"
-      )}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+    <ModernCard
+      variant="3d-card"
+      hover="glass-3d"
+      className="flex items-center justify-between p-4 relative group"
     >
-      <div className="flex items-center space-x-4 flex-1">
+      {/* Gradient Background on Hover */}
+      <div
+        className="absolute inset-0 opacity-5 transition-opacity duration-300"
+        style={{
+          background: 'linear-gradient(135deg, rgb(250, 112, 154) 0%, rgb(254, 225, 64) 100%)',
+          borderRadius: '1.5rem'
+        }}
+      />
+
+      <div className="flex items-center space-x-4 flex-1 relative z-10">
         <Avatar
           className={cn(
             "h-12 w-12 border-2 border-background shadow-sm"
@@ -93,7 +98,7 @@ const GroupListItem: React.FC<GroupListItemProps> = ({
           </AvatarFallback>
         </Avatar>
 
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 relative z-10">
           <h3 className="font-semibold text-lg truncate">
             {group.name}
           </h3>
@@ -105,45 +110,40 @@ const GroupListItem: React.FC<GroupListItemProps> = ({
         </div>
       </div>
 
-      <div className="flex items-center space-x-2">
+      {/* Floating Action Buttons */}
+      <div className={cn(
+        "flex items-center space-x-2 transition-all duration-300 relative z-20",
+        "opacity-100 scale-100",
+        isRTL ? "flex-row-reverse" : "flex-row"
+      )}>
         <Button
           variant="outline"
-          size="sm"
-          className="h-8 rounded-full"
+          size="icon"
+          className="h-10 w-10 rounded-2xl bg-white/90 backdrop-blur-sm border-white/50 shadow-lg hover:bg-white hover:scale-110 transition-all duration-300"
+          style={{
+            background: 'rgba(59, 130, 246, 0.15)',
+            border: '2px solid rgb(125, 211, 252)',
+            backdropFilter: 'blur(10px)'
+          }}
           onClick={handleEditClick}
         >
-          <Edit className="h-3.5 w-3.5 mr-1.5" />
-          {t('common.edit')}
+          <Edit className="h-5 w-5 text-blue-600" />
         </Button>
-
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 rounded-full"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <MoreVertical className="h-4 w-4" />
-              <span className="sr-only">{t('common.more_options')}</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={handleEditClick}>
-              <Edit className="mr-2 h-4 w-4" />
-              <span>{t('common.edit')}</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              className="text-destructive focus:text-destructive"
-              onClick={handleDeleteClick}
-            >
-              <Trash2 className="mr-2 h-4 w-4" />
-              <span>{t('common.delete')}</span>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <Button
+          variant="outline"
+          size="icon"
+          className="h-10 w-10 rounded-2xl bg-white/90 backdrop-blur-sm border-white/50 shadow-lg hover:bg-red-50 hover:scale-110 transition-all duration-300"
+          style={{
+            background: 'rgba(239, 68, 68, 0.15)',
+            border: '2px solid rgb(252, 165, 165)',
+            backdropFilter: 'blur(10px)'
+          }}
+          onClick={handleDeleteClick}
+        >
+          <Trash2 className="h-5 w-5 text-red-600" />
+        </Button>
       </div>
-    </div>
+    </ModernCard>
   );
 };
 
