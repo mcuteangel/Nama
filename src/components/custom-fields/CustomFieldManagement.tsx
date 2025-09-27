@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { Type, Hash, Calendar, ListChecks, Search, ListFilter, Plus } from "lucide-react";
 import { type CustomFieldTemplate } from "@/domain/schemas/custom-field-template";
@@ -10,8 +10,7 @@ import {
   ModernSelect, 
   ModernSelectContent, 
   ModernSelectItem, 
-  ModernSelectTrigger,
-  type ModernSelectItemProps
+  ModernSelectTrigger
 } from "@/components/ui/modern-select";
 import { ModernTooltip, ModernTooltipContent, ModernTooltipTrigger } from "@/components/ui/modern-tooltip";
 import useAppSettings from '@/hooks/use-app-settings';
@@ -39,7 +38,6 @@ const CustomFieldManagement: React.FC = () => {
   const { searchTerm, setSearchTerm, filterType, setFilterType, filteredFields } = useCustomFieldFilters(customFields);
 
   // Responsive styles
-  const headerButtonSize = isMobile ? "sm" : "default";
   const searchInputWidth = isMobile ? "w-full" : "w-64";
 
   const handleAddSuccess = () => {
@@ -60,16 +58,6 @@ const CustomFieldManagement: React.FC = () => {
       description: t('custom_field_template.update_success_description')
     });
   };
-
-  // Handlers are used in child components
-
-  const handleAddFieldClick = useCallback(() => {
-    setIsAddDialogOpen(true);
-  }, []);
-
-  const handleSearchChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(event.target.value);
-  }, [setSearchTerm]);
 
   const handleFilterChange = (value: TemplateType | "all") => {
     setFilterType(value);
@@ -121,6 +109,10 @@ const CustomFieldManagement: React.FC = () => {
           <PageHeader
             title={t('custom_field_management.title')}
             description={t('custom_field_management.description')}
+            {...(!isMobile && {
+              onAddClick: () => setIsAddDialogOpen(true),
+              addButtonLabel: t('custom_field_management.add_field')
+            })}
           />
           
           <div className="flex flex-col sm:flex-row gap-4 w-full mb-6">
@@ -129,6 +121,10 @@ const CustomFieldManagement: React.FC = () => {
                 type="text"
                 placeholder={t('common.search')}
                 className="w-full pl-12 pr-4 py-3 rounded-xl focus:ring-4 focus:ring-blue-500/30"
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                }}
+                value={searchTerm}
                 style={{
                   background: 'rgba(255,255,255,0.1)',
                   border: `2px solid ${designTokens.colors.glass.border}`,
@@ -138,8 +134,6 @@ const CustomFieldManagement: React.FC = () => {
                   boxShadow: designTokens.shadows.glass,
                   transition: `all ${designTokens.transitions.duration.normal} ${designTokens.transitions.easing.easeOut}`
                 }}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
                 onKeyPress={(e) => {
                   if (e.key === 'Enter') {
                     e.preventDefault();

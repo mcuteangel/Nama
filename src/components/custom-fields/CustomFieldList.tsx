@@ -18,6 +18,7 @@ import { GlassButton } from "@/components/ui/glass-button";
 import EmptyState from "@/components/common/EmptyState";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import CustomFieldCard from "./CustomFieldCard";
+import { ModernCard, ModernCardContent } from "../ui/modern-card";
 
 interface CustomFieldListProps {
   fields: CustomFieldTemplate[];
@@ -66,11 +67,15 @@ export const CustomFieldList: React.FC<CustomFieldListProps> = ({
   // Enhanced empty state
   if (!isLoading && fields.length === 0) {
     return (
-      <div className="relative">
+      <ModernCard
+        variant="glass"
+        hover="glass-3d"
+        className="relative overflow-hidden"
+      >
         {/* Background decoration */}
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 via-transparent to-purple-50/30 dark:from-blue-900/10 dark:via-transparent dark:to-purple-900/10 rounded-2xl"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 via-transparent to-purple-50/30 dark:from-blue-900/10 dark:via-transparent dark:to-purple-900/10"></div>
 
-        <div className="relative p-8">
+        <ModernCardContent className="relative p-8">
           <EmptyState
             icon={ClipboardList}
             title="هنوز فیلد سفارشی‌ای ایجاد نشده!"
@@ -123,8 +128,8 @@ export const CustomFieldList: React.FC<CustomFieldListProps> = ({
               ))}
             </div>
           </EmptyState>
-        </div>
-      </div>
+        </ModernCardContent>
+      </ModernCard>
     );
   }
 
@@ -132,48 +137,46 @@ export const CustomFieldList: React.FC<CustomFieldListProps> = ({
   return (
     <div className="space-y-6">
       {/* Header with stats */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-5 bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 rounded-2xl border border-purple-200 dark:border-purple-800/50 shadow-sm hover:shadow-md transition-shadow duration-300">
-        <div className="flex items-center gap-4">
-          <div className="p-2.5 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-xl shadow-lg">
-            <Grid className="w-6 h-6 text-white" />
-          </div>
-          <div>
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-              {t('custom_field_management.custom_fields')} <span className="text-purple-600 dark:text-purple-400">({fields.length})</span>
-            </h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-              {t('custom_field_management.manage_fields')}
-            </p>
-          </div>
-        </div>
+      <ModernCard
+        variant="glass"
+        hover="glass-3d"
+        className="relative overflow-hidden"
+      >
+        <ModernCardContent className="p-5">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="p-2.5 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-xl shadow-lg">
+                <Grid className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                  {t('custom_field_management.custom_fields')} <span className="text-purple-600 dark:text-purple-400">({fields.length})</span>
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                  {t('custom_field_management.manage_fields')}
+                </p>
+              </div>
+            </div>
 
-        <div className="px-4 py-2 bg-white/70 dark:bg-gray-800/70 rounded-full text-sm font-medium text-gray-800 dark:text-gray-200 border border-purple-100 dark:border-purple-900/50 backdrop-blur-sm">
-          {fields.length} {t('common.fields')}
-        </div>
-      </div>
+            <div className="px-4 py-2 bg-white/70 dark:bg-gray-800/70 rounded-full text-sm font-medium text-gray-800 dark:text-gray-200 border border-purple-100 dark:border-purple-900/50 backdrop-blur-sm">
+              {fields.length} {t('common.fields')}
+            </div>
+          </div>
+        </ModernCardContent>
+      </ModernCard>
 
-      {/* Fields Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-        {fields.map((field, index) => (
-          <div
+      {/* Fields grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {fields.map((field) => (
+          <CustomFieldCard
             key={field.id}
-            className="animate-in slide-in-from-bottom-4 duration-500"
-            style={{
-              animationDelay: `${index * 100}ms`,
-              animationFillMode: 'both'
-            }}
-          >
-            <CustomFieldCard
-              field={field}
-              onEdit={onEdit}
-              onDelete={onDelete}
-              isDeleting={isDeleting}
-            />
-          </div>
+            field={field}
+            onEdit={onEdit}
+            onDelete={onDelete}
+            isDeleting={isDeleting}
+          />
         ))}
       </div>
-
-      {/* Floating Action Button has been moved to parent component */}
     </div>
   );
 };

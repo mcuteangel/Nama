@@ -1,5 +1,4 @@
 import { GradientButton, GlassButton } from "@/components/ui/glass-button";
-import { ModernLoader } from "@/components/ui/modern-loader";
 import { useToast } from "@/components/ui/use-toast";
 import { ModernInput } from "@/components/ui/modern-input";
 import { PlusCircle, Search, Grid, List } from "lucide-react";

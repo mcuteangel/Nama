@@ -13,7 +13,6 @@ interface GroupsHeaderProps {
   onAddClick: () => void;
   isDarkMode: boolean;
   handleThemeToggle: () => void;
-  isRTL?: boolean;
   activeTab?: 'overview' | 'manage';
   setActiveTab?: (tab: 'overview' | 'manage') => void;
 }
@@ -24,7 +23,6 @@ const GroupsHeader: React.FC<GroupsHeaderProps> = ({
   onAddClick,
   isDarkMode,
   handleThemeToggle,
-  isRTL = false,
   activeTab = 'overview',
   setActiveTab,
 }) => {
@@ -52,7 +50,6 @@ const GroupsHeader: React.FC<GroupsHeaderProps> = ({
     },
   ];
 
-  const activeTabData = tabs.find(tab => tab.id === activeTab);
 
   return (
     <motion.div 

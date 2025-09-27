@@ -77,11 +77,11 @@ const GroupDetail = () => {
     return <div>گروهی پیدا نشد.</div>;
   }
 
-  const handleContactDeleted = (id: string) => {
+  const handleContactDeleted = (_id: string) => {
     // Handle contact deleted if needed
   };
 
-  const handleContactEdited = (id: string) => {
+  const handleContactEdited = (_id: string) => {
     // Handle contact edited if needed
   };
 

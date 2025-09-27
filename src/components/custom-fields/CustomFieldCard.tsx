@@ -8,41 +8,17 @@ import {
   TextCursorInput,
   CheckSquare,
   Check,
-  List,
-  MoreVertical
-} from "lucide-react";
+  List} from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useAppSettings } from '@/hooks/use-app-settings';
 import { cn } from "@/lib/utils";
 import { type CustomFieldTemplate } from "@/domain/schemas/custom-field-template";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { motion } from "framer-motion";
 import { ModernCard, ModernCardContent, ModernCardHeader, ModernCardTitle } from "../ui/modern-card";
 
 type TemplateType = 'text' | 'number' | 'date' | 'list' | 'checklist';
-
-const getTypeColor = (type: string) => {
-  switch (type) {
-    case 'text':
-      return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300';
-    case 'number':
-      return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300';
-    case 'date':
-      return 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300';
-    case 'list':
-    case 'checklist':
-      return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300';
-    default:
-      return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300';
-  }
-};
 
 interface CustomFieldCardProps {
   field: CustomFieldTemplate;
@@ -84,26 +60,20 @@ const CustomFieldCard: React.FC<CustomFieldCardProps> = ({
     }
   };
 
-  const getTypeBadgeVariant = (type: TemplateType) => {
-    switch (type) {
-      case 'text': return 'default' as const;
-      case 'number': return 'secondary' as const;
-      case 'date': return 'outline' as const;
-      case 'list': 
-      case 'checklist': 
-        return 'secondary' as const;
-      default: return 'default' as const;
-    }
-  };
 
-  const getTypeColor = (type: TemplateType) => {
+  const getTypeColor = (type: string) => {
     switch (type) {
-      case 'text': return '#3b82f6';
-      case 'number': return '#10b981';
-      case 'date': return '#f59e0b';
-      case 'list': return '#8b5cf6';
-      case 'checklist': return '#ec4899';
-      default: return '#6b7280';
+      case 'text':
+        return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300';
+      case 'number':
+        return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300';
+      case 'date':
+        return 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300';
+      case 'list':
+      case 'checklist':
+        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300';
+      default:
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300';
     }
   };
 
@@ -136,7 +106,10 @@ const CustomFieldCard: React.FC<CustomFieldCardProps> = ({
       >
         {/* Gradient Background on Hover */}
         <div
-          className="absolute inset-0 opacity-10 dark:opacity-5 transition-opacity duration-300"
+          className={cn(
+            "absolute inset-0 opacity-10 dark:opacity-5 transition-opacity duration-300",
+            getTypeColor(field.type).split(' ')[0] // استفاده از کلاس رنگی متناظر
+          )}
           style={{
             background: field.type === 'text' 
               ? 'linear-gradient(135deg, rgb(99, 102, 241) 0%, rgb(147, 51, 234) 100%)' // Purple gradient for text
@@ -198,12 +171,13 @@ const CustomFieldCard: React.FC<CustomFieldCardProps> = ({
 
           <div className="flex flex-wrap gap-2 mt-2">
             <Badge
-              variant={getTypeBadgeVariant(field.type as TemplateType)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg"
+              className={cn(
+                "flex items-center gap-1.5 px-3 py-1.5 rounded-lg",
+                getTypeColor(field.type)
+              )}
               style={{
-                backgroundColor: getTypeColor(field.type as TemplateType) + '15',
-                borderColor: getTypeColor(field.type as TemplateType) + '30',
-                color: getTypeColor(field.type as TemplateType)
+                backgroundColor: getTypeColor(field.type).split(' ')[0] + '15',
+                borderColor: getTypeColor(field.type).split(' ')[0] + '30'
               }}
             >
               {getTypeIcon(field.type as TemplateType)}
