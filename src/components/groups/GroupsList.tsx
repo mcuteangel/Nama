@@ -41,7 +41,7 @@ const GroupsList: React.FC<GroupsListProps> = ({
 
   // Filter and sort groups based on props
   const filteredAndSortedGroups = useMemo(() => {
-    let filtered = groups.filter(group => {
+    const filtered = groups.filter(group => {
       const matchesSearch = group.name.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesColor = !selectedColor || group.color === selectedColor;
       return matchesSearch && matchesColor;

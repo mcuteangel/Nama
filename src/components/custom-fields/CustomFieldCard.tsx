@@ -1,61 +1,75 @@
 import React from "react";
-import { Edit, Trash2, Sparkles, Clock } from "lucide-react";
+import { 
+  Edit, 
+  Trash2, 
+  Type,
+  Hash,
+  Calendar,
+  TextCursorInput,
+  CheckSquare,
+  Check,
+  List,
+  MoreVertical
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useAppSettings } from '@/hooks/use-app-settings';
 import { cn } from "@/lib/utils";
 import { type CustomFieldTemplate } from "@/domain/schemas/custom-field-template";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { formatDistanceToNow } from "date-fns";
-import { faIR } from "date-fns/locale";
 import {
-  ModernCard,
-  ModernCardHeader,
-  ModernCardContent,
-  ModernCardTitle
-} from "@/components/ui/modern-card";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { motion } from "framer-motion";
-import LoadingSpinner from "@/components/common/LoadingSpinner";
+import { ModernCard, ModernCardContent, ModernCardHeader, ModernCardTitle } from "../ui/modern-card";
 
-type TemplateType = 'text' | 'number' | 'date' | 'list';
+type TemplateType = 'text' | 'number' | 'date' | 'list' | 'checklist';
+
+const getTypeColor = (type: string) => {
+  switch (type) {
+    case 'text':
+      return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300';
+    case 'number':
+      return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300';
+    case 'date':
+      return 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300';
+    case 'list':
+    case 'checklist':
+      return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300';
+    default:
+      return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300';
+  }
+};
 
 interface CustomFieldCardProps {
   field: CustomFieldTemplate;
   onEdit: (field: CustomFieldTemplate) => void;
   onDelete: (id: string) => void;
-  isDeleting: boolean;
+  isDeleting?: boolean; // Marked as optional since it's not used
 }
 
 const CustomFieldCard: React.FC<CustomFieldCardProps> = ({
   field,
   onEdit,
   onDelete,
-  isDeleting
+  isDeleting: _isDeleting // Prefix with _ to indicate it's intentionally unused
 }) => {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const { settings } = useAppSettings();
-
-  // تشخیص زبان برای موقعیت دکمه‌ها
   const isRTL = settings.language === 'fa';
 
-  // تاریخ ایجاد فیلد
-  const createdAt = field.created_at
-    ? new Date(field.created_at)
-    : new Date();
-
-  const formattedDate = formatDistanceToNow(createdAt, {
-    addSuffix: true,
-    locale: i18n.language === 'fa' ? faIR : undefined
-  });
-
   const getTypeIcon = (type: TemplateType) => {
+    const iconClass = "w-4 h-4 flex-shrink-0";
     switch (type) {
-      case 'text': return '📝';
-      case 'number': return '🔢';
-      case 'date': return '📅';
-      case 'list': return '📋';
-      default: return '📝';
+      case 'text': return <TextCursorInput className={iconClass} />;
+      case 'number': return <Hash className={iconClass} />;
+      case 'date': return <Calendar className={iconClass} />;
+      case 'list': return <List className={iconClass} />;
+      case 'checklist': return <CheckSquare className={iconClass} />;
+      default: return <Type className={iconClass} />;
     }
   };
 
@@ -65,6 +79,7 @@ const CustomFieldCard: React.FC<CustomFieldCardProps> = ({
       case 'number': return t('contact_form.number');
       case 'date': return t('contact_form.date');
       case 'list': return t('contact_form.list');
+      case 'checklist': return t('contact_form.checklist');
       default: return type;
     }
   };
@@ -74,7 +89,9 @@ const CustomFieldCard: React.FC<CustomFieldCardProps> = ({
       case 'text': return 'default' as const;
       case 'number': return 'secondary' as const;
       case 'date': return 'outline' as const;
-      case 'list': return 'secondary' as const;
+      case 'list': 
+      case 'checklist': 
+        return 'secondary' as const;
       default: return 'default' as const;
     }
   };
@@ -85,6 +102,7 @@ const CustomFieldCard: React.FC<CustomFieldCardProps> = ({
       case 'number': return '#10b981';
       case 'date': return '#f59e0b';
       case 'list': return '#8b5cf6';
+      case 'checklist': return '#ec4899';
       default: return '#6b7280';
     }
   };
@@ -118,9 +136,15 @@ const CustomFieldCard: React.FC<CustomFieldCardProps> = ({
       >
         {/* Gradient Background on Hover */}
         <div
-          className="absolute inset-0 opacity-5 transition-opacity duration-300"
+          className="absolute inset-0 opacity-10 dark:opacity-5 transition-opacity duration-300"
           style={{
-            background: 'linear-gradient(135deg, rgb(250, 112, 154) 0%, rgb(254, 225, 64) 100%)',
+            background: field.type === 'text' 
+              ? 'linear-gradient(135deg, rgb(99, 102, 241) 0%, rgb(147, 51, 234) 100%)' // Purple gradient for text
+              : field.type === 'number'
+              ? 'linear-gradient(135deg, rgb(14, 165, 233) 0%, rgb(59, 130, 246) 100%)' // Blue gradient for number
+              : field.type === 'date'
+              ? 'linear-gradient(135deg, rgb(22, 163, 74) 0%, rgb(34, 197, 94) 100%)' // Green gradient for date
+              : 'linear-gradient(135deg, rgb(236, 72, 153) 0%, rgb(219, 39, 119) 100%)', // Pink gradient for list
             borderRadius: '1rem'
           }}
         />
@@ -148,112 +172,110 @@ const CustomFieldCard: React.FC<CustomFieldCardProps> = ({
             variant="outline"
             size="icon"
             className="h-10 w-10 rounded-2xl bg-white/90 backdrop-blur-sm border-white/50 shadow-lg hover:bg-red-50 hover:scale-110 transition-all duration-300"
-            style={{
-              background: 'rgba(239, 68, 68, 0.15)',
-              border: '2px solid rgb(252, 165, 165)',
-              backdropFilter: 'blur(10px)'
-            }}
             onClick={handleDeleteClick}
-            disabled={isDeleting}
           >
-            {isDeleting ? <LoadingSpinner size={20} /> : <Trash2 className="h-5 w-5 text-red-600" />}
+            <Trash2 className="h-5 w-5 text-red-600" />
           </Button>
         </div>
 
-        {/* Card Header */}
-        <ModernCardHeader className="pb-2">
-          <div className="flex items-center space-x-4 pt-2">
-            <Avatar
-              className={cn(
-                "h-16 w-16 border-4 border-background shadow-md",
-                "transition-transform duration-300 group-hover:scale-110"
-              )}
-              style={{ backgroundColor: getTypeColor(field.type) }}
-            >
-              <AvatarFallback className="text-2xl font-bold text-white">
-                {getTypeIcon(field.type)}
-              </AvatarFallback>
-            </Avatar>
-
-            <div className="flex-1 min-w-0">
-              <ModernCardTitle
-                className="text-xl font-bold truncate"
-                id={`field-${field.id}-title`}
-              >
-                {field.name}
-              </ModernCardTitle>
-
-              <div className="flex items-center text-sm text-muted-foreground mt-1 space-x-4">
-                <div className="flex items-center">
-                  <Clock className="h-4 w-4 mr-1" />
-                  <span>{formattedDate}</span>
-                </div>
-              </div>
-            </div>
+        {/* Field Content */}
+        <ModernCardHeader className="flex items-center gap-2">
+          <div className="h-10 w-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+            {getTypeIcon(field.type as TemplateType)}
           </div>
+          <ModernCardTitle
+            id={`field-${field.id}-title`}
+            className="text-lg font-bold"
+          >
+            {field.name}
+          </ModernCardTitle>
         </ModernCardHeader>
 
-        {/* Card Content */}
-        <ModernCardContent className="flex-1 py-4">
-          <div className="space-y-4">
-            {field.description && (
-              <p className="text-sm text-muted-foreground line-clamp-2">
-                {field.description}
-              </p>
-            )}
+        <ModernCardContent className="flex flex-col gap-2">
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            {field.description}
+          </p>
 
-            {/* Type Badge */}
-            <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2 mt-2">
+            <Badge
+              variant={getTypeBadgeVariant(field.type as TemplateType)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg"
+              style={{
+                backgroundColor: getTypeColor(field.type as TemplateType) + '15',
+                borderColor: getTypeColor(field.type as TemplateType) + '30',
+                color: getTypeColor(field.type as TemplateType)
+              }}
+            >
+              {getTypeIcon(field.type as TemplateType)}
+              <span className="text-xs font-medium">
+                {getTypeLabel(field.type as TemplateType)}
+              </span>
+            </Badge>
+            
+            {field.required && (
               <Badge
-                variant={getTypeBadgeVariant(field.type)}
-                className="flex items-center gap-1"
+                variant="outline"
+                className="text-xs font-medium px-2 py-1 bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800"
               >
-                <span className="text-sm">{getTypeIcon(field.type)}</span>
-                {getTypeLabel(field.type)}
+                {isRTL ? 'الزامی' : 'Required'}
               </Badge>
-              {field.required && (
-                <Badge variant="destructive" className="flex items-center gap-1">
-                  <span>⭐</span>
-                  ضروری
-                </Badge>
-              )}
-            </div>
+            )}
+          </div>
 
-            {/* Options for list type */}
-            {field.type === 'list' && field.options && field.options.length > 0 && (
-              <div className="border-t border-gray-200/60 dark:border-gray-700/60 pt-4">
+            {/* Options for list/checklist type */}
+            {(field.type === 'list' || field.type === 'checklist') && field.options && field.options.length > 0 && (
+              <div className="border-t border-gray-200/60 dark:border-gray-700/60 pt-4 mt-2">
                 <div className="flex items-center gap-2 mb-3">
-                  <span className="text-lg">{getTypeIcon(field.type)}</span>
-                  <p className="text-sm font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
-                    گزینه‌های لیست
+                  <div className="p-1.5 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                    <CheckSquare className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                  </div>
+                  <p className="text-sm font-bold text-gray-600 dark:text-gray-400">
+                    {field.type === 'checklist' 
+                      ? isRTL ? 'گزینه‌های چک‌لیست' : 'Checklist Options'
+                      : isRTL ? 'گزینه‌های لیست' : 'List Options'}
                   </p>
                 </div>
-                <div className="flex flex-wrap gap-2">
+                <div className="space-y-2">
                   {field.options.slice(0, 3).map((option, index) => (
-                    <Badge
+                    <div 
                       key={index}
-                      variant="outline"
-                      className="text-xs px-3 py-1 rounded-lg border-gray-300 dark:border-gray-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200"
+                      className={`flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 bg-white/50 dark:bg-gray-800/50 px-3 py-2 rounded-lg border ${
+                        field.type === 'checklist' 
+                          ? 'border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer transition-colors'
+                          : 'border-gray-200 dark:border-gray-700'
+                      }`}
                     >
-                      {option}
-                    </Badge>
+                      {field.type === 'checklist' ? (
+                        <>
+                          <div className="w-4 h-4 rounded border border-gray-300 dark:border-gray-600 flex items-center justify-center flex-shrink-0">
+                            <Check className="w-3 h-3 text-green-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+                          </div>
+                          <span className="truncate">{option}</span>
+                        </>
+                      ) : (
+                        <Badge 
+                          variant="outline" 
+                          className="text-xs px-2 py-0.5 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700"
+                        >
+                          {option}
+                        </Badge>
+                      )}
+                    </div>
                   ))}
                   {field.options.length > 3 && (
-                    <Badge
-                      variant="secondary"
-                      className="text-xs px-3 py-1 rounded-lg bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 text-gray-700 dark:text-gray-300 font-semibold"
-                    >
-                      +{field.options.length - 3} گزینه دیگر
-                    </Badge>
+                    <div className="text-xs text-gray-500 dark:text-gray-400 text-center pt-1">
+                      {isRTL 
+                        ? `+${field.options.length - 3} گزینه دیگر`
+                        : `+${field.options.length - 3} more options`}
+                    </div>
                   )}
                 </div>
               </div>
             )}
-          </div>
-        </ModernCardContent>
-      </ModernCard>
-    </motion.div>
-  );
+          </ModernCardContent>
+        </ModernCard>
+      </motion.div>
+    );
 };
 
 export default CustomFieldCard;

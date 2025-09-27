@@ -1,6 +1,18 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { ClipboardList, Plus, Sparkles, Grid } from "lucide-react";
+import { 
+  ClipboardList, 
+  Plus, 
+  Sparkles, 
+  Grid, 
+  Lightbulb,
+  Building2,
+  Target,
+  MapPin,
+  Cake,
+  Star,
+  Phone
+} from "lucide-react";
 import { type CustomFieldTemplate } from "@/domain/schemas/custom-field-template";
 import { GlassButton } from "@/components/ui/glass-button";
 import EmptyState from "@/components/common/EmptyState";
@@ -35,7 +47,7 @@ export const CustomFieldList: React.FC<CustomFieldListProps> = ({
             <Sparkles className="w-8 h-8 text-white animate-spin" />
           </div>
           <div className="absolute -top-2 -right-2 w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center animate-bounce">
-            <span className="text-xs font-bold text-yellow-900">⚡</span>
+            <Sparkles className="w-3 h-3 text-yellow-900" />
           </div>
         </div>
         <div className="text-center space-y-2">
@@ -76,7 +88,7 @@ export const CustomFieldList: React.FC<CustomFieldListProps> = ({
               </GlassButton>
 
               <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                <span>💡</span>
+                <Lightbulb className="w-4 h-4 text-yellow-500" />
                 <span>ایده‌هایی برای شروع:</span>
               </div>
             </div>
@@ -84,12 +96,12 @@ export const CustomFieldList: React.FC<CustomFieldListProps> = ({
             {/* Suggestions */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-8">
               {[
-                { icon: "🏢", title: "شرکت", desc: "نام شرکت مخاطب" },
-                { icon: "🎯", title: "سمت", desc: "عنوان شغلی یا تخصص" },
-                { icon: "📍", title: "شهر", desc: "محل زندگی یا کار" },
-                { icon: "🎂", title: "تاریخ تولد", desc: "برای یادآوری تولد" },
-                { icon: "⭐", title: "اولویت", desc: "سطح اهمیت مخاطب" },
-                { icon: "📞", title: "تلفن دوم", desc: "شماره تلفن اضافی" }
+                { icon: <Building2 className="w-6 h-6" />, title: "شرکت", desc: "نام شرکت مخاطب" },
+                { icon: <Target className="w-6 h-6" />, title: "سمت", desc: "عنوان شغلی یا تخصص" },
+                { icon: <MapPin className="w-6 h-6" />, title: "شهر", desc: "محل زندگی یا کار" },
+                { icon: <Cake className="w-6 h-6" />, title: "تاریخ تولد", desc: "برای یادآوری تولد" },
+                { icon: <Star className="w-6 h-6" />, title: "اولویت", desc: "سطح اهمیت مخاطب" },
+                { icon: <Phone className="w-6 h-6" />, title: "تلفن دوم", desc: "شماره تلفن اضافی" }
               ].map((suggestion, index) => (
                 <div
                   key={index}
@@ -97,9 +109,9 @@ export const CustomFieldList: React.FC<CustomFieldListProps> = ({
                   onClick={onAddNew}
                 >
                   <div className="flex items-center gap-3 mb-2">
-                    <span className="text-2xl group-hover:scale-110 transition-transform duration-200">
-                      {suggestion.icon}
-                    </span>
+                    <div className="p-1.5 bg-blue-100 dark:bg-blue-900/30 rounded-lg group-hover:scale-110 transition-transform duration-200">
+                      {React.cloneElement(suggestion.icon, { className: "w-5 h-5 text-blue-600 dark:text-blue-400" })}
+                    </div>
                     <h4 className="font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200">
                       {suggestion.title}
                     </h4>
@@ -120,25 +132,23 @@ export const CustomFieldList: React.FC<CustomFieldListProps> = ({
   return (
     <div className="space-y-6">
       {/* Header with stats */}
-      <div className="flex items-center justify-between p-4 bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 rounded-xl border border-green-200 dark:border-green-800">
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-gradient-to-r from-green-500 to-blue-600 rounded-lg shadow-lg">
-            <Grid className="w-5 h-5 text-white" />
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-5 bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 rounded-2xl border border-purple-200 dark:border-purple-800/50 shadow-sm hover:shadow-md transition-shadow duration-300">
+        <div className="flex items-center gap-4">
+          <div className="p-2.5 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-xl shadow-lg">
+            <Grid className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white">
-              {t('custom_field_management.custom_fields')} ({fields.length})
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+              {t('custom_field_management.custom_fields')} <span className="text-purple-600 dark:text-purple-400">({fields.length})</span>
             </h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
               {t('custom_field_management.manage_fields')}
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          <div className="px-3 py-1 bg-white/60 dark:bg-gray-800/60 rounded-full text-sm font-medium text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700">
-            {fields.length} {t('common.fields')}
-          </div>
+        <div className="px-4 py-2 bg-white/70 dark:bg-gray-800/70 rounded-full text-sm font-medium text-gray-800 dark:text-gray-200 border border-purple-100 dark:border-purple-900/50 backdrop-blur-sm">
+          {fields.length} {t('common.fields')}
         </div>
       </div>
 
@@ -163,22 +173,7 @@ export const CustomFieldList: React.FC<CustomFieldListProps> = ({
         ))}
       </div>
 
-      {/* Quick Actions Footer */}
-      <div className="flex justify-center pt-8">
-        <button
-          onClick={onAddNew}
-          className="flex items-center gap-3 px-8 py-4 text-lg font-semibold rounded-xl text-white hover:text-white/90 transition-all duration-300 hover:scale-105"
-          style={{
-            background: 'linear-gradient(135deg, var(--gradient-from, #8b5cf6) 0%, var(--gradient-to, #ec4899) 100%)',
-            boxShadow: '0 4px 14px 0 rgba(139, 92, 246, 0.3)',
-            fontFamily: 'var(--font-sans)',
-            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
-          }}
-        >
-          <Plus size={24} className="text-white" />
-          {t('custom_field_management.add_field')}
-        </button>
-      </div>
+      {/* Floating Action Button has been moved to parent component */}
     </div>
   );
 };
