@@ -2,9 +2,11 @@ import React from "react";
 import {
   Edit,
   Trash2,
-  Clock
+  Clock,
+  Users
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -31,6 +33,7 @@ interface Group {
   color?: string;
   created_at?: string;
   description?: string;
+  contact_count?: number;
 }
 
 interface GroupListItemProps {
@@ -44,6 +47,7 @@ const GroupListItem: React.FC<GroupListItemProps> = ({
   onEdit,
   onDelete
 }) => {
+  const navigate = useNavigate();
   const { i18n } = useTranslation();
   const { settings } = useAppSettings();
 
@@ -70,11 +74,16 @@ const GroupListItem: React.FC<GroupListItemProps> = ({
     onDelete?.(group.id, group.name);
   };
 
+  const handleCardClick = () => {
+    navigate(`/groups/${group.id}`);
+  };
+
   return (
     <ModernCard
       variant="3d-card"
       hover="glass-3d"
-      className="flex items-center justify-between p-4 relative group"
+      className="flex items-center justify-between p-4 relative group cursor-pointer"
+      onClick={handleCardClick}
     >
       {/* Gradient Background on Hover */}
       <div
@@ -103,9 +112,15 @@ const GroupListItem: React.FC<GroupListItemProps> = ({
             {group.name}
           </h3>
 
-          <div className="flex items-center text-sm text-muted-foreground mt-1">
-            <Clock className="h-4 w-4 mr-1" />
-            <span>{formattedDate}</span>
+          <div className="flex items-center text-sm text-muted-foreground mt-1 space-x-4">
+            <div className="flex items-center">
+              <Clock className="h-4 w-4 mr-1" />
+              <span>{formattedDate}</span>
+            </div>
+            <div className="flex items-center">
+              <Users className="h-4 w-4 mr-1" />
+              <span>{group.contact_count || 0}</span>
+            </div>
           </div>
         </div>
       </div>

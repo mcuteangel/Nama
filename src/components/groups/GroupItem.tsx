@@ -2,11 +2,13 @@ import React from "react";
 import {
   Edit,
   Trash2,
-  Clock
+  Clock,
+  Users
 } from "lucide-react";
 import { useAppSettings } from '@/hooks/use-app-settings';
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -36,6 +38,7 @@ interface Group {
   color?: string;
   created_at?: string;
   description?: string;
+  contact_count?: number;
 }
 
 interface GroupItemProps {
@@ -49,6 +52,7 @@ const GroupItem: React.FC<GroupItemProps> = ({
   onEdit,
   onDelete
 }) => {
+  const navigate = useNavigate();
   const { i18n } = useTranslation();
   const { settings } = useAppSettings();
 
@@ -75,6 +79,10 @@ const GroupItem: React.FC<GroupItemProps> = ({
     onDelete?.(group.id, group.name);
   };
 
+  const handleCardClick = () => {
+    navigate(`/groups/${group.id}`);
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -90,7 +98,8 @@ const GroupItem: React.FC<GroupItemProps> = ({
       <ModernCard
         variant="3d-card"
         hover="glass-3d"
-        className="h-full flex flex-col overflow-hidden relative group"
+        className="h-full flex flex-col overflow-hidden relative group cursor-pointer"
+        onClick={handleCardClick}
       >
         {/* Gradient Background on Hover */}
         <div
@@ -159,9 +168,15 @@ const GroupItem: React.FC<GroupItemProps> = ({
                 {group.name}
               </ModernCardTitle>
 
-              <div className="flex items-center text-sm text-muted-foreground mt-1">
-                <Clock className="h-4 w-4 mr-1" />
-                <span>{formattedDate}</span>
+              <div className="flex items-center text-sm text-muted-foreground mt-1 space-x-4">
+                <div className="flex items-center">
+                  <Clock className="h-4 w-4 mr-1" />
+                  <span>{formattedDate}</span>
+                </div>
+                <div className="flex items-center">
+                  <Users className="h-4 w-4 mr-1" />
+                  <span>{group.contact_count || 0}</span>
+                </div>
               </div>
             </div>
           </div>

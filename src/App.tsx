@@ -17,6 +17,7 @@ const AddContact = React.lazy(() => import('./pages/AddContact'));
 const ContactDetail = React.lazy(() => import('./pages/ContactDetail'));
 const EditContact = React.lazy(() => import('./pages/EditContact'));
 const Groups = React.lazy(() => import('./pages/Groups'));
+const GroupDetail = React.lazy(() => import('./pages/GroupDetail'));
 const CustomFields = React.lazy(() => import('./pages/CustomFields'));
 const UserProfile = React.lazy(() => import('./pages/UserProfile'));
 const Settings = React.lazy(() => 
@@ -152,6 +153,7 @@ function App() {
                     <Route path="/contacts/:id" element={<ProtectedRoute><ContactDetail /></ProtectedRoute>} />
                     <Route path="/contacts/edit/:id" element={<ProtectedRoute><EditContact /></ProtectedRoute>} />
                     <Route path="/groups" element={<ProtectedRoute><Groups /></ProtectedRoute>} />
+                    <Route path="/groups/:id" element={<ProtectedRoute><GroupDetail /></ProtectedRoute>} />
                     <Route path="/custom-fields" element={<ProtectedRoute><CustomFields /></ProtectedRoute>} />
                     <Route path="/profile" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
                     <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />

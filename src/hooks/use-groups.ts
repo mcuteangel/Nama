@@ -11,6 +11,7 @@ interface Group {
   name: string;
   color?: string;
   created_at?: string;
+  contact_count?: number;
 }
 
 export const useGroups = () => {
@@ -59,11 +60,12 @@ export const useGroups = () => {
         async () => {
           const { data, error } = await supabase
             .from("groups")
-            .select("id, name, color, created_at")
+            .select("id, name, color, created_at, contact_count:contact_groups(count)")
             .eq("user_id", session.user.id)
             .order("name", { ascending: true });
 
-          return { data: data as Group[], error: error?.message || null };
+          const groupsWithCount = data?.map(g => ({ ...g, contact_count: g.contact_count?.[0]?.count || 0 })) || [];
+          return { data: groupsWithCount as Group[], error: error?.message || null };
         }
       );
 
