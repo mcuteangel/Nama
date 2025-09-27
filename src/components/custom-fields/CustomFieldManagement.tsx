@@ -75,12 +75,9 @@ const CustomFieldManagement: React.FC = () => {
   }, [customFields]);
 
   const containerStyle = {
-    background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
     padding: designTokens.spacing[6],
     paddingBottom: isMobile ? '100px' : designTokens.spacing[6], // اضافه کردن فضای بیشتر در پایین برای موبایل
   };
-  
-  // استایل‌های اضافی برای دکمه شناور
 
   return (
     <div

@@ -14,6 +14,7 @@ import { designTokens } from '@/lib/design-tokens';
 import { useTranslation } from 'react-i18next';
 import { useAppSettings } from '@/hooks/use-app-settings';
 import { useIsMobile } from '@/hooks/use-mobile';
+import PageHeader from "@/components/ui/PageHeader";
 
 const Groups = React.memo(() => {
   const navigate = useNavigate();
@@ -78,45 +79,13 @@ const Groups = React.memo(() => {
   }, [groups]);
 
   return (
-    <div
-      className={`min-h-screen w-full ${settings.theme === 'dark' ? 'dark' : ''}`}
-      style={{
-        background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
-        padding: designTokens.spacing[6]
-      }}
-    >
-      <div className="max-w-7xl mx-auto space-y-6">
-        {/* Compact Header Section */}
-        <div
-          className="text-center py-8 px-6 rounded-2xl"
-          style={{
-            background: designTokens.colors.glass.background,
-            border: `1px solid ${designTokens.colors.glass.border}`,
-            backdropFilter: 'blur(15px)',
-            boxShadow: designTokens.shadows.glass
-          }}
-        >
-          <h1
-            className="text-3xl md:text-4xl font-bold mb-3"
-            style={{
-              background: designTokens.gradients.primary,
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
-              fontFamily: designTokens.typography.fonts.primary
-            }}
-          >
-            {t('pages.groups.management')}
-          </h1>
-          <p
-            className="text-base text-gray-600 dark:text-gray-300 max-w-2xl mx-auto"
-            style={{
-              fontFamily: designTokens.typography.fonts.secondary
-            }}
-          >
-            {t('pages.groups.management_description')}
-          </p>
-        </div>
+    <div className={`min-h-screen w-full ${settings.theme === 'dark' ? 'dark' : ''}`}>
+      <div className="max-w-7xl mx-auto p-6">
+        <PageHeader
+          title={t('pages.groups.management')}
+          description={t('pages.groups.management_description')}
+          className="mb-6"
+        />
 
         <div
           className="rounded-3xl overflow-hidden"
