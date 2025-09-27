@@ -462,10 +462,16 @@
     "title": "Custom Field Management",
     "description": "Manage custom field templates for your contacts",
     "filter_description": "Filter and search custom fields",
+    "custom_fields": "Custom Fields",
+    "manage_fields": "Manage and organize your custom fields",
     "add_field": "Add Custom Field",
+    "no_fields": "No custom fields yet!",
+    "no_fields_description": "Create custom fields to collect more information from your contacts and have more structured data.",
+    "create_first_field": "Create Your First Custom Field",
     "search_placeholder": "Search fields...",
+    "filter_by_type": "Filter by field type",
+    "all_types": "All Types",
     "search_term": "Search term",
-    "filter_all": "All Types",
     "active_filters": "Active filters",
     "search": "Search",
     "type": "Type",
@@ -474,7 +480,13 @@
     "add_first_field": "Add Your First Field",
     "delete_confirm_title": "Delete Custom Field Template?",
     "delete_confirm_description": "This action cannot be undone. This template will be permanently deleted. (Existing data in contacts will not be affected)",
-    "field_type": "Field Type"
+    "field_type": "Field Type",
+    "types": {
+      "text": "Text",
+      "number": "Number",
+      "date": "Date",
+      "list": "List"
+    }
   },
   "import": {
     "title": "Import Contacts",

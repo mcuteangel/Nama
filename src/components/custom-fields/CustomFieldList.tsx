@@ -1,6 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { ClipboardList, Plus, Sparkles, Grid, List as ListIcon } from "lucide-react";
+import { ClipboardList, Plus, Sparkles, Grid } from "lucide-react";
 import { type CustomFieldTemplate } from "@/domain/schemas/custom-field-template";
 import { GlassButton } from "@/components/ui/glass-button";
 import EmptyState from "@/components/common/EmptyState";
@@ -24,7 +24,7 @@ export const CustomFieldList: React.FC<CustomFieldListProps> = ({
   onDelete,
   onAddNew
 }) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation(['common', 'custom_field_management']);
 
   // Loading state with enhanced design
   if (isLoading && fields.length === 0) {
@@ -127,17 +127,17 @@ export const CustomFieldList: React.FC<CustomFieldListProps> = ({
           </div>
           <div>
             <h3 className="text-lg font-bold text-gray-900 dark:text-white">
-              فیلدهای سفارشی ({fields.length})
+              {t('custom_field_management.custom_fields')} ({fields.length})
             </h3>
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              مدیریت و سازماندهی فیلدهای سفارشی شما
+              {t('custom_field_management.manage_fields')}
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-2">
           <div className="px-3 py-1 bg-white/60 dark:bg-gray-800/60 rounded-full text-sm font-medium text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700">
-            {fields.length} فیلد
+            {fields.length} {t('common.fields')}
           </div>
         </div>
       </div>
@@ -165,15 +165,19 @@ export const CustomFieldList: React.FC<CustomFieldListProps> = ({
 
       {/* Quick Actions Footer */}
       <div className="flex justify-center pt-8">
-        <GlassButton
-          variant="glass"
+        <button
           onClick={onAddNew}
-          className="flex items-center gap-3 px-8 py-4 text-lg font-semibold bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105"
+          className="flex items-center gap-3 px-8 py-4 text-lg font-semibold rounded-xl text-white hover:text-white/90 transition-all duration-300 hover:scale-105"
+          style={{
+            background: 'linear-gradient(135deg, var(--gradient-from, #8b5cf6) 0%, var(--gradient-to, #ec4899) 100%)',
+            boxShadow: '0 4px 14px 0 rgba(139, 92, 246, 0.3)',
+            fontFamily: 'var(--font-sans)',
+            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+          }}
         >
-          <Plus size={24} />
-          افزودن فیلد سفارشی جدید
-          <Sparkles className="w-5 h-5 animate-pulse" />
-        </GlassButton>
+          <Plus size={24} className="text-white" />
+          {t('custom_field_management.add_field')}
+        </button>
       </div>
     </div>
   );
