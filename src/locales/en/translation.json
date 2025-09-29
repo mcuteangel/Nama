@@ -224,7 +224,8 @@
       "other": "Other",
       "unknown": "Unknown"
     },
-    "of_total": "of total"
+    "of_total": "of total",
+    "not_specified": "Not specified"
   },
   "errors": {
     "loading_group_colors": "Error loading existing group colors",
@@ -236,6 +237,8 @@
     "public_url_error": "Error getting public URL of image",
     "upload_error": "Error uploading image: {{message}}",
     "delete_image_error": "Error deleting image: {{message}}",
+    "avatar_upload_failed": "Failed to upload avatar. Please try again.",
+    "avatar_remove_failed": "Failed to remove avatar. Please try again.",
     "load_contacts_error": "Error loading contacts",
     "create_template_error": "An error occurred while creating template",
     "edit_template_error": "An error occurred while editing template",
@@ -257,6 +260,8 @@
     "profile_load_error": "Error loading profile: {{message}}",
     "profile_load_retry": "Error loading profile (attempt {{retryCount}} of {{maxRetries}}): {{message}}",
     "update_profile_error": "An error occurred while updating profile",
+    "invalid_file_type": "Please select a valid image file",
+    "file_too_large": "File size is too large. Please select a file smaller than 5 MB",
     "load_custom_fields_failed": "Failed to load custom field templates",
     "delete_custom_field_failed": "Failed to delete custom field template",
     "create_custom_field_template_error": "Error creating custom field template",
@@ -266,6 +271,7 @@
   },
   "actions": {
     "add_new_group": "Add New Group",
+    "add_group": "Add Group",
     "close": "Close",
     "save_changes": "Save Changes",
     "cancel_operation": "Cancel Operation",
@@ -283,7 +289,8 @@
     "cancel": "Cancel",
     "confirm": "Confirm",
     "remove": "Remove",
-    "dismiss": "Dismiss"
+    "dismiss": "Dismiss",
+    "retry": "Retry"
   },
   "system_messages": {
     "preparing_group_form": "Preparing group form...",
@@ -296,6 +303,8 @@
     "template_edit_success": "Template edited successfully",
     "profile_update_success": "Profile updated successfully",
     "profile_loaded_success": "Profile loaded successfully",
+    "avatar_updated": "Avatar updated successfully",
+    "avatar_removed": "Avatar removed successfully",
     "connection_test_start": "Starting connection test...",
     "connection_success": "✅ Successful connection - {{count}} users found",
     "connection_error": "❌ Error: {{error}}"
@@ -327,6 +336,7 @@
     "email_address": "Email Address",
     "birth_date": "Birth Date",
     "phone_type": "Phone Type",
+    "phone": "Phone",
     "phone_number": "Phone Number",
     "extension_optional": "Extension (Optional)",
     "social_network_type": "Social Network Type",
@@ -336,6 +346,7 @@
     "position": "Position/Expertise",
     "company": "Company",
     "location": "Location",
+    "bio": "Bio",
     "birthday": "Birthday"
   },
   "form_placeholders": {
@@ -682,7 +693,7 @@
       "description": "Customize how you receive notifications from the app",
       "setup": "Set Up Notifications"
     },
-    "subtitle": "Manage your profile and settings",
+    "subtitle": "Manage your profile information",
     "avatar_alt": "User avatar",
     "edit_avatar": "Edit avatar",
     "upload_new": "Upload new",
@@ -711,11 +722,23 @@
       "tips_description": "Complete your profile to unlock all features and get the most out of the application."
     }
   },
+  "pages": {
+    "user_profile": {
+      "title": "User Profile",
+      "subtitle": "Manage your profile information"
+    },
+    "groups": {
+      "management": "Group Management",
+      "management_description": "Create, edit, and delete contact groups",
+      "search_placeholder": "Search groups...",
+      "all_colors": "All Colors",
+      "filter_by_color": "Filter by color"
+    }
+  },
   "settings": {
     "title": "Settings",
     "description": "Manage application settings and user preferences",
     "notifications": {
-      "title": "Notifications",
       "email": "Email Notifications",
       "email_desc": "Receive email notifications for important updates",
       "push": "Push Notifications",
@@ -736,6 +759,7 @@
       "frequency_desc": "Control how often you receive notifications",
       "daily_summary": "Daily Summary Time",
       "daily_summary_desc": "Time of day to receive your daily summary",
+      "navigating_to_add_group": "Navigating to add group page...",
       "description": "Customize how you receive notifications from the app"
     },
     "appearance": {
@@ -767,5 +791,22 @@
     "saved": "Saved",
     "save_changes": "Save Changes",
     "changes_saved": "Changes saved successfully"
+  },
+  "sorting": {
+    "sort_by": "Sort by",
+    "name_asc": "Name (A-Z)",
+    "name_desc": "Name (Z-A)",
+    "created_at_desc": "Newest first",
+    "created_at_asc": "Oldest first"
+  },
+  "display_modes": {
+    "grid": "Grid view",
+    "list": "List view"
+  },
+  "component_names": {
+    "groups": "Groups"
+  },
+  "notifications": {
+    "navigating_to_add_group": ""
   }
 }

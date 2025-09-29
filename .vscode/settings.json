@@ -7,6 +7,12 @@
     "i18n-ally.pathMatcher": "{locale}/translation.json",
     "i18n-ally.extract.ignored": [
         "(prefers-color-scheme: dark)",
-        "Overview"
+        "Overview",
+        "w-12 h-12",
+        "w-20 h-20",
+        "w-40 h-40",
+        "w-40 h-40",
+        "w-32 h-32",
+        "w-32 h-32"
     ]
 }

@@ -6,17 +6,16 @@ import { GlassButton } from "@/components/ui/glass-button";
 import { Label } from '@/components/ui/label';
 import { ModernInput } from '@/components/ui/modern-input';
 import { ModernTextarea } from '@/components/ui/modern-textarea';
-import { ModernDatePicker } from '@/components/ui/modern-date-picker'; // Added import
-import { ModernCard, ModernCardHeader, ModernCardTitle, ModernCardContent, ModernCardFooter } from '@/components/ui/modern-card';
+import { ModernDatePicker } from '@/components/ui/modern-date-picker';
+import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { useSession } from '@/integrations/supabase/auth';
 import LoadingMessage from '../common/LoadingMessage';
 import LoadingSpinner from '../common/LoadingSpinner';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { useProfile, ProfileData } from '@/hooks/useProfile';
 import ProfileAvatar from './ProfileAvatar';
-import ProfileCompletionIndicator from './ProfileCompletionIndicator';
-import { User, Mail, Phone, FileText, Save, CheckCircle, MapPin, Calendar, AlertCircle } from 'lucide-react';
+import { ProfileData, useProfile } from '@/hooks/useProfile';
+import { User, CheckCircle, AlertCircle, Phone, FileText, MapPin, Calendar, Mail, Save } from 'lucide-react';
 
 // Schema validation for profile form with enhanced validation
 const profileSchema = z.object({
@@ -39,7 +38,9 @@ const profileSchema = z.object({
 
 type ProfileFormValues = z.infer<typeof profileSchema>;
 
-const UserProfileFormNew: React.FC = () => {
+const UserProfileFormNew: React.FC<{
+  onCancel: () => void;
+}> = ({ onCancel }) => {
   const { t } = useTranslation();
   const { session } = useSession();
   const { profile, loading, error, updateProfile, clearError, retryOperation } = useProfile();
@@ -403,54 +404,60 @@ const UserProfileFormNew: React.FC = () => {
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.4 }}
-      className="flex flex-col items-center justify-center w-full"
+      className="w-full"
     >
-      <div className="w-full space-y-6">
-        {/* Profile Completion Indicator */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-        >
-          <ProfileCompletionIndicator compact />
-        </motion.div>
-
-        {/* Profile Form Card */}
-        <ModernCard
-          variant="glass"
-          hover="lift"
-          className="backdrop-blur-2xl border border-white/30 shadow-2xl"
-        >
-          <ModernCardHeader className="text-center mb-8">
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="flex justify-center mb-6"
-            >
+      <ModernCard
+        variant="glass"
+        className="glass-advanced glass-3d-hover backdrop-blur-2xl border border-white/30 shadow-2xl"
+      >
+        <ModernCardContent className="p-6 glass-advanced border border-white/20">
+          <div className="space-y-6">
+            {/* Profile Avatar Section */}
+            <div className="flex justify-center">
               <ProfileAvatar
                 avatarUrl={profile?.avatar_url}
                 onAvatarUpdate={() => {
-                  // The profile will be refreshed automatically by the hook
+                  // Profile will be refreshed automatically by the hook
                 }}
-                size="lg"
+                size="md"
+                editable={true}
               />
-            </motion.div>
-            <ModernCardTitle className="text-3xl font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent mb-2">
-              {t('form_labels.profile_user')}
-            </ModernCardTitle>
-            <p className="text-gray-600 dark:text-gray-400">
-              {t('profile.description')}
-            </p>
-            <p className="text-sm text-gray-500 dark:text-gray-500 mt-2">
-              {t('profile.required_fields_notice')}
-            </p>
-            {error && (
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="mt-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg"
+            </div>
+
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              {formFields}
+
+            {/* Form Actions */}
+            <div className="flex justify-center gap-4 pt-4 border-t border-gray-200/50 dark:border-gray-700/50">
+              <GlassButton
+                type="button"
+                onClick={onCancel}
+                variant="ghost"
+                className="px-6 py-3 rounded-xl text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800/50 font-semibold transition-all duration-300"
               >
+                {t('actions.cancel')}
+              </GlassButton>
+              <GlassButton
+                type="submit"
+                className="px-8 py-3 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-semibold transition-all duration-300 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={loading || !form.formState.isDirty}
+                aria-label={loading ? t('actions.saving_progress') : t('actions.save_changes')}
+              >
+                <div className="flex items-center gap-3">
+                  {loading ? (
+                    <LoadingSpinner size={20} className="text-primary-foreground" />
+                  ) : (
+                    <Save size={20} className="text-primary-foreground" />
+                  )}
+                  <span>
+                    {loading ? t('actions.saving_progress') : t('actions.save_changes')}
+                  </span>
+                </div>
+              </GlassButton>
+            </div>
+
+            {error && (
+              <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
                 <p className="text-red-600 dark:text-red-400 text-sm flex items-center gap-2">
                   <AlertCircle size={16} />
                   {error}
@@ -475,43 +482,12 @@ const UserProfileFormNew: React.FC = () => {
                     {t('actions.retry')}
                   </GlassButton>
                 </div>
-              </motion.div>
+              </div>
             )}
-          </ModernCardHeader>
-          <ModernCardContent>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-              {formFields}
-
-              {/* Form Actions */}
-              <ModernCardFooter className="flex justify-center gap-4 p-0 pt-8 border-t border-gray-200/50 dark:border-gray-700/50">
-                <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="flex-1 max-w-xs"
-                >
-                  <GlassButton
-                    type="submit"
-                    className="w-full px-8 py-4 rounded-xl bg-gradient-to-r from-primary to-purple-600 text-white font-semibold transition-all duration-300 hover:shadow-lg hover:shadow-primary/25 disabled:opacity-50 disabled:cursor-not-allowed"
-                    disabled={loading || !form.formState.isDirty}
-                    aria-label={loading ? t('actions.saving_progress') : t('actions.save_changes')}
-                  >
-                    <div className="flex items-center justify-center gap-3">
-                      {loading ? (
-                        <LoadingSpinner size={20} className="text-white" />
-                      ) : (
-                        <Save size={20} />
-                      )}
-                      <span>
-                        {loading ? t('actions.saving_progress') : t('actions.save_changes')}
-                      </span>
-                    </div>
-                  </GlassButton>
-                </motion.div>
-              </ModernCardFooter>
             </form>
-          </ModernCardContent>
-        </ModernCard>
-      </div>
+          </div>
+        </ModernCardContent>
+      </ModernCard>
     </motion.div>
   );
 };

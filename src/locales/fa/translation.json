@@ -238,7 +238,8 @@
       "female": "زن",
       "other": "دیگر",
       "unknown": "نامشخص"
-    }
+    },
+    "not_specified": "نامشخص"
   },
   "login": {
     "title": "ورود به Nama Contacts",
@@ -330,6 +331,7 @@
       "frequency_desc": "کنترل دفعات دریافت اعلان‌ها",
       "daily_summary": "زمان خلاصه روزانه",
       "daily_summary_desc": "زمان روز برای دریافت خلاصه روزانه",
+      "navigating_to_add_group": "در حال انتقال به صفحه افزودن گروه...",
       "description": "شخصی‌سازی نحوه دریافت اعلان‌ها از برنامه"
     },
     "appearance": {
@@ -569,6 +571,8 @@
     "public_url_error": "خطا در دریافت آدرس عمومی تصویر",
     "upload_error": "خطا در آپلود تصویر: {{message}}",
     "delete_image_error": "خطا در حذف تصویر: {{message}}",
+    "avatar_upload_failed": "خطا در آپلود آواتار. لطفاً دوباره تلاش کنید.",
+    "avatar_remove_failed": "خطا در حذف آواتار. لطفاً دوباره تلاش کنید.",
     "load_contacts_error": "خطا در بارگذاری مخاطبین",
     "create_template_error": "خطایی در ایجاد قالب رخ داد",
     "edit_template_error": "خطایی در ویرایش قالب رخ داد",
@@ -592,6 +596,8 @@
     "update_profile_error": "خطایی در به‌روزرسانی پروفایل رخ داد",
     "unknown": "خطای ناشناخته",
     "loading_ungrouped_contacts": "خطا در بارگذاری مخاطبین بدون گروه",
+    "invalid_file_type": "لطفاً یک فایل تصویری معتبر انتخاب کنید",
+    "file_too_large": "حجم فایل خیلی بزرگ است. لطفاً فایلی کوچکتر از 5 مگابایت انتخاب کنید",
     "load_custom_fields_failed": "خطا در بارگذاری قالب‌های فیلد سفارشی",
     "delete_custom_field_failed": "خطا در حذف قالب فیلد سفارشی",
     "create_custom_field_template_error": "خطا در ایجاد قالب فیلد سفارشی",
@@ -601,6 +607,7 @@
   },
   "actions": {
     "add_new_group": "افزودن گروه جدید",
+    "add_group": "افزودن گروه",
     "close": "بستن",
     "save_changes": "ذخیره تغییرات",
     "cancel_operation": "لغو عملیات",
@@ -619,6 +626,7 @@
     "confirm": "تایید",
     "remove": "حذف",
     "dismiss": "رد کردن",
+    "retry": "تلاش مجدد",
     "add_contact": "افزودن مخاطب جدید",
     "new": "جدید",
     "export": "خروجی",
@@ -635,6 +643,8 @@
     "template_edit_success": "قالب با موفقیت ویرایش شد",
     "profile_update_success": "پروفایل با موفقیت به‌روزرسانی شد",
     "profile_loaded_success": "پروفایل با موفقیت بارگذاری شد",
+    "avatar_updated": "آواتار با موفقیت به‌روزرسانی شد",
+    "avatar_removed": "آواتار با موفقیت حذف شد",
     "connection_test_start": "در حال شروع تست اتصال...",
     "connection_success": "✅ اتصال موفق - {{count}} کاربر یافت شد",
     "connection_error": "❌ خطا: {{error}}"
@@ -667,6 +677,7 @@
     "email_address": "آدرس ایمیل",
     "birth_date": "تاریخ تولد",
     "phone_type": "نوع شماره",
+    "phone": "تلفن",
     "phone_number": "شماره تلفن",
     "extension_optional": "داخلی (اختیاری)",
     "social_network_type": "نوع شبکه اجتماعی",
@@ -674,7 +685,10 @@
     "profile_user": "پروفایل کاربر",
     "user_email": "ایمیل",
     "position": "سمت/تخصص",
-    "company": "شرکت"
+    "company": "شرکت",
+    "location": "مکان",
+    "bio": "بیوگرافی",
+    "birthday": "تولد"
   },
   "form_placeholders": {
     "enter_name": "نام خود را وارد کنید",
@@ -693,7 +707,9 @@
     "first_name": "نام*",
     "last_name": "نام خانوادگی*",
     "position": "سمت/تخصص",
-    "company": "شرکت"
+    "company": "شرکت",
+    "enter_location": "مکان خود را وارد کنید",
+    "enter_bio": "درباره خودتان بنویسید..."
   },
   "section_titles": {
     "custom_fields": "فیلدهای سفارشی",
@@ -1028,7 +1044,7 @@
       "description": "شخصی‌سازی نحوه دریافت اعلان‌ها از برنامه",
       "setup": "راه‌اندازی اعلان‌ها"
     },
-    "subtitle": "مدیریت پروفایل و تنظیمات شما",
+    "subtitle": "مدیریت اطلاعات پروفایل شما",
     "avatar_alt": "آواتار کاربر",
     "edit_avatar": "ویرایش آواتار",
     "upload_new": "آپلود جدید",
@@ -1056,5 +1072,32 @@
       "tips_title": "نکات تکمیل پروفایل",
       "tips_description": "برای باز کردن تمام ویژگی‌ها و بهره‌برداری کامل از برنامه، پروفایل خود را تکمیل کنید."
     }
+  },
+  "pages": {
+    "user_profile": {
+      "title": "پروفایل کاربری",
+      "subtitle": "مدیریت اطلاعات پروفایل شما"
+    },
+    "groups": {
+      "management": "مدیریت گروه‌ها",
+      "management_description": "ایجاد، ویرایش و حذف گروه‌های مخاطبین",
+      "search_placeholder": "جستجوی گروه‌ها...",
+      "all_colors": "همه رنگ‌ها",
+      "filter_by_color": "فیلتر بر اساس رنگ"
+    }
+  },
+  "sorting": {
+    "sort_by": "مرتب‌سازی بر اساس",
+    "name_asc": "نام (الف-ی)",
+    "name_desc": "نام (ی-الف)",
+    "created_at_desc": "جدیدترین اول",
+    "created_at_asc": "قدیمی‌ترین اول"
+  },
+  "display_modes": {
+    "grid": "نمایش کارتی",
+    "list": "نمایش لیستی"
+  },
+  "component_names": {
+    "groups": "گروه‌ها"
   }
 }

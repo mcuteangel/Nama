@@ -285,7 +285,7 @@ const Groups = React.memo(() => {
                       </GlassButton>
                     </ModernTooltipTrigger>
                     <ModernTooltipContent>
-                      <p>نمایش کارتی</p>
+                      <p>{t('display_modes.grid')}</p>
                     </ModernTooltipContent>
                   </ModernTooltip>
 
@@ -307,7 +307,7 @@ const Groups = React.memo(() => {
                       </GlassButton>
                     </ModernTooltipTrigger>
                     <ModernTooltipContent>
-                      <p>نمایش لیستی</p>
+                      <p>{t('display_modes.list')}</p>
                     </ModernTooltipContent>
                   </ModernTooltip>
                 </div>
