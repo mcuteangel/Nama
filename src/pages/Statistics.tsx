@@ -1,338 +1,239 @@
-import React, { Suspense, useMemo, useCallback } from "react";
-import { useTranslation } from "react-i18next";
-import {
-  TrendingUp,
-  Calendar,
-  Award,
-  PieChart
-} from "lucide-react";
-
-import { ModernCard, ModernCardContent } from "@/components/ui/modern-card";
-import { ModernTabs, ModernTabsList, ModernTabsTrigger, ModernTabsContent } from "@/components/ui/modern-tabs";
-import { MasonryGrid, ResponsiveGrid } from "@/components/ui/modern-grid";
+import React, { useMemo, useState } from "react";
+import { useSession } from "@/integrations/supabase/auth";
+import { useQuery } from "@tanstack/react-query";
+import { ContactStatisticsService } from "@/services/contact-statistics-service";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ModernLoader } from "@/components/ui/modern-loader";
+import PageHeader from "@/components/ui/PageHeader";
+import {
+  StatisticsFilters,
+  StatisticsOverviewCards,
+  StatisticsOverviewTab,
+  StatisticsDemographicsTab,
+  StatisticsTimelineTab,
+  StatisticsDetailsTab,
+} from "@/components/statistics";
 
-import { StatisticsProvider } from "@/components/statistics/StatisticsContext";
-import { useStatistics } from "@/components/statistics/useStatistics";
-import StatisticsCompactStats from "@/components/statistics/StatisticsCompactStats";
-import TotalContactsCard from "@/components/statistics/TotalContactsCard";
-import ContactsByGenderChart from "@/components/statistics/ContactsByGenderChart";
-import ContactsByGroupChart from "@/components/statistics/ContactsByGroupChart";
-import ContactsByPreferredMethodChart from "@/components/statistics/ContactsByPreferredMethodChart";
-import UpcomingBirthdaysList from "@/components/statistics/UpcomingBirthdaysList";
-import ContactsByCreationTimeChart from "@/components/statistics/ContactsByCreationTimeChart";
-import TopCompaniesList from "@/components/statistics/TopCompaniesList";
-import TopPositionsList from "@/components/statistics/TopPositionsList";
-import StatisticsDateFilter from "@/components/statistics/StatisticsDateFilter";
-import ComparativeStatistics from "@/components/statistics/ComparativeStatistics";
-import StatisticsHeader from "../components/statistics/StatisticsHeader";
-import StatisticsLoading from "../components/statistics/StatisticsLoading";
-import StatisticsError from "../components/statistics/StatisticsError";
-import StatisticsFooter from "../components/statistics/StatisticsFooter";
-
-// Define type for dashboard settings
-interface DashboardSettings {
-  layoutMode: 'masonry' | 'grid';
-  showSettings: boolean;
-  voiceEnabled: boolean;
-  showComparison: boolean;
+function toDateStr(d: Date) {
+  return d.toISOString().slice(0, 10);
 }
 
-// Lazy load heavy components only when needed
-const LazyStatisticsCompactStats = React.memo(StatisticsCompactStats);
-const LazyTotalContactsCard = React.memo(TotalContactsCard);
-const LazyContactsByGenderChart = React.memo(ContactsByGenderChart);
-const LazyContactsByGroupChart = React.memo(ContactsByGroupChart);
-const LazyContactsByPreferredMethodChart = React.memo(ContactsByPreferredMethodChart);
-const LazyUpcomingBirthdaysList = React.memo(UpcomingBirthdaysList);
-const LazyContactsByCreationTimeChart = React.memo(ContactsByCreationTimeChart);
-const LazyTopCompaniesList = React.memo(TopCompaniesList);
-const LazyTopPositionsList = React.memo(TopPositionsList);
-const LazyComparativeStatistics = React.memo(ComparativeStatistics);
+const addMonths = (date: Date, months: number) => {
+  const d = new Date(date);
+  d.setMonth(d.getMonth() + months);
+  return d;
+};
 
-// Main dashboard content component
-const StatisticsDashboard: React.FC = React.memo(() => {
-  const { state, refreshData, setDateRange, fetchComparisonData } = useStatistics();
-  const { t, i18n } = useTranslation();
-  
-  // Load settings from localStorage or use defaults
-  const [settings, setSettings] = React.useState<DashboardSettings>(() => {
-    try {
-      const savedSettings = localStorage.getItem('statisticsPageSettings');
-      if (savedSettings) {
-        return JSON.parse(savedSettings);
-      }
-    } catch (e) {
-      console.warn('Failed to parse dashboard settings from localStorage', e);
-    }
-    
-    // Default settings
-    return {
-      layoutMode: 'masonry',
-      showSettings: false,
-      voiceEnabled: false,
-      showComparison: false
-    };
-  });
-  
-  // Determine if we're in RTL mode based on the current language
-  const isRTL = useMemo(() => i18n.dir() === 'rtl', [i18n]);
-  
-  // Determine theme based on system preference or saved setting
-  const [isDarkMode, setIsDarkMode] = React.useState<boolean>(() => {
-    try {
-      const savedTheme = localStorage.getItem('statisticsPageTheme');
-      if (savedTheme !== null) {
-        return savedTheme === 'dark';
-      }
-    } catch (e) {
-      console.warn('Failed to parse theme from localStorage', e);
-    }
-    
-    // Default to system preference
-    return window.matchMedia('(prefers-color-scheme: dark)').matches;
-  });
-
-  // Save settings to localStorage whenever they change
-  React.useEffect(() => {
-    try {
-      localStorage.setItem('statisticsPageSettings', JSON.stringify(settings));
-    } catch (e) {
-      console.warn('Failed to save dashboard settings to localStorage', e);
-    }
-  }, [settings]);
-  
-  // Save theme preference to localStorage whenever it changes
-  React.useEffect(() => {
-    try {
-      localStorage.setItem('statisticsPageTheme', isDarkMode ? 'dark' : 'light');
-    } catch (e) {
-      console.warn('Failed to save theme preference to localStorage', e);
-    }
-  }, [isDarkMode]);
-
-  // Update settings helper
-  const updateSettings = useCallback((newSettings: Partial<DashboardSettings>) => {
-    setSettings(prev => ({ ...prev, ...newSettings }));
-  }, []);
-
-  // Memoized tab content to prevent unnecessary re-renders
-  const tabContent = useMemo(() => {
-    const gridProps = settings.layoutMode === 'masonry' 
-      ? { columns: 3, gap: "lg" } as const
-      : { breakpoints: { sm: 1, md: 2, lg: 3, xl: 4 } } as const;
-    
-    const GridComponent = settings.layoutMode === 'masonry' ? MasonryGrid : ResponsiveGrid;
-    
-    return (
-      <ModernTabs defaultValue="overview" className="w-full" dir={isRTL ? 'rtl' : 'ltr'}>
-        <ModernTabsList
-          className="grid w-full grid-cols-2 sm:grid-cols-4 mb-6 sm:mb-8 bg-white/10 dark:bg-gray-800/10 backdrop-blur-xl rounded-2xl p-2 border border-white/20"
-          glassEffect="default"
-          hoverEffect="lift"
-        >
-          <ModernTabsTrigger
-            value="overview"
-            className="flex items-center gap-1 sm:gap-2 rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-600 data-[state=active]:text-white transition-all duration-300 hover:scale-105 text-xs sm:text-sm"
-            hoverEffect="scale"
-          >
-            <TrendingUp size={14} className={isRTL ? 'rotate-180' : ''} />
-            <span className="hidden xs:inline">{t('statistics.overview', 'Overview')}</span>
-          </ModernTabsTrigger>
-
-          <ModernTabsTrigger
-            value="distribution"
-            className="flex items-center gap-1 sm:gap-2 rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-green-500 data-[state=active]:to-blue-600 data-[state=active]:text-white transition-all duration-300 hover:scale-105 text-xs sm:text-sm"
-            hoverEffect="scale"
-          >
-            <PieChart size={14} className={isRTL ? 'rotate-180' : ''} />
-            <span className="hidden xs:inline">{t('statistics.distribution', 'Distribution')}</span>
-          </ModernTabsTrigger>
-
-          <ModernTabsTrigger
-            value="timeline"
-            className="flex items-center gap-1 sm:gap-2 rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-pink-600 data-[state=active]:text-white transition-all duration-300 hover:scale-105 text-xs sm:text-sm"
-            hoverEffect="scale"
-          >
-            <Calendar size={14} className={isRTL ? 'rotate-180' : ''} />
-            <span className="hidden xs:inline">{t('statistics.timeline', 'Timeline')}</span>
-          </ModernTabsTrigger>
-
-          <ModernTabsTrigger
-            value="insights"
-            className="flex items-center gap-1 sm:gap-2 rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-red-600 data-[state=active]:text-white transition-all duration-300 hover:scale-105 text-xs sm:text-sm"
-            hoverEffect="scale"
-          >
-            <Award size={14} className={isRTL ? 'rotate-180' : ''} />
-            <span className="hidden xs:inline">{t('statistics.insights', 'Insights')}</span>
-          </ModernTabsTrigger>
-        </ModernTabsList>
-
-        {/* Overview Tab */}
-        <ModernTabsContent value="overview" className="space-y-6 sm:space-y-8">
-          <GridComponent {...gridProps} className="animate-in fade-in duration-700">
-            <div className="animate-in slide-in-from-left-4 duration-500">
-              <Suspense fallback={<ModernLoader variant="spinner" size="lg" />}>
-                <LazyTotalContactsCard count={state.data.totalContacts} />
-              </Suspense>
-            </div>
-            <div className="animate-in slide-in-from-right-4 duration-500 delay-100">
-              <Suspense fallback={<ModernLoader variant="spinner" size="lg" />}>
-                <LazyContactsByCreationTimeChart data={state.data.creationTimeData} />
-              </Suspense>
-            </div>
-            <div className="animate-in slide-in-from-bottom-4 duration-500 delay-200">
-              <Suspense fallback={<ModernLoader variant="spinner" size="lg" />}>
-                <LazyUpcomingBirthdaysList data={state.data.upcomingBirthdays} />
-              </Suspense>
-            </div>
-          </GridComponent>
-        </ModernTabsContent>
-
-        {/* Distribution Tab */}
-        <ModernTabsContent value="distribution" className="space-y-6 sm:space-y-8">
-          <GridComponent {...gridProps} className="animate-in fade-in duration-700">
-            <div className="animate-in slide-in-from-left-4 duration-500">
-              <Suspense fallback={<ModernLoader variant="spinner" size="lg" />}>
-                <LazyContactsByGenderChart data={state.data.genderData} />
-              </Suspense>
-            </div>
-            <div className="animate-in slide-in-from-right-4 duration-500 delay-100">
-              <Suspense fallback={<ModernLoader variant="spinner" size="lg" />}>
-                <LazyContactsByGroupChart data={state.data.groupData} />
-              </Suspense>
-            </div>
-            <div className="animate-in slide-in-from-bottom-4 duration-500 delay-200">
-              <Suspense fallback={<ModernLoader variant="spinner" size="lg" />}>
-                <LazyContactsByPreferredMethodChart data={state.data.preferredMethodData} />
-              </Suspense>
-            </div>
-          </GridComponent>
-        </ModernTabsContent>
-
-        {/* Timeline Tab */}
-        <ModernTabsContent value="timeline" className="space-y-6 sm:space-y-8">
-          <GridComponent 
-            {...(settings.layoutMode === 'masonry' ? { columns: 2, gap: "lg" } : { breakpoints: { sm: 1, md: 2, lg: 3, xl: 4 } })}
-            className="animate-in fade-in duration-700"
-          >
-            <div className="col-span-2 animate-in slide-in-from-left-4 duration-500">
-              <Suspense fallback={<ModernLoader variant="spinner" size="lg" />}>
-                <LazyContactsByCreationTimeChart data={state.data.creationTimeData} />
-              </Suspense>
-            </div>
-            <div className="animate-in slide-in-from-right-4 duration-500 delay-100">
-              <Suspense fallback={<ModernLoader variant="spinner" size="lg" />}>
-                <LazyUpcomingBirthdaysList data={state.data.upcomingBirthdays} />
-              </Suspense>
-            </div>
-          </GridComponent>
-        </ModernTabsContent>
-
-        {/* Insights Tab */}
-        <ModernTabsContent value="insights" className="space-y-6 sm:space-y-8">
-          <GridComponent 
-            {...(settings.layoutMode === 'masonry' ? { columns: 2, gap: "lg" } : { breakpoints: { sm: 1, md: 2, lg: 3, xl: 4 } })}
-            className="animate-in fade-in duration-700"
-          >
-            <div className="animate-in slide-in-from-left-4 duration-500">
-              <Suspense fallback={<ModernLoader variant="spinner" size="lg" />}>
-                <LazyTopCompaniesList data={state.data.topCompaniesData} />
-              </Suspense>
-            </div>
-            <div className="animate-in slide-in-from-right-4 duration-500 delay-100">
-              <Suspense fallback={<ModernLoader variant="spinner" size="lg" />}>
-                <LazyTopPositionsList data={state.data.topPositionsData} />
-              </Suspense>
-            </div>
-          </GridComponent>
-        </ModernTabsContent>
-      </ModernTabs>
-    );
-  }, [settings.layoutMode, isRTL, t, state.data]);
-
-  // Loading state
-  if (state.loading) {
-    return <StatisticsLoading isDarkMode={isDarkMode} isRTL={isRTL} />;
-  }
-
-  // Error state
-  if (state.error) {
-    return <StatisticsError error={state.error} onRetry={refreshData} isDarkMode={isDarkMode} />;
-  }
-
-  // Main content
-  return (
-    <div className={`min-h-screen ${isDarkMode ? 'bg-gradient-to-br from-gray-900 via-slate-900 to-gray-900' : 'bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50'} transition-all duration-700 p-3 sm:p-4 md:p-6 lg:p-8`} dir={isRTL ? 'rtl' : 'ltr'}>
-      <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8">
-        <StatisticsHeader 
-          isDarkMode={isDarkMode}
-          isRTL={isRTL}
-          settings={settings}
-          updateSettings={updateSettings}
-          refreshData={refreshData}
-          setIsDarkMode={setIsDarkMode}
-          state={state}
-        />
-        
-        {/* Date filter */}
-        <StatisticsDateFilter
-          onDateRangeChange={setDateRange}
-          onComparePeriod={(startDate, endDate) => {
-            fetchComparisonData(startDate, endDate);
-            updateSettings({ showComparison: true });
-          }}
-        />
-
-        {/* Comparative analysis */}
-        {settings.showComparison && state.comparisonData.previousData && (
-          <div className="animate-in fade-in slide-in-from-bottom-4">
-            <LazyComparativeStatistics
-              title="statistics.comparative_analysis"
-              data={[
-                {
-                  label: t('statistics.total_contacts'),
-                  current: state.data.totalContacts || 0,
-                  previous: state.comparisonData.previousData.totalContacts || 0
-                },
-                {
-                  label: t('statistics.active_groups'),
-                  current: state.data.groupData?.length || 0,
-                  previous: state.comparisonData.previousData.groupData?.length || 0
-                }
-              ]}
-            />
-          </div>
-        )}
-
-        {/* Compact stats */}
-        <div className="animate-in fade-in slide-in-from-bottom-4" style={{ animationDelay: '200ms' }}>
-          <LazyStatisticsCompactStats data={state.data} />
-        </div>
-
-        {/* Main content with tabs */}
-        <ModernCard variant="glass" hover="lift" className="backdrop-blur-2xl border border-white/30 shadow-2xl">
-          <ModernCardContent className="p-4 sm:p-6 md:p-8">
-            {tabContent}
-          </ModernCardContent>
-        </ModernCard>
-
-        <StatisticsFooter isDarkMode={isDarkMode} />
-      </div>
-    </div>
-  );
-});
-
-/**
- * Main Statistics Page Component
- * Wraps content with StatisticsProvider for data management
- * Includes persistent settings and proper theme handling
- */
 const Statistics: React.FC = () => {
+  const { session } = useSession();
+
+  const [quickRange, setQuickRange] = useState<string>("12m");
+  const [fromDate, setFromDate] = useState<string | undefined>(() => toDateStr(addMonths(new Date(), -12)));
+  const [toDate, setToDate] = useState<string | undefined>(() => toDateStr(new Date()));
+
+  // Sync quick ranges to from/to
+  const onChangeQuickRange = (val: string) => {
+    setQuickRange(val);
+    const today = new Date();
+    if (val === "3m") {
+      setFromDate(toDateStr(addMonths(today, -3)));
+      setToDate(toDateStr(today));
+    } else if (val === "6m") {
+      setFromDate(toDateStr(addMonths(today, -6)));
+      setToDate(toDateStr(today));
+    } else if (val === "12m") {
+      setFromDate(toDateStr(addMonths(today, -12)));
+      setToDate(toDateStr(today));
+    } else if (val === "all") {
+      setFromDate(undefined);
+      setToDate(undefined);
+    }
+  };
+
+  const dateRange = useMemo(() => ({ startDate: fromDate ?? null, endDate: toDate ?? null }), [fromDate, toDate]);
+
+  // Queries
+  const { data: totalContacts, isLoading: isLoadingTotal } = useQuery({
+    queryKey: ["totalContacts", session?.user?.id, dateRange],
+    queryFn: () =>
+      ContactStatisticsService.getTotalContacts(
+        session?.user?.id || "",
+        dateRange.startDate,
+        dateRange.endDate,
+      ),
+    enabled: !!session?.user?.id,
+  });
+
+  const { data: genderStats, isLoading: isLoadingGender } = useQuery({
+    queryKey: ["genderStats", session?.user?.id, dateRange],
+    queryFn: () =>
+      ContactStatisticsService.getContactsByGender(
+        session?.user?.id || "",
+        dateRange.startDate,
+        dateRange.endDate,
+      ),
+    enabled: !!session?.user?.id,
+  });
+
+  const { data: groupStats, isLoading: isLoadingGroups } = useQuery({
+    queryKey: ["groupStats", session?.user?.id, dateRange],
+    queryFn: () =>
+      ContactStatisticsService.getContactsByGroup(
+        session?.user?.id || "",
+        dateRange.startDate,
+        dateRange.endDate,
+      ),
+    enabled: !!session?.user?.id,
+  });
+
+  const { data: contactMethodStats, isLoading: isLoadingContactMethods } = useQuery({
+    queryKey: ["contactMethodStats", session?.user?.id, dateRange],
+    queryFn: () =>
+      ContactStatisticsService.getContactsByPreferredMethod(
+        session?.user?.id || "",
+        dateRange.startDate,
+        dateRange.endDate,
+      ),
+    enabled: !!session?.user?.id,
+  });
+
+  const { data: timelineStats, isLoading: isLoadingTimeline } = useQuery({
+    queryKey: ["timelineStats", session?.user?.id, dateRange],
+    queryFn: () =>
+      ContactStatisticsService.getContactsByCreationMonth(
+        session?.user?.id || "",
+        dateRange.startDate,
+        dateRange.endDate,
+      ),
+    enabled: !!session?.user?.id,
+  });
+
+  const { data: companyStats, isLoading: isLoadingCompanies } = useQuery({
+    queryKey: ["companyStats", session?.user?.id, dateRange],
+    queryFn: () =>
+      ContactStatisticsService.getTopCompanies(
+        session?.user?.id || "",
+        5,
+        dateRange.startDate,
+        dateRange.endDate,
+      ),
+    enabled: !!session?.user?.id,
+  });
+
+  const { data: positionStats, isLoading: isLoadingPositions } = useQuery({
+    queryKey: ["positionStats", session?.user?.id, dateRange],
+    queryFn: () =>
+      ContactStatisticsService.getTopPositions(
+        session?.user?.id || "",
+        5,
+        dateRange.startDate,
+        dateRange.endDate,
+      ),
+    enabled: !!session?.user?.id,
+  });
+
+  // Transforms
+  const genderChartData = useMemo(() => {
+    const src = genderStats?.data || [];
+    const labels: Record<string, string> = { male: "مرد", female: "زن", not_specified: "نامشخص" };
+    return src.map((g) => ({ name: labels[g.gender] ?? g.gender, value: g.count }));
+  }, [genderStats]);
+
+  const contactMethodChartData = useMemo(() => {
+    const src = contactMethodStats?.data || [];
+    const labels: Record<string, string> = { email: "ایمیل", phone: "تلفن", sms: "پیامک", any: "هر روشی" };
+    return src.map((m) => ({ name: labels[m.method] ?? m.method, value: m.count }));
+  }, [contactMethodStats]);
+
+  const timelineChartData = useMemo(() => {
+    const src = timelineStats?.data || [];
+    // Keep month_year as label; can be mapped to fa later if needed
+    return src.map((i) => ({ month: i.month_year, count: i.count }));
+  }, [timelineStats]);
+
+  const isLoading =
+    isLoadingTotal ||
+    isLoadingGender ||
+    isLoadingGroups ||
+    isLoadingContactMethods ||
+    isLoadingTimeline ||
+    isLoadingCompanies ||
+    isLoadingPositions;
+
   return (
-    <StatisticsProvider>
-      <StatisticsDashboard />
-    </StatisticsProvider>
+    <div className="container mx-auto p-6 space-y-6">
+      <PageHeader
+        title="آمار و گزارش‌ها"
+        description="تحلیل جامع اطلاعات مخاطبین شما"
+        showBackButton={true}
+      />
+
+      <StatisticsFilters
+        quickRange={quickRange}
+        onQuickRangeChange={onChangeQuickRange}
+        fromDate={fromDate}
+        onFromDateChange={setFromDate}
+        toDate={toDate}
+        onToDateChange={setToDate}
+      />
+
+      {isLoading ? (
+        <div className="flex items-center justify-center h-64">
+          <ModernLoader variant="ring" size="lg" />
+        </div>
+      ) : (
+        <>
+          <StatisticsOverviewCards
+            totalContacts={totalContacts?.data ?? 0}
+            groupCount={groupStats?.data?.length ?? 0}
+            companyCount={companyStats?.data?.length ?? 0}
+            monthlyAverage={
+              timelineChartData.length > 0
+                ? Math.round(
+                    timelineChartData.reduce((a, c) => a + (c.count || 0), 0) /
+                      timelineChartData.length,
+                  )
+                : 0
+            }
+          />
+
+          <Tabs defaultValue="overview" className="space-y-4">
+            <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4">
+              <TabsTrigger value="overview">نمای کلی</TabsTrigger>
+              <TabsTrigger value="demographics">جمعیت‌شناسی</TabsTrigger>
+              <TabsTrigger value="timeline">روند زمانی</TabsTrigger>
+              <TabsTrigger value="details">جزئیات</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="overview" className="space-y-4">
+              <StatisticsOverviewTab
+                genderChartData={genderChartData}
+                contactMethodChartData={contactMethodChartData}
+              />
+            </TabsContent>
+
+            <TabsContent value="demographics" className="space-y-4">
+              <StatisticsDemographicsTab
+                companyStats={companyStats?.data || []}
+                positionStats={positionStats?.data || []}
+              />
+            </TabsContent>
+
+            <TabsContent value="timeline" className="space-y-4">
+              <StatisticsTimelineTab
+                timelineChartData={timelineChartData}
+              />
+            </TabsContent>
+
+            <TabsContent value="details" className="space-y-4">
+              <StatisticsDetailsTab
+                groupStats={groupStats?.data || []}
+              />
+            </TabsContent>
+          </Tabs>
+        </>
+      )}
+    </div>
   );
 };
 
