@@ -156,11 +156,11 @@ const StatisticsFilters: React.FC<StatisticsFiltersProps> = ({
                   <span className="text-sm font-semibold text-slate-700 group-hover:text-slate-800 transition-colors duration-300">
                     فیلترهای پیشرفته
                   </span>
-                  {(selectedCompany || selectedPosition || selectedContactMethod) && (
+                  {(selectedCompany && selectedCompany !== "all") || (selectedPosition && selectedPosition !== "all") || (selectedContactMethod && selectedContactMethod !== "all") || (fromDate || toDate) ? (
                     <span className="px-2 py-1 text-xs font-medium bg-emerald-100 text-emerald-700 rounded-full">
                       فعال
                     </span>
-                  )}
+                  ) : null}
                 </div>
                 {isAdvancedFiltersOpen ? (
                   <ChevronUp className="h-4 w-4 text-slate-400 group-hover:text-slate-600 transition-colors duration-300" />
@@ -181,7 +181,6 @@ const StatisticsFilters: React.FC<StatisticsFiltersProps> = ({
                   <ModernSelect
                     value={selectedCompany}
                     onValueChange={(value) => onCompanyChange?.(value === "all" ? undefined : value)}
-                    className="flex-1"
                   >
                     <ModernSelectTrigger
                       variant="glass"
@@ -210,7 +209,6 @@ const StatisticsFilters: React.FC<StatisticsFiltersProps> = ({
                   <ModernSelect
                     value={selectedPosition}
                     onValueChange={(value) => onPositionChange?.(value === "all" ? undefined : value)}
-                    className="flex-1"
                   >
                     <ModernSelectTrigger
                       variant="glass"
@@ -239,7 +237,6 @@ const StatisticsFilters: React.FC<StatisticsFiltersProps> = ({
                   <ModernSelect
                     value={selectedContactMethod}
                     onValueChange={(value) => onContactMethodChange?.(value === "all" ? undefined : value)}
-                    className="flex-1"
                   >
                     <ModernSelectTrigger
                       variant="glass"
@@ -267,16 +264,20 @@ const StatisticsFilters: React.FC<StatisticsFiltersProps> = ({
               <div className="text-sm text-slate-600">
                 فیلترهای فعال:
                 {quickRange !== "all" && <span className="text-blue-600 font-medium"> بازه زمانی،</span>}
-                {selectedCompany && <span className="text-blue-600 font-medium"> شرکت،</span>}
-                {selectedPosition && <span className="text-purple-600 font-medium"> موقعیت شغلی،</span>}
-                {selectedContactMethod && <span className="text-emerald-600 font-medium"> روش ارتباط،</span>}
-                {!selectedCompany && !selectedPosition && !selectedContactMethod && quickRange === "all" && (
+                {(fromDate || toDate) && <span className="text-blue-600 font-medium"> تاریخ سفارشی،</span>}
+                {(selectedCompany && selectedCompany !== "all") && <span className="text-blue-600 font-medium"> شرکت،</span>}
+                {(selectedPosition && selectedPosition !== "all") && <span className="text-purple-600 font-medium"> موقعیت شغلی،</span>}
+                {(selectedContactMethod && selectedContactMethod !== "all") && <span className="text-emerald-600 font-medium"> روش ارتباط،</span>}
+                {quickRange === "all" && !fromDate && !toDate && !selectedCompany && !selectedPosition && !selectedContactMethod && (
                   <span className="text-slate-400"> بدون فیلتر</span>
+                )}
+                {(quickRange !== "all" || fromDate || toDate) && (selectedCompany === "all" || !selectedCompany) && (selectedPosition === "all" || !selectedPosition) && (selectedContactMethod === "all" || !selectedContactMethod) && (
+                  <span className="text-slate-400"> فقط فیلترهای زمانی</span>
                 )}
               </div>
               <button
                 onClick={() => {
-                  onQuickRangeChange("12m");
+                  onQuickRangeChange("all");
                   onFromDateChange(undefined);
                   onToDateChange(undefined);
                   onCompanyChange?.(undefined);

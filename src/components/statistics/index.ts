@@ -5,3 +5,8 @@ export { default as StatisticsDemographicsTab } from './StatisticsDemographicsTa
 export { default as StatisticsTimelineTab } from './StatisticsTimelineTab';
 export { default as StatisticsDetailsTab } from './StatisticsDetailsTab';
 export { default as StatisticsLoading } from './StatisticsLoading';
+export { default as BirthdaysTab } from './BirthdaysTab';
+export { default as AdvancedCompanyStatsTab } from './AdvancedCompanyStatsTab';
+export { default as AdvancedGroupStatsTab } from './AdvancedGroupStatsTab';
+export { default as ActivityStatsTab } from './ActivityStatsTab';
+export { default as CommunicationStatsTab } from './CommunicationStatsTab';

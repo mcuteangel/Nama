@@ -147,4 +147,115 @@ export const ContactStatisticsService = {
     const uniquePositions = [...new Set(data.map(item => item.position))].filter(Boolean);
     return { data: uniquePositions, error: null };
   },
+
+  // جدید: آمار تولدها در ماه‌های مختلف
+  async getBirthdaysByMonth(userId: string, startDate?: string | null, endDate?: string | null): Promise<{ data: Array<{ month: string; count: number }> | null; error: string | null }> {
+    const { data, error } = await supabase.rpc('get_birthdays_by_month', {
+      user_id_param: userId,
+      start_date_param: startDate || null,
+      end_date_param: endDate || null
+    });
+
+    if (error) {
+      return { data: null, error: error.message };
+    }
+    return { data: data as Array<{ month: string; count: number }>, error: null };
+  },
+
+  // جدید: آمار فعالیت‌های سیستم (آخرین فعالیت‌های کاربر)
+  async getRecentActivity(userId: string, limit: number = 5, startDate?: string | null, endDate?: string | null): Promise<{ data: Array<{ id: string; activity_type: string; entity_type: string; entity_name: string; description: string; created_at: string }> | null; error: string | null }> {
+    let query = supabase
+      .from('user_activities')
+      .select('id, activity_type, entity_type, entity_name, description, created_at')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false })
+      .limit(limit);
+
+    // Apply date range filter if provided
+    if (startDate) {
+      query = query.gte('created_at', startDate);
+    }
+    if (endDate) {
+      query = query.lte('created_at', endDate);
+    }
+
+    const { data, error } = await query;
+
+    if (error) {
+      return { data: null, error: error.message };
+    }
+    return { data: data as Array<{ id: string; activity_type: string; entity_type: string; entity_name: string; description: string; created_at: string }>, error: null };
+  },
+
+  // جدید: آمار شرکت‌های با رشد ماهانه
+  async getCompanyGrowth(userId: string, startDate?: string | null, endDate?: string | null): Promise<{ data: Array<{ company: string; current_count: number; previous_count: number; growth: number }> | null; error: string | null }> {
+    const { data, error } = await supabase.rpc('get_company_growth', {
+      user_id_param: userId,
+      start_date_param: startDate || null,
+      end_date_param: endDate || null
+    });
+
+    if (error) {
+      return { data: null, error: error.message };
+    }
+    return { data: data as Array<{ company: string; current_count: number; previous_count: number; growth: number }>, error: null };
+  },
+
+  // جدید: آمار گروه‌های با بیشترین اعضا
+  async getLargestGroups(userId: string, limit: number = 5, startDate?: string | null, endDate?: string | null): Promise<{ data: Array<{ name: string; color?: string; count: number; growth: number }> | null; error: string | null }> {
+    const { data, error } = await supabase.rpc('get_largest_groups', {
+      user_id_param: userId,
+      limit_param: limit,
+      start_date_param: startDate || null,
+      end_date_param: endDate || null
+    });
+
+    if (error) {
+      return { data: null, error: error.message };
+    }
+    return { data: data as Array<{ name: string; color?: string; count: number; growth: number }>, error: null };
+  },
+
+  // جدید: آمار منابع اضافه شدن مخاطبین
+  async getContactSources(userId: string, startDate?: string | null, endDate?: string | null): Promise<{ data: Array<{ source: string; count: number }> | null; error: string | null }> {
+    const { data, error } = await supabase.rpc('get_contact_sources', {
+      user_id_param: userId,
+      start_date_param: startDate || null,
+      end_date_param: endDate || null
+    });
+
+    if (error) {
+      return { data: null, error: error.message };
+    }
+    return { data: data as Array<{ source: string; count: number }>, error: null };
+  },
+
+  // جدید: آمار سن مخاطبین
+  async getAgeDistribution(userId: string, startDate?: string | null, endDate?: string | null): Promise<{ data: Array<{ age_group: string; count: number }> | null; error: string | null }> {
+    const { data, error } = await supabase.rpc('get_age_distribution', {
+      user_id_param: userId,
+      start_date_param: startDate || null,
+      end_date_param: endDate || null
+    });
+
+    if (error) {
+      return { data: null, error: error.message };
+    }
+    return { data: data as Array<{ age_group: string; count: number }>, error: null };
+  },
+
+  // جدید: آمار مخاطبین جدید در بازه‌های زمانی مختلف
+  async getNewContactsByPeriod(userId: string, period: 'daily' | 'weekly' | 'monthly', startDate?: string | null, endDate?: string | null): Promise<{ data: Array<{ period: string; count: number }> | null; error: string | null }> {
+    const { data, error } = await supabase.rpc('get_new_contacts_by_period', {
+      user_id_param: userId,
+      period_param: period,
+      start_date_param: startDate || null,
+      end_date_param: endDate || null
+    });
+
+    if (error) {
+      return { data: null, error: error.message };
+    }
+    return { data: data as Array<{ period: string; count: number }>, error: null };
+  },
 };

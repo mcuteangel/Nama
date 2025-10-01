@@ -13,6 +13,11 @@ import {
   StatisticsTimelineTab,
   StatisticsDetailsTab,
   StatisticsLoading,
+  BirthdaysTab,
+  AdvancedCompanyStatsTab,
+  AdvancedGroupStatsTab,
+  ActivityStatsTab,
+  CommunicationStatsTab,
 } from "@/components/statistics";
 
 function toDateStr(d: Date) {
@@ -31,15 +36,9 @@ const addMonths = (date: Date, months: number) => {
 const Statistics: React.FC = () => {
   const { session } = useSession();
 
-  const [quickRange, setQuickRange] = useState<string>("12m");
-  const [fromDate, setFromDate] = useState<string | undefined>(() => {
-    const today = new Date();
-    return toDateStr(today);
-  });
-  const [toDate, setToDate] = useState<string | undefined>(() => {
-    const today = new Date();
-    return toDateStr(today);
-  });
+  const [quickRange, setQuickRange] = useState<string>("all");
+  const [fromDate, setFromDate] = useState<string | undefined>(undefined);
+  const [toDate, setToDate] = useState<string | undefined>(undefined);
 
   // فیلترهای پیشرفته جدید
   const [selectedPosition, setSelectedPosition] = useState<string>("all");
@@ -68,7 +67,7 @@ const Statistics: React.FC = () => {
 
   // Queries
   const { data: totalContacts, isLoading: isLoadingTotal } = useQuery({
-    queryKey: ["totalContacts", session?.user?.id, dateRange],
+    queryKey: ["totalContacts", session?.user?.id, dateRange.startDate, dateRange.endDate, selectedPosition, selectedContactMethod],
     queryFn: () =>
       ContactStatisticsService.getTotalContacts(
         session?.user?.id || "",
@@ -76,10 +75,13 @@ const Statistics: React.FC = () => {
         dateRange.endDate,
       ),
     enabled: !!session?.user?.id,
+    staleTime: 5 * 60 * 1000, // 5 دقیقه
+    gcTime: 10 * 60 * 1000, // 10 دقیقه
+    refetchOnWindowFocus: true,
   });
 
   const { data: genderStats, isLoading: isLoadingGender } = useQuery({
-    queryKey: ["genderStats", session?.user?.id, dateRange],
+    queryKey: ["genderStats", session?.user?.id, dateRange.startDate, dateRange.endDate, selectedPosition, selectedContactMethod],
     queryFn: () =>
       ContactStatisticsService.getContactsByGender(
         session?.user?.id || "",
@@ -87,10 +89,13 @@ const Statistics: React.FC = () => {
         dateRange.endDate,
       ),
     enabled: !!session?.user?.id,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    refetchOnWindowFocus: true,
   });
 
   const { data: groupStats, isLoading: isLoadingGroups } = useQuery({
-    queryKey: ["groupStats", session?.user?.id, dateRange],
+    queryKey: ["groupStats", session?.user?.id, dateRange.startDate, dateRange.endDate, selectedPosition, selectedContactMethod],
     queryFn: () =>
       ContactStatisticsService.getContactsByGroup(
         session?.user?.id || "",
@@ -98,10 +103,13 @@ const Statistics: React.FC = () => {
         dateRange.endDate,
       ),
     enabled: !!session?.user?.id,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    refetchOnWindowFocus: true,
   });
 
   const { data: contactMethodStats, isLoading: isLoadingContactMethods } = useQuery({
-    queryKey: ["contactMethodStats", session?.user?.id, dateRange],
+    queryKey: ["contactMethodStats", session?.user?.id, dateRange.startDate, dateRange.endDate, selectedPosition, selectedContactMethod],
     queryFn: () =>
       ContactStatisticsService.getContactsByPreferredMethod(
         session?.user?.id || "",
@@ -109,10 +117,13 @@ const Statistics: React.FC = () => {
         dateRange.endDate,
       ),
     enabled: !!session?.user?.id,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    refetchOnWindowFocus: true,
   });
 
   const { data: timelineStats, isLoading: isLoadingTimeline } = useQuery({
-    queryKey: ["timelineStats", session?.user?.id, dateRange],
+    queryKey: ["timelineStats", session?.user?.id, dateRange.startDate, dateRange.endDate, selectedPosition, selectedContactMethod],
     queryFn: () =>
       ContactStatisticsService.getContactsByCreationMonth(
         session?.user?.id || "",
@@ -120,10 +131,13 @@ const Statistics: React.FC = () => {
         dateRange.endDate,
       ),
     enabled: !!session?.user?.id,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    refetchOnWindowFocus: true,
   });
 
   const { data: companyStats, isLoading: isLoadingCompanies } = useQuery({
-    queryKey: ["companyStats", session?.user?.id, dateRange],
+    queryKey: ["companyStats", session?.user?.id, dateRange.startDate, dateRange.endDate, selectedPosition, selectedContactMethod],
     queryFn: () =>
       ContactStatisticsService.getTopCompanies(
         session?.user?.id || "",
@@ -132,10 +146,27 @@ const Statistics: React.FC = () => {
         dateRange.endDate,
       ),
     enabled: !!session?.user?.id,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    refetchOnWindowFocus: true,
+  });
+
+  const { data: upcomingBirthdays, isLoading: isLoadingBirthdays } = useQuery({
+    queryKey: ["upcomingBirthdays", session?.user?.id, dateRange.startDate, dateRange.endDate, selectedPosition, selectedContactMethod],
+    queryFn: () =>
+      ContactStatisticsService.getUpcomingBirthdays(
+        session?.user?.id || "",
+        dateRange.startDate,
+        dateRange.endDate,
+      ),
+    enabled: !!session?.user?.id,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    refetchOnWindowFocus: true,
   });
 
   const { data: positionStats, isLoading: isLoadingPositions } = useQuery({
-    queryKey: ["positionStats", session?.user?.id, dateRange],
+    queryKey: ["positionStats", session?.user?.id, dateRange.startDate, dateRange.endDate, selectedPosition, selectedContactMethod],
     queryFn: () =>
       ContactStatisticsService.getTopPositions(
         session?.user?.id || "",
@@ -144,6 +175,81 @@ const Statistics: React.FC = () => {
         dateRange.endDate,
       ),
     enabled: !!session?.user?.id,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    refetchOnWindowFocus: true,
+  });
+
+  const { data: companyGrowth, isLoading: isLoadingCompanyGrowth } = useQuery({
+    queryKey: ["companyGrowth", session?.user?.id, dateRange.startDate, dateRange.endDate, selectedPosition, selectedContactMethod],
+    queryFn: () =>
+      ContactStatisticsService.getCompanyGrowth(
+        session?.user?.id || "",
+        dateRange.startDate,
+        dateRange.endDate,
+      ),
+    enabled: !!session?.user?.id,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    refetchOnWindowFocus: true,
+  });
+
+  const { data: groupGrowth, isLoading: isLoadingGroupGrowth } = useQuery({
+    queryKey: ["groupGrowth", session?.user?.id, dateRange.startDate, dateRange.endDate, selectedPosition, selectedContactMethod],
+    queryFn: () =>
+      ContactStatisticsService.getLargestGroups(
+        session?.user?.id || "",
+        8,
+        dateRange.startDate,
+        dateRange.endDate,
+      ),
+    enabled: !!session?.user?.id,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    refetchOnWindowFocus: true,
+  });
+
+  const { data: recentActivity, isLoading: isLoadingActivity } = useQuery({
+    queryKey: ["recentActivity", session?.user?.id, dateRange.startDate, dateRange.endDate, selectedPosition, selectedContactMethod],
+    queryFn: () =>
+      ContactStatisticsService.getRecentActivity(
+        session?.user?.id || "",
+        6,
+        dateRange.startDate,
+        dateRange.endDate,
+      ),
+    enabled: !!session?.user?.id,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    refetchOnWindowFocus: true,
+  });
+
+  const { data: communicationMethods, isLoading: isLoadingCommunication } = useQuery({
+    queryKey: ["communicationMethods", session?.user?.id, dateRange.startDate, dateRange.endDate, selectedPosition, selectedContactMethod],
+    queryFn: () =>
+      ContactStatisticsService.getContactsByPreferredMethod(
+        session?.user?.id || "",
+        dateRange.startDate,
+        dateRange.endDate,
+      ),
+    enabled: !!session?.user?.id,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    refetchOnWindowFocus: true,
+  });
+
+  const { data: birthdaysByMonth, isLoading: isLoadingBirthdaysByMonth } = useQuery({
+    queryKey: ["birthdaysByMonth", session?.user?.id, dateRange.startDate, dateRange.endDate, selectedPosition, selectedContactMethod],
+    queryFn: () =>
+      ContactStatisticsService.getBirthdaysByMonth(
+        session?.user?.id || "",
+        dateRange.startDate,
+        dateRange.endDate,
+      ),
+    enabled: !!session?.user?.id,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    refetchOnWindowFocus: true,
   });
 
   // مقایسه با دوره قبلی
@@ -168,7 +274,7 @@ const Statistics: React.FC = () => {
   }, [fromDate, toDate]);
 
   const { data: previousTotalContacts } = useQuery({
-    queryKey: ["previousTotalContacts", session?.user?.id, previousDateRange],
+    queryKey: ["previousTotalContacts", session?.user?.id, previousDateRange?.startDate, previousDateRange?.endDate],
     queryFn: () =>
       ContactStatisticsService.getTotalContacts(
         session?.user?.id || "",
@@ -176,10 +282,13 @@ const Statistics: React.FC = () => {
         previousDateRange?.endDate,
       ),
     enabled: !!session?.user?.id && !!previousDateRange,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    refetchOnWindowFocus: true,
   });
 
   const { data: previousGroupStats } = useQuery({
-    queryKey: ["previousGroupStats", session?.user?.id, previousDateRange],
+    queryKey: ["previousGroupStats", session?.user?.id, previousDateRange?.startDate, previousDateRange?.endDate],
     queryFn: () =>
       ContactStatisticsService.getContactsByGroup(
         session?.user?.id || "",
@@ -187,10 +296,13 @@ const Statistics: React.FC = () => {
         previousDateRange?.endDate,
       ),
     enabled: !!session?.user?.id && !!previousDateRange,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    refetchOnWindowFocus: true,
   });
 
   const { data: previousCompanyStats } = useQuery({
-    queryKey: ["previousCompanyStats", session?.user?.id, previousDateRange],
+    queryKey: ["previousCompanyStats", session?.user?.id, previousDateRange?.startDate, previousDateRange?.endDate],
     queryFn: () =>
       ContactStatisticsService.getTopCompanies(
         session?.user?.id || "",
@@ -199,10 +311,13 @@ const Statistics: React.FC = () => {
         previousDateRange?.endDate,
       ),
     enabled: !!session?.user?.id && !!previousDateRange,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    refetchOnWindowFocus: true,
   });
 
   const { data: previousTimelineStats } = useQuery({
-    queryKey: ["previousTimelineStats", session?.user?.id, previousDateRange],
+    queryKey: ["previousTimelineStats", session?.user?.id, previousDateRange?.startDate, previousDateRange?.endDate],
     queryFn: () =>
       ContactStatisticsService.getContactsByCreationMonth(
         session?.user?.id || "",
@@ -210,6 +325,9 @@ const Statistics: React.FC = () => {
         previousDateRange?.endDate,
       ),
     enabled: !!session?.user?.id && !!previousDateRange,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    refetchOnWindowFocus: true,
   });
 
   // Transforms
@@ -238,7 +356,13 @@ const Statistics: React.FC = () => {
     isLoadingContactMethods ||
     isLoadingTimeline ||
     isLoadingCompanies ||
-    isLoadingPositions;
+    isLoadingPositions ||
+    isLoadingBirthdays ||
+    isLoadingBirthdaysByMonth ||
+    isLoadingCompanyGrowth ||
+    isLoadingGroupGrowth ||
+    isLoadingActivity ||
+    isLoadingCommunication;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/50">
@@ -260,6 +384,8 @@ const Statistics: React.FC = () => {
           onPositionChange={(value: string | undefined) => setSelectedPosition(value || "all")}
           selectedContactMethod={selectedContactMethod}
           onContactMethodChange={(value: string | undefined) => setSelectedContactMethod(value || "all")}
+          selectedCompany={undefined}
+          onCompanyChange={() => {}}
         />
 
         {isLoading ? (
@@ -272,7 +398,7 @@ const Statistics: React.FC = () => {
               companyCount={companyStats?.data?.length ?? 0}
               monthlyAverage={
                 timelineChartData.length > 0
-                  ? Math.round(timelineChartData.reduce((a, c) => a + (c.count || 0), 0) / timelineChartData.length)
+                  ? Math.round(timelineChartData.reduce((a, c) => a + (c.count ?? 0), 0) / timelineChartData.length)
                   : 0
               }
               previousTotalContacts={previousTotalContacts?.data ?? 0}
@@ -280,16 +406,21 @@ const Statistics: React.FC = () => {
               previousCompanyCount={previousCompanyStats?.data?.length ?? 0}
               previousMonthlyAverage={
                 previousTimelineStats?.data && previousTimelineStats.data.length > 0
-                  ? Math.round(previousTimelineStats.data.reduce((a, c) => a + (c.count || 0), 0) / previousTimelineStats.data.length)
+                  ? Math.round(previousTimelineStats.data.reduce((a, c) => a + (c.count ?? 0), 0) / previousTimelineStats.data.length)
                   : 0
               }
             />
             <Tabs defaultValue="overview" className="space-y-6" dir={document.documentElement.dir === 'rtl' ? 'rtl' : 'ltr'}>
-              <TabsList className={`grid w-full grid-cols-4 h-14 bg-white/80 backdrop-blur-sm border-0 shadow-lg glass-3d-hover ${document.documentElement.dir === 'rtl' ? 'grid-flow-col-reverse' : ''}`}>
+              <TabsList className={`grid w-full grid-cols-9 h-14 bg-white/80 backdrop-blur-sm border-0 shadow-lg glass-3d-hover ${document.documentElement.dir === 'rtl' ? 'grid-flow-col-reverse' : ''}`}>
                 <TabsTrigger value="overview" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-600 data-[state=active]:text-white glass-3d-hover">نمای کلی</TabsTrigger>
                 <TabsTrigger value="demographics" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-500 data-[state=active]:to-teal-600 data-[state=active]:text-white glass-3d-hover">جمعیت شناسی</TabsTrigger>
                 <TabsTrigger value="timeline" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-orange-600 data-[state=active]:text-white glass-3d-hover">روند زمانی</TabsTrigger>
-                <TabsTrigger value="details" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-pink-500 data-[state=active]:to-rose-600 data-[state=active]:text-white glass-3d-hover">جزئیات</TabsTrigger>
+                <TabsTrigger value="birthdays" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-pink-500 data-[state=active]:to-rose-600 data-[state=active]:text-white glass-3d-hover">تولدها</TabsTrigger>
+                <TabsTrigger value="companies" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-indigo-500 data-[state=active]:to-purple-600 data-[state=active]:text-white glass-3d-hover">شرکت‌ها</TabsTrigger>
+                <TabsTrigger value="groups" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-violet-500 data-[state=active]:to-purple-600 data-[state=active]:text-white glass-3d-hover">گروه‌ها</TabsTrigger>
+                <TabsTrigger value="activity" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500 data-[state=active]:to-blue-600 data-[state=active]:text-white glass-3d-hover">فعالیت‌ها</TabsTrigger>
+                <TabsTrigger value="communication" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-teal-500 data-[state=active]:to-green-600 data-[state=active]:text-white glass-3d-hover">ارتباطات</TabsTrigger>
+                <TabsTrigger value="details" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-slate-500 data-[state=active]:to-gray-600 data-[state=active]:text-white glass-3d-hover">جزئیات</TabsTrigger>
               </TabsList>
 
               <TabsContent value="overview" className="space-y-6">
@@ -302,8 +433,8 @@ const Statistics: React.FC = () => {
 
               <TabsContent value="demographics" className="space-y-6">
                 <StatisticsDemographicsTab
-                  companyStats={companyStats?.data || []}
-                  positionStats={positionStats?.data || []}
+                  companyStats={companyStats?.data ?? []}
+                  positionStats={positionStats?.data ?? []}
                   isLoading={isLoadingCompanies || isLoadingPositions}
                 />
               </TabsContent>
@@ -315,9 +446,52 @@ const Statistics: React.FC = () => {
                 />
               </TabsContent>
 
+              <TabsContent value="birthdays" className="space-y-6">
+                <BirthdaysTab
+                  upcomingBirthdays={upcomingBirthdays?.data ?? []}
+                  birthdaysByMonth={birthdaysByMonth?.data ?? []}
+                  isLoading={isLoadingBirthdays || isLoadingBirthdaysByMonth}
+                />
+              </TabsContent>
+
+              <TabsContent value="companies" className="space-y-6">
+                <AdvancedCompanyStatsTab
+                  companyGrowth={companyGrowth?.data ?? []}
+                  companyStats={companyStats?.data ?? []}
+                  isLoading={isLoadingCompanyGrowth}
+                />
+              </TabsContent>
+
+              <TabsContent value="activity" className="space-y-6">
+                <ActivityStatsTab
+                  recentActivity={recentActivity?.data ?? []}
+                  isLoading={isLoadingActivity}
+                />
+              </TabsContent>
+
+              <TabsContent value="groups" className="space-y-6">
+                <AdvancedGroupStatsTab
+                  groupGrowth={groupGrowth?.data ?? []}
+                  groupStats={groupStats?.data ?? []}
+                  isLoading={isLoadingGroupGrowth}
+                />
+              </TabsContent>
+
+              <TabsContent value="communication" className="space-y-6">
+                <CommunicationStatsTab
+                  communicationMethods={communicationMethods?.data ? communicationMethods.data.map(item => ({
+                    method: item.method,
+                    count: item.count,
+                    percentage: Math.round((item.count / communicationMethods.data!.reduce((sum, i) => sum + i.count, 0)) * 100)
+                  })) : []}
+                  isLoading={isLoadingCommunication}
+                />
+              </TabsContent>
+
               <TabsContent value="details" className="space-y-6">
                 <StatisticsDetailsTab
-                  groupStats={groupStats?.data || []}
+                  groupStats={groupStats?.data ?? []}
+                  upcomingBirthdays={upcomingBirthdays?.data ?? []}
                   isLoading={isLoadingGroups}
                 />
               </TabsContent>
