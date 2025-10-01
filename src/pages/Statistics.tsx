@@ -284,8 +284,8 @@ const Statistics: React.FC = () => {
                   : 0
               }
             />
-            <Tabs defaultValue="overview" className="space-y-6">
-              <TabsList className="grid w-full grid-cols-4 h-14 bg-white/80 backdrop-blur-sm border-0 shadow-lg glass-3d-hover">
+            <Tabs defaultValue="overview" className="space-y-6" dir={document.documentElement.dir === 'rtl' ? 'rtl' : 'ltr'}>
+              <TabsList className={`grid w-full grid-cols-4 h-14 bg-white/80 backdrop-blur-sm border-0 shadow-lg glass-3d-hover ${document.documentElement.dir === 'rtl' ? 'grid-flow-col-reverse' : ''}`}>
                 <TabsTrigger value="overview" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-600 data-[state=active]:text-white glass-3d-hover">نمای کلی</TabsTrigger>
                 <TabsTrigger value="demographics" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-500 data-[state=active]:to-teal-600 data-[state=active]:text-white glass-3d-hover">جمعیت شناسی</TabsTrigger>
                 <TabsTrigger value="timeline" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-orange-600 data-[state=active]:text-white glass-3d-hover">روند زمانی</TabsTrigger>

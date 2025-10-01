@@ -38,10 +38,10 @@ const StatisticsOverviewCards: React.FC<StatisticsOverviewCardsProps> = ({
   const averageChange = calculateChange(monthlyAverage, previousMonthlyAverage);
 
   const ChangeIcon = ({ isPositive, value }: { isPositive: boolean; value: number }) => {
-    if (value === 0) return <Minus className="w-4 h-4 text-slate-400 transition-colors duration-300" />;
+    if (value === 0) return <Minus className="w-3 h-3 text-slate-400 transition-colors duration-300" />;
     return isPositive ?
-      <TrendingUp className="w-4 h-4 text-emerald-500 transition-colors duration-300" /> :
-      <TrendingDown className="w-4 h-4 text-red-500 transition-colors duration-300" />;
+      <TrendingUp className="w-3 h-3 text-emerald-500 transition-colors duration-300" /> :
+      <TrendingDown className="w-3 h-3 text-red-500 transition-colors duration-300" />;
   };
 
   const cards = [
@@ -88,51 +88,51 @@ const StatisticsOverviewCards: React.FC<StatisticsOverviewCardsProps> = ({
   ];
 
   return (
-    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       {cards.map((card, index) => (
         <Card
           key={card.title}
-          className={`group relative overflow-hidden bg-gradient-to-br ${card.bgGradient} backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-[1.02] hover:-translate-y-1 animate-in fade-in-50 slide-in-from-bottom-4`}
-          style={{ animationDelay: `${index * 100}ms` }}
+          className={`group relative overflow-hidden bg-gradient-to-br ${card.bgGradient} backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.01] animate-in fade-in-50 slide-in-from-bottom-4`}
+          style={{ animationDelay: `${index * 80}ms` }}
         >
           {/* Background Pattern */}
-          <div className="absolute inset-0 opacity-5">
-            <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent" />
+          <div className="absolute inset-0 opacity-3">
+            <div className="absolute inset-0 bg-gradient-to-br from-white/15 to-transparent" />
           </div>
 
           {/* Gradient Overlay */}
-          <div className={`absolute inset-0 bg-gradient-to-br ${card.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500`} />
+          <div className={`absolute inset-0 bg-gradient-to-br ${card.gradient} opacity-0 group-hover:opacity-8 transition-opacity duration-300`} />
 
-          <CardHeader className="relative flex flex-row items-center justify-between space-y-0 pb-3">
-            <CardTitle className="text-sm font-semibold text-slate-700 group-hover:text-slate-800 transition-colors duration-300">
+          <CardHeader className="relative flex flex-row items-center justify-between space-y-0 pb-2 px-4 pt-4">
+            <CardTitle className="text-xs font-medium text-slate-600 group-hover:text-slate-700 transition-colors duration-300">
               {card.title}
             </CardTitle>
-            <div className={`p-2 rounded-xl ${card.iconBg} shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-              <card.icon className="h-5 w-5 text-white" />
+            <div className={`p-1.5 rounded-lg ${card.iconBg} shadow-md group-hover:scale-105 transition-transform duration-300`}>
+              <card.icon className="h-3.5 w-3.5 text-white" />
             </div>
           </CardHeader>
 
-          <CardContent className="relative">
-            <div className="text-3xl font-bold text-slate-800 mb-2 group-hover:text-slate-900 transition-colors duration-300">
+          <CardContent className="relative px-4 pb-4">
+            <div className="text-2xl font-bold text-slate-800 mb-1 group-hover:text-slate-900 transition-colors duration-300">
               {card.value.toLocaleString()}
             </div>
 
-            <div className="flex items-center gap-2 mb-3">
+            <div className="flex items-center gap-1.5 mb-2">
               <ChangeIcon isPositive={card.change.isPositive} value={card.change.value} />
-              <p className={`text-sm font-medium ${
+              <p className={`text-xs font-medium ${
                 card.change.isPositive ? 'text-emerald-600' : card.change.value === 0 ? 'text-slate-400' : 'text-red-600'
               }`}>
                 {card.change.percentage !== 0 && `${card.change.isPositive ? '+' : ''}${card.change.percentage}%`}
               </p>
             </div>
 
-            <p className="text-xs text-slate-500 leading-relaxed">
+            <p className="text-xs text-slate-500 leading-tight">
               {card.description}
             </p>
 
             {/* Decorative Elements */}
-            <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-white/10 to-transparent rounded-full -translate-y-10 translate-x-10 group-hover:translate-x-8 group-hover:-translate-y-8 transition-transform duration-500" />
-            <div className="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-tr from-white/5 to-transparent rounded-full translate-y-8 -translate-x-8 group-hover:translate-x-6 group-hover:translate-y-6 transition-transform duration-500" />
+            <div className="absolute top-1 right-1 w-12 h-12 bg-gradient-to-br from-white/8 to-transparent rounded-full opacity-40" />
+            <div className="absolute bottom-1 left-1 w-10 h-10 bg-gradient-to-tr from-white/4 to-transparent rounded-full opacity-40" />
           </CardContent>
         </Card>
       ))}
