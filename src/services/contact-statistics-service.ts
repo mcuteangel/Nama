@@ -102,8 +102,8 @@ export const ContactStatisticsService = {
   },
 
   async getTopPositions(userId: string, limit: number = 5, startDate?: string | null, endDate?: string | null): Promise<{ data: Array<{ position: string; count: number }> | null; error: string | null }> {
-    const { data, error } = await supabase.rpc('get_top_positions', { 
-      user_id_param: userId, 
+    const { data, error } = await supabase.rpc('get_top_positions', {
+      user_id_param: userId,
       limit_param: limit,
       start_date_param: startDate || null,
       end_date_param: endDate || null
@@ -112,5 +112,39 @@ export const ContactStatisticsService = {
       return { data: null, error: error.message };
     }
     return { data: data as Array<{ position: string; count: number }>, error: null };
+  },
+
+  // جدید: دریافت لیست شرکت‌های منحصر به فرد برای فیلتر
+  async getUniqueCompanies(userId: string): Promise<{ data: string[] | null; error: string | null }> {
+    const { data, error } = await supabase
+      .from('contacts')
+      .select('company')
+      .eq('user_id', userId)
+      .not('company', 'is', null)
+      .not('company', 'eq', '');
+
+    if (error) {
+      return { data: null, error: error.message };
+    }
+
+    const uniqueCompanies = [...new Set(data.map(item => item.company))].filter(Boolean);
+    return { data: uniqueCompanies, error: null };
+  },
+
+  // جدید: دریافت لیست موقعیت‌های شغلی منحصر به فرد برای فیلتر
+  async getUniquePositions(userId: string): Promise<{ data: string[] | null; error: string | null }> {
+    const { data, error } = await supabase
+      .from('contacts')
+      .select('position')
+      .eq('user_id', userId)
+      .not('position', 'is', null)
+      .not('position', 'eq', '');
+
+    if (error) {
+      return { data: null, error: error.message };
+    }
+
+    const uniquePositions = [...new Set(data.map(item => item.position))].filter(Boolean);
+    return { data: uniquePositions, error: null };
   },
 };

@@ -14,6 +14,8 @@ interface PositionStats {
 interface StatisticsDemographicsTabProps {
   companyStats?: CompanyStats[];
   positionStats?: PositionStats[];
+  isLoading?: boolean;
+  error?: string | null;
 }
 
 const COLORS = {
@@ -23,7 +25,77 @@ const COLORS = {
 const StatisticsDemographicsTab: React.FC<StatisticsDemographicsTabProps> = ({
   companyStats = [],
   positionStats = [],
+  isLoading = false,
+  error = null,
 }) => {
+  if (isLoading) {
+    return (
+      <div className="grid gap-4 md:grid-cols-2">
+        <Card className="glass-card">
+          <CardHeader>
+            <div className="h-6 w-[150px] bg-muted/50 rounded animate-pulse mb-2" />
+            <div className="h-4 w-[200px] bg-muted/50 rounded animate-pulse" />
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {Array.from({ length: 5 }).map((_, idx) => (
+                <div key={idx} className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 bg-muted/50 rounded-full animate-pulse" />
+                    <div className="h-4 w-[120px] bg-muted/50 rounded animate-pulse" />
+                  </div>
+                  <div className="h-6 w-[40px] bg-muted/50 rounded animate-pulse" />
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="glass-card">
+          <CardHeader>
+            <div className="h-6 w-[180px] bg-muted/50 rounded animate-pulse mb-2" />
+            <div className="h-4 w-[220px] bg-muted/50 rounded animate-pulse" />
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {Array.from({ length: 5 }).map((_, idx) => (
+                <div key={idx} className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 bg-muted/50 rounded-full animate-pulse" />
+                    <div className="h-4 w-[100px] bg-muted/50 rounded animate-pulse" />
+                  </div>
+                  <div className="h-6 w-[40px] bg-muted/50 rounded animate-pulse" />
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="grid gap-4 md:grid-cols-2">
+        <Card className="glass-card">
+          <CardContent className="flex items-center justify-center h-[300px]">
+            <div className="text-center text-muted-foreground">
+              <p className="text-sm">خطا در بارگذاری آمار شرکت‌ها</p>
+              <p className="text-xs mt-1">{error}</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="glass-card">
+          <CardContent className="flex items-center justify-center h-[300px]">
+            <div className="text-center text-muted-foreground">
+              <p className="text-sm">خطا در بارگذاری آمار موقعیت‌ها</p>
+              <p className="text-xs mt-1">داده‌ای برای نمایش وجود ندارد</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="grid gap-4 md:grid-cols-2">
       <Card className="glass-card">

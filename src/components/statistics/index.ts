@@ -4,3 +4,4 @@ export { default as StatisticsOverviewTab } from './StatisticsOverviewTab';
 export { default as StatisticsDemographicsTab } from './StatisticsDemographicsTab';
 export { default as StatisticsTimelineTab } from './StatisticsTimelineTab';
 export { default as StatisticsDetailsTab } from './StatisticsDetailsTab';
+export { default as StatisticsLoading } from './StatisticsLoading';

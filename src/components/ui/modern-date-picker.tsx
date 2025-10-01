@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Calendar } from 'lucide-react';
 import { ModernInput } from '@/components/ui/modern-input';
 import { JalaliCalendar } from '@/components/JalaliCalendar';
@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/modern-popover';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
+import { useJalaliCalendar } from '@/hooks/use-jalali-calendar';
 
 export interface ModernDatePickerProps {
   value?: string;
@@ -34,33 +35,39 @@ export const ModernDatePicker = React.forwardRef<
   ...props
 }, ref) => {
   const { t } = useTranslation();
+  const { formatDate } = useJalaliCalendar();
   const [isOpen, setIsOpen] = useState(false);
-  const [tempDate, setTempDate] = useState<Date | undefined>(
-    value ? new Date(value) : undefined
-  );
 
-  // Format date for display
-  const formatDate = (date: Date | undefined): string => {
-    if (!date) return '';
-    // Format as YYYY-MM-DD for consistency
-    return date.toISOString().split('T')[0];
-  };
+  // Format date for display based on calendar type
+  const displayValue = React.useMemo(() => {
+    if (!value) return '';
+    try {
+      // Handle both ISO string and Date object
+      const date = typeof value === 'string' ? new Date(value + 'T00:00:00.000Z') : value;
+      return formatDate(date);
+    } catch (error) {
+      console.warn('Date parsing error:', error, 'Value:', value);
+      return value;
+    }
+  }, [value, formatDate]);
 
   // Handle date selection from calendar
   const handleDateSelect = (date: Date) => {
-    setTempDate(date);
     if (onChange) {
-      onChange(date.toISOString().split('T')[0]);
+      // Create date with local time components to avoid timezone issues
+      const year = date.getFullYear();
+      const month = date.getMonth();
+      const day = date.getDate();
+
+      // Create new date object with same local date but at midnight UTC
+      const selectedDate = new Date(Date.UTC(year, month, day));
+
+      // Send date in ISO format for backend storage (YYYY-MM-DD)
+      const dateStr = selectedDate.toISOString().split('T')[0];
+      console.log('Selected date:', dateStr, 'Original date:', date);
+      onChange(dateStr);
     }
     setIsOpen(false);
-  };
-
-  // Handle input clear
-  const handleClear = () => {
-    setTempDate(undefined);
-    if (onChange) {
-      onChange('');
-    }
   };
 
   return (
@@ -69,7 +76,7 @@ export const ModernDatePicker = React.forwardRef<
         <ModernPopoverTrigger asChild>
           <div className="relative">
             <ModernInput
-              value={value || ''}
+              value={displayValue}
               placeholder={placeholder || t('form_placeholders.select_birth_date')}
               variant={variant}
               inputSize={inputSize}
@@ -85,8 +92,8 @@ export const ModernDatePicker = React.forwardRef<
             </div>
           </div>
         </ModernPopoverTrigger>
-        <ModernPopoverContent 
-          className="p-0 w-auto" 
+        <ModernPopoverContent
+          className="p-0 w-auto"
           align="start"
           glassEffect="advanced"
         >

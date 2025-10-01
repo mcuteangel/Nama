@@ -10,11 +10,42 @@ interface TimelineStats {
 
 interface StatisticsTimelineTabProps {
   timelineChartData: TimelineStats[];
+  isLoading?: boolean;
+  error?: string | null;
 }
 
 const StatisticsTimelineTab: React.FC<StatisticsTimelineTabProps> = ({
   timelineChartData,
+  isLoading = false,
+  error = null,
 }) => {
+  if (isLoading) {
+    return (
+      <Card className="glass-card">
+        <CardHeader>
+          <div className="h-6 w-[200px] bg-muted/50 rounded animate-pulse mb-2" />
+          <div className="h-4 w-[250px] bg-muted/50 rounded animate-pulse" />
+        </CardHeader>
+        <CardContent>
+          <div className="h-[380px] w-full bg-muted/20 rounded-lg animate-pulse" />
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card className="glass-card">
+        <CardContent className="flex items-center justify-center h-[380px]">
+          <div className="text-center text-muted-foreground">
+            <p className="text-sm">خطا در بارگذاری روند زمانی</p>
+            <p className="text-xs mt-1">{error}</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card className="glass-card">
       <CardHeader>

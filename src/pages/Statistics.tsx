@@ -12,24 +12,38 @@ import {
   StatisticsDemographicsTab,
   StatisticsTimelineTab,
   StatisticsDetailsTab,
+  StatisticsLoading,
 } from "@/components/statistics";
 
 function toDateStr(d: Date) {
-  return d.toISOString().slice(0, 10);
+  // Use UTC to avoid timezone issues completely
+  const year = d.getUTCFullYear();
+  const month = String(d.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(d.getUTCDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 }
 
 const addMonths = (date: Date, months: number) => {
-  const d = new Date(date);
-  d.setMonth(d.getMonth() + months);
-  return d;
+  // Avoid timezone issues by creating new date with local components
+  return new Date(date.getFullYear(), date.getMonth() + months, date.getDate());
 };
 
 const Statistics: React.FC = () => {
   const { session } = useSession();
 
   const [quickRange, setQuickRange] = useState<string>("12m");
-  const [fromDate, setFromDate] = useState<string | undefined>(() => toDateStr(addMonths(new Date(), -12)));
-  const [toDate, setToDate] = useState<string | undefined>(() => toDateStr(new Date()));
+  const [fromDate, setFromDate] = useState<string | undefined>(() => {
+    const today = new Date();
+    return toDateStr(today);
+  });
+  const [toDate, setToDate] = useState<string | undefined>(() => {
+    const today = new Date();
+    return toDateStr(today);
+  });
+
+  // فیلترهای پیشرفته جدید
+  const [selectedPosition, setSelectedPosition] = useState<string>("all");
+  const [selectedContactMethod, setSelectedContactMethod] = useState<string>("all");
 
   // Sync quick ranges to from/to
   const onChangeQuickRange = (val: string) => {
@@ -132,6 +146,72 @@ const Statistics: React.FC = () => {
     enabled: !!session?.user?.id,
   });
 
+  // مقایسه با دوره قبلی
+  const previousDateRange = useMemo(() => {
+    if (!fromDate || !toDate) return null;
+
+    // Parse dates without timezone issues
+    const fromDateObj = new Date(fromDate + 'T00:00:00');
+    const toDateObj = new Date(toDate + 'T00:00:00');
+    const diffMs = toDateObj.getTime() - fromDateObj.getTime();
+    const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+
+    const previousToDate = new Date(fromDateObj);
+    previousToDate.setDate(previousToDate.getDate() - 1);
+    const previousFromDate = new Date(previousToDate);
+    previousFromDate.setDate(previousFromDate.getDate() - diffDays);
+
+    return {
+      startDate: toDateStr(previousFromDate),
+      endDate: toDateStr(previousToDate),
+    };
+  }, [fromDate, toDate]);
+
+  const { data: previousTotalContacts } = useQuery({
+    queryKey: ["previousTotalContacts", session?.user?.id, previousDateRange],
+    queryFn: () =>
+      ContactStatisticsService.getTotalContacts(
+        session?.user?.id || "",
+        previousDateRange?.startDate,
+        previousDateRange?.endDate,
+      ),
+    enabled: !!session?.user?.id && !!previousDateRange,
+  });
+
+  const { data: previousGroupStats } = useQuery({
+    queryKey: ["previousGroupStats", session?.user?.id, previousDateRange],
+    queryFn: () =>
+      ContactStatisticsService.getContactsByGroup(
+        session?.user?.id || "",
+        previousDateRange?.startDate,
+        previousDateRange?.endDate,
+      ),
+    enabled: !!session?.user?.id && !!previousDateRange,
+  });
+
+  const { data: previousCompanyStats } = useQuery({
+    queryKey: ["previousCompanyStats", session?.user?.id, previousDateRange],
+    queryFn: () =>
+      ContactStatisticsService.getTopCompanies(
+        session?.user?.id || "",
+        5,
+        previousDateRange?.startDate,
+        previousDateRange?.endDate,
+      ),
+    enabled: !!session?.user?.id && !!previousDateRange,
+  });
+
+  const { data: previousTimelineStats } = useQuery({
+    queryKey: ["previousTimelineStats", session?.user?.id, previousDateRange],
+    queryFn: () =>
+      ContactStatisticsService.getContactsByCreationMonth(
+        session?.user?.id || "",
+        previousDateRange?.startDate,
+        previousDateRange?.endDate,
+      ),
+    enabled: !!session?.user?.id && !!previousDateRange,
+  });
+
   // Transforms
   const genderChartData = useMemo(() => {
     const src = genderStats?.data || [];
@@ -161,78 +241,90 @@ const Statistics: React.FC = () => {
     isLoadingPositions;
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <PageHeader
-        title="آمار و گزارش‌ها"
-        description="تحلیل جامع اطلاعات مخاطبین شما"
-        showBackButton={true}
-      />
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/50">
+      <div className="container mx-auto p-6 space-y-8">
+        <PageHeader
+          title="آمار و گزارش‌ها"
+          description="تحلیل جامع اطلاعات مخاطبین شما"
+          showBackButton={true}
+        />
 
-      <StatisticsFilters
-        quickRange={quickRange}
-        onQuickRangeChange={onChangeQuickRange}
-        fromDate={fromDate}
-        onFromDateChange={setFromDate}
-        toDate={toDate}
-        onToDateChange={setToDate}
-      />
+        <StatisticsFilters
+          quickRange={quickRange}
+          onQuickRangeChange={onChangeQuickRange}
+          fromDate={fromDate}
+          onFromDateChange={setFromDate}
+          toDate={toDate}
+          onToDateChange={setToDate}
+          selectedPosition={selectedPosition}
+          onPositionChange={(value: string | undefined) => setSelectedPosition(value || "all")}
+          selectedContactMethod={selectedContactMethod}
+          onContactMethodChange={(value: string | undefined) => setSelectedContactMethod(value || "all")}
+        />
 
-      {isLoading ? (
-        <div className="flex items-center justify-center h-64">
-          <ModernLoader variant="ring" size="lg" />
-        </div>
-      ) : (
-        <>
-          <StatisticsOverviewCards
-            totalContacts={totalContacts?.data ?? 0}
-            groupCount={groupStats?.data?.length ?? 0}
-            companyCount={companyStats?.data?.length ?? 0}
-            monthlyAverage={
-              timelineChartData.length > 0
-                ? Math.round(
-                    timelineChartData.reduce((a, c) => a + (c.count || 0), 0) /
-                      timelineChartData.length,
-                  )
-                : 0
-            }
-          />
+        {isLoading ? (
+          <StatisticsLoading />
+        ) : (
+          <>
+            <StatisticsOverviewCards
+              totalContacts={totalContacts?.data ?? 0}
+              groupCount={groupStats?.data?.length ?? 0}
+              companyCount={companyStats?.data?.length ?? 0}
+              monthlyAverage={
+                timelineChartData.length > 0
+                  ? Math.round(timelineChartData.reduce((a, c) => a + (c.count || 0), 0) / timelineChartData.length)
+                  : 0
+              }
+              previousTotalContacts={previousTotalContacts?.data ?? 0}
+              previousGroupCount={previousGroupStats?.data?.length ?? 0}
+              previousCompanyCount={previousCompanyStats?.data?.length ?? 0}
+              previousMonthlyAverage={
+                previousTimelineStats?.data && previousTimelineStats.data.length > 0
+                  ? Math.round(previousTimelineStats.data.reduce((a, c) => a + (c.count || 0), 0) / previousTimelineStats.data.length)
+                  : 0
+              }
+            />
+            <Tabs defaultValue="overview" className="space-y-6">
+              <TabsList className="grid w-full grid-cols-4 h-14 bg-white/80 backdrop-blur-sm border-0 shadow-lg glass-3d-hover">
+                <TabsTrigger value="overview" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-600 data-[state=active]:text-white glass-3d-hover">نمای کلی</TabsTrigger>
+                <TabsTrigger value="demographics" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-500 data-[state=active]:to-teal-600 data-[state=active]:text-white glass-3d-hover">جمعیت شناسی</TabsTrigger>
+                <TabsTrigger value="timeline" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-orange-600 data-[state=active]:text-white glass-3d-hover">روند زمانی</TabsTrigger>
+                <TabsTrigger value="details" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-pink-500 data-[state=active]:to-rose-600 data-[state=active]:text-white glass-3d-hover">جزئیات</TabsTrigger>
+              </TabsList>
 
-          <Tabs defaultValue="overview" className="space-y-4">
-            <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4">
-              <TabsTrigger value="overview">نمای کلی</TabsTrigger>
-              <TabsTrigger value="demographics">جمعیت‌شناسی</TabsTrigger>
-              <TabsTrigger value="timeline">روند زمانی</TabsTrigger>
-              <TabsTrigger value="details">جزئیات</TabsTrigger>
-            </TabsList>
+              <TabsContent value="overview" className="space-y-6">
+                <StatisticsOverviewTab
+                  genderChartData={genderChartData}
+                  contactMethodChartData={contactMethodChartData}
+                  isLoading={isLoadingGender || isLoadingContactMethods}
+                />
+              </TabsContent>
 
-            <TabsContent value="overview" className="space-y-4">
-              <StatisticsOverviewTab
-                genderChartData={genderChartData}
-                contactMethodChartData={contactMethodChartData}
-              />
-            </TabsContent>
+              <TabsContent value="demographics" className="space-y-6">
+                <StatisticsDemographicsTab
+                  companyStats={companyStats?.data || []}
+                  positionStats={positionStats?.data || []}
+                  isLoading={isLoadingCompanies || isLoadingPositions}
+                />
+              </TabsContent>
 
-            <TabsContent value="demographics" className="space-y-4">
-              <StatisticsDemographicsTab
-                companyStats={companyStats?.data || []}
-                positionStats={positionStats?.data || []}
-              />
-            </TabsContent>
+              <TabsContent value="timeline" className="space-y-6">
+                <StatisticsTimelineTab
+                  timelineChartData={timelineChartData}
+                  isLoading={isLoadingTimeline}
+                />
+              </TabsContent>
 
-            <TabsContent value="timeline" className="space-y-4">
-              <StatisticsTimelineTab
-                timelineChartData={timelineChartData}
-              />
-            </TabsContent>
-
-            <TabsContent value="details" className="space-y-4">
-              <StatisticsDetailsTab
-                groupStats={groupStats?.data || []}
-              />
-            </TabsContent>
-          </Tabs>
-        </>
-      )}
+              <TabsContent value="details" className="space-y-6">
+                <StatisticsDetailsTab
+                  groupStats={groupStats?.data || []}
+                  isLoading={isLoadingGroups}
+                />
+              </TabsContent>
+            </Tabs>
+          </>
+        )}
+      </div>
     </div>
   );
 };
