@@ -1,4 +1,5 @@
-import React from "react";
+import { useTranslation } from "react-i18next";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Gift, Clock, TrendingUp } from "lucide-react";
@@ -29,6 +30,16 @@ const BirthdaysTab: React.FC<BirthdaysTabProps> = ({
   isLoading = false,
   error = null,
 }) => {
+  const { t } = useTranslation();
+  const [calendarType, setCalendarType] = useState<'jalali' | 'gregorian'>('jalali');
+
+  useEffect(() => {
+    // خواندن تنظیمات تقویم از localStorage
+    const savedCalendar = localStorage.getItem('calendar_type') as 'jalali' | 'gregorian';
+    if (savedCalendar) {
+      setCalendarType(savedCalendar);
+    }
+  }, []);
   if (isLoading) {
     return (
       <div className="grid gap-6 md:grid-cols-2">
@@ -74,7 +85,7 @@ const BirthdaysTab: React.FC<BirthdaysTabProps> = ({
           <CardContent className="flex items-center justify-center h-[300px] p-4">
             <div className="text-center text-muted-foreground">
               <Gift className="h-8 w-8 mx-auto mb-2 opacity-50" />
-              <p className="text-sm">خطا در بارگذاری تولدهای پیش رو</p>
+              <p className="text-sm">{t('statistics.error_loading_upcoming_birthdays')}</p>
               <p className="text-xs mt-1">{error}</p>
             </div>
           </CardContent>
@@ -83,8 +94,8 @@ const BirthdaysTab: React.FC<BirthdaysTabProps> = ({
           <CardContent className="flex items-center justify-center h-[300px] p-4">
             <div className="text-center text-muted-foreground">
               <TrendingUp className="h-8 w-8 mx-auto mb-2 opacity-50" />
-              <p className="text-sm">آمار تولدها</p>
-              <p className="text-xs mt-1">داده‌ای برای نمایش وجود ندارد</p>
+              <p className="text-sm">{t('statistics.error_loading_birthdays_stats')}</p>
+              <p className="text-xs mt-1">{t('statistics.no_birthdays_stats_data')}</p>
             </div>
           </CardContent>
         </Card>
@@ -111,10 +122,10 @@ const BirthdaysTab: React.FC<BirthdaysTabProps> = ({
             </div>
             <div>
               <CardTitle className="text-xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
-                تولدهای پیش رو
+                {t('statistics.upcoming_birthdays')}
               </CardTitle>
               <CardDescription className="text-sm text-slate-500 leading-relaxed">
-                مخاطبینی که تولدشان نزدیک است
+                {t('statistics.upcoming_birthdays_description')}
               </CardDescription>
             </div>
           </div>
@@ -154,7 +165,7 @@ const BirthdaysTab: React.FC<BirthdaysTabProps> = ({
                           : 'bg-gradient-to-r from-blue-100 to-cyan-100 text-blue-700 border-blue-200 hover:from-blue-200 hover:to-cyan-200'
                       }`}
                     >
-                      {birthday.days_until_birthday} روز دیگر
+                      {t('statistics.days_remaining', { count: birthday.days_until_birthday })}
                     </Badge>
                   </div>
                 </div>
@@ -164,8 +175,8 @@ const BirthdaysTab: React.FC<BirthdaysTabProps> = ({
                 <div className="w-16 h-16 bg-gradient-to-br from-slate-100 to-slate-200 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Gift className="h-8 w-8 text-slate-400" />
                 </div>
-                <p className="text-sm text-slate-500 font-medium">تولدی در ۳۰ روز آینده وجود ندارد</p>
-                <p className="text-xs text-slate-400 mt-1">مخاطبین جدیدی با تاریخ تولد اضافه کنید</p>
+                <p className="text-sm text-slate-500 font-medium">{t('statistics.no_birthdays_in_30_days_title')}</p>
+                <p className="text-xs text-slate-400 mt-1">{t('statistics.no_birthdays_in_30_days_description')}</p>
               </div>
             )}
           </div>
@@ -193,10 +204,10 @@ const BirthdaysTab: React.FC<BirthdaysTabProps> = ({
             </div>
             <div>
               <CardTitle className="text-xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
-                توزیع تولدها در ماه‌ها
+                {t('statistics.birthdays_distribution_by_month')}
               </CardTitle>
               <CardDescription className="text-sm text-slate-500 leading-relaxed">
-                تعداد تولدها در هر ماه از سال شمسی
+                {t('statistics.birthdays_distribution_by_month_description')}
               </CardDescription>
             </div>
           </div>
@@ -206,21 +217,39 @@ const BirthdaysTab: React.FC<BirthdaysTabProps> = ({
           <div className="space-y-3">
             {birthdaysByMonth.length > 0 ? (
               birthdaysByMonth.map((item, idx) => {
-                // تعریف رنگ‌ها برای هر ماه
-                const monthColors: Record<string, string> = {
-                  'فروردین': 'bg-red-100 text-red-700',
-                  'اردیبهشت': 'bg-orange-100 text-orange-700',
-                  'خرداد': 'bg-yellow-100 text-yellow-700',
-                  'تیر': 'bg-green-100 text-green-700',
-                  'مرداد': 'bg-teal-100 text-teal-700',
-                  'شهریور': 'bg-blue-100 text-blue-700',
-                  'مهر': 'bg-indigo-100 text-indigo-700',
-                  'آبان': 'bg-purple-100 text-purple-700',
-                  'آذر': 'bg-pink-100 text-pink-700',
-                  'دی': 'bg-rose-100 text-rose-700',
-                  'بهمن': 'bg-slate-100 text-slate-700',
-                  'اسفند': 'bg-cyan-100 text-cyan-700',
+                // انتخاب مجموعه ماه‌ها بر اساس نوع تقویم
+                const monthTranslations = calendarType === 'gregorian'
+                  ? {
+                      [t('statistics.english_months.january')]: 'bg-red-100 text-red-700',
+                      [t('statistics.english_months.february')]: 'bg-orange-100 text-orange-700',
+                      [t('statistics.english_months.march')]: 'bg-yellow-100 text-yellow-700',
+                      [t('statistics.english_months.april')]: 'bg-green-100 text-green-700',
+                      [t('statistics.english_months.may')]: 'bg-teal-100 text-teal-700',
+                      [t('statistics.english_months.june')]: 'bg-blue-100 text-blue-700',
+                      [t('statistics.english_months.july')]: 'bg-indigo-100 text-indigo-700',
+                      [t('statistics.english_months.august')]: 'bg-purple-100 text-purple-700',
+                      [t('statistics.english_months.september')]: 'bg-pink-100 text-pink-700',
+                      [t('statistics.english_months.october')]: 'bg-rose-100 text-rose-700',
+                      [t('statistics.english_months.november')]: 'bg-slate-100 text-slate-700',
+                      [t('statistics.english_months.december')]: 'bg-cyan-100 text-cyan-700',
+                    }
+                  : {
+                  [t('statistics.months.farvardin')]: 'bg-red-100 text-red-700',
+                  [t('statistics.months.ordibehesht')]: 'bg-orange-100 text-orange-700',
+                  [t('statistics.months.khordad')]: 'bg-yellow-100 text-yellow-700',
+                  [t('statistics.months.tir')]: 'bg-green-100 text-green-700',
+                  [t('statistics.months.mordad')]: 'bg-teal-100 text-teal-700',
+                  [t('statistics.months.shahrivar')]: 'bg-blue-100 text-blue-700',
+                  [t('statistics.months.mehr')]: 'bg-indigo-100 text-indigo-700',
+                  [t('statistics.months.aban')]: 'bg-purple-100 text-purple-700',
+                  [t('statistics.months.azar')]: 'bg-pink-100 text-pink-700',
+                  [t('statistics.months.dey')]: 'bg-rose-100 text-rose-700',
+                  [t('statistics.months.bahman')]: 'bg-slate-100 text-slate-700',
+                  [t('statistics.months.esfand')]: 'bg-cyan-100 text-cyan-700',
                 };
+
+                // تعریف رنگ‌ها برای هر ماه با استفاده از ترجمه‌ها
+                const monthColors: Record<string, string> = monthTranslations;
 
                 return (
                   <div
@@ -229,7 +258,7 @@ const BirthdaysTab: React.FC<BirthdaysTabProps> = ({
                     style={{ animationDelay: `${idx * 100}ms` }}
                   >
                     <div className="flex items-center gap-3">
-                      <div className={`w-3 h-3 rounded-full ${monthColors[item.month] || 'bg-gray-100 text-gray-700'} shadow-sm`} />
+                      <div className={`w-3 h-3 rounded-full shadow-sm ${monthColors[item.month] || 'bg-gray-100 text-gray-700'}`} />
                       <span className="text-sm font-medium text-slate-700 group-hover/item:text-slate-800 transition-colors duration-300">
                         {item.month}
                       </span>
@@ -245,8 +274,8 @@ const BirthdaysTab: React.FC<BirthdaysTabProps> = ({
                 <div className="w-16 h-16 bg-gradient-to-br from-slate-100 to-slate-200 rounded-full flex items-center justify-center mx-auto mb-4">
                   <TrendingUp className="h-8 w-8 text-slate-400" />
                 </div>
-                <p className="text-sm text-slate-500 font-medium">داده‌ای برای نمایش وجود ندارد</p>
-                <p className="text-xs text-slate-400 mt-1">مخاطبینی با تاریخ تولد اضافه کنید</p>
+                <p className="text-sm text-slate-500 font-medium">{t('statistics.add_contacts_with_birthdays')}</p>
+                <p className="text-xs text-slate-400 mt-1">{t('statistics.add_contacts_with_birthdays_description')}</p>
               </div>
             )}
           </div>

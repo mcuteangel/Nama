@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Check, Copy } from "lucide-react";
 import { ModernTooltip, ModernTooltipContent, ModernTooltipTrigger } from "@/components/ui/modern-tooltip";
 import { GradientButton } from "@/components/ui/glass-button";
@@ -15,6 +16,7 @@ interface ShareStatisticsProps {
 }
 
 const ShareStatistics: React.FC<ShareStatisticsProps> = ({ filters }) => {
+  const { t } = useTranslation();
   const [copied, setCopied] = useState(false);
 
   const generateShareableLink = () => {
@@ -55,18 +57,18 @@ const ShareStatistics: React.FC<ShareStatisticsProps> = ({ filters }) => {
           {copied ? (
             <>
               <Check size={18} className="text-green-600" />
-              <span className="hidden sm:inline">کپی شد</span>
+              <span className="hidden sm:inline">{t('share_statistics.copy_success')}</span>
             </>
           ) : (
             <>
               <Copy size={18} />
-              <span className="hidden sm:inline">اشتراک لینک</span>
+              <span className="hidden sm:inline">{t('share_statistics.share_link')}</span>
             </>
           )}
         </GradientButton>
       </ModernTooltipTrigger>
       <ModernTooltipContent>
-        <p>کپی لینک آمارها با فیلترهای فعلی</p>
+        <p>{t('share_statistics.tooltip')}</p>
       </ModernTooltipContent>
     </ModernTooltip>
   );

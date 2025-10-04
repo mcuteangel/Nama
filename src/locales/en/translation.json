@@ -55,6 +55,21 @@
     "birth_date": "Birth Date",
     "avatar_url": "Avatar URL"
   },
+  "home": {
+    "welcome_title": "Welcome to Nama Contacts!",
+    "welcome_subtitle": "Managing your contacts has never been easier",
+    "welcome_description": "With this app, you can easily add, edit, delete and organize your contacts.",
+    "view_contacts": "View Contacts",
+    "add_new_contact": "Add New Contact",
+    "transferring_to_contacts": "Navigating to contacts page...",
+    "transferring_to_add_contact": "Navigating to add contact page...",
+    "app_title": "Nama Contacts",
+    "app_subtitle": "Easy and smart contact management",
+    "features_title": "Main Features",
+    "feature_simple_management": "Contact management with simple UI",
+    "feature_jalali_calendar": "Jalali calendar support",
+    "feature_secure_storage": "Secure cloud storage"
+  },
   "contact": {
     "no_phone": "No phone number",
     "delete_success": "Contact deleted successfully.",
@@ -791,6 +806,11 @@
     "saved": "Saved",
     "save_changes": "Save Changes",
     "changes_saved": "Changes saved successfully"
+  },
+  "share_statistics": {
+    "copy_success": "Copied",
+    "share_link": "Share Link",
+    "tooltip": "Copy statistics link with current filters"
   },
   "sorting": {
     "sort_by": "Sort by",

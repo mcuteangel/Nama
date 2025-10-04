@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, Tag, Building, TrendingUp, TrendingDown, Minus } from "lucide-react";
 
@@ -25,6 +26,7 @@ const StatisticsOverviewCards: React.FC<StatisticsOverviewCardsProps> = ({
   previousCompanyCount = 0,
   previousMonthlyAverage = 0,
 }) => {
+  const { t } = useTranslation();
   const calculateChange = (current: number, previous: number) => {
     if (previous === 0) return { value: current, percentage: 0, isPositive: true };
     const change = current - previous;
@@ -46,44 +48,44 @@ const StatisticsOverviewCards: React.FC<StatisticsOverviewCardsProps> = ({
 
   const cards = [
     {
-      title: "کل مخاطبین",
+      title: t('statistics.total_contacts'),
       value: totalContacts,
       change: totalChange,
       icon: Users,
       gradient: "from-blue-500 via-blue-600 to-indigo-600",
       bgGradient: "from-blue-50/50 via-blue-100/30 to-indigo-100/20",
       iconBg: "bg-gradient-to-br from-blue-500 to-indigo-600",
-      description: "تعداد کل مخاطبین ثبت شده",
+      description: t('statistics.total_contacts_description'),
     },
     {
-      title: "تعداد گروه‌ها",
+      title: t('statistics.total_groups'),
       value: groupCount,
       change: groupChange,
       icon: Tag,
       gradient: "from-purple-500 via-purple-600 to-pink-600",
       bgGradient: "from-purple-50/50 via-purple-100/30 to-pink-100/20",
       iconBg: "bg-gradient-to-br from-purple-500 to-pink-600",
-      description: "گروه‌های ایجاد شده",
+      description: t('statistics.total_groups_description'),
     },
     {
-      title: "شرکت‌های برتر",
+      title: t('statistics.top_companies'),
       value: companyCount,
       change: companyChange,
       icon: Building,
       gradient: "from-emerald-500 via-emerald-600 to-teal-600",
       bgGradient: "from-emerald-50/50 via-emerald-100/30 to-teal-100/20",
       iconBg: "bg-gradient-to-br from-emerald-500 to-teal-600",
-      description: "شرکت‌های ثبت شده",
+      description: t('statistics.total_companies_description'),
     },
     {
-      title: "میانگین ماهانه",
+      title: t('statistics.monthly_average'),
       value: monthlyAverage,
       change: averageChange,
       icon: TrendingUp,
       gradient: "from-amber-500 via-orange-500 to-red-500",
       bgGradient: "from-amber-50/50 via-orange-100/30 to-red-100/20",
       iconBg: "bg-gradient-to-br from-amber-500 to-orange-600",
-      description: "میانگین مخاطبین جدید در ماه",
+      description: t('statistics.monthly_average_description'),
     },
   ];
 

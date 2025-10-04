@@ -1,22 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { 
-  ModernCard, 
-  ModernCardContent, 
-  ModernCardDescription, 
-  ModernCardHeader, 
-  ModernCardTitle} from "@/components/ui/modern-card";
+import { useTranslation } from "react-i18next";
 import { GradientButton } from "@/components/ui/glass-button";
-import { GlassButton } from "@/components/ui/glass-button";
 import { useToast } from "@/components/ui/use-toast";
-import { JalaliCalendar } from "@/components/JalaliCalendar";
-import { format } from "date-fns-jalali";
-import { Calendar, Users, Plus, Sparkles, Heart } from "lucide-react";
+import { Users, Plus, Phone, BookOpen } from "lucide-react";
 
 const Home = () => {
   const navigate = useNavigate();
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   useEffect(() => {
     const hasSeenWelcome = localStorage.getItem('hasSeenWelcome');
@@ -24,137 +16,94 @@ const Home = () => {
       navigate('/contacts');
     } else {
       localStorage.setItem('hasSeenWelcome', 'true');
-      // خوش‌آمدگویی با toast
+      // خوش‌آمدگویی ساده
       setTimeout(() => {
-        toast.success('به Nama Contacts خوش آمدید!', {
-          title: 'خوش آمدید',
-          description: 'مدیریت مخاطبین شما آسان‌تر از همیشه'
+        toast.success(t('home.welcome_title'), {
+          title: t('home.welcome_title'),
+          description: t('home.welcome_subtitle')
         });
-      }, 1000);
+      }, 500);
     }
-  }, [navigate, toast]);
+  }, [navigate, toast, t]);
 
   const handleContactsClick = () => {
-    toast.info('انتقال به صفحه مخاطبین...');
+    toast.info(t('home.transferring_to_contacts'));
     navigate('/contacts');
   };
 
   const handleAddContactClick = () => {
-    toast.info('انتقال به افزودن مخاطب جدید...');
+    toast.info(t('home.transferring_to_add_contact'));
     navigate('/add-contact');
   };
 
   return (
-    <div className="flex flex-col items-center justify-center p-4 h-full w-full bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-900 dark:to-gray-800 min-h-screen">
-      {/* کارت خوش‌آمدگویی اصلی */}
-      <ModernCard 
-        variant="glass" 
-        hover="lift" 
-        className="w-full max-w-md mb-8 fade-in-up"
-      >
-        <ModernCardHeader>
-          <div className="flex items-center justify-center mb-4">
-            <div className="w-16 h-16 bg-gradient-primary rounded-full flex items-center justify-center floating">
-              <Sparkles className="w-8 h-8 text-white" />
-            </div>
+    <div className="flex flex-col items-center justify-center p-6 h-full w-full bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 min-h-screen">
+      {/* هدر اصلی */}
+      <div className="text-center mb-12 space-y-4">
+        <div className="flex items-center justify-center mb-6">
+          <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center shadow-lg">
+            <Phone className="w-10 h-10 text-white" />
           </div>
-          <ModernCardTitle gradient className="text-center heading-2">
-            به Nama Contacts خوش آمدید!
-          </ModernCardTitle>
-          <ModernCardDescription className="text-center body-large">
-            مدیریت مخاطبین شما هرگز آسان‌تر از این نبوده است.
-          </ModernCardDescription>
-        </ModernCardHeader>
-        <ModernCardContent className="space-y-6">
-          <p className="text-center body-regular text-muted-foreground">
-            با استفاده از این برنامه می‌توانید به راحتی مخاطبین خود را اضافه، ویرایش، حذف و سازماندهی کنید.
-          </p>
-          
-          <div className="grid grid-cols-1 gap-4">
-            <GradientButton 
-              gradientType="ocean"
-              size="lg"
-              onClick={handleContactsClick}
-              className="w-full font-persian neomorphism"
-            >
-              <Users className="w-5 h-5 mr-2" />
-              مشاهده مخاطبین
-            </GradientButton>
-            
-            <GlassButton 
-              size="lg"
-              onClick={handleAddContactClick}
-              className="w-full font-persian"
-            >
-              <Plus className="w-5 h-5 mr-2" />
-              افزودن مخاطب جدید
-            </GlassButton>
-          </div>
-        </ModernCardContent>
-      </ModernCard>
+        </div>
 
-      {/* کارت تقویم جلالی */}
-      <ModernCard 
-        variant="neomorphism" 
-        hover="glow"
-        className="w-full max-w-md mb-8 fade-in-up"
-        style={{ animationDelay: '0.2s' }}
-      >
-        <ModernCardHeader>
-          <div className="flex items-center justify-center mb-2">
-            <Calendar className="w-6 h-6 text-primary mr-2" />
-            <ModernCardTitle className="heading-3">
-              تقویم جلالی
-            </ModernCardTitle>
-          </div>
-          <ModernCardDescription className="text-center">
-            تاریخ انتخاب شده: {selectedDate ? format(selectedDate, 'yyyy/MM/dd') : 'هیچ تاریخی انتخاب نشده است.'}
-          </ModernCardDescription>
-        </ModernCardHeader>
-        <ModernCardContent className="flex justify-center">
-          <JalaliCalendar selected={selectedDate} onSelect={setSelectedDate} />
-        </ModernCardContent>
-      </ModernCard>
+        <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent font-persian">
+          {t('home.app_title')}
+        </h1>
 
-      {/* کارت‌های آمار سریع */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-4xl mb-8">
-        <ModernCard 
-          variant="gradient-sunset" 
-          hover="scale"
-          className="fade-in-left stagger-item"
-        >
-          <ModernCardContent className="text-center text-white">
-            <Heart className="w-8 h-8 mx-auto mb-2" />
-            <h3 className="heading-4 mb-1">مخاطبین</h3>
-            <p className="body-small opacity-90">مدیریت آسان</p>
-          </ModernCardContent>
-        </ModernCard>
-
-        <ModernCard 
-          variant="gradient-success" 
-          hover="scale"
-          className="fade-in-up stagger-item"
-        >
-          <ModernCardContent className="text-center text-white">
-            <Users className="w-8 h-8 mx-auto mb-2" />
-            <h3 className="heading-4 mb-1">گروه‌بندی</h3>
-            <p className="body-small opacity-90">سازماندهی هوشمند</p>
-          </ModernCardContent>
-        </ModernCard>
-
-        <ModernCard 
-          variant="gradient-info" 
-          hover="scale"
-          className="fade-in-right stagger-item"
-        >
-          <ModernCardContent className="text-center text-white">
-            <Sparkles className="w-8 h-8 mx-auto mb-2" />
-            <h3 className="heading-4 mb-1">هوش مصنوعی</h3>
-            <p className="body-small opacity-90">پیشنهادات هوشمند</p>
-          </ModernCardContent>
-        </ModernCard>
+        <p className="text-lg text-gray-600 dark:text-gray-300 max-w-md mx-auto font-persian">
+          {t('home.app_subtitle')}
+        </p>
       </div>
 
+      {/* دکمه‌های اصلی */}
+      <div className="w-full max-w-sm space-y-4 mb-8">
+        <GradientButton
+          gradientType="ocean"
+          size="lg"
+          onClick={handleContactsClick}
+          className="w-full font-persian text-lg py-4 h-auto shadow-lg hover:shadow-xl transition-all duration-300"
+        >
+          <Users className="w-6 h-6 ml-3" />
+          {t('home.view_contacts')}
+        </GradientButton>
+
+        <GradientButton
+          gradientType="sunset"
+          size="lg"
+          onClick={handleAddContactClick}
+          className="w-full font-persian text-lg py-4 h-auto shadow-lg hover:shadow-xl transition-all duration-300"
+        >
+          <Plus className="w-6 h-6 ml-3" />
+          {t('home.add_new_contact')}
+        </GradientButton>
+      </div>
+
+      {/* کارت اطلاعات اضافی */}
+      <div className="w-full max-w-md">
+        <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-white/20">
+          <div className="flex items-center justify-center mb-4">
+            <BookOpen className="w-8 h-8 text-blue-500 ml-2" />
+            <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200 font-persian">
+              {t('home.features_title')}
+            </h3>
+          </div>
+
+          <div className="space-y-3 text-sm text-gray-600 dark:text-gray-300">
+            <div className="flex items-center">
+              <div className="w-2 h-2 bg-blue-500 rounded-full ml-3"></div>
+              <span className="font-persian">{t('home.feature_simple_management')}</span>
+            </div>
+            <div className="flex items-center">
+              <div className="w-2 h-2 bg-purple-500 rounded-full ml-3"></div>
+              <span className="font-persian">{t('home.feature_jalali_calendar')}</span>
+            </div>
+            <div className="flex items-center">
+              <div className="w-2 h-2 bg-green-500 rounded-full ml-3"></div>
+              <span className="font-persian">{t('home.feature_secure_storage')}</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

@@ -1,7 +1,8 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Activity, User, MessageCircle, Calendar, Clock, Users, Building, Settings, Plus, Edit } from "lucide-react";
+import { Activity, User, MessageCircle, Calendar, Clock, Users, Settings, Plus, Edit } from "lucide-react";
 
 interface RecentActivity {
   id: string;
@@ -18,15 +19,15 @@ interface ActivityStatsTabProps {
   error?: string | null;
 }
 
-const getDayColor = (day: string) => {
+const getDayColor = (day: string, t: (key: string) => string) => {
   const colors: Record<string, string> = {
-    'شنبه': 'bg-red-100 text-red-700',
-    'یکشنبه': 'bg-orange-100 text-orange-700',
-    'دوشنبه': 'bg-yellow-100 text-yellow-700',
-    'سه‌شنبه': 'bg-green-100 text-green-700',
-    'چهارشنبه': 'bg-teal-100 text-teal-700',
-    'پنج‌شنبه': 'bg-blue-100 text-blue-700',
-    'جمعه': 'bg-indigo-100 text-indigo-700',
+    [t("statistics.activity_stats.days.saturday")]: 'bg-red-100 text-red-700',
+    [t("statistics.activity_stats.days.sunday")]: 'bg-orange-100 text-orange-700',
+    [t("statistics.activity_stats.days.monday")]: 'bg-yellow-100 text-yellow-700',
+    [t("statistics.activity_stats.days.tuesday")]: 'bg-green-100 text-green-700',
+    [t("statistics.activity_stats.days.wednesday")]: 'bg-teal-100 text-teal-700',
+    [t("statistics.activity_stats.days.thursday")]: 'bg-blue-100 text-blue-700',
+    [t("statistics.activity_stats.days.friday")]: 'bg-indigo-100 text-indigo-700',
   };
   return colors[day] || 'bg-slate-100 text-slate-700';
 };
@@ -75,19 +76,40 @@ const getActivityBadgeColor = (activityType: string) => {
   }
 };
 
-const formatActivityDescription = (activity: RecentActivity) => {
+const formatActivityDescription = (activity: RecentActivity, t: (key: string) => string) => {
   const { activity_type, entity_type, entity_name } = activity;
 
   switch (activity_type) {
     case 'created':
-      return `ایجاد ${entity_type === 'contact' ? 'مخاطب' : entity_type === 'group' ? 'گروه' : entity_type === 'custom_field' ? 'فیلد سفارشی' : entity_type} "${entity_name}"`;
+      if (entity_type === 'contact') {
+        return t("statistics.activity_stats.activity_types.created_contact") + ` "${entity_name}"`;
+      } else if (entity_type === 'group') {
+        return t("statistics.activity_stats.activity_types.created_group") + ` "${entity_name}"`;
+      } else if (entity_type === 'custom_field') {
+        return t("statistics.activity_stats.activity_types.created_custom_field") + ` "${entity_name}"`;
+      }
+      break;
     case 'updated':
-      return `بروزرسانی ${entity_type === 'contact' ? 'مخاطب' : entity_type === 'group' ? 'گروه' : entity_type === 'custom_field' ? 'فیلد سفارشی' : entity_type} "${entity_name}"`;
+      if (entity_type === 'contact') {
+        return t("statistics.activity_stats.activity_types.updated_contact") + ` "${entity_name}"`;
+      } else if (entity_type === 'group') {
+        return t("statistics.activity_stats.activity_types.updated_group") + ` "${entity_name}"`;
+      } else if (entity_type === 'custom_field') {
+        return t("statistics.activity_stats.activity_types.updated_custom_field") + ` "${entity_name}"`;
+      }
+      break;
     case 'deleted':
-      return `حذف ${entity_type === 'contact' ? 'مخاطب' : entity_type === 'group' ? 'گروه' : entity_type === 'custom_field' ? 'فیلد سفارشی' : entity_type} "${entity_name}"`;
-    default:
-      return activity.description || `${activity_type} ${entity_type}`;
+      if (entity_type === 'contact') {
+        return t("statistics.activity_stats.activity_types.deleted_contact") + ` "${entity_name}"`;
+      } else if (entity_type === 'group') {
+        return t("statistics.activity_stats.activity_types.deleted_group") + ` "${entity_name}"`;
+      } else if (entity_type === 'custom_field') {
+        return t("statistics.activity_stats.activity_types.deleted_custom_field") + ` "${entity_name}"`;
+      }
+      break;
   }
+
+  return activity.description || `${activity_type} ${entity_type}`;
 };
 
 const ActivityStatsTab: React.FC<ActivityStatsTabProps> = ({
@@ -95,6 +117,7 @@ const ActivityStatsTab: React.FC<ActivityStatsTabProps> = ({
   isLoading = false,
   error = null,
 }) => {
+  const { t } = useTranslation();
   if (isLoading) {
     return (
       <div className="grid gap-6 md:grid-cols-2">
@@ -140,7 +163,7 @@ const ActivityStatsTab: React.FC<ActivityStatsTabProps> = ({
           <CardContent className="flex items-center justify-center h-[300px] p-4">
             <div className="text-center text-muted-foreground">
               <Activity className="h-8 w-8 mx-auto mb-2 opacity-50" />
-              <p className="text-sm">خطا در بارگذاری فعالیت‌ها</p>
+              <p className="text-sm">{t("statistics.activity_stats.error_loading")}</p>
               <p className="text-xs mt-1">{error}</p>
             </div>
           </CardContent>
@@ -149,8 +172,8 @@ const ActivityStatsTab: React.FC<ActivityStatsTabProps> = ({
           <CardContent className="flex items-center justify-center h-[300px] p-4">
             <div className="text-center text-muted-foreground">
               <MessageCircle className="h-8 w-8 mx-auto mb-2 opacity-50" />
-              <p className="text-sm">آمار فعالیت</p>
-              <p className="text-xs mt-1">داده‌ای برای نمایش وجود ندارد</p>
+              <p className="text-sm">{t("statistics.activity_stats.activity_stats")}</p>
+              <p className="text-xs mt-1">{t("statistics.activity_stats.no_data_available")}</p>
             </div>
           </CardContent>
         </Card>
@@ -177,10 +200,10 @@ const ActivityStatsTab: React.FC<ActivityStatsTabProps> = ({
             </div>
             <div>
               <CardTitle className="text-xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
-                فعالیت‌های اخیر
+                {t("statistics.activity_stats.recent_activities")}
               </CardTitle>
               <CardDescription className="text-sm text-slate-500 leading-relaxed">
-                آخرین فعالیت‌های سیستم
+                {t("statistics.activity_stats.recent_activities_description")}
               </CardDescription>
             </div>
           </div>
@@ -200,7 +223,7 @@ const ActivityStatsTab: React.FC<ActivityStatsTabProps> = ({
                   </div>
                   <div>
                     <span className="text-sm font-semibold text-slate-700 group-hover/item:text-slate-800 transition-colors duration-300">
-                      {formatActivityDescription(activity)}
+                      {formatActivityDescription(activity, t)}
                     </span>
                     <div className="flex items-center gap-2 mt-1">
                       <Clock className="h-3 w-3 text-slate-400" />
@@ -240,10 +263,10 @@ const ActivityStatsTab: React.FC<ActivityStatsTabProps> = ({
             </div>
             <div>
               <CardTitle className="text-xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
-                فعالیت روزانه
+                {t("statistics.activity_stats.daily_activity")}
               </CardTitle>
               <CardDescription className="text-sm text-slate-500 leading-relaxed">
-                توزیع فعالیت‌ها در روزهای هفته
+                {t("statistics.activity_stats.daily_activity_description")}
               </CardDescription>
             </div>
           </div>
@@ -263,12 +286,20 @@ const ActivityStatsTab: React.FC<ActivityStatsTabProps> = ({
               }, {} as Record<string, { count: number; activities: number }>);
 
               // تبدیل به آرایه و مرتب‌سازی بر اساس روز هفته
-              const weekDays = ['شنبه', 'یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنج‌شنبه', 'جمعه'];
+              const weekDays = [
+                t("statistics.activity_stats.days.saturday"),
+                t("statistics.activity_stats.days.sunday"),
+                t("statistics.activity_stats.days.monday"),
+                t("statistics.activity_stats.days.tuesday"),
+                t("statistics.activity_stats.days.wednesday"),
+                t("statistics.activity_stats.days.thursday"),
+                t("statistics.activity_stats.days.friday")
+              ];
               const sortedDailyActivity = weekDays.map(day => ({
                 day,
                 count: dailyActivity[day]?.count || 0,
                 activity: dailyActivity[day]?.activities || 0,
-                color: getDayColor(day)
+                color: getDayColor(day, t)
               })).filter(item => item.count > 0);
 
               return sortedDailyActivity.length > 0 ? (
@@ -288,7 +319,7 @@ const ActivityStatsTab: React.FC<ActivityStatsTabProps> = ({
                       <Badge className={`text-xs font-semibold transition-all duration-300 ${item.color} border-current`}>
                         {item.count}
                       </Badge>
-                      <span className="text-xs text-slate-400">({item.activity} فعالیت)</span>
+                      <span className="text-xs text-slate-400">{t("statistics.activity_stats.activities_count", { count: item.activity })}</span>
                     </div>
                   </div>
                 ))
@@ -297,8 +328,8 @@ const ActivityStatsTab: React.FC<ActivityStatsTabProps> = ({
                   <div className="w-16 h-16 bg-gradient-to-br from-slate-100 to-slate-200 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Calendar className="h-8 w-8 text-slate-400" />
                   </div>
-                  <p className="text-sm text-slate-500 font-medium">داده‌ای برای نمایش وجود ندارد</p>
-                  <p className="text-xs text-slate-400 mt-1">فعالیت‌هایی با مخاطبین ایجاد کنید</p>
+                  <p className="text-sm text-slate-500 font-medium">{t("statistics.activity_stats.no_data_available")}</p>
+                  <p className="text-xs text-slate-400 mt-1">{t("statistics.activity_stats.create_activities")}</p>
                 </div>
               );
             })()}

@@ -1,7 +1,7 @@
 {
   "name": "nama-1",
   "version": "1.0.0",
-  "description": "Smart Contact Management System with AI Power",
+  "type": "module",
   "homepage": "https://github.com/mcuteangel/Nama",
   "repository": {
     "type": "git",

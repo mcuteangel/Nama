@@ -2,6 +2,7 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Gift, Users, Clock } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface GroupStats {
   name: string;
@@ -30,6 +31,7 @@ const StatisticsDetailsTab: React.FC<StatisticsDetailsTabProps> = ({
   isLoading = false,
   error = null,
 }) => {
+  const { t } = useTranslation();
   if (isLoading) {
     return (
       <div className="grid gap-6 md:grid-cols-2">
@@ -71,7 +73,7 @@ const StatisticsDetailsTab: React.FC<StatisticsDetailsTabProps> = ({
         <Card className="relative overflow-hidden bg-gradient-to-br from-red-50/50 via-white/80 to-red-50/30 backdrop-blur-sm border-0 shadow-xl">
           <CardContent className="flex items-center justify-center h-[300px]">
             <div className="text-center text-slate-500">
-              <p className="text-sm font-medium">خطا در بارگذاری آمار گروه‌ها</p>
+              <p className="text-sm font-medium">{t('statistics.details_tab.groups_error')}</p>
               <p className="text-xs mt-1">{error}</p>
             </div>
           </CardContent>
@@ -79,8 +81,8 @@ const StatisticsDetailsTab: React.FC<StatisticsDetailsTabProps> = ({
         <Card className="relative overflow-hidden bg-gradient-to-br from-red-50/50 via-white/80 to-red-50/30 backdrop-blur-sm border-0 shadow-xl">
           <CardContent className="flex items-center justify-center h-[300px]">
             <div className="text-center text-slate-500">
-              <p className="text-sm font-medium">تولدهای پیش رو</p>
-              <p className="text-xs mt-1">این بخش به زودی تکمیل خواهد شد</p>
+              <p className="text-sm font-medium">{t('statistics.details_tab.upcoming_birthdays_title')}</p>
+              <p className="text-xs mt-1">{t('statistics.details_tab.coming_soon')}</p>
             </div>
           </CardContent>
         </Card>
@@ -107,10 +109,10 @@ const StatisticsDetailsTab: React.FC<StatisticsDetailsTabProps> = ({
             </div>
             <div>
               <CardTitle className="text-xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
-                گروه‌های پرمخاطب
+                {t('statistics.details_tab.top_groups_title')}
               </CardTitle>
               <CardDescription className="text-sm text-slate-500 leading-relaxed">
-                گروه‌هایی با بیشترین تعداد مخاطب
+                {t('statistics.details_tab.top_groups_description')}
               </CardDescription>
             </div>
           </div>
@@ -166,10 +168,10 @@ const StatisticsDetailsTab: React.FC<StatisticsDetailsTabProps> = ({
             </div>
             <div>
               <CardTitle className="text-xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
-                تولدهای پیش رو
+                {t('statistics.details_tab.upcoming_birthdays_title')}
               </CardTitle>
               <CardDescription className="text-sm text-slate-500 leading-relaxed">
-                مخاطبینی که تولدشان نزدیک است
+                {t('statistics.details_tab.upcoming_birthdays_description')}
               </CardDescription>
             </div>
           </div>
@@ -209,7 +211,7 @@ const StatisticsDetailsTab: React.FC<StatisticsDetailsTabProps> = ({
                           : 'bg-gradient-to-r from-blue-100 to-cyan-100 text-blue-700 border-blue-200 hover:from-blue-200 hover:to-cyan-200'
                       }`}
                     >
-                      {birthday.days_until_birthday} روز دیگر
+                      {birthday.days_until_birthday} {t('statistics.details_tab.days_remaining')}
                     </Badge>
                   </div>
                 </div>
@@ -219,8 +221,8 @@ const StatisticsDetailsTab: React.FC<StatisticsDetailsTabProps> = ({
                 <div className="w-16 h-16 bg-gradient-to-br from-slate-100 to-slate-200 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Gift className="h-8 w-8 text-slate-400" />
                 </div>
-                <p className="text-sm text-slate-500 font-medium">تولدی در ۳۰ روز آینده وجود ندارد</p>
-                <p className="text-xs text-slate-400 mt-1">مخاطبین جدیدی با تاریخ تولد اضافه کنید</p>
+                <p className="text-sm text-slate-500 font-medium">{t('statistics.details_tab.no_birthdays_title')}</p>
+                <p className="text-xs text-slate-400 mt-1">{t('statistics.details_tab.no_birthdays_description')}</p>
               </div>
             )}
           </div>

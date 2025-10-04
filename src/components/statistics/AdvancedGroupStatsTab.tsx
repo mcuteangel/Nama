@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Users, TrendingUp, TrendingDown, Minus } from "lucide-react";
@@ -29,6 +30,7 @@ const AdvancedGroupStatsTab: React.FC<AdvancedGroupStatsTabProps> = ({
   isLoading = false,
   error = null,
 }) => {
+  const { t } = useTranslation();
   if (isLoading) {
     return (
       <div className="grid gap-6 md:grid-cols-2">
@@ -74,7 +76,7 @@ const AdvancedGroupStatsTab: React.FC<AdvancedGroupStatsTabProps> = ({
           <CardContent className="flex items-center justify-center h-[300px] p-4">
             <div className="text-center text-muted-foreground">
               <Users className="h-8 w-8 mx-auto mb-2 opacity-50" />
-              <p className="text-sm">خطا در بارگذاری آمار گروه‌ها</p>
+              <p className="text-sm">{t("statistics.advanced_group_stats.error_loading")}</p>
               <p className="text-xs mt-1">{error}</p>
             </div>
           </CardContent>
@@ -83,8 +85,8 @@ const AdvancedGroupStatsTab: React.FC<AdvancedGroupStatsTabProps> = ({
           <CardContent className="flex items-center justify-center h-[300px] p-4">
             <div className="text-center text-muted-foreground">
               <TrendingUp className="h-8 w-8 mx-auto mb-2 opacity-50" />
-              <p className="text-sm">آمار رشد گروه‌ها</p>
-              <p className="text-xs mt-1">داده‌ای برای نمایش وجود ندارد</p>
+              <p className="text-sm">{t("statistics.advanced_group_stats.growth_stats")}</p>
+              <p className="text-xs mt-1">{t("statistics.advanced_group_stats.no_data_available")}</p>
             </div>
           </CardContent>
         </Card>
@@ -111,10 +113,10 @@ const AdvancedGroupStatsTab: React.FC<AdvancedGroupStatsTabProps> = ({
             </div>
             <div>
               <CardTitle className="text-xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
-                رشد گروه‌ها
+                {t("statistics.advanced_group_stats.growth_title")}
               </CardTitle>
               <CardDescription className="text-sm text-slate-500 leading-relaxed">
-                گروه‌هایی با بالاترین رشد ماهانه
+                {t("statistics.advanced_group_stats.growth_description")}
               </CardDescription>
             </div>
           </div>
@@ -142,7 +144,7 @@ const AdvancedGroupStatsTab: React.FC<AdvancedGroupStatsTabProps> = ({
                       </span>
                       <div className="flex items-center gap-2 mt-1">
                         <span className="text-xs text-slate-500">
-                          اعضا: {group.count}
+                          {t("statistics.advanced_group_stats.members_count", { count: group.count })}
                         </span>
                       </div>
                     </div>
@@ -192,10 +194,10 @@ const AdvancedGroupStatsTab: React.FC<AdvancedGroupStatsTabProps> = ({
             </div>
             <div>
               <CardTitle className="text-xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
-                گروه‌های بزرگ
+                {t("statistics.advanced_group_stats.large_groups_title")}
               </CardTitle>
               <CardDescription className="text-sm text-slate-500 leading-relaxed">
-                گروه‌هایی با بالاترین تعداد اعضا
+                {t("statistics.advanced_group_stats.large_groups_description")}
               </CardDescription>
             </div>
           </div>
@@ -269,8 +271,8 @@ const AdvancedGroupStatsTab: React.FC<AdvancedGroupStatsTabProps> = ({
                 <div className="w-16 h-16 bg-gradient-to-br from-slate-100 to-slate-200 rounded-full flex items-center justify-center mx-auto mb-4">
                   <TrendingUp className="h-8 w-8 text-slate-400" />
                 </div>
-                <p className="text-sm text-slate-500 font-medium">داده‌ای برای نمایش وجود ندارد</p>
-                <p className="text-xs text-slate-400 mt-1">گروه‌هایی با مخاطب اضافه کنید</p>
+                <p className="text-sm text-slate-500 font-medium">{t("statistics.advanced_group_stats.no_data_available")}</p>
+                <p className="text-xs text-slate-400 mt-1">{t("statistics.advanced_group_stats.add_groups")}</p>
               </div>
             )}
           </div>

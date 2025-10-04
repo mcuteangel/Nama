@@ -4,6 +4,7 @@ import { ChartContainer, ChartTooltip } from "@/components/ui/chart";
 import { CartesianGrid, XAxis, YAxis, ResponsiveContainer, Area, AreaChart } from "recharts";
 import { useJalaliCalendar } from "@/hooks/use-jalali-calendar";
 import { TrendingUp, Calendar } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface TimelineStats {
   month: string;
@@ -22,6 +23,7 @@ const StatisticsTimelineTab: React.FC<StatisticsTimelineTabProps> = ({
   error = null,
 }) => {
   const { formatDate } = useJalaliCalendar();
+  const { t } = useTranslation();
 
   if (isLoading) {
     return (
@@ -43,7 +45,7 @@ const StatisticsTimelineTab: React.FC<StatisticsTimelineTabProps> = ({
         <CardContent className="flex items-center justify-center h-[300px] p-4">
           <div className="text-center text-muted-foreground">
             <Calendar className="h-8 w-8 mx-auto mb-2 opacity-50" />
-            <p className="text-sm">خطا در بارگذاری روند زمانی</p>
+            <p className="text-sm">{t('statistics.timeline_tab.error_loading')}</p>
             <p className="text-xs mt-1">{error}</p>
           </div>
         </CardContent>
@@ -74,17 +76,17 @@ const StatisticsTimelineTab: React.FC<StatisticsTimelineTabProps> = ({
           </div>
           <div>
             <CardTitle className="text-xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
-              روند اضافه شدن مخاطبین
+              {t('statistics.timeline_tab.title')}
             </CardTitle>
             <CardDescription className="text-sm text-slate-500 leading-relaxed">
-              تعداد مخاطبین جدید در هر ماه بر اساس تاریخ شمسی
+              {t('statistics.timeline_tab.description')}
             </CardDescription>
           </div>
         </div>
       </CardHeader>
 
       <CardContent className="relative p-4">
-        <ChartContainer config={{ count: { label: "تعداد", color: "hsl(var(--chart-1))" } }} className="h-[240px] w-full">
+        <ChartContainer config={{ count: { label: t('statistics.timeline_tab.count_label'), color: "hsl(var(--chart-1))" } }} className="h-[240px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={formattedData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
               <defs>
@@ -110,7 +112,7 @@ const StatisticsTimelineTab: React.FC<StatisticsTimelineTabProps> = ({
                         <p className="font-semibold text-slate-800 text-center mb-2">{label}</p>
                         <div className="space-y-2">
                           <div className="flex justify-between items-center">
-                            <span className="text-sm text-slate-600">تعداد:</span>
+                            <span className="text-sm text-slate-600">{t('statistics.timeline_tab.count_with_colon')}</span>
                             <span className="font-bold text-emerald-600 text-lg">{data.count}</span>
                           </div>
                         </div>

@@ -1,4 +1,4 @@
-import React from "react";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 
 interface CompanyStats {
@@ -28,6 +28,8 @@ const StatisticsDemographicsTab: React.FC<StatisticsDemographicsTabProps> = ({
   isLoading = false,
   error = null,
 }) => {
+  const { t } = useTranslation();
+
   if (isLoading) {
     return (
       <div className="grid gap-4 md:grid-cols-2">
@@ -79,7 +81,7 @@ const StatisticsDemographicsTab: React.FC<StatisticsDemographicsTabProps> = ({
         <Card className="glass-card">
           <CardContent className="flex items-center justify-center h-[300px]">
             <div className="text-center text-muted-foreground">
-              <p className="text-sm">خطا در بارگذاری آمار شرکت‌ها</p>
+              <p className="text-sm">{t('statistics.advanced_company_stats.error_loading')}</p>
               <p className="text-xs mt-1">{error}</p>
             </div>
           </CardContent>
@@ -87,8 +89,8 @@ const StatisticsDemographicsTab: React.FC<StatisticsDemographicsTabProps> = ({
         <Card className="glass-card">
           <CardContent className="flex items-center justify-center h-[300px]">
             <div className="text-center text-muted-foreground">
-              <p className="text-sm">خطا در بارگذاری آمار موقعیت‌ها</p>
-              <p className="text-xs mt-1">داده‌ای برای نمایش وجود ندارد</p>
+              <p className="text-sm">{t('statistics.advanced_company_stats.error_loading_positions')}</p>
+              <p className="text-xs mt-1">{t('statistics.advanced_company_stats.no_data_available')}</p>
             </div>
           </CardContent>
         </Card>
@@ -100,8 +102,8 @@ const StatisticsDemographicsTab: React.FC<StatisticsDemographicsTabProps> = ({
     <div className="grid gap-4 md:grid-cols-2">
       <Card className="glass-card">
         <CardHeader>
-          <CardTitle>شرکت‌های برتر</CardTitle>
-          <CardDescription>پنج شرکت با بیشترین مخاطب</CardDescription>
+          <CardTitle>{t('statistics.advanced_company_stats.top_companies_card_title')}</CardTitle>
+          <CardDescription>{t('statistics.advanced_company_stats.top_companies_card_description')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
@@ -112,7 +114,7 @@ const StatisticsDemographicsTab: React.FC<StatisticsDemographicsTabProps> = ({
                     className="w-3 h-3 rounded-full"
                     style={{ backgroundColor: COLORS.primary[idx % COLORS.primary.length] }}
                   />
-                  <span className="text-sm">{c.company || "نامشخص"}</span>
+                  <span className="text-sm">{c.company || t('statistics.advanced_company_stats.unknown_company')}</span>
                 </div>
                 <span className="text-xs px-2 py-1 rounded bg-muted">{c.count}</span>
               </div>
@@ -123,8 +125,8 @@ const StatisticsDemographicsTab: React.FC<StatisticsDemographicsTabProps> = ({
 
       <Card className="glass-card">
         <CardHeader>
-          <CardTitle>موقعیت‌های شغلی برتر</CardTitle>
-          <CardDescription>پنج موقعیت با بیشترین تعداد</CardDescription>
+          <CardTitle>{t('statistics.advanced_company_stats.top_positions_card_title')}</CardTitle>
+          <CardDescription>{t('statistics.advanced_company_stats.top_positions_card_description')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
@@ -135,7 +137,7 @@ const StatisticsDemographicsTab: React.FC<StatisticsDemographicsTabProps> = ({
                     className="w-3 h-3 rounded-full"
                     style={{ backgroundColor: COLORS.primary[idx % COLORS.primary.length] }}
                   />
-                  <span className="text-sm">{p.position || "نامشخص"}</span>
+                  <span className="text-sm">{p.position || t('statistics.advanced_company_stats.unknown_position')}</span>
                 </div>
                 <span className="text-xs px-2 py-1 rounded bg-muted">{p.count}</span>
               </div>

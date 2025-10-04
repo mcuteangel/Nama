@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Building, TrendingUp, TrendingDown, Minus } from "lucide-react";
@@ -28,6 +29,7 @@ const AdvancedCompanyStatsTab: React.FC<AdvancedCompanyStatsTabProps> = ({
   isLoading = false,
   error = null,
 }) => {
+  const { t } = useTranslation();
   if (isLoading) {
     return (
       <div className="grid gap-6 md:grid-cols-2">
@@ -73,7 +75,7 @@ const AdvancedCompanyStatsTab: React.FC<AdvancedCompanyStatsTabProps> = ({
           <CardContent className="flex items-center justify-center h-[300px] p-4">
             <div className="text-center text-muted-foreground">
               <Building className="h-8 w-8 mx-auto mb-2 opacity-50" />
-              <p className="text-sm">خطا در بارگذاری آمار شرکت‌ها</p>
+              <p className="text-sm">{t("statistics.advanced_company_stats.error_loading")}</p>
               <p className="text-xs mt-1">{error}</p>
             </div>
           </CardContent>
@@ -82,8 +84,8 @@ const AdvancedCompanyStatsTab: React.FC<AdvancedCompanyStatsTabProps> = ({
           <CardContent className="flex items-center justify-center h-[300px] p-4">
             <div className="text-center text-muted-foreground">
               <TrendingUp className="h-8 w-8 mx-auto mb-2 opacity-50" />
-              <p className="text-sm">آمار رشد شرکت‌ها</p>
-              <p className="text-xs mt-1">داده‌ای برای نمایش وجود ندارد</p>
+              <p className="text-sm">{t("statistics.advanced_company_stats.growth_stats")}</p>
+              <p className="text-xs mt-1">{t("statistics.advanced_company_stats.no_data_available")}</p>
             </div>
           </CardContent>
         </Card>
@@ -110,10 +112,10 @@ const AdvancedCompanyStatsTab: React.FC<AdvancedCompanyStatsTabProps> = ({
             </div>
             <div>
               <CardTitle className="text-xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
-                رشد شرکت‌ها
+                {t("statistics.advanced_company_stats.growth_title")}
               </CardTitle>
               <CardDescription className="text-sm text-slate-500 leading-relaxed">
-                شرکت‌هایی با بالاترین رشد ماهانه
+                {t("statistics.advanced_company_stats.growth_description")}
               </CardDescription>
             </div>
           </div>
@@ -138,11 +140,11 @@ const AdvancedCompanyStatsTab: React.FC<AdvancedCompanyStatsTabProps> = ({
                       </span>
                       <div className="flex items-center gap-2 mt-1">
                         <span className="text-xs text-slate-500">
-                          قبلی: {company.previous_count}
+                          {t("statistics.advanced_company_stats.previous_count", { count: company.previous_count })}
                         </span>
                         <span className="text-xs text-slate-400">→</span>
                         <span className="text-xs text-slate-500">
-                          فعلی: {company.current_count}
+                          {t("statistics.advanced_company_stats.current_count", { count: company.current_count })}
                         </span>
                       </div>
                     </div>
@@ -192,10 +194,10 @@ const AdvancedCompanyStatsTab: React.FC<AdvancedCompanyStatsTabProps> = ({
             </div>
             <div>
               <CardTitle className="text-xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
-                شرکت‌های برتر
+                {t("statistics.advanced_company_stats.top_companies_title")}
               </CardTitle>
               <CardDescription className="text-sm text-slate-500 leading-relaxed">
-                شرکت‌هایی با بالاترین تعداد مخاطب
+                {t("statistics.advanced_company_stats.top_companies_description")}
               </CardDescription>
             </div>
           </div>
@@ -263,8 +265,8 @@ const AdvancedCompanyStatsTab: React.FC<AdvancedCompanyStatsTabProps> = ({
                 <div className="w-16 h-16 bg-gradient-to-br from-slate-100 to-slate-200 rounded-full flex items-center justify-center mx-auto mb-4">
                   <TrendingUp className="h-8 w-8 text-slate-400" />
                 </div>
-                <p className="text-sm text-slate-500 font-medium">داده‌ای برای نمایش وجود ندارد</p>
-                <p className="text-xs text-slate-400 mt-1">مخاطبینی با شرکت اضافه کنید</p>
+                <p className="text-sm text-slate-500 font-medium">{t("statistics.advanced_company_stats.no_data_available")}</p>
+                <p className="text-xs text-slate-400 mt-1">{t("statistics.advanced_company_stats.add_companies")}</p>
               </div>
             )}
           </div>

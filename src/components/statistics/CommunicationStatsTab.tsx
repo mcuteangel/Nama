@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { MessageCircle, Phone, Mail, TrendingUp } from "lucide-react";
@@ -20,6 +21,36 @@ const CommunicationStatsTab: React.FC<CommunicationStatsTabProps> = ({
   isLoading = false,
   error = null,
 }) => {
+  const { t } = useTranslation();
+
+  // تعریف ثابت‌های ترجمه برای روش‌های ارتباط
+  const COMMUNICATION_METHODS = {
+    SMS: t("common.contact_method.sms"),
+    PHONE: t("common.contact_method.phone"),
+    EMAIL: t("common.contact_method.email")
+  };
+
+  // تعریف نام‌های جایگزین برای مطابقت (هم انگلیسی و هم فارسی ترجمه شده)
+  const METHOD_ALIASES = {
+    // نام‌های انگلیسی کوچک
+    [COMMUNICATION_METHODS.SMS.toLowerCase()]: COMMUNICATION_METHODS.SMS,
+    [COMMUNICATION_METHODS.PHONE.toLowerCase()]: COMMUNICATION_METHODS.PHONE,
+    [COMMUNICATION_METHODS.EMAIL.toLowerCase()]: COMMUNICATION_METHODS.EMAIL,
+    // نام‌های انگلیسی بزرگ
+    [COMMUNICATION_METHODS.SMS]: COMMUNICATION_METHODS.SMS,
+    [COMMUNICATION_METHODS.PHONE]: COMMUNICATION_METHODS.PHONE,
+    [COMMUNICATION_METHODS.EMAIL]: COMMUNICATION_METHODS.EMAIL,
+    // نام‌های کلیدی انگلیسی
+    'sms': COMMUNICATION_METHODS.SMS,
+    'phone': COMMUNICATION_METHODS.PHONE,
+    'email': COMMUNICATION_METHODS.EMAIL,
+    // نام‌های فارسی ترجمه شده
+    [t("statistics.communication_stats.method_names.sms_persian")]: COMMUNICATION_METHODS.SMS,
+    [t("statistics.communication_stats.method_names.phone_persian")]: COMMUNICATION_METHODS.PHONE,
+    [t("statistics.communication_stats.method_names.phone_call")]: COMMUNICATION_METHODS.PHONE,
+    [t("statistics.communication_stats.method_names.call")]: COMMUNICATION_METHODS.PHONE,
+    [t("statistics.communication_stats.method_names.message")]: COMMUNICATION_METHODS.SMS
+  };
   if (isLoading) {
     return (
       <div className="grid gap-6 md:grid-cols-2">
@@ -62,7 +93,7 @@ const CommunicationStatsTab: React.FC<CommunicationStatsTabProps> = ({
           <CardContent className="flex items-center justify-center h-[300px] p-4">
             <div className="text-center text-muted-foreground">
               <MessageCircle className="h-8 w-8 mx-auto mb-2 opacity-50" />
-              <p className="text-sm">خطا در بارگذاری آمار ارتباط</p>
+              <p className="text-sm">{t("statistics.communication_stats.error_loading")}</p>
               <p className="text-xs mt-1">{error}</p>
             </div>
           </CardContent>
@@ -71,8 +102,8 @@ const CommunicationStatsTab: React.FC<CommunicationStatsTabProps> = ({
           <CardContent className="flex items-center justify-center h-[300px] p-4">
             <div className="text-center text-muted-foreground">
               <TrendingUp className="h-8 w-8 mx-auto mb-2 opacity-50" />
-              <p className="text-sm">آمار روش‌های ارتباط</p>
-              <p className="text-xs mt-1">داده‌ای برای نمایش وجود ندارد</p>
+              <p className="text-sm">{t("statistics.communication_stats.communication_methods_stats")}</p>
+              <p className="text-xs mt-1">{t("statistics.communication_stats.no_data_available")}</p>
             </div>
           </CardContent>
         </Card>
@@ -99,10 +130,10 @@ const CommunicationStatsTab: React.FC<CommunicationStatsTabProps> = ({
             </div>
             <div>
               <CardTitle className="text-xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
-                توزیع روش‌های ارتباط
+                {t("statistics.communication_stats.distribution_title")}
               </CardTitle>
               <CardDescription className="text-sm text-slate-500 leading-relaxed">
-                محبوب‌ترین روش‌های ارتباط با مخاطبین
+                {t("statistics.communication_stats.distribution_description")}
               </CardDescription>
             </div>
           </div>
@@ -113,16 +144,13 @@ const CommunicationStatsTab: React.FC<CommunicationStatsTabProps> = ({
             {communicationMethods.length > 0 ? (
               communicationMethods.map((item, idx) => {
                 const getMethodIcon = (method: string) => {
-                  switch (method.toLowerCase()) {
-                    case 'sms':
-                    case 'پیامک':
+                  const normalizedMethod = METHOD_ALIASES[method.toLowerCase()] || method;
+                  switch (normalizedMethod) {
+                    case COMMUNICATION_METHODS.SMS:
                       return MessageCircle;
-                    case 'phone':
-                    case 'تماس تلفنی':
-                    case 'تلفن':
+                    case COMMUNICATION_METHODS.PHONE:
                       return Phone;
-                    case 'email':
-                    case 'ایمیل':
+                    case COMMUNICATION_METHODS.EMAIL:
                       return Mail;
                     default:
                       return MessageCircle;
@@ -130,16 +158,13 @@ const CommunicationStatsTab: React.FC<CommunicationStatsTabProps> = ({
                 };
 
                 const getMethodColor = (method: string) => {
-                  switch (method.toLowerCase()) {
-                    case 'sms':
-                    case 'پیامک':
+                  const normalizedMethod = METHOD_ALIASES[method.toLowerCase()] || method;
+                  switch (normalizedMethod) {
+                    case COMMUNICATION_METHODS.SMS:
                       return { icon: 'from-green-500 to-emerald-600', bg: 'bg-green-100 text-green-700' };
-                    case 'phone':
-                    case 'تماس تلفنی':
-                    case 'تلفن':
+                    case COMMUNICATION_METHODS.PHONE:
                       return { icon: 'from-blue-500 to-indigo-600', bg: 'bg-blue-100 text-blue-700' };
-                    case 'email':
-                    case 'ایمیل':
+                    case COMMUNICATION_METHODS.EMAIL:
                       return { icon: 'from-purple-500 to-pink-600', bg: 'bg-purple-100 text-purple-700' };
                     default:
                       return { icon: 'from-slate-500 to-gray-600', bg: 'bg-slate-100 text-slate-700' };
@@ -164,7 +189,7 @@ const CommunicationStatsTab: React.FC<CommunicationStatsTabProps> = ({
                           {item.method}
                         </span>
                         <p className="text-xs text-slate-500 mt-1">
-                          {item.percentage}% از کل ارتباط‌ها
+                          {t("statistics.communication_stats.percentage_of_total", { percentage: item.percentage })}
                         </p>
                       </div>
                     </div>
@@ -179,8 +204,8 @@ const CommunicationStatsTab: React.FC<CommunicationStatsTabProps> = ({
                 <div className="w-16 h-16 bg-gradient-to-br from-slate-100 to-slate-200 rounded-full flex items-center justify-center mx-auto mb-4">
                   <MessageCircle className="h-8 w-8 text-slate-400" />
                 </div>
-                <p className="text-sm text-slate-500 font-medium">داده‌ای برای نمایش وجود ندارد</p>
-                <p className="text-xs text-slate-400 mt-1">مخاطبینی با روش ارتباط اضافه کنید</p>
+                <p className="text-sm text-slate-500 font-medium">{t("statistics.communication_stats.no_data_available")}</p>
+                <p className="text-xs text-slate-400 mt-1">{t("statistics.communication_stats.add_contacts_with_method")}</p>
               </div>
             )}
           </div>
@@ -208,10 +233,10 @@ const CommunicationStatsTab: React.FC<CommunicationStatsTabProps> = ({
             </div>
             <div>
               <CardTitle className="text-xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
-                موفقیت ارتباط
+                {t("statistics.communication_stats.success_title")}
               </CardTitle>
               <CardDescription className="text-sm text-slate-500 leading-relaxed">
-                نرخ موفقیت روش‌های مختلف ارتباط
+                {t("statistics.communication_stats.success_description")}
               </CardDescription>
             </div>
           </div>
@@ -226,16 +251,13 @@ const CommunicationStatsTab: React.FC<CommunicationStatsTabProps> = ({
                 const successRate = Math.round(baseSuccessRate);
 
                 const getMethodColor = (method: string) => {
-                  switch (method.toLowerCase()) {
-                    case 'sms':
-                    case 'پیامک':
+                  const normalizedMethod = METHOD_ALIASES[method.toLowerCase()] || method;
+                  switch (normalizedMethod) {
+                    case COMMUNICATION_METHODS.SMS:
                       return 'bg-green-100 text-green-700';
-                    case 'phone':
-                    case 'تماس تلفنی':
-                    case 'تلفن':
+                    case COMMUNICATION_METHODS.PHONE:
                       return 'bg-blue-100 text-blue-700';
-                    case 'email':
-                    case 'ایمیل':
+                    case COMMUNICATION_METHODS.EMAIL:
                       return 'bg-purple-100 text-purple-700';
                     default:
                       return 'bg-slate-100 text-slate-700';
@@ -268,8 +290,8 @@ const CommunicationStatsTab: React.FC<CommunicationStatsTabProps> = ({
                 <div className="w-16 h-16 bg-gradient-to-br from-slate-100 to-slate-200 rounded-full flex items-center justify-center mx-auto mb-4">
                   <TrendingUp className="h-8 w-8 text-slate-400" />
                 </div>
-                <p className="text-sm text-slate-500 font-medium">داده‌ای برای نمایش وجود ندارد</p>
-                <p className="text-xs text-slate-400 mt-1">اطلاعات موفقیت ارتباط در دسترس نیست</p>
+                <p className="text-sm text-slate-500 font-medium">{t("statistics.communication_stats.no_data_available")}</p>
+                <p className="text-xs text-slate-400 mt-1">{t("statistics.communication_stats.success_info_not_available")}</p>
               </div>
             )}
           </div>

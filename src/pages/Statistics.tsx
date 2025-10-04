@@ -1,9 +1,9 @@
 import React, { useMemo, useState } from "react";
 import { useSession } from "@/integrations/supabase/auth";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { ContactStatisticsService } from "@/services/contact-statistics-service";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ModernLoader } from "@/components/ui/modern-loader";
 import PageHeader from "@/components/ui/PageHeader";
 import {
   StatisticsFilters,
@@ -35,6 +35,7 @@ const addMonths = (date: Date, months: number) => {
 
 const Statistics: React.FC = () => {
   const { session } = useSession();
+  const { t } = useTranslation();
 
   const [quickRange, setQuickRange] = useState<string>("all");
   const [fromDate, setFromDate] = useState<string | undefined>(undefined);
@@ -333,15 +334,24 @@ const Statistics: React.FC = () => {
   // Transforms
   const genderChartData = useMemo(() => {
     const src = genderStats?.data || [];
-    const labels: Record<string, string> = { male: "مرد", female: "زن", not_specified: "نامشخص" };
+    const labels: Record<string, string> = {
+      male: t("gender.male"),
+      female: t("gender.female"),
+      not_specified: t("gender.not_specified")
+    };
     return src.map((g) => ({ name: labels[g.gender] ?? g.gender, value: g.count }));
-  }, [genderStats]);
+  }, [genderStats, t]);
 
   const contactMethodChartData = useMemo(() => {
     const src = contactMethodStats?.data || [];
-    const labels: Record<string, string> = { email: "ایمیل", phone: "تلفن", sms: "پیامک", any: "هر روشی" };
+    const labels: Record<string, string> = {
+      email: t("common.contact_method.email"),
+      phone: t("common.contact_method.phone"),
+      sms: t("common.contact_method.sms"),
+      any: t("common.contact_method.any")
+    };
     return src.map((m) => ({ name: labels[m.method] ?? m.method, value: m.count }));
-  }, [contactMethodStats]);
+  }, [contactMethodStats, t]);
 
   const timelineChartData = useMemo(() => {
     const src = timelineStats?.data || [];
@@ -368,8 +378,8 @@ const Statistics: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/50">
       <div className="container mx-auto p-6 space-y-8">
         <PageHeader
-          title="آمار و گزارش‌ها"
-          description="تحلیل جامع اطلاعات مخاطبین شما"
+          title={t("statistics.page_title")}
+          description={t("statistics.page_description")}
           showBackButton={true}
         />
 
@@ -412,15 +422,15 @@ const Statistics: React.FC = () => {
             />
             <Tabs defaultValue="overview" className="space-y-6" dir={document.documentElement.dir === 'rtl' ? 'rtl' : 'ltr'}>
               <TabsList className={`grid w-full grid-cols-9 h-14 bg-white/80 backdrop-blur-sm border-0 shadow-lg glass-3d-hover ${document.documentElement.dir === 'rtl' ? 'grid-flow-col-reverse' : ''}`}>
-                <TabsTrigger value="overview" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-600 data-[state=active]:text-white glass-3d-hover">نمای کلی</TabsTrigger>
-                <TabsTrigger value="demographics" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-500 data-[state=active]:to-teal-600 data-[state=active]:text-white glass-3d-hover">جمعیت شناسی</TabsTrigger>
-                <TabsTrigger value="timeline" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-orange-600 data-[state=active]:text-white glass-3d-hover">روند زمانی</TabsTrigger>
-                <TabsTrigger value="birthdays" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-pink-500 data-[state=active]:to-rose-600 data-[state=active]:text-white glass-3d-hover">تولدها</TabsTrigger>
-                <TabsTrigger value="companies" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-indigo-500 data-[state=active]:to-purple-600 data-[state=active]:text-white glass-3d-hover">شرکت‌ها</TabsTrigger>
-                <TabsTrigger value="groups" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-violet-500 data-[state=active]:to-purple-600 data-[state=active]:text-white glass-3d-hover">گروه‌ها</TabsTrigger>
-                <TabsTrigger value="activity" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500 data-[state=active]:to-blue-600 data-[state=active]:text-white glass-3d-hover">فعالیت‌ها</TabsTrigger>
-                <TabsTrigger value="communication" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-teal-500 data-[state=active]:to-green-600 data-[state=active]:text-white glass-3d-hover">ارتباطات</TabsTrigger>
-                <TabsTrigger value="details" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-slate-500 data-[state=active]:to-gray-600 data-[state=active]:text-white glass-3d-hover">جزئیات</TabsTrigger>
+                <TabsTrigger value="overview" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-600 data-[state=active]:text-white glass-3d-hover">{t("statistics.tabs.overview")}</TabsTrigger>
+                <TabsTrigger value="demographics" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-500 data-[state=active]:to-teal-600 data-[state=active]:text-white glass-3d-hover">{t("statistics.tabs.demographics")}</TabsTrigger>
+                <TabsTrigger value="timeline" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-orange-600 data-[state=active]:text-white glass-3d-hover">{t("statistics.tabs.timeline")}</TabsTrigger>
+                <TabsTrigger value="birthdays" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-pink-500 data-[state=active]:to-rose-600 data-[state=active]:text-white glass-3d-hover">{t("statistics.tabs.birthdays")}</TabsTrigger>
+                <TabsTrigger value="companies" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-indigo-500 data-[state=active]:to-purple-600 data-[state=active]:text-white glass-3d-hover">{t("statistics.tabs.companies")}</TabsTrigger>
+                <TabsTrigger value="groups" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-violet-500 data-[state=active]:to-purple-600 data-[state=active]:text-white glass-3d-hover">{t("statistics.tabs.groups")}</TabsTrigger>
+                <TabsTrigger value="activity" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500 data-[state=active]:to-blue-600 data-[state=active]:text-white glass-3d-hover">{t("statistics.tabs.activity")}</TabsTrigger>
+                <TabsTrigger value="communication" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-teal-500 data-[state=active]:to-green-600 data-[state=active]:text-white glass-3d-hover">{t("statistics.tabs.communication")}</TabsTrigger>
+                <TabsTrigger value="details" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-slate-500 data-[state=active]:to-gray-600 data-[state=active]:text-white glass-3d-hover">{t("statistics.tabs.details")}</TabsTrigger>
               </TabsList>
 
               <TabsContent value="overview" className="space-y-6">

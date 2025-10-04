@@ -8,9 +8,9 @@ import {
   ModernPopoverTrigger,
 } from '@/components/ui/modern-popover';
 import { GlassButton } from "@/components/ui/glass-button";
+import { ModernButton } from '@/components/ui/modern-button';
 import { cn, applyGlassEffect } from '@/lib/utils';
 import moment from 'moment-jalaali';
-import { useJalaliCalendar } from '@/hooks/use-jalali-calendar';
 import { useAppSettings } from '@/hooks/use-app-settings';
 
 export interface JalaliCalendarProps {
@@ -64,6 +64,15 @@ export function JalaliCalendar({
     }
   }, [initialLocale, settings.calendarType]);
 
+  // همگام‌سازی با prop خارجی selected: تاریخ انتخابی و ماه جاری را به همان تاریخ ببر
+  useEffect(() => {
+    if (selected) {
+      const m = moment(selected).startOf('day');
+      setSelectedDate(m.valueOf());
+      setCurrentDate(m.valueOf());
+    }
+  }, [selected]);
+
   const monthDays = React.useMemo(() => {
     const days: Array<{
       date: moment.Moment;
@@ -74,65 +83,37 @@ export function JalaliCalendar({
       dayIndex?: number;
     }> = [];
 
-    const startOfMonth = isJalali 
+    // شروع و پایان ماه بر اساس نوع تقویم
+    const startOfMonth = isJalali
       ? currentMoment.clone().startOf('jMonth')
       : currentMoment.clone().startOf('month');
-    
-    const endOfMonth = isJalali 
+
+    const endOfMonth = isJalali
       ? currentMoment.clone().endOf('jMonth')
       : currentMoment.clone().endOf('month');
-    
-    // تنظیم اول هفته برای محاسبات بعدی
-    if (isJalali) {
-      // برای تقویم شمسی: شنبه اولین روز هفته
-      moment.updateLocale('fa', {
-        week: {
-          dow: 6, // شنبه اولین روز هفته (6)
-          doy: 6  // هفته‌ای که شامل 1 فروردین باشد هفته اول سال است
-        }
-      });
-      moment.locale('fa');
-    } else {
-      // برای تقویم میلادی: یکشنبه اولین روز هفته
-      moment.updateLocale('en', {
-        week: {
-          dow: 0, // یکشنبه اولین روز هفته (0)
-          doy: 6  // تعریف استاندارد برای هفته اول سال
-        }
-      });
-      moment.locale('en');
-    }
 
-    // محاسبه شروع و پایان هفته با توجه به تقویم انتخاب شده
-    const startOfWeek = isJalali
-      ? startOfMonth.clone().startOf('week') // استفاده از week برای تقویم شمسی
-      : startOfMonth.clone().startOf('week'); // استفاده از week برای تقویم میلادی
-      
-    const endOfWeek = isJalali
-      ? endOfMonth.clone().endOf('week') // استفاده از week برای تقویم شمسی
-      : endOfMonth.clone().endOf('week'); // استفاده از week برای تقویم میلادی
+    // ایندکس روز هفته بدون تغییر locale گلوبال
+    // شمسی: شنبه=0 ... جمعه=6 | میلادی: یکشنبه=0 ... شنبه=6
+    const getWeekIndex = (d: moment.Moment) => (isJalali ? (d.day() + 1) % 7 : d.day());
 
-    const day = startOfWeek.clone();
+    const leading = getWeekIndex(startOfMonth);
+    const trailing = 6 - getWeekIndex(endOfMonth);
+
+    const gridStart = startOfMonth.clone().subtract(leading, 'day');
+    const gridEnd = endOfMonth.clone().add(trailing, 'day');
+
+    const day = gridStart.clone();
     let dayIndex = 0;
-    while (day.isSameOrBefore(endOfWeek, 'day')) {
+    while (day.isSameOrBefore(gridEnd, 'day')) {
       const isCurrentMonth = isJalali
         ? day.jMonth() === currentMoment.jMonth()
         : day.isSame(currentMoment, 'month');
-        
+
       const today = moment().startOf('day');
       const isToday = day.isSame(today, 'day');
       const isSelected = day.isSame(selectedMoment, 'day');
-      
-      // محاسبه روز هفته
-      let dayOfWeek;
-      if (isJalali) {
-        // برای تقویم شمسی: شنبه=0، یکشنبه=1، ...، جمعه=6
-        dayOfWeek = (day.day() + 1) % 7;
-      } else {
-        // برای تقویم میلادی: یکشنبه=0، دوشنبه=1، ...، شنبه=6
-        dayOfWeek = day.day();
-      }
-      
+
+      const dayOfWeek = getWeekIndex(day);
       const isWeekend = isJalali
         ? dayOfWeek === 6 // جمعه در تقویم شمسی
         : dayOfWeek === 0 || dayOfWeek === 6; // آخر هفته در تقویم میلادی
@@ -143,7 +124,7 @@ export function JalaliCalendar({
         isToday,
         isSelected,
         isWeekend,
-        dayIndex // برای دیباگ کردن
+        dayIndex,
       });
 
       day.add(1, 'day');
@@ -187,6 +168,8 @@ export function JalaliCalendar({
   const handleDateClick = (date: moment.Moment) => {
     const newDate = date.clone().startOf('day');
     setSelectedDate(newDate.valueOf());
+    // هنگام انتخاب تاریخ، ماه نمایشی هم به ماه همان تاریخ برود
+    setCurrentDate(newDate.valueOf());
     if (onSelect) {
       onSelect(newDate.toDate());
     }
@@ -223,7 +206,7 @@ export function JalaliCalendar({
     }
   };
 
-  const { month, year, monthName, yearNumber } = getMonthYear();
+  const { month, monthName, yearNumber } = getMonthYear();
 
   const changeMonth = (monthIndex: number) => {
     setCurrentDate((prev: number) => {
@@ -299,14 +282,16 @@ export function JalaliCalendar({
       {/* Calendar Type Toggle */}
       {showToggle && (
         <div className="flex justify-end mb-3">
-          <GlassButton
-            variant="outline"
+          <ModernButton
+            variant="glass"
             size="sm"
+            rounded="full"
+            shadow="xl"
             onClick={toggleCalendarType}
-            className="text-xs h-7 px-2"
+            className="text-xs px-3 h-7 bg-white/40 dark:bg-gray-800/60 hover:bg-white/50 dark:hover:bg-gray-700/70 backdrop-saturate-150"
           >
             {isJalali ? 'میلادی' : 'شمسی'}
-          </GlassButton>
+          </ModernButton>
         </div>
       )}
 
@@ -432,14 +417,16 @@ export function JalaliCalendar({
               </ModernPopoverContent>
             </ModernPopover>
           </div>
-          <GlassButton
-            variant="outline"
+          <ModernButton
+            variant="glass"
             size="sm"
+            rounded="full"
+            shadow="xl"
             onClick={goToToday}
-            className="text-xs h-7 px-2"
+            className="text-xs px-3 h-7 bg-white/40 dark:bg-gray-800/60 hover:bg-white/50 dark:hover:bg-gray-700/70 backdrop-saturate-150"
           >
             {isJalali ? 'امروز' : 'Today'}
-          </GlassButton>
+          </ModernButton>
         </div>
         
         <GlassButton
@@ -468,7 +455,7 @@ export function JalaliCalendar({
               key={index}
               className={cn(
                 "text-center text-xs font-medium py-1 text-muted-foreground",
-                isWeekend && "text-destructive/80"
+                isWeekend && "text-red-600"
               )}
             >
               {day}
@@ -487,10 +474,10 @@ export function JalaliCalendar({
             onClick={() => handleDateClick(day.date)}
             disabled={!day.isCurrentMonth}
             className={cn(
-              "h-9 w-9 p-0 text-sm font-medium transition-colors duration-200 rounded-full",
+              "relative h-9 w-9 p-0 text-sm font-medium transition-colors duration-200 rounded-full",
               !day.isCurrentMonth && "text-muted-foreground opacity-50",
-              day.isWeekend && !day.isSelected && "text-destructive/70",
-              day.isToday && !day.isSelected && "bg-accent/50 text-accent-foreground",
+              day.isWeekend && !day.isSelected && "text-red-600",
+              day.isToday && !day.isSelected && "bg-accent/50 text-accent-foreground ring-2 ring-primary",
               day.isSelected && "bg-primary text-primary-foreground hover:bg-primary/90"
             )}
           >
