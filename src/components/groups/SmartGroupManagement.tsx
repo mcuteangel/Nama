@@ -11,7 +11,11 @@ import {
   BarChart3,
   Lightbulb,
   ArrowRight,
-  Star
+  Star,
+  Activity,
+  Layers,
+  Clock,
+  Award
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useSession } from "@/integrations/supabase/auth";
@@ -56,7 +60,7 @@ const SmartGroupManagement: React.FC = React.memo(() => {
   const [isGeneratingSuggestions, setIsGeneratingSuggestions] = useState(false);
   const [hoveredSuggestion, setHoveredSuggestion] = useState<string | null>(null);
   const [selectedSuggestion, setSelectedSuggestion] = useState<string | null>(null);
-  const [, setIsAnimating] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
 
   // محاسبات آماری پیشرفته با useMemo برای عملکرد بهتر
   const stats = useMemo(() => ({

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Copy, Merge, XCircle, Info, AlertTriangle } from "lucide-react";
+import { Copy, Merge, XCircle, Info, AlertTriangle, Zap, TrendingUp, Target, Activity } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useSession } from "@/integrations/supabase/auth";
 import { useErrorHandler } from "@/hooks/use-error-handler";
@@ -67,7 +67,7 @@ const DuplicateContactManagement: React.FC = React.memo(() => {
   const [isScanning, setIsScanning] = useState(false);
   const [hoveredPair, setHoveredPair] = useState<string | null>(null);
 
-  // محاسبه آمار با useMemo برای عملکرد بهتر
+  // محاسبه آمار پیشرفته با useMemo برای عملکرد بهتر
   const stats = useMemo(() => ({
     total: duplicatePairs.length,
     highConfidence: duplicatePairs.filter(p =>
@@ -328,31 +328,53 @@ const DuplicateContactManagement: React.FC = React.memo(() => {
   }
 
   return (
-    <AIBaseCard
-      title={t('ai_suggestions.duplicate_contact_management_title')}
-      description={t('ai_suggestions.duplicate_contact_management_description')}
-      icon={<Copy size={20} />}
-      variant="warning"
-      compact
-    >
-      {/* آمار سریع */}
-      {stats.total > 0 && (
-        <div className="grid grid-cols-3 gap-2 mb-4 p-3 bg-gradient-to-r from-orange-50/60 to-red-50/60 dark:from-orange-900/30 dark:to-red-900/30 rounded-lg border border-orange-200/30 dark:border-orange-700/30">
-          <div className="text-center">
-            <div className="text-lg font-bold text-orange-600 dark:text-orange-400">{stats.total}</div>
-            <div className="text-xs text-orange-500 dark:text-orange-300">{t('common.total', 'کل')}</div>
+    <div className="space-y-6">
+      {/* Enhanced Header */}
+      <div className="relative bg-gradient-to-br from-orange-50/60 via-red-50/40 to-pink-50/20 dark:from-orange-900/20 dark:via-red-900/10 dark:to-pink-900/5 rounded-3xl p-6 border-2 border-orange-200/30 dark:border-orange-800/30 backdrop-blur-xl overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 via-red-500/5 to-pink-500/5"></div>
+        <div className="relative flex items-center gap-4">
+          <div className="relative">
+            <div className="w-16 h-16 rounded-3xl bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center shadow-xl transform transition-all duration-300 hover:scale-110">
+              <Copy size={32} className="text-white" />
+            </div>
+            <div className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-400 rounded-full animate-bounce"></div>
+            <div className="absolute -bottom-1 -left-1 w-3 h-3 bg-red-400 rounded-full animate-pulse"></div>
           </div>
-          <div className="text-center">
-            <div className="text-lg font-bold text-red-600 dark:text-red-400">{stats.highConfidence}</div>
-            <div className="text-xs text-red-500 dark:text-red-300">{t('ai_suggestions.high_confidence', 'بالا')}</div>
-          </div>
-          <div className="text-center">
-            <div className="text-lg font-bold text-yellow-600 dark:text-yellow-400">{stats.mediumConfidence}</div>
-            <div className="text-xs text-yellow-500 dark:text-yellow-300">{t('ai_suggestions.medium_confidence', 'متوسط')}</div>
+          <div className="flex-1">
+            <h3 className="text-2xl font-bold bg-gradient-to-r from-orange-600 via-red-600 to-pink-600 bg-clip-text text-transparent mb-2">
+              {t('ai_suggestions.duplicate_contact_management_title')}
+            </h3>
+            <p className="text-gray-600 dark:text-gray-300">
+              {t('ai_suggestions.duplicate_contact_management_description')}
+            </p>
           </div>
         </div>
-      )}
 
+        {/* Enhanced Statistics */}
+        {stats.total > 0 && (
+          <div className="grid grid-cols-3 gap-4 mt-6">
+            <div className="bg-gradient-to-br from-orange-500/10 to-orange-600/10 dark:from-orange-500/20 dark:to-orange-600/20 rounded-2xl p-4 border border-orange-200/30 dark:border-orange-800/30 backdrop-blur-sm text-center">
+              <Activity size={24} className="text-orange-500 mx-auto mb-2" />
+              <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">{stats.total}</div>
+              <div className="text-sm text-orange-500 dark:text-orange-300">{t('common.total', 'کل')}</div>
+            </div>
+
+            <div className="bg-gradient-to-br from-red-500/10 to-red-600/10 dark:from-red-500/20 dark:to-red-600/20 rounded-2xl p-4 border border-red-200/30 dark:border-red-800/30 backdrop-blur-sm text-center">
+              <TrendingUp size={24} className="text-red-500 mx-auto mb-2" />
+              <div className="text-2xl font-bold text-red-600 dark:text-red-400">{stats.highConfidence}</div>
+              <div className="text-sm text-red-500 dark:text-red-300">{t('ai_suggestions.high_confidence', 'بالا')}</div>
+            </div>
+
+            <div className="bg-gradient-to-br from-yellow-500/10 to-yellow-600/10 dark:from-yellow-500/20 dark:to-yellow-600/20 rounded-2xl p-4 border border-yellow-200/30 dark:border-yellow-800/30 backdrop-blur-sm text-center">
+              <Target size={24} className="text-yellow-500 mx-auto mb-2" />
+              <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">{stats.mediumConfidence}</div>
+              <div className="text-sm text-yellow-500 dark:text-yellow-300">{t('ai_suggestions.medium_confidence', 'متوسط')}</div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Scan Button */}
       <GlassButton
         onClick={fetchAllContactsForDuplicates}
         disabled={isScanning}
@@ -368,6 +390,33 @@ const DuplicateContactManagement: React.FC = React.memo(() => {
         {t('ai_suggestions.scan_for_duplicates')}
       </GlassButton>
 
+      {/* Scanning Animation */}
+      {isScanning && (
+        <div className="bg-gradient-to-r from-orange-50/60 to-red-50/60 dark:from-orange-900/20 dark:to-red-900/20 rounded-2xl p-6 border border-orange-200/30 dark:border-orange-800/30 backdrop-blur-sm">
+          <div className="flex items-center gap-4 mb-4">
+            <div className="relative">
+              <Copy size={32} className="text-orange-500 animate-pulse" />
+              <div className="absolute inset-0 bg-orange-500/20 rounded-full animate-ping"></div>
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-orange-600 dark:text-orange-400">
+                {t('ai_suggestions.scanning_contacts', 'در حال اسکن مخاطبین')}
+              </h3>
+              <p className="text-sm text-orange-500 dark:text-orange-300">
+                {t('ai_suggestions.analyzing_duplicates', 'در حال تحلیل تکراری‌ها...')}
+              </p>
+            </div>
+          </div>
+
+          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mb-2">
+            <div className="bg-gradient-to-r from-orange-500 to-red-600 h-2 rounded-full animate-pulse" style={{ width: '75%' }}></div>
+          </div>
+          <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
+            {t('ai_suggestions.processing_step', 'مرحله: مقایسه اطلاعات مخاطبین')}
+          </p>
+        </div>
+      )}
+
       {duplicatePairs.length === 0 && !isScanning && (
         <EmptyState
           icon={Copy}
@@ -377,74 +426,95 @@ const DuplicateContactManagement: React.FC = React.memo(() => {
       )}
 
       {duplicatePairs.length > 0 && (
-        <div className="space-y-2 pt-3 border-t border-gray-200 dark:border-gray-700">
-          <h4 className="text-sm font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
-            <AlertTriangle size={16} className="text-orange-500" />
-            <span className="bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
-              {t('ai_suggestions.pending_duplicate_suggestions')}
-            </span>
-            <span className="bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-200 px-2 py-1 rounded-full text-xs font-semibold">
-              {duplicatePairs.length}
-            </span>
-          </h4>
-          <div className="grid gap-2 max-h-96 overflow-y-auto">
+        <div className="space-y-4">
+          <div className="flex items-center justify-between p-4 bg-gradient-to-r from-red-50/60 to-orange-50/60 dark:from-red-900/20 dark:to-orange-900/20 rounded-2xl border border-red-200/30 dark:border-red-800/30 backdrop-blur-sm">
+            <div className="flex items-center gap-3">
+              <AlertTriangle size={24} className="text-red-500 animate-pulse" />
+              <div>
+                <h4 className="text-lg font-bold text-gray-800 dark:text-gray-100">
+                  {t('ai_suggestions.pending_duplicate_suggestions')}
+                </h4>
+                <p className="text-sm text-gray-600 dark:text-gray-300">
+                  {t('ai_suggestions.duplicates_detected', 'تکراری‌های شناسایی شده نیاز به بررسی دارند')}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <div className="bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-200 px-3 py-1 rounded-full text-sm font-semibold">
+                {duplicatePairs.length}
+              </div>
+              <Zap size={20} className="text-red-500" />
+            </div>
+          </div>
+
+          <div className="grid gap-4 max-h-96 overflow-y-auto">
             {duplicatePairs.map((pair, index) => (
               <div
                 key={index}
-                className={`bg-gradient-to-r from-white/20 via-gray-50/30 to-slate-50/30 dark:from-gray-800/20 dark:via-gray-700/30 dark:to-gray-600/30 p-2 rounded-lg border border-white/30 backdrop-blur-sm shadow-sm transition-all duration-300 ${
-                  hoveredPair === pair.mainContact.id ? 'scale-105 shadow-lg' : ''
-                }`}
+                className={`
+                  group bg-gradient-to-r from-white/60 via-white/40 to-white/20
+                  dark:from-gray-800/60 dark:via-gray-700/40 dark:to-gray-600/20
+                  p-6 rounded-2xl border-2 backdrop-blur-sm shadow-lg
+                  transition-all duration-500 ease-out
+                  hover:shadow-2xl hover:shadow-red-500/20 hover:scale-[1.02]
+                  ${hoveredPair === pair.mainContact.id ? 'border-red-300/70 shadow-red-500/30' : 'border-white/40 dark:border-gray-600/40'}
+                  animate-slide-in
+                `}
+                style={{ animationDelay: `${index * 100}ms` }}
                 onMouseEnter={() => setHoveredPair(pair.mainContact.id)}
                 onMouseLeave={() => setHoveredPair(null)}
                 role="region"
                 aria-labelledby={`duplicate-${index}`}
               >
-                <div className="flex items-center gap-2 text-xs text-gray-700 dark:text-gray-200 mb-2">
-                  <Info size={12} className="text-blue-500" />
-                  <span id={`duplicate-${index}`}>{t('ai_suggestions.duplicate_reason')}: {pair.reason}</span>
+                <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-200 mb-4">
+                  <Info size={14} className="text-blue-500" />
+                  <span id={`duplicate-${index}`} className="font-semibold">{t('ai_suggestions.duplicate_reason')}: {pair.reason}</span>
                 </div>
-                <div className="grid grid-cols-1 gap-2">
-                  <div className="p-2 border rounded-md bg-gray-50 dark:bg-gray-700">
-                    <p className="font-medium text-sm text-gray-800 dark:text-gray-100">
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="p-4 border-2 border-blue-200/30 dark:border-blue-800/30 rounded-xl bg-gradient-to-br from-blue-50/30 to-blue-100/20 dark:from-blue-900/20 dark:to-blue-800/10">
+                    <p className="font-bold text-lg text-blue-800 dark:text-blue-200 mb-2">
                       {t('ai_suggestions.main_contact')}: {pair.mainContact.first_name} {pair.mainContact.last_name}
                     </p>
                     {pair.mainContact.email_addresses.slice(0, 1).map((e, i) => (
-                      <p key={i} className="text-xs text-gray-600 dark:text-gray-300 truncate">{e.email_address}</p>
+                      <p key={i} className="text-sm text-gray-600 dark:text-gray-300 truncate">{e.email_address}</p>
                     ))}
                     {pair.mainContact.phone_numbers.slice(0, 1).map((p, i) => (
-                      <p key={i} className="text-xs text-gray-600 dark:text-gray-300">{p.phone_number}</p>
+                      <p key={i} className="text-sm text-gray-600 dark:text-gray-300">{p.phone_number}</p>
                     ))}
                   </div>
-                  <div className="p-2 border rounded-md bg-gray-50 dark:bg-gray-700">
-                    <p className="font-medium text-sm text-gray-800 dark:text-gray-100">
+                  <div className="p-4 border-2 border-red-200/30 dark:border-red-800/30 rounded-xl bg-gradient-to-br from-red-50/30 to-red-100/20 dark:from-red-900/20 dark:to-red-800/10">
+                    <p className="font-bold text-lg text-red-800 dark:text-red-200 mb-2">
                       {t('ai_suggestions.duplicate_contact')}: {pair.duplicateContact.first_name} {pair.duplicateContact.last_name}
                     </p>
                     {pair.duplicateContact.email_addresses.slice(0, 1).map((e, i) => (
-                      <p key={i} className="text-xs text-gray-600 dark:text-gray-300 truncate">{e.email_address}</p>
+                      <p key={i} className="text-sm text-gray-600 dark:text-gray-300 truncate">{e.email_address}</p>
                     ))}
                     {pair.duplicateContact.phone_numbers.slice(0, 1).map((p, i) => (
-                      <p key={i} className="text-xs text-gray-600 dark:text-gray-300">{p.phone_number}</p>
+                      <p key={i} className="text-sm text-gray-600 dark:text-gray-300">{p.phone_number}</p>
                     ))}
                   </div>
                 </div>
-                <div className="flex justify-end gap-1 mt-2">
+
+                <div className="flex justify-end gap-3 mt-4">
                   <GlassButton
                     variant="ghost"
                     size="sm"
                     onClick={() => handleMergeContacts(pair.mainContact, pair.duplicateContact)}
-                    className="w-7 h-7 rounded-full bg-green-100/50 hover:bg-green-200/70 dark:bg-green-900/30 dark:hover:bg-green-800/50 text-green-600 hover:text-green-700 transition-all duration-200"
+                    className="w-10 h-10 rounded-2xl bg-green-500/10 hover:bg-green-500/20 dark:bg-green-900/30 dark:hover:bg-green-800/50 text-green-600 hover:text-green-700 transition-all duration-300 hover:scale-110 border-2 border-green-200/50 dark:border-green-800/50"
                     aria-label={t('ai_suggestions.merge_contacts')}
                   >
-                    <Merge size={14} />
+                    <Merge size={18} />
                   </GlassButton>
                   <GlassButton
                     variant="ghost"
                     size="sm"
                     onClick={() => handleDiscardDuplicate(pair.duplicateContact.id)}
-                    className="w-7 h-7 rounded-full bg-red-100/50 hover:bg-red-200/70 dark:bg-red-900/30 dark:hover:bg-red-800/50 text-red-600 hover:text-red-700 transition-all duration-200"
+                    className="w-10 h-10 rounded-2xl bg-red-500/10 hover:bg-red-500/20 dark:bg-red-900/30 dark:hover:bg-red-800/50 text-red-600 hover:text-red-700 transition-all duration-300 hover:scale-110 border-2 border-red-200/50 dark:border-red-800/50"
                     aria-label={t('common.discard')}
                   >
-                    <XCircle size={14} />
+                    <XCircle size={18} />
                   </GlassButton>
                 </div>
               </div>
@@ -452,7 +522,7 @@ const DuplicateContactManagement: React.FC = React.memo(() => {
           </div>
         </div>
       )}
-    </AIBaseCard>
+    </div>
   );
 });
 
