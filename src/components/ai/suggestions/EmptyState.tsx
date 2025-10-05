@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sparkles } from "lucide-react";
+import { Lightbulb, Sparkles } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 export const EmptyState: React.FC = () => {
@@ -11,13 +11,14 @@ export const EmptyState: React.FC = () => {
         <Sparkles size={48} className="mx-auto text-gray-400" />
       </div>
       <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-200 mb-3">
-        {t('ai_suggestions.ready_to_start', 'آماده شروع هستیم!')}
+        {t('ai_suggestions.ready_to_start')}
       </h3>
       <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
-        {t('ai_suggestions.enter_text_to_start', 'متن خود را وارد کنید تا هوش مصنوعی شروع به کار کند')}
+        {t('ai_suggestions.enter_text_to_start')}
       </p>
-      <div className="text-xs text-gray-400 dark:text-gray-500">
-        💡 {t('common.hint', 'راهنمایی')}: {t('ai_suggestions.enter_text_hint', 'متن خود را در کادر بالا وارد کنید')}
+      <div className="text-xs text-gray-400 dark:text-gray-500 flex items-center justify-center gap-1">
+        <Lightbulb className="w-3.5 h-3.5 text-amber-500" />
+        <span>{t('common.hint')}: {t('ai_suggestions.enter_text_hint')}</span>
       </div>
     </div>
   );

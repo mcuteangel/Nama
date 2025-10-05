@@ -10,7 +10,7 @@ import GenderSuggestionManagement from "@/components/ai/GenderSuggestionManageme
 import SmartGroupManagement from "@/components/groups/SmartGroupManagement";
 import DuplicateContactManagement from "@/components/DuplicateContactManagement";
 import { useAISuggestions } from "@/hooks/use-ai-suggestions";
-import { Brain, Sparkles, Users, VenetianMask, ScanText } from "lucide-react";
+import { Brain, Users, VenetianMask, ScanText } from "lucide-react";
 
 const AISuggestions: React.FC = () => {
   const { t } = useTranslation();
@@ -71,8 +71,8 @@ const AISuggestions: React.FC = () => {
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header with PageHeader */}
         <PageHeader
-          title={t('ai_suggestions.title', 'پیشنهادات هوش مصنوعی')}
-          description={t('ai_suggestions.description', 'استخراج هوشمند اطلاعات مخاطبین از متن')}
+          title={t('ai_suggestions.title')}
+          description={t('ai_suggestions.description')}
           showBackButton={true}
           className="mb-6"
         />
@@ -82,8 +82,8 @@ const AISuggestions: React.FC = () => {
           <div className="md:col-span-1">
             <div className="h-full">
               <AIBaseCard
-                title={t('ai_suggestions.input_section_title', 'ورود اطلاعات')}
-                description={t('ai_suggestions.input_section_description', 'متن خود را وارد کنید یا از قابلیت گفتار به متن استفاده کنید')}
+                title={t('ai_suggestions.input_section_title')}
+                description={t('ai_suggestions.input_section_description')}
                 icon={<ScanText className="w-5 h-5 text-indigo-400" />}
                 variant="gradient"
                 className="h-full backdrop-blur-lg bg-gradient-to-br from-indigo-500/10 to-blue-500/10 dark:from-indigo-900/20 dark:to-blue-900/20 rounded-2xl shadow-xl border border-indigo-200/30 dark:border-indigo-800/30"
@@ -110,8 +110,8 @@ const AISuggestions: React.FC = () => {
           {/* Main AI Suggestions Card */}
           <div className="md:col-span-1">
             <AIBaseCard
-              title={t('ai_suggestions.title', 'پیشنهادات هوشمند')}
-              description={t('ai_suggestions.description', 'پیشنهادات استخراج شده از متن ورودی')}
+              title={t('ai_suggestions.title')}
+              description={t('ai_suggestions.suggestions_section_title')}
               icon={<ScanText className="w-5 h-5 text-indigo-400" />}
               variant="gradient"
               className="relative h-full backdrop-blur-lg bg-gradient-to-br from-indigo-500/10 to-blue-500/10 dark:from-indigo-900/20 dark:to-blue-900/20 rounded-2xl shadow-xl border border-indigo-200/30 dark:border-indigo-800/30"
@@ -149,8 +149,8 @@ const AISuggestions: React.FC = () => {
           {/* AI Features Cards */}
           <div className="md:col-span-2">
             <AIBaseCard
-              title={t('ai_suggestions.smart_group_management_title', 'مدیریت گروه‌های هوشمند')}
-              description={t('ai_suggestions.smart_group_management_description', 'ایجاد و مدیریت خودکار گروه‌های مخاطبین')}
+              title={t('ai_suggestions.smart_group_management_title')}
+              description={t('ai_suggestions.smart_group_management_description')}
               icon={<Brain className="w-5 h-5 text-purple-500" />}
               variant="gradient"
               className="h-full backdrop-blur-lg bg-gradient-to-br from-purple-500/10 to-blue-500/10 dark:from-purple-900/30 dark:to-blue-900/30 rounded-2xl shadow-xl border border-purple-200/30 dark:border-purple-800/30"
@@ -161,8 +161,8 @@ const AISuggestions: React.FC = () => {
           </div>
 
           <AIBaseCard
-            title={t('ai_suggestions.duplicate_management', 'مدیریت تکراری‌ها')}
-            description={t('ai_suggestions.duplicate_contact_management_description', 'شناسایی و ادغام خودکار مخاطبین تکراری')}
+            title={t('ai_suggestions.duplicate_management')}
+            description={t('ai_suggestions.duplicate_contact_management_description')}
             icon={<Users className="w-5 h-5 text-amber-500" />}
             variant="warning"
             className="h-full backdrop-blur-lg bg-gradient-to-br from-amber-500/10 to-orange-500/10 dark:from-amber-900/20 dark:to-orange-900/20 rounded-2xl shadow-xl border border-amber-200/30 dark:border-amber-800/30"
@@ -172,8 +172,8 @@ const AISuggestions: React.FC = () => {
           </AIBaseCard>
 
           <AIBaseCard
-            title={t('ai_suggestions.gender_suggestion_title', 'پیشنهاد جنسیت')}
-            description={t('ai_suggestions.gender_suggestion_description', 'پیشنهاد هوشمند جنسیت بر اساس نام مخاطبین')}
+            title={t('ai_suggestions.gender_suggestion_title')}
+            description={t('ai_suggestions.gender_suggestion_description_local')}
             icon={<VenetianMask className="w-5 h-5 text-blue-500" />}
             variant="info"
             className="h-full backdrop-blur-lg bg-gradient-to-br from-blue-500/10 to-cyan-500/10 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-2xl shadow-xl border border-blue-200/30 dark:border-blue-800/30"
@@ -187,7 +187,7 @@ const AISuggestions: React.FC = () => {
         <div className="text-center py-6">
           <div className="inline-flex items-center gap-2 p-2 px-4 rounded-full backdrop-blur-lg bg-white/30 dark:bg-gray-800/50 shadow-lg border border-white/20 dark:border-gray-700/50">
             <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-              قدرت گرفته از هوش مصنوعی پیشرفته
+              {t('ai_suggestions.ai_powered_footer')}
             </span>
           </div>
         </div>

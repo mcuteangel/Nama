@@ -3,8 +3,10 @@ import { GlassButton } from "@/components/ui/glass-button";
 import { Brain, Search, CheckSquare, Square, CheckCircle, XCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import AISuggestionCard from "@/components/ai/AISuggestionCard";
+import { mapToContactExtractionSuggestion } from "@/utils/mappers";
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import { AISuggestionDisplay } from "@/types/ai-suggestions-display.types";
+import { ContactExtractionSuggestion } from "@/types/ai-suggestions.types";
 
 interface SuggestionsListProps {
   pendingSuggestions: AISuggestionDisplay[];
@@ -21,9 +23,9 @@ interface SuggestionsListProps {
 
   // Handlers
   handleSelectSuggestion: (suggestionId: string) => void;
-  handleProcessSuggestion: (suggestion: AISuggestionDisplay) => void;
+  handleProcessSuggestion: (suggestion: ContactExtractionSuggestion) => void;
   handleDiscardSuggestion: (suggestionId: string) => void;
-  handleEditSuggestion: (suggestion: AISuggestionDisplay) => void;
+  handleEditSuggestion: (suggestion: ContactExtractionSuggestion) => void;
   handleBatchAccept: () => void;
   handleBatchDiscard: () => void;
 }
@@ -60,12 +62,12 @@ export const SuggestionsList: React.FC<SuggestionsListProps> = ({
         <div className="flex items-center gap-3">
           <Brain size={24} className="text-yellow-500 animate-pulse" />
           <div>
-            <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100">
-              {t('ai_suggestions.smart_suggestions', 'پیشنهادات هوشمند')}
-            </h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              {filteredSuggestions.length} {t('common.of', 'از')} {stats.total} {t('ai_suggestions.suggestions', 'پیشنهاد')}
-            </p>
+              <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100">
+                {t('ai_suggestions.smart_suggestions')}
+              </h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                {filteredSuggestions.length} {t('common.of')} {stats.total} {t('ai_suggestions.suggestions')}
+              </p>
           </div>
         </div>
         <div className="flex items-center gap-3">
@@ -76,14 +78,13 @@ export const SuggestionsList: React.FC<SuggestionsListProps> = ({
             className="flex items-center gap-2"
           >
             {isBatchMode ? <CheckSquare size={16} /> : <Square size={16} />}
-            {t('ai_suggestions.batch_mode', 'حالت گروهی')}
+            {t('ai_suggestions.batch_mode')}
           </GlassButton>
           <div className="relative w-full sm:w-80">
             <Search size={20} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
             <input
               ref={searchInputRef}
-              type="text"
-              placeholder={t('common.search_suggestions', 'جستجو در پیشنهادات...')}
+              placeholder={t('common.search_suggestions')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-10 pr-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-4 focus:ring-blue-300 focus:border-blue-500 transition-all duration-300"
@@ -99,7 +100,7 @@ export const SuggestionsList: React.FC<SuggestionsListProps> = ({
             <div className="flex items-center gap-3">
               <CheckSquare size={20} className="text-blue-500" />
               <span className="font-medium text-gray-800 dark:text-gray-100">
-                {selectedSuggestions.size} {t('ai_suggestions.selected', 'انتخاب شده')}
+                {selectedSuggestions.size} {t('ai_suggestions.selected')}
               </span>
             </div>
             <div className="flex gap-2">
@@ -110,7 +111,7 @@ export const SuggestionsList: React.FC<SuggestionsListProps> = ({
                 disabled={isSavingOrUpdating}
               >
                 <CheckCircle size={16} />
-                {t('ai_suggestions.accept_selected', 'پذیرش انتخاب شده‌ها')}
+                {t('ai_suggestions.accept_selected')}
               </GlassButton>
               <GlassButton
                 onClick={handleBatchDiscard}
@@ -119,7 +120,7 @@ export const SuggestionsList: React.FC<SuggestionsListProps> = ({
                 disabled={isSavingOrUpdating}
               >
                 <XCircle size={16} />
-                {t('ai_suggestions.discard_selected', 'رد انتخاب شده‌ها')}
+                {t('ai_suggestions.discard_selected')}
               </GlassButton>
             </div>
           </div>
@@ -131,7 +132,7 @@ export const SuggestionsList: React.FC<SuggestionsListProps> = ({
         <div className="text-center py-8">
           <LoadingSpinner size={48} className="mx-auto mb-4 animate-spin text-blue-500" />
           <p className="text-lg font-semibold text-gray-800 dark:text-gray-100">
-            {t('ai_suggestions.loading_suggestions', 'بارگذاری پیشنهادات...')}
+            {t('ai_suggestions.loading_suggestions')}
           </p>
         </div>
       )}
@@ -157,7 +158,7 @@ export const SuggestionsList: React.FC<SuggestionsListProps> = ({
               )}
               <div className="flex-1">
                 <AISuggestionCard
-                  suggestion={suggestion}
+                  suggestion={mapToContactExtractionSuggestion(suggestion)}
                   onProcess={handleProcessSuggestion}
                   onDiscard={handleDiscardSuggestion}
                   onEdit={handleEditSuggestion}
@@ -174,17 +175,17 @@ export const SuggestionsList: React.FC<SuggestionsListProps> = ({
         <div className="text-center py-8">
           <Search size={64} className="mx-auto text-gray-400 mb-4" />
           <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2">
-            {t('common.no_results', 'نتیجه‌ای یافت نشد')}
+            {t('common.no_results')}
           </h3>
           <p className="text-gray-600 dark:text-gray-400 mb-4">
-            {t('common.no_results_for', 'هیچ نتیجه‌ای برای')} "{searchQuery}" {t('common.not_found', 'یافت نشد')}
+            {t('common.no_results_for')} "{searchQuery}" {t('common.not_found')}
           </p>
           <GlassButton
             onClick={() => setSearchQuery('')}
             variant="outline"
             className="px-6 py-2 rounded-xl"
           >
-            {t('common.clear_search', 'پاک کردن جستجو')}
+            {t('common.clear_search')}
           </GlassButton>
         </div>
       )}

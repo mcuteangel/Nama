@@ -23,7 +23,7 @@ declare global {
 }
 
 export function useSpeechToText(): SpeechToTextHook {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -36,8 +36,9 @@ export function useSpeechToText(): SpeechToTextHook {
 
   const startListening = useCallback(() => {
     if (!browserSupportsSpeechRecognition) {
-      setError(ErrorManager.getErrorMessage('مرورگر شما از تشخیص گفتار پشتیبانی نمی‌کند.'));
-      ErrorManager.notifyUser('مرورگر شما از تشخیص گفتار پشتیبانی نمی‌کند.', 'error');
+      const errorMsg = t('ai_suggestions.speech_recognition_not_supported');
+      setError(ErrorManager.getErrorMessage(errorMsg));
+      ErrorManager.notifyUser(errorMsg, 'error');
       return;
     }
 
@@ -59,8 +60,6 @@ export function useSpeechToText(): SpeechToTextHook {
     };
 
     recognitionRef.current.onresult = (event: SpeechRecognitionEvent) => {
-      const interimTranscript = '';
-
       for (let i = event.resultIndex; i < event.results.length; i++) {
         const result = event.results[i];
         const text = result[0].transcript;
@@ -85,7 +84,7 @@ export function useSpeechToText(): SpeechToTextHook {
     
     recognitionRef.current.onerror = (event: SpeechRecognitionErrorEvent) => {
       setIsListening(false);
-      const errorMessage = `خطا در تشخیص گفتار: ${event.error}`;
+      const errorMessage = t('ai_suggestions.speech_recognition_error', { error: event.error });
       setError(errorMessage);
       ErrorManager.logError(event, { context: 'useSpeechToText', eventType: 'onerror' });
       ErrorManager.notifyUser(errorMessage, 'error');
@@ -93,7 +92,7 @@ export function useSpeechToText(): SpeechToTextHook {
     };
 
     recognitionRef.current.start();
-  }, [browserSupportsSpeechRecognition, i18n.language]);
+  }, [browserSupportsSpeechRecognition, i18n.language, isListening, t]);
 
   const stopListening = useCallback((resetTranscript = true) => {
     if (!isListening) return;
@@ -110,7 +109,7 @@ export function useSpeechToText(): SpeechToTextHook {
       }
       console.log('Speech recognition stopped.');
     }
-  }, []);
+  }, [isListening]);
   
   // Add a function to clear the transcript without stopping recognition
   const clearTranscript = useCallback(() => {

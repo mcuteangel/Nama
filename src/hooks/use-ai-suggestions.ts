@@ -7,11 +7,32 @@ import { useErrorHandler } from "@/hooks/use-error-handler";
 import { ErrorManager } from "@/lib/error-manager";
 import { invalidateCache, fetchWithCache } from "@/utils/cache-helpers";
 import { useNavigate } from "react-router-dom";
-import { ContactFormValues } from "@/types/contact";
+import { ContactFormValues, EmailAddressFormData, PhoneNumberFormData } from "@/types/contact";
 import { ContactCrudService } from "@/services/contact-crud-service";
 import { ContactListService } from "@/services/contact-list-service";
+
+interface ContactEmail {
+  id: string;
+  email_type: string;
+  email_address: string;
+}
+
+interface ContactPhone {
+  id: string;
+  phone_type: string;
+  phone_number: string;
+}
+
+interface ContactFromAPI {
+  id: string;
+  first_name: string;
+  last_name: string;
+  email_addresses: ContactEmail[];
+  phone_numbers: ContactPhone[];
+}
 import { AISuggestionsService, AISuggestion as AISuggestionServiceType } from "@/services/ai-suggestions-service";
 import { AISuggestionDisplay, SuggestionStats } from "@/types/ai-suggestions-display.types";
+import { ContactExtractionSuggestion } from "@/types/ai-suggestions.types";
 
 /**
  * Custom hook برای مدیریت state و logic صفحه پیشنهادات هوش مصنوعی
@@ -199,8 +220,8 @@ export function useAISuggestions() {
           const extracted = s.extracted_data;
           const existingContact = allContacts?.find(contact =>
             (contact.first_name === extracted.firstName && contact.last_name === extracted.lastName) ||
-            extracted.emailAddresses.some(e => contact.email_addresses.some((ce: { id: string; email_type: string; email_address: string }) => ce.email_address === e.email_address)) ||
-            extracted.phoneNumbers.some(p => contact.phone_numbers.some((cp: any) => cp.phone_number === p.phone_number))
+            extracted.emailAddresses.some(e => contact.email_addresses.some(ce => ce.email_address === e.email_address)) ||
+            extracted.phoneNumbers.some(p => contact.phone_numbers.some(cp => cp.phone_number === p.phone_number))
           );
 
           if (existingContact) {
@@ -212,8 +233,8 @@ export function useAISuggestions() {
                 id: existingContact.id,
                 firstName: existingContact.first_name,
                 lastName: existingContact.last_name,
-                emailAddresses: existingContact.email_addresses.map((e: any) => e.email_address),
-                phoneNumbers: existingContact.phone_numbers.map((p: any) => p.phone_number),
+                emailAddresses: existingContact.email_addresses.map(e => e.email_address),
+                phoneNumbers: existingContact.phone_numbers.map(p => p.phone_number),
                 similarity: 95,
                 matchType: 'exact'
               } : undefined,
@@ -342,7 +363,7 @@ export function useAISuggestions() {
     setIsProcessingSuggestions(false);
   }, [rawTextInput, enqueueContactExtraction, session, t, fetchPendingSuggestions]);
 
-  const handleProcessSuggestion = useCallback(async (suggestion: AISuggestionDisplay) => {
+  const handleProcessSuggestion = useCallback(async (suggestion: ContactExtractionSuggestion) => {
     const contactValues: ContactFormValues = {
       firstName: suggestion.extractedData.firstName,
       lastName: suggestion.extractedData.lastName,
@@ -382,7 +403,7 @@ export function useAISuggestions() {
     });
   }, [executeSaveOrUpdate]);
 
-  const handleEditSuggestion = useCallback((suggestion: AISuggestionDisplay) => {
+  const handleEditSuggestion = useCallback((suggestion: ContactExtractionSuggestion) => {
     localStorage.setItem('ai_prefill_contact_data', JSON.stringify(suggestion.extractedData));
     localStorage.setItem('ai_suggestion_id_to_update', suggestion.id);
 
