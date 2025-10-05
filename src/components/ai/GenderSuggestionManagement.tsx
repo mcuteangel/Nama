@@ -101,7 +101,7 @@ const GenderSuggestionManagement: React.FC = React.memo(() => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 p-6">
       <GenderSuggestionStats
         ungenderedContacts={ungenderedContacts}
         genderSuggestions={genderSuggestions}
