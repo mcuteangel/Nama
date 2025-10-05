@@ -4,7 +4,7 @@ import { useSession } from '@/integrations/supabase/auth';
 import { ErrorManager } from '@/lib/error-manager';
 import { supabase } from '@/integrations/supabase/client';
 import { invalidateCache } from '@/utils/cache-helpers';
-import { suggestGenderFromName, updateLearnedGenderPreference } from '@/utils/gender-learning';
+import { suggestGenderFromName, updateLearnedGenderPreference, saveLearnedPersianName } from '@/utils/gender-learning';
 import { GenderSuggestion, SuggestionStatus, SuggestionPriority } from '@/types/ai-suggestions.types';
 
 interface ContactForGenderSuggestion {
@@ -45,32 +45,34 @@ export const useGenderSuggestionActions = ({
     setIsGenerating(true);
 
     try {
-      const newSuggestions: GenderSuggestion[] = ungenderedContacts
-        .map(contact => {
-          const suggestedGender = suggestGenderFromName(contact.first_name);
-          if (suggestedGender === 'not_specified') return null;
+      const newSuggestions: GenderSuggestion[] = [];
 
-          return {
-            id: `gender_${contact.id}_${Date.now()}`,
-            type: 'gender_suggestion' as const,
-            status: 'pending' as SuggestionStatus,
-            priority: 'medium' as SuggestionPriority,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            tags: ['gender', 'ai-suggestion'],
-            contactId: contact.id,
-            contactName: `${contact.first_name} ${contact.last_name}`,
-            currentGender: contact.gender,
-            suggestedGender,
-            confidence: {
-              score: Math.floor(Math.random() * 20) + 80,
-              factors: ['name_analysis', 'learned_patterns'],
-              lastUpdated: new Date()
-            },
-            reasoning: [`نام "${contact.first_name}" معمولاً برای جنسیت ${suggestedGender === 'male' ? 'مردانه' : 'زنانه'} است`]
-          } as GenderSuggestion;
-        })
-        .filter((s): s is GenderSuggestion => s !== null);
+      for (const contact of ungenderedContacts) {
+        const suggestedGender = await suggestGenderFromName(contact.first_name);
+        if (suggestedGender === 'not_specified') continue;
+
+        const suggestion: GenderSuggestion = {
+          id: `gender_${contact.id}_${Date.now()}`,
+          type: 'gender_suggestion' as const,
+          status: 'pending' as SuggestionStatus,
+          priority: 'medium' as SuggestionPriority,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          tags: ['gender', 'ai-suggestion'],
+          contactId: contact.id,
+          contactName: `${contact.first_name} ${contact.last_name}`,
+          currentGender: contact.gender,
+          suggestedGender,
+          confidence: {
+            score: Math.floor(Math.random() * 20) + 80,
+            factors: ['name_analysis', 'learned_patterns'],
+            lastUpdated: new Date()
+          },
+          reasoning: [`نام "${contact.first_name}" معمولاً برای جنسیت ${suggestedGender === 'male' ? 'مردانه' : 'زنانه'} است`]
+        };
+
+        newSuggestions.push(suggestion);
+      }
 
       setGenderSuggestions(newSuggestions);
       if (newSuggestions.length === 0) {
@@ -105,6 +107,13 @@ export const useGenderSuggestionActions = ({
         ungenderedContacts.find(c => c.id === suggestion.contactId)?.first_name || '',
         suggestion.suggestedGender
       );
+
+      // اضافه کردن نام جدید به لیست نام‌های فارسی
+      const contactFirstName = ungenderedContacts.find(c => c.id === suggestion.contactId)?.first_name;
+      if (contactFirstName) {
+        saveLearnedPersianName(contactFirstName, suggestion.suggestedGender);
+      }
+
       updateLearnedNamesCount();
 
       // به‌روزرسانی وضعیت پیشنهاد

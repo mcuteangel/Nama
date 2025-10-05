@@ -14,7 +14,6 @@ import { useSession } from "@/integrations/supabase/auth";
 import EmptyState from '../common/EmptyState';
 import LoadingSpinner from '../common/LoadingSpinner';
 import { GlassButton, GradientGlassButton } from "@/components/ui/glass-button";
-import { ModernCard, ModernCardHeader, ModernCardTitle, ModernCardContent } from "@/components/ui/modern-card";
 import { useGroupSuggestions } from '@/hooks/use-group-suggestions';
 import { GroupSuggestionsList } from './GroupSuggestionsList';
 
@@ -55,20 +54,7 @@ const SmartGroupManagement: React.FC = React.memo(() => {
   }
 
   return (
-    <ModernCard
-      variant="glass"
-      className="rounded-3xl shadow-2xl border-2 border-white/40 dark:border-gray-600/40 backdrop-blur-xl bg-gradient-to-br from-purple-50/50 via-blue-50/30 to-indigo-50/20 dark:from-purple-900/20 dark:via-blue-900/10 dark:to-indigo-900/5 overflow-hidden transition-all duration-500 hover:shadow-3xl hover:border-purple-300/50 dark:hover:border-purple-600/50 hover:-translate-y-1 hover:scale-[1.02]"
-    >
-      <ModernCardHeader className="pb-4">
-        <ModernCardTitle className="text-gray-800 dark:text-gray-100 flex items-center gap-2 text-xl font-bold">
-          <Brain size={24} className="text-blue-500 animate-pulse" />
-          <span className="text-gray-800 dark:text-gray-200">{t('ai_suggestions.smart_group_management_title')}</span>
-        </ModernCardTitle>
-        <p className="text-base text-gray-600 dark:text-gray-400">
-        </p>
-      </ModernCardHeader>
-
-      <ModernCardContent className="space-y-4">
+    <div className="space-y-6">
         {/* Statistics */}
         {stats.totalContacts > 0 && !isGeneratingSuggestions && (
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3">
@@ -171,8 +157,7 @@ const SmartGroupManagement: React.FC = React.memo(() => {
           onApplySuggestion={handleApplySuggestion}
           onDiscardSuggestion={handleDiscardSuggestion}
         />
-      </ModernCardContent>
-    </ModernCard>
+    </div>
   );
 });
 

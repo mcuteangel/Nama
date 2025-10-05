@@ -8,7 +8,8 @@ interface SpeechToTextHook {
   isListening: boolean;
   transcript: string;
   startListening: () => void;
-  stopListening: () => void;
+  stopListening: (resetTranscript?: boolean) => void;
+  clearTranscript: () => void;
   browserSupportsSpeechRecognition: boolean;
   error: string | null;
 }
@@ -27,6 +28,7 @@ export function useSpeechToText(): SpeechToTextHook {
   const [transcript, setTranscript] = useState('');
   const [error, setError] = useState<string | null>(null);
   const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const finalTranscriptRef = useRef('');
 
   const browserSupportsSpeechRecognition =
     typeof window !== 'undefined' &&
@@ -41,36 +43,46 @@ export function useSpeechToText(): SpeechToTextHook {
 
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     recognitionRef.current = new SpeechRecognition();
-    recognitionRef.current.continuous = false; // Listen for a single utterance
-    recognitionRef.current.interimResults = true; // Get interim results
-    recognitionRef.current.lang = i18n.language === 'fa' ? 'fa-IR' : 'en-US'; // Set language based on i18n
+    
+    // Enhanced settings for better dictation
+    recognitionRef.current.continuous = true; // Keep listening even after a pause
+    recognitionRef.current.maxAlternatives = 1; // Only get the most likely alternative
+    recognitionRef.current.lang = i18n.language === 'fa' ? 'fa-IR' : 'en-US';
+    
+    // Increase the silence time before considering speech as complete
+    recognitionRef.current.continuous = true;
+    recognitionRef.current.interimResults = true;
 
     recognitionRef.current.onstart = () => {
       setIsListening(true);
       setError(null);
-      console.log('Speech recognition started.');
     };
 
     recognitionRef.current.onresult = (event: SpeechRecognitionEvent) => {
-      let interimTranscript = '';
-      let finalTranscript = '';
+      const interimTranscript = '';
 
       for (let i = event.resultIndex; i < event.results.length; i++) {
         const result = event.results[i];
+        const text = result[0].transcript;
+        
         if (result.isFinal) {
-          finalTranscript += result[0].transcript;
+          // Add final results to the final transcript
+          finalTranscriptRef.current += ' ' + text;
+          setTranscript(finalTranscriptRef.current);
         } else {
-          interimTranscript += result[0].transcript;
+          // For interim results, show them but don't add to final yet
+          setTranscript(finalTranscriptRef.current + ' ' + text);
         }
       }
-      setTranscript(finalTranscript || interimTranscript);
     };
-
+    
     recognitionRef.current.onend = () => {
-      setIsListening(false);
-      console.log('Speech recognition ended.');
+      // Automatically restart recognition when it ends
+      if (isListening) {
+        recognitionRef.current?.start();
+      }
     };
-
+    
     recognitionRef.current.onerror = (event: SpeechRecognitionErrorEvent) => {
       setIsListening(false);
       const errorMessage = `خطا در تشخیص گفتار: ${event.error}`;
@@ -83,12 +95,27 @@ export function useSpeechToText(): SpeechToTextHook {
     recognitionRef.current.start();
   }, [browserSupportsSpeechRecognition, i18n.language]);
 
-  const stopListening = useCallback(() => {
+  const stopListening = useCallback((resetTranscript = true) => {
+    if (!isListening) return;
     if (recognitionRef.current) {
-      recognitionRef.current.stop();
       setIsListening(false);
+      try {
+        recognitionRef.current.stop();
+      } catch (e) {
+        console.log('Speech recognition already stopped');
+      }
+      if (resetTranscript) {
+        finalTranscriptRef.current = ''; // Reset the final transcript
+        setTranscript(''); // Clear the current transcript
+      }
       console.log('Speech recognition stopped.');
     }
+  }, []);
+  
+  // Add a function to clear the transcript without stopping recognition
+  const clearTranscript = useCallback(() => {
+    finalTranscriptRef.current = '';
+    setTranscript('');
   }, []);
 
   useEffect(() => {
@@ -105,7 +132,8 @@ export function useSpeechToText(): SpeechToTextHook {
     transcript,
     startListening,
     stopListening,
+    clearTranscript,
     browserSupportsSpeechRecognition,
     error,
-  };
+  } as const;
 }
