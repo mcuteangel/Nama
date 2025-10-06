@@ -1,4 +1,4 @@
-{
+﻿{
   "contact_form": {
     "group": "گروه",
     "select_group": "انتخاب گروه",
@@ -492,7 +492,6 @@
     "fields": "فیلد",
     "confidence": "اعتماد",
     "batch_accept_success": "{{count}} پیشنهاد با موفقیت پردازش شد",
-    "confirm_discard_description": "آیا مطمئن هستید که می‌خواهید این پیشنهاد را حذف کنید؟",
     "social_links": "شبکه‌های اجتماعی",
     "batch_discard_success": "{{count}} پیشنهاد با موفقیت حذف شد",
     "failed_to_discard_suggestion": "خطا در حذف پیشنهاد.",
@@ -566,6 +565,10 @@
     "new_contact_suggestion": "پیشنهاد مخاطب جدید",
     "update_contact_suggestion": "پیشنهاد به‌روزرسانی مخاطب",
     "found_existing_contact": "مخاطب موجود یافت شد: {{name}}",
+    "add_new_contact": "افزودن مخاطب جدید",
+    "update_existing_contact": "به‌روزرسانی مخاطب موجود",
+    "confirm_discard_title": "آیا از رد کردن این پیشنهاد مطمئن هستید؟",
+    "confirm_discard_description": "این پیشنهاد برای همیشه حذف خواهد شد.",
     "extractor_error": "خطا در استخراج اطلاعات",
     "smart_group_management_title": "مدیریت هوشمند گروه‌ها",
     "smart_group_management_description": "پیشنهاد گروه‌بندی برای مخاطبین بدون گروه بر اساس اطلاعات موجود.",
@@ -583,7 +586,7 @@
     "duplicate_contact_management_title": "مدیریت تماس‌های تکراری",
     "duplicate_contact_management_description": "شناسایی و ادغام تماس‌های تکراری برای حفظ یکپارچگی داده‌ها.",
     "scan_for_duplicates": "اسکن برای یافتن تکراری‌ها",
-    "no_duplicates_found": "هیچ تماس تکراری یافت نشد.",
+    "no_duplicates_found": "هیچ مخاطب تکراری یافت نشد.",
     "duplicates_found": "{{count}} تماس تکراری یافت شد.",
     "pending_duplicate_suggestions": "پیشنهادات تکراری در انتظار",
     "duplicate_reason": "دلیل تکراری بودن",

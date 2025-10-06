@@ -44,7 +44,7 @@ export const DuplicateContactList: React.FC<DuplicateContactListProps> = ({
               {t('ai_suggestions.pending_duplicate_suggestions')}
             </h4>
             <p className="text-sm text-gray-600 dark:text-gray-300">
-              {t('ai_suggestions.duplicates_detected', 'تکراری‌های شناسایی شده نیاز به بررسی دارند')}
+              {t('ai_suggestions.duplicates_detected')}
             </p>
           </div>
         </div>

@@ -770,6 +770,12 @@
   },
   "common_company_terms": ["Company", "Organization", "Institute", "Group"],
   "ai_suggestions": {
+    "no_duplicates_found": "No duplicates found",
+    "no_duplicates_found_description": "No duplicate contacts were found in the system.",
+    "duplicates_detected": "Duplicate contacts need review",
+    "scanning_contacts": "Scanning contacts",
+    "analyzing_duplicates": "Analyzing duplicates...",
+    "merge_contacts": "Merge contacts",
     "similarity_threshold": "Similarity Threshold",
     "similarity_threshold_help": "Adjust how similar contacts need to be to be grouped together (higher = more strict matching)",
     "company_terms": "Company Terms",
