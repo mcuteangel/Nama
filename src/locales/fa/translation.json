@@ -1,4 +1,4 @@
-﻿{
+{
   "contact_form": {
     "group": "گروه",
     "select_group": "انتخاب گروه",
@@ -198,6 +198,7 @@
     "no_results": "نتیجه‌ای یافت نشد",
     "search_suggestions": "جستجو در پیشنهادات...",
     "hint": "راهنمایی",
+    "total": "کل",
     "home": "خانه",
     "add_contact": "افزودن مخاطب",
     "groups": "گروه‌ها",
@@ -463,8 +464,26 @@
     "users_loaded_success": "کاربران با موفقیت بارگذاری شدند."
   },
   "ai_suggestions": {
+    "ungendered_contacts": "مخاطبین بدون جنسیت",
+    "male_suggestions": "مرد",
+    "female_suggestions": "زن",
+    "no_gender_suggestions_found_local": "هیچ پیشنهاد جنسیتی برای مخاطبین محلی یافت نشد",
+    "gender_reasoning_name_analysis": "نام '{{name}}' معمولاً برای جنسیت {{gender}} استفاده می‌شود",
+    "learned_names_description": "تعداد نام‌هایی که هوش مصنوعی یاد گرفته است",
+    "clear_learning_button": "پاک کردن داده‌های یادگیری",
+    "ai_processing_gender": "در حال پردازش جنسیت توسط هوش مصنوعی",
+    "analyzing_names": "در حال تحلیل نام‌ها برای تعیین جنسیت...",
+    "processing_names": "در حال پردازش نام‌ها...",
+    "no_duplicates_found_description": "هیچ مخاطب تکراری در سیستم یافت نشد.",
+    "duplicates_detected": "مخاطبین تکراری نیاز به بررسی دارند",
+    "scanning_contacts": "در حال اسکن مخاطبین",
+    "analyzing_duplicates": "در حال تحلیل تکراری‌ها...",
+    "learned_preferences_cleared": "ترجیحات یادگیری جنسیت پاک شدند",
+    "high_confidence": "اطمینان بالا",
+    "medium_confidence": "اطمینان متوسط",
     "similarity_threshold": "آستانه تشابه",
     "similarity_threshold_help": "میزان تشابه مورد نیاز برای گروه‌بندی مخاطبین را تنظیم کنید (مقدار بالاتر = تطابق دقیق‌تر)",
+    "duplicate_management": "مدیریت تکراری‌ها",
     "company_terms": "اصطلاحات شرکتی",
     "add_company_term": "افزودن اصطلاح شرکتی (مثلاً 'شرکت', 'سهامی')",
     "company_terms_help": "پسوندهای رایج شرکت‌ها که در مقایسه نام شرکت‌ها نادیده گرفته می‌شوند",
@@ -475,6 +494,7 @@
     "error_generating_suggestions": "خطا در تولید پیشنهادات گروه‌بندی",
     "no_group_suggestions_found": "هیچ پیشنهاد گروه‌بندی برای مخاطبین شما یافت نشد",
     "group_suggestions_generated": "پیشنهادات گروه‌بندی با موفقیت تولید شدند",
+    "error_fetching_contacts_for_duplicates": "خطا در دریافت مخاطبین برای تشخیص تکراری‌ها",
     "priority": "اولویت {{number}}",
     "apply_this_suggestion": "اعمال این پیشنهاد",
     "suggestions_description": "پیشنهادات هوشمند برای گروه‌بندی مخاطبین",
@@ -483,6 +503,8 @@
     "apply_all": "اعمال همه",
     "processing_step": "مرحله: تحلیل داده‌های مخاطبین",
     "all_contacts_grouped_description": "تمام مخاطبین شما با موفقیت در گروه‌های مربوطه سازماندهی شده‌اند. در حال حاضر نیازی به اقدام دیگری نیست.",
+    "all_contacts_gendered": "تمامی مخاطبان دارای جنسیت هستند",
+    "all_contacts_gendered_description": "به تمامی مخاطبان شما جنسیت اختصاص داده شده است. در حال حاضر نیازی به اقدام دیگری نیست.",
     "ungrouped_contacts": "مخاطبین بدون گروه",
     "match_rate": "نرخ تطابق",
     "unique_groups": "گروه‌های منحصر به فرد",
@@ -613,11 +635,12 @@
     "speech_recognition_error": "خطا در تشخیص گفتار رخ داد.",
     "generate_gender_suggestions": "ایجاد پیشنهادات جنسیت",
     "no_ungendered_contacts": "هیچ مخاطبی با جنسیت نامشخص یافت نشد.",
-    "all_contacts_gendered": "همه مخاطبین دارای جنسیت مشخص هستند.",
     "generating_gender_suggestions_local": "در حال ایجاد پیشنهادات جنسیت...",
     "gender_suggestions_generated_local": "پیشنهادات جنسیت با موفقیت ایجاد شد.",
     "error_generating_gender_suggestions_local": "خطا در ایجاد پیشنهادات جنسیت.",
     "pending_gender_suggestions": "پیشنهادات جنسیت در انتظار",
+    "gender_suggestions_ready": "پیشنهادات جنسیت آماده بررسی هستند",
+    "accept_gender_suggestion": "تایید پیشنهاد جنسیت",
     "suggested_gender": "جنسیت پیشنهادی",
     "applying_gender_suggestion": "در حال اعمال پیشنهاد جنسیت...",
     "gender_suggestion_applied_success": "پیشنهاد جنسیت با موفقیت اعمال شد.",
@@ -628,9 +651,15 @@
     "clear_learned_preferences": "پاک کردن ترجیحات یادگرفته شده",
     "confirm_clear_learning_title": "آیا مطمئن هستید که می‌خواهید ترجیحات یادگرفته شده را پاک کنید؟",
     "confirm_clear_learning_description": "این عمل باعث حذف تمام داده‌ای از پیشنهاد جنسیت یادگرفته شده از حافظه محلی مرورگر شما خواهد شد. این ممکن است دقت پیشنهادات آینده را کاهش دهد.",
-    "learned_names_count": "تعداد نام‌های یادگرفته شده"
+    "learned_names_count": "تعداد نام‌های یادگرفته شده",
+    "merge_contacts": "ادغام مخاطبین"
   },
-  "common_company_terms": ["شرکت", "سازمان", "موسسه", "مجموعه"],
+  "common_company_terms": [
+    "شرکت",
+    "سازمان",
+    "موسسه",
+    "مجموعه"
+  ],
   "gender": {
     "male": "مرد",
     "female": "زن",
@@ -683,6 +712,7 @@
   "errors": {
     "fetch_contacts_error": "خطا در دریافت اطلاعات مخاطبین",
     "fetch_contacts_error_fa": "خطا در دریافت مخاطبین",
+    "failed_parse_learned_names": "خطا در پردازش نام‌های یادگرفته شده فارسی",
     "unknown_processing_error": "خطای ناشناخته در پردازش لیست مخاطبین",
     "help_text": "اگر مشکل ادامه داشت، لطفاً با پشتیبانی تماس بگیرید.",
     "async_error_occurred": "خطایی در بارگذاری داده‌ها رخ داد",
@@ -734,7 +764,15 @@
     "create_custom_field_template_error": "خطا در ایجاد قالب فیلد سفارشی",
     "edit_custom_field_template_error": "خطا در به‌روزرسانی قالب فیلد سفارشی",
     "merge_contacts_error": "خطا در ادغام مخاطبین",
-    "failed_to_fetch_contact_details": "خطا در دریافت جزئیات کامل مخاطب برای ادغام"
+    "failed_to_fetch_contact_details": "خطا در دریافت جزئیات کامل مخاطب برای ادغام",
+    "failed_parse_gender_preferences": "خطا در پردازش ترجیحات جنسیتی ذخیره شده",
+    "failed_clear_learned_names": "خطا در پاک کردن نام‌های یادگرفته شده فارسی",
+    "failed_load_persian_names_suggestion": "خطا در بارگیری نام‌های فارسی برای پیشنهاد جنسیت",
+    "failed_clear_gender_preferences": "خطا در پاک کردن ترجیحات جنسیتی ذخیره شده",
+    "failed_save_learned_name": "خطا در ذخیره نام یادگرفته شده",
+    "failed_save_gender_preferences": "خطا در ذخیره ترجیحات جنسیتی",
+    "failed_load_persian_names": "خطا در بارگیری اطلاعات نام‌های فارسی",
+    "failed_load_persian_names_with_status": "خطا در بارگیری نام‌های فارسی. وضعیت: {{status}}"
   },
   "actions": {
     "add_new_group": "افزودن گروه جدید",

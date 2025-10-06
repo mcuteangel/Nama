@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Sparkles, TrendingUp, CheckCircle, XCircle, User } from 'lucide-react';
+import { FaMars, FaVenus, FaGenderless } from 'react-icons/fa';
 import { GlassButton } from "@/components/ui/glass-button";
 import AIBaseCard from '../AIBaseCard';
 import EmptyState from '../../common/EmptyState';
-import { ErrorManager } from '@/lib/error-manager';
 import { GenderSuggestion } from '@/types/ai-suggestions.types';
 
 interface ContactForGenderSuggestion {
@@ -52,7 +52,7 @@ const GenderSuggestionList: React.FC<GenderSuggestionListProps> = ({
   return (
     <AIBaseCard
       title={t('ai_suggestions.pending_gender_suggestions')}
-      description={t('ai_suggestions.gender_suggestions_ready', 'پیشنهادات جنسیت آماده بررسی هستند')}
+      description={t('ai_suggestions.gender_suggestions_ready' )}
       icon={<Sparkles size={20} className="text-yellow-500 animate-pulse" />}
       variant="warning"
       className="rounded-3xl shadow-2xl backdrop-blur-xl bg-gradient-to-br from-yellow-50/80 via-white/60 to-orange-50/80 dark:from-yellow-950/30 dark:via-gray-900/60 dark:to-orange-950/30 border border-white/20 dark:border-white/10 hover:shadow-yellow-500/20 hover:shadow-2xl transition-all duration-500"
@@ -72,8 +72,13 @@ const GenderSuggestionList: React.FC<GenderSuggestionListProps> = ({
             title={suggestion.contactName}
             description={`${t('ai_suggestions.suggested_gender')}: ${t(`gender.${suggestion.suggestedGender}`)}`}
             icon={
-              suggestion.suggestedGender === 'male' ? '👨' :
-              suggestion.suggestedGender === 'female' ? '👩' : '❓'
+              suggestion.suggestedGender === 'male' ? (
+                <FaMars size={20} className="text-blue-500" />
+              ) : suggestion.suggestedGender === 'female' ? (
+                <FaVenus size={20} className="text-pink-500" />
+              ) : (
+                <FaGenderless size={20} className="text-gray-500" />
+              )
             }
             variant={suggestion.suggestedGender === 'male' ? 'primary' : 'danger'}
             compact
@@ -81,7 +86,7 @@ const GenderSuggestionList: React.FC<GenderSuggestionListProps> = ({
             hoverable={true}
             priority={suggestion.priority}
             status={suggestion.status}
-            confidence={suggestion.confidence}
+            confidence={suggestion.confidence.score}
             showConfidence={true}
             className={`rounded-2xl shadow-xl backdrop-blur-xl border border-white/20 hover:border-white/40 transition-all duration-300 transform hover:scale-[1.02] hover:shadow-2xl hover:-translate-y-1 ${
               hoveredSuggestion === suggestion.id

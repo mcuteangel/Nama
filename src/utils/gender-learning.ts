@@ -1,4 +1,5 @@
 import { ErrorManager } from '@/lib/error-manager';
+import { t } from 'i18next';
 
 const LEARNED_GENDER_PREFERENCES_KEY = 'learned_gender_preferences';
 const LEARNED_GENDER_THRESHOLD = 3; // Number of times a gender must be suggested/accepted to be considered a 'strong' preference
@@ -25,7 +26,7 @@ const LEARNED_NAMES_KEY = 'learned_persian_names';
 /**
  * دریافت نام‌های جدید یادگرفته شده از localStorage
  */
-function getLearnedPersianNames(): PersianNamesData {
+function getLearnedPersianNames(errorMessage = t('errors.failed_parse_learned_names')): PersianNamesData {
   if (typeof window === 'undefined') {
     return { male: [], female: [] };
   }
@@ -33,7 +34,10 @@ function getLearnedPersianNames(): PersianNamesData {
     const stored = localStorage.getItem(LEARNED_NAMES_KEY);
     return stored ? JSON.parse(stored) : { male: [], female: [] };
   } catch (e) {
-    ErrorManager.logError(e, { context: 'getLearnedPersianNames', message: 'Failed to parse learned persian names' });
+    ErrorManager.logError(e, { 
+      context: 'getLearnedPersianNames', 
+      message: errorMessage
+    });
     return { male: [], female: [] };
   }
 }
@@ -59,14 +63,17 @@ export function saveLearnedPersianName(firstName: string, gender: 'male' | 'fema
   try {
     localStorage.setItem(LEARNED_NAMES_KEY, JSON.stringify(learnedNames));
   } catch (e) {
-    ErrorManager.logError(e, { context: 'saveLearnedPersianName', message: 'Failed to save learned persian name' });
+    ErrorManager.logError(e, { 
+      context: 'saveLearnedPersianName', 
+      message: t('errors.failed_save_learned_name') 
+    });
   }
 }
 
 /**
  * بارگذاری داده‌های نام‌های فارسی از فایل JSON و ترکیب با نام‌های جدید یادگرفته شده
  */
-async function loadPersianNames(): Promise<PersianNamesData> {
+async function loadPersianNames(errorMessage = t('errors.failed_load_persian_names')): Promise<PersianNamesData> {
   // اگر قبلاً کش شده، برگردون
   if (persianNamesCache) {
     return persianNamesCache;
@@ -80,7 +87,9 @@ async function loadPersianNames(): Promise<PersianNamesData> {
     if (typeof window !== 'undefined') {
       const response = await fetch('/data/persian-names.json');
       if (!response.ok) {
-        throw new Error(`Failed to load persian names: ${response.status}`);
+        throw new Error(
+          t('errors.failed_load_persian_names_with_status', { status: response.status })
+        );
       }
       baseNames = await response.json();
     } else {
@@ -89,7 +98,7 @@ async function loadPersianNames(): Promise<PersianNamesData> {
       baseNames = namesModule.default;
     }
   } catch (error) {
-    ErrorManager.logError(error, { context: 'loadPersianNames', message: 'Failed to load base persian names data' });
+    ErrorManager.logError(error, { context: 'loadPersianNames', message: errorMessage });
 
     // اگر فایل بارگذاری نشد، از لیست پیش‌فرض استفاده کن (fallback)
     baseNames = {
@@ -109,9 +118,10 @@ async function loadPersianNames(): Promise<PersianNamesData> {
 
 /**
  * Retrieves learned gender preferences from localStorage.
+ * @param errorMessage Optional custom error message for i18n support
  * @returns A map of first names to their gender counts.
  */
-export function getLearnedGenderPreferences(): LearnedGenderPreferences {
+export function getLearnedGenderPreferences(errorMessage = t('errors.failed_parse_gender_preferences')): LearnedGenderPreferences {
   if (typeof window === 'undefined') {
     return {};
   }
@@ -119,7 +129,7 @@ export function getLearnedGenderPreferences(): LearnedGenderPreferences {
     const stored = localStorage.getItem(LEARNED_GENDER_PREFERENCES_KEY);
     return stored ? JSON.parse(stored) : {};
   } catch (e) {
-    ErrorManager.logError(e, { context: 'getLearnedGenderPreferences', message: 'Failed to parse learned gender preferences from localStorage.' });
+    ErrorManager.logError(e, { context: 'getLearnedGenderPreferences', message: errorMessage });
     return {};
   }
 }
@@ -133,7 +143,7 @@ export function updateLearnedGenderPreference(firstName: string, gender: 'male' 
   if (typeof window === 'undefined') {
     return;
   }
-  const preferences = getLearnedGenderPreferences();
+  const preferences = getLearnedGenderPreferences(t('errors.failed_parse_gender_preferences'));
   const normalizedFirstName = firstName.toLowerCase();
 
   if (!preferences[normalizedFirstName]) {
@@ -144,7 +154,10 @@ export function updateLearnedGenderPreference(firstName: string, gender: 'male' 
   try {
     localStorage.setItem(LEARNED_GENDER_PREFERENCES_KEY, JSON.stringify(preferences));
   } catch (e) {
-    ErrorManager.logError(e, { context: 'updateLearnedGenderPreference', message: 'Failed to save learned gender preferences to localStorage.' });
+    ErrorManager.logError(e, { 
+      context: 'updateLearnedGenderPreference', 
+      message: t('errors.failed_save_gender_preferences') 
+    });
   }
 }
 
@@ -158,7 +171,10 @@ export function clearLearnedGenderPreferences() {
   try {
     localStorage.removeItem(LEARNED_GENDER_PREFERENCES_KEY);
   } catch (e) {
-    ErrorManager.logError(e, { context: 'clearLearnedGenderPreferences', message: 'Failed to clear learned gender preferences from localStorage.' });
+    ErrorManager.logError(e, { 
+      context: 'clearLearnedGenderPreferences', 
+      message: t('errors.failed_clear_gender_preferences') 
+    });
   }
 }
 
@@ -169,7 +185,7 @@ export function clearLearnedGenderPreferences() {
  */
 export const suggestGenderFromName = async (firstName: string): Promise<'male' | 'female' | 'not_specified'> => {
   const lowerFirstName = firstName.toLowerCase();
-  const preferences = getLearnedGenderPreferences();
+  const preferences = getLearnedGenderPreferences(t('errors.failed_parse_gender_preferences'));
 
   // 1. Check learned preferences first
   const learnedCounts = preferences[lowerFirstName];
@@ -193,7 +209,10 @@ export const suggestGenderFromName = async (firstName: string): Promise<'male' |
       return 'female';
     }
   } catch (error) {
-    ErrorManager.logError(error, { context: 'suggestGenderFromName', message: 'Failed to load persian names for suggestion' });
+    ErrorManager.logError(error, { 
+      context: 'suggestGenderFromName', 
+      message: t('errors.failed_load_persian_names_suggestion') 
+    });
   }
 
   return 'not_specified';
@@ -224,6 +243,9 @@ export function clearLearnedPersianNames(): void {
   try {
     localStorage.removeItem(LEARNED_NAMES_KEY);
   } catch (e) {
-    ErrorManager.logError(e, { context: 'clearLearnedPersianNames', message: 'Failed to clear learned persian names' });
+    ErrorManager.logError(e, { 
+      context: 'clearLearnedPersianNames', 
+      message: t('errors.failed_clear_learned_names') 
+    });
   }
 }

@@ -45,10 +45,10 @@ export const DuplicateContactScanner: React.FC<DuplicateContactScannerProps> = (
             </div>
             <div>
               <h3 className="text-lg font-bold text-orange-600 dark:text-orange-400">
-                {t('ai_suggestions.scanning_contacts', 'در حال اسکن مخاطبین')}
+                {t('ai_suggestions.scanning_contacts')}
               </h3>
               <p className="text-sm text-orange-500 dark:text-orange-300">
-                {t('ai_suggestions.analyzing_duplicates', 'در حال تحلیل تکراری‌ها...')}
+                {t('ai_suggestions.analyzing_duplicates')}
               </p>
             </div>
           </div>
@@ -57,7 +57,7 @@ export const DuplicateContactScanner: React.FC<DuplicateContactScannerProps> = (
             <div className="bg-gradient-to-r from-orange-500 to-red-600 h-2 rounded-full animate-pulse" style={{ width: '75%' }}></div>
           </div>
           <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
-            {t('ai_suggestions.processing_step', 'مرحله: مقایسه اطلاعات مخاطبین')}
+            {t('ai_suggestions.processing_step')}
           </p>
         </div>
       )}

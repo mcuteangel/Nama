@@ -68,7 +68,10 @@ export const useGenderSuggestionActions = ({
             factors: ['name_analysis', 'learned_patterns'],
             lastUpdated: new Date()
           },
-          reasoning: [`نام "${contact.first_name}" معمولاً برای جنسیت ${suggestedGender === 'male' ? 'مردانه' : 'زنانه'} است`]
+          reasoning: [t('ai_suggestions.gender_reasoning_name_analysis', { 
+            name: contact.first_name, 
+            gender: t(`common.${suggestedGender}`) 
+          })]
         };
 
         newSuggestions.push(suggestion);

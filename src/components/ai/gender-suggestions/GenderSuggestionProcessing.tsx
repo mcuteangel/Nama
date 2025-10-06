@@ -18,8 +18,8 @@ const GenderSuggestionProcessing: React.FC<GenderSuggestionProcessingProps> = ({
 
   return (
     <AIBaseCard
-      title={t('ai_suggestions.ai_processing_gender', 'هوش مصنوعی در حال تحلیل')}
-      description={t('ai_suggestions.analyzing_names', 'نام‌ها را برای تعیین جنسیت تحلیل می‌کند...')}
+      title={t('ai_suggestions.ai_processing_gender')}
+      description={t('ai_suggestions.analyzing_names')}
       icon={<Heart size={20} className="text-pink-500 animate-pulse" />}
       variant="warning"
       className="rounded-3xl shadow-2xl backdrop-blur-xl bg-gradient-to-br from-pink-50/80 via-white/60 to-purple-50/80 dark:from-pink-950/30 dark:via-gray-900/60 dark:to-purple-950/30 border border-white/20 dark:border-white/10 hover:shadow-pink-500/20 hover:shadow-2xl transition-all duration-500 animate-pulse"
@@ -34,7 +34,7 @@ const GenderSuggestionProcessing: React.FC<GenderSuggestionProcessingProps> = ({
         <div className="flex items-center justify-center gap-3 mb-4">
           <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-pink-100/50 dark:bg-pink-900/30 text-pink-700 dark:text-pink-300 text-sm font-medium backdrop-blur-sm border border-pink-200/30 dark:border-pink-800/30">
             <Loader2 size={14} className="animate-spin text-pink-500" />
-            <span>{t('ai_suggestions.processing_names', 'مرحله: یادگیری از نام‌های قبلی')}</span>
+            <span>{t('ai_suggestions.processing_names')}</span>
           </div>
         </div>
 

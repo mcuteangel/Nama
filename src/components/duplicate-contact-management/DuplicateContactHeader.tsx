@@ -37,19 +37,19 @@ export const DuplicateContactHeader: React.FC<DuplicateContactHeaderProps> = ({ 
           <div className="bg-gradient-to-br from-orange-500/10 to-orange-600/10 dark:from-orange-500/20 dark:to-orange-600/20 rounded-2xl p-4 border border-orange-200/30 dark:border-orange-800/30 backdrop-blur-sm text-center">
             <Activity size={24} className="text-orange-500 mx-auto mb-2" />
             <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">{stats.total}</div>
-            <div className="text-sm text-orange-500 dark:text-orange-300">{t('common.total', 'کل')}</div>
+            <div className="text-sm text-orange-500 dark:text-orange-300">{t('common.total')}</div>
           </div>
 
           <div className="bg-gradient-to-br from-red-500/10 to-red-600/10 dark:from-red-500/20 dark:to-red-600/20 rounded-2xl p-4 border border-red-200/30 dark:border-red-800/30 backdrop-blur-sm text-center">
             <TrendingUp size={24} className="text-red-500 mx-auto mb-2" />
             <div className="text-2xl font-bold text-red-600 dark:text-red-400">{stats.highConfidence}</div>
-            <div className="text-sm text-red-500 dark:text-red-300">{t('ai_suggestions.high_confidence', 'بالا')}</div>
+            <div className="text-sm text-red-500 dark:text-red-300">{t('ai_suggestions.high_confidence')}</div>
           </div>
 
           <div className="bg-gradient-to-br from-yellow-500/10 to-yellow-600/10 dark:from-yellow-500/20 dark:to-yellow-600/20 rounded-2xl p-4 border border-yellow-200/30 dark:border-yellow-800/30 backdrop-blur-sm text-center">
             <Target size={24} className="text-yellow-500 mx-auto mb-2" />
             <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">{stats.mediumConfidence}</div>
-            <div className="text-sm text-yellow-500 dark:text-yellow-300">{t('ai_suggestions.medium_confidence', 'متوسط')}</div>
+            <div className="text-sm text-yellow-500 dark:text-yellow-300">{t('ai_suggestions.medium_confidence')}</div>
           </div>
         </div>
       )}

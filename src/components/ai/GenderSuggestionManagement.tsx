@@ -6,7 +6,7 @@ import { ErrorManager } from "@/lib/error-manager";
 import LoadingMessage from "../common/LoadingMessage";
 import { supabase } from '@/integrations/supabase/client';
 import { clearLearnedGenderPreferences, getLearnedGenderPreferences } from '@/utils/gender-learning';
-import { GenderSuggestion, SuggestionStatus } from '@/types/ai-suggestions.types';
+import { GenderSuggestion } from '@/types/ai-suggestions.types';
 import {
   GenderSuggestionStats,
   GenderSuggestionActions,
@@ -32,9 +32,9 @@ const GenderSuggestionManagement: React.FC = React.memo(() => {
   const [learnedNamesCount, setLearnedNamesCount] = useState(0);
 
   const updateLearnedNamesCount = useCallback(() => {
-    const preferences = getLearnedGenderPreferences();
+    const preferences = getLearnedGenderPreferences(t('errors.failed_parse_gender_preferences'));
     setLearnedNamesCount(Object.keys(preferences).length);
-  }, []);
+  }, [t]);
 
   const onSuccessFetchContacts = useCallback((result: { data: ContactForGenderSuggestion[] | null; error: string | null; fromCache: boolean }) => {
     if (result.data) {

@@ -5,7 +5,7 @@ interface AIBaseCardProps {
   description?: string;
   icon?: React.ReactNode;
   variant?: 'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'info' | 'gradient';
-  children: React.ReactNode;
+  children?: React.ReactNode;
   actions?: React.ReactNode;
   className?: string;
   headerClassName?: string;
@@ -20,6 +20,12 @@ interface AIBaseCardProps {
   showConfidence?: boolean;
   showStats?: boolean;
   loading?: boolean;
+  compact?: boolean;
+  animated?: boolean;
+  hoverable?: boolean;
+  style?: React.CSSProperties;
+  onMouseEnter?: () => void;
+  onMouseLeave?: () => void;
 }
 
 const AIBaseCard: React.FC<AIBaseCardProps> = ({
