@@ -7,29 +7,10 @@ import { useErrorHandler } from "@/hooks/use-error-handler";
 import { ErrorManager } from "@/lib/error-manager";
 import { invalidateCache, fetchWithCache } from "@/utils/cache-helpers";
 import { useNavigate } from "react-router-dom";
-import { ContactFormValues, EmailAddressFormData, PhoneNumberFormData } from "@/types/contact";
+import { ContactFormValues } from "@/types/contact";
 import { ContactCrudService } from "@/services/contact-crud-service";
 import { ContactListService } from "@/services/contact-list-service";
 
-interface ContactEmail {
-  id: string;
-  email_type: string;
-  email_address: string;
-}
-
-interface ContactPhone {
-  id: string;
-  phone_type: string;
-  phone_number: string;
-}
-
-interface ContactFromAPI {
-  id: string;
-  first_name: string;
-  last_name: string;
-  email_addresses: ContactEmail[];
-  phone_numbers: ContactPhone[];
-}
 import { AISuggestionsService, AISuggestion as AISuggestionServiceType } from "@/services/ai-suggestions-service";
 import { AISuggestionDisplay, SuggestionStats } from "@/types/ai-suggestions-display.types";
 import { ContactExtractionSuggestion } from "@/types/ai-suggestions.types";
@@ -392,16 +373,16 @@ export function useAISuggestions() {
         if (error) throw new Error(error);
       }
       const { success, error: updateError } = await AISuggestionsService.updateSuggestionStatus(suggestion.id, 'accepted');
-      if (!success) throw new Error(updateError || 'Failed to update suggestion status.');
+      if (!success) throw new Error(updateError || t('ai_suggestions.failed_to_update_suggestion_status'));
     });
-  }, [executeSaveOrUpdate]);
+  }, [executeSaveOrUpdate, t]);
 
   const handleDiscardSuggestion = useCallback(async (suggestionId: string) => {
     await executeSaveOrUpdate(async () => {
       const { success, error } = await AISuggestionsService.updateSuggestionStatus(suggestionId, 'discarded');
-      if (!success) throw new Error(error || 'Failed to discard suggestion.');
+      if (!success) throw new Error(error || t('ai_suggestions.failed_to_discard_suggestion'));
     });
-  }, [executeSaveOrUpdate]);
+  }, [executeSaveOrUpdate, t]);
 
   const handleEditSuggestion = useCallback((suggestion: ContactExtractionSuggestion) => {
     localStorage.setItem('ai_prefill_contact_data', JSON.stringify(suggestion.extractedData));

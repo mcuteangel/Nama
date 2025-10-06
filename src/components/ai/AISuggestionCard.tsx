@@ -1,12 +1,12 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { PlusCircle, UserCheck, Phone, Mail, Building, Briefcase, Link as LinkIcon, XCircle, Edit, Sparkles, ChevronDown, ChevronUp, CheckCircle, Info, Zap, Heart, Clock, TrendingUp, AlertCircle } from "lucide-react";
+import { PlusCircle, UserCheck, Phone, Mail, Building, Briefcase, Link as LinkIcon, XCircle, Edit, Sparkles, ChevronDown, ChevronUp, CheckCircle, Info, Zap, Heart } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { ExtractedContactInfo } from '@/hooks/use-contact-extractor';
 import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import LoadingSpinner from '../common/LoadingSpinner';
 import { GlassButton } from "@/components/ui/glass-button";
+import { CancelButton } from "@/components/common";
 import AIBaseCard from './AIBaseCard';
-import { ContactExtractionSuggestion, ConfidenceLevel, SuggestionStatus, SuggestionPriority } from '@/types/ai-suggestions.types';
+import { ContactExtractionSuggestion } from '@/types/ai-suggestions.types';
 
 export interface AISuggestionCardProps {
   suggestion: ContactExtractionSuggestion;
@@ -33,7 +33,7 @@ const AISuggestionCard: React.FC<AISuggestionCardProps> = React.memo(({
   const [isExpanded, setIsExpanded] = useState(false);
   const [hovered, setHovered] = useState(false);
 
-  const { extractedData, existingContact, type, stats, confidence, priority, status } = suggestion;
+  const { extractedData, existingContact, source: { confidence = 0 }, priority, status } = suggestion;
 
   // محاسبه فیلدهای موجود با useMemo برای عملکرد بهتر
   const fieldStats = useMemo(() => ({
@@ -57,12 +57,12 @@ const AISuggestionCard: React.FC<AISuggestionCardProps> = React.memo(({
 
   // تولید عنوان اکشن بر اساس نوع پیشنهاد
   const getActionLabel = useCallback(() => {
-    if (type === 'new') {
-      return t('ai_suggestions.add_new_contact', 'افزودن مخاطب جدید');
+    if (!existingContact) {
+      return t('ai_suggestions.add_new_contact');
     } else {
-      return t('ai_suggestions.update_existing_contact', 'به‌روزرسانی مخاطب موجود');
+      return t('ai_suggestions.update_existing_contact');
     }
-  }, [type, t]);
+  }, [existingContact, t]);
 
   // هندلرهای رویدادها
   const handleProcess = useCallback(() => {
@@ -104,10 +104,10 @@ const AISuggestionCard: React.FC<AISuggestionCardProps> = React.memo(({
           variant="outline"
           size={compact ? "sm" : "default"}
           className={`flex items-center gap-2 ${compact ? 'px-3 py-2' : 'px-3 py-3'} rounded-xl hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-all duration-300 hover:scale-105`}
-          aria-label={t('common.edit', 'ویرایش')}
+          aria-label={t('common.edit')}
         >
           <Edit size={14} />
-          {!compact && <span>{t('common.edit', 'ویرایش')}</span>}
+          {!compact && <span>{t('common.edit')}</span>}
         </GlassButton>
         <AlertDialog>
           <AlertDialogTrigger asChild>
@@ -116,30 +116,30 @@ const AISuggestionCard: React.FC<AISuggestionCardProps> = React.memo(({
               disabled={isProcessing}
               size={compact ? "sm" : "default"}
               className={`flex items-center gap-2 ${compact ? 'px-3 py-2' : 'px-3 py-3'} rounded-xl hover:scale-105 transition-all duration-300`}
-              aria-label={t('common.discard', 'حذف')}
+              aria-label={t('common.discard')}
             >
               <XCircle size={14} />
-              {!compact && <span>{t('common.discard', 'حذف')}</span>}
+              {!compact && <span>{t('common.discard')}</span>}
             </GlassButton>
           </AlertDialogTrigger>
           <AlertDialogContent className="glass rounded-xl p-6">
             <AlertDialogHeader>
               <AlertDialogTitle className="text-red-800 dark:text-red-200 flex items-center gap-3 text-lg">
                 <XCircle size={20} className="animate-pulse" />
-                {t('ai_suggestions.confirm_discard_title', 'تأیید حذف')}
+                {t('ai_suggestions.confirm_discard_title')}
               </AlertDialogTitle>
               <AlertDialogDescription className="text-gray-600 dark:text-gray-300 text-base leading-relaxed">
-                {t('ai_suggestions.confirm_discard_description', 'آیا مطمئن هستید که می‌خواهید این پیشنهاد را حذف کنید؟')}
+                {t('ai_suggestions.confirm_discard_description')}
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter className="gap-3">
-              <CancelButton text={t('common.cancel', 'لغو')} />
+              <CancelButton text={t('common.cancel')} />
               <AlertDialogAction
                 onClick={handleDiscard}
                 className="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
               >
                 <XCircle size={14} className="mr-2" />
-                {t('common.discard', 'حذف')}
+                {t('common.discard')}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
@@ -150,28 +150,28 @@ const AISuggestionCard: React.FC<AISuggestionCardProps> = React.memo(({
 
   // تولید عنوان و توضیحات کارت
   const cardTitle = useMemo(() => {
-    if (type === 'new') {
-      return t('ai_suggestions.new_contact', 'مخاطب جدید');
+    if (!existingContact) {
+      return t('ai_suggestions.new_contact');
     } else {
-      return t('ai_suggestions.update_contact', 'به‌روزرسانی مخاطب');
+      return t('ai_suggestions.update_contact');
     }
-  }, [type, t]);
+  }, [existingContact, t]);
 
   const cardDescription = useMemo(() => {
-    if (type === 'update' && existingContact) {
+    if (existingContact) {
       return t('ai_suggestions.found_existing', { name: `${existingContact.firstName} ${existingContact.lastName}` });
     }
     return undefined;
-  }, [type, existingContact, t]);
+  }, [existingContact, t]);
 
   // تولید آیکون مناسب
   const cardIcon = useMemo(() => {
-    if (type === 'new') {
+    if (!existingContact) {
       return <PlusCircle size={20} className="animate-bounce" />;
     } else {
       return <UserCheck size={20} className="animate-pulse" />;
     }
-  }, [type]);
+  }, [existingContact]);
 
   // تولید نوار آمار پیشرفته
   const statsBar = useMemo(() => {
@@ -185,23 +185,23 @@ const AISuggestionCard: React.FC<AISuggestionCardProps> = React.memo(({
             <div className="flex items-center gap-1 px-2 py-1 bg-blue-100/60 dark:bg-blue-900/40 rounded-lg">
               <Info size={12} className="text-blue-600 dark:text-blue-400" />
               <span className="text-xs font-bold text-blue-700 dark:text-blue-300">
-                {fieldStats.totalFields} {t('ai_suggestions.fields', 'فیلد')}
+                {fieldStats.totalFields} {t('ai_suggestions.fields')}
               </span>
             </div>
-            {confidence && showConfidence && (
+            {showConfidence && (
               <div className="flex items-center gap-1">
                 <span className="text-xs font-semibold text-gray-600 dark:text-gray-400">
-                  {t('ai_suggestions.confidence', 'اعتماد')}:
+                  {t('ai_suggestions.confidence')}:
                 </span>
                 <div className="flex items-center gap-1">
                   <div className="w-16 h-2 bg-gray-200 dark:bg-gray-600 rounded-full overflow-hidden">
                     <div
                       className="h-full bg-gradient-to-r from-green-400 to-green-600 rounded-full transition-all duration-1000"
-                      style={{ width: `${confidence.score}%` }}
+                      style={{ width: `${confidence}%` }}
                     ></div>
                   </div>
                   <span className="text-xs font-bold text-green-600 dark:text-green-400">
-                    {confidence.score}%
+                    {confidence}%
                   </span>
                 </div>
               </div>
@@ -252,7 +252,7 @@ const AISuggestionCard: React.FC<AISuggestionCardProps> = React.memo(({
       >
         {isExpanded ? <ChevronUp size={14} className="animate-bounce" /> : <ChevronDown size={14} className="animate-bounce" />}
         <span className="font-medium">
-          {isExpanded ? t('common.collapse', 'بستن') : t('common.expand', 'مشاهده جزئیات')}
+          {isExpanded ? t('common.collapse') : t('common.expand')}
         </span>
       </button>
     </div>
@@ -289,7 +289,7 @@ const AISuggestionCard: React.FC<AISuggestionCardProps> = React.memo(({
           <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-indigo-50/60 to-indigo-100/40 dark:from-indigo-900/20 dark:to-indigo-800/20 rounded-xl border border-indigo-200/30 dark:border-indigo-800/30">
             <LinkIcon size={14} className="text-indigo-600 dark:text-indigo-400 animate-pulse" />
             <span className="text-sm font-medium text-gray-900 dark:text-gray-50">
-              {extractedData.socialLinks.length} {t('common.social_links', 'لینک شبکه اجتماعی')}
+              {extractedData.socialLinks.length} {t('ai_suggestions.social_links')}
             </span>
           </div>
         )}
@@ -316,9 +316,8 @@ const AISuggestionCard: React.FC<AISuggestionCardProps> = React.memo(({
         title={cardTitle}
         description={cardDescription}
         icon={cardIcon}
-        variant={type === 'new' ? 'primary' : 'warning'}
+        variant={!existingContact ? 'primary' : 'warning'}
         actions={actions}
-        compact={compact}
         suggestionType="contact_extraction"
         priority={priority}
         status={status}

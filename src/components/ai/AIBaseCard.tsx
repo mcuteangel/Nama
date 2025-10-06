@@ -11,6 +11,15 @@ interface AIBaseCardProps {
   headerClassName?: string;
   clickable?: boolean;
   onClick?: () => void;
+  
+  // Additional props from AISuggestionCard
+  suggestionType?: string;
+  priority?: string | number;
+  status?: string;
+  confidence?: number;
+  showConfidence?: boolean;
+  showStats?: boolean;
+  loading?: boolean;
 }
 
 const AIBaseCard: React.FC<AIBaseCardProps> = ({

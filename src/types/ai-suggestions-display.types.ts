@@ -56,7 +56,18 @@ export interface AISuggestionDisplay {
   updatedAt: Date;
   expiresAt?: Date;
   tags: string[];
-  metadata?: Record<string, any>;
+  metadata?: {
+    /** Additional context or notes about the suggestion */
+    notes?: string;
+    /** Source of the suggestion if different from the main source */
+    sourceDetails?: {
+      type?: string;
+      id?: string;
+      confidence?: number;
+    };
+    /** Any custom fields that don't fit the above */
+    [key: string]: unknown;
+  };
 }
 
 /**

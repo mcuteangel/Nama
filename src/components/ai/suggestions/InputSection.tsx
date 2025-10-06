@@ -1,7 +1,7 @@
 import React from 'react';
 import { ModernTextarea } from "@/components/ui/modern-textarea";
 import { GlassButton } from "@/components/ui/glass-button";
-import { Mic, StopCircle, FileText, Zap, ArrowRight, HelpCircle } from "lucide-react";
+import { Mic, StopCircle, FileText, Zap, ArrowRight } from "lucide-react";
 import { ModernTooltip, ModernTooltipContent, ModernTooltipProvider, ModernTooltipTrigger } from "@/components/ui/modern-tooltip";
 import { useTranslation } from "react-i18next";
 import LoadingSpinner from '@/components/common/LoadingSpinner';
@@ -58,17 +58,17 @@ export const InputSection: React.FC<InputSectionProps> = ({
             <div className="flex items-center gap-3 mb-3">
               <FileText size={20} className="text-blue-500" />
               <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">
-                {t('ai_suggestions.input_text', 'متن ورودی')}
+                {t('ai_suggestions.input_text')}
               </span>
               {rawTextInput.length > 0 && (
                 <span className="text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-2 py-1 rounded-full">
-                  {rawTextInput.length} کاراکتر
+                  {t('ai_suggestions.character_count', { count: rawTextInput.length })}
                 </span>
               )}
             </div>
 
             <ModernTextarea
-              placeholder={t('ai_suggestions.enter_text_placeholder', 'مثال: جان دو مدیرعامل شرکت ABC است. ایمیل: john.doe@abc.com تلفن: ۱۲۳۴۵۶۷۸۹۰...')}
+              placeholder={t('ai_suggestions.enter_text_placeholder')}
               value={rawTextInput}
               onChange={(e) => setRawTextInput(e.target.value)}
               variant="glass"
@@ -100,7 +100,7 @@ export const InputSection: React.FC<InputSectionProps> = ({
                           }
                         `}
                         disabled={isProcessing}
-                        aria-label={isListening ? t('ai_suggestions.stop_voice', 'توقف تشخیص گفتار') : t('ai_suggestions.start_voice', 'شروع تشخیص گفتار')}
+                        aria-label={isListening ? t('ai_suggestions.stop_voice') : t('ai_suggestions.start_voice')}
                       >
                         {isListening ? (
                           <div className="relative flex items-center justify-center">
@@ -118,9 +118,7 @@ export const InputSection: React.FC<InputSectionProps> = ({
                     
                     <ModernTooltipContent 
                       side="right" 
-                      className="max-w-xs"
-                      glassEffect="glassAdvanced"
-                      gradientType={isListening ? "emeraldToCyan" : "indigoToPurple"}
+                      className="max-w-xs bg-white dark:bg-gray-800 text-gray-800 dark:text-white p-4 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700"
                     >
                       {isListening ? (
                         <div className="space-y-2 p-2">
@@ -129,20 +127,20 @@ export const InputSection: React.FC<InputSectionProps> = ({
                               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                             </span>
-                            {t('ai_suggestions.listening', 'در حال گوش دادن...')}
+                            {t('ai_suggestions.listening')}
                           </div>
-                          <div className="text-sm text-white/90">
-                            <h4 className="font-bold mb-1 text-white">راهنما</h4>
-                            <ul className="list-disc list-inside space-y-1 rtl:space-y-reverse">
-                              <li>مکث کوتاه بین جملات اشکالی ندارد</li>
-                              <li>برای توقف، دکمه را فشار دهید</li>
-                              <li>متن به طور خودکار اضافه می‌شود</li>
+                          <div className="text-sm text-gray-700 dark:text-gray-200">
+                            <h4 className="font-bold mb-2 text-gray-800 dark:text-white text-base">{t('ai_suggestions.guide')}</h4>
+                            <ul className="list-disc list-inside space-y-2 rtl:space-y-reverse text-gray-700 dark:text-gray-200">
+                              <li className="rtl:pr-2">{t('ai_suggestions.guide_tip_1')}</li>
+                              <li className="rtl:pr-2">{t('ai_suggestions.guide_tip_2')}</li>
+                              <li className="rtl:pr-2">{t('ai_suggestions.guide_tip_3')}</li>
                             </ul>
                           </div>
                         </div>
                       ) : (
                         <p className="text-sm">
-                          {t('ai_suggestions.click_to_speak', 'برای شروع تشخیص صدا کلیک کنید')}
+                          {t('ai_suggestions.click_to_speak')}
                         </p>
                       )}
                     </ModernTooltipContent>
@@ -151,10 +149,10 @@ export const InputSection: React.FC<InputSectionProps> = ({
                   <div className="text-xs text-gray-500 dark:text-gray-400 text-center mt-1">
                     {isListening ? (
                       <span className="text-emerald-500 font-medium">
-                        {t('ai_suggestions.speak_now', 'صحبت کنید...')}
+                        {t('ai_suggestions.speak_now')}
                       </span>
                     ) : (
-                      <span>{t('ai_suggestions.click_to_speak', 'برای صحبت کلیک کنید')}</span>
+                      <span>{t('ai_suggestions.click_to_speak')}</span>
                     )}
                   </div>
                 </div>
@@ -181,12 +179,12 @@ export const InputSection: React.FC<InputSectionProps> = ({
             {isProcessing ? (
               <>
                 <LoadingSpinner size={20} className="animate-spin" />
-                <span>{t('common.processing', 'در حال پردازش...')}</span>
+                <span>{t('common.processing')}</span>
               </>
             ) : (
               <>
                 <Zap size={20} className="animate-pulse" />
-                <span>{t('ai_suggestions.extract_and_suggest', 'استخراج هوشمند')}</span>
+                <span>{t('ai_suggestions.extract_and_suggest')}</span>
                 <ArrowRight size={16} />
               </>
             )}
@@ -204,16 +202,14 @@ export const InputSection: React.FC<InputSectionProps> = ({
                   disabled={isProcessing || !rawTextInput.trim()}
                   className="px-4 py-2 rounded-2xl transition-all duration-500 hover:scale-110 hover:-translate-y-2 bg-gradient-to-br from-orange-300/50 via-red-300/50 to-pink-400/50 dark:from-orange-200/50 dark:via-red-200/50 dark:to-pink-300/50 backdrop-blur-xl border border-orange-300/40 dark:border-orange-200/40 hover:border-orange-200/60 hover:from-orange-200/70 hover:via-red-200/70 hover:to-pink-300/70 text-white hover:text-white shadow-[0_6px_24px_rgba(251,146,60,0.3)] hover:shadow-[0_10px_32px_rgba(251,146,60,0.5)]"
                 >
-                  {t('common.clear', 'پاک کردن')}
+                  {t('common.clear')}
                 </GlassButton>
               </ModernTooltipTrigger>
               <ModernTooltipContent 
                 side="top" 
                 className="max-w-xs"
-                glassEffect="glassAdvanced"
-                gradientType="orangeToPink"
               >
-                <p className="text-sm">{t('ai_suggestions.clear_text', 'پاک کردن متن')}</p>
+                <p className="text-sm">{t('ai_suggestions.clear_text')}</p>
               </ModernTooltipContent>
             </ModernTooltip>
           </div>
@@ -225,7 +221,7 @@ export const InputSection: React.FC<InputSectionProps> = ({
             <Zap size={24} className="text-blue-500 animate-pulse" />
             <div className="flex-1">
               <div className="text-sm font-medium text-blue-600 dark:text-blue-400 mb-1">
-                {t('ai_suggestions.ai_processing', 'هوش مصنوعی در حال تحلیل')}
+                {t('ai_suggestions.ai_processing')}
               </div>
               <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                 <div className="bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-full animate-pulse" style={{ width: '80%' }}></div>
