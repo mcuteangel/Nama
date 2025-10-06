@@ -1,11 +1,11 @@
-import { 
-  ModernCard, 
-  ModernCardContent, 
-  ModernCardDescription, 
-  ModernCardHeader, 
-  ModernCardTitle 
+import {
+  ModernCard,
+  ModernCardContent,
+  ModernCardDescription,
+  ModernCardHeader,
+  ModernCardTitle
 } from "@/components/ui/modern-card";
-import UserList from "@/components/user-management/UserList";
+import { UserList } from "@/features/user-management/components";
 import { useTranslation } from "react-i18next";
 
 const UserManagement = () => {
