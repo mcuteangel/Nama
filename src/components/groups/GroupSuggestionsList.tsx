@@ -33,7 +33,7 @@ export const GroupSuggestionsList: React.FC<GroupSuggestionsListProps> = ({
               {t('ai_suggestions.pending_group_suggestions')}
             </h4>
             <p className="text-xs text-gray-600 dark:text-gray-300">
-              {t('ai_suggestions.suggestions_description', 'پیشنهادات هوشمند برای گروه‌بندی مخاطبین')}
+              {t('ai_suggestions.suggestions_description')}
             </p>
           </div>
         </div>

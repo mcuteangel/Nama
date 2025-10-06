@@ -64,7 +64,7 @@ export interface BaseAISuggestion {
   updatedAt: Date;
   expiresAt?: Date;
   tags: string[];
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 /**
@@ -206,7 +206,7 @@ export interface SuggestionEvent {
   event: 'created' | 'viewed' | 'processed' | 'discarded' | 'failed' | 'expired';
   timestamp: Date;
   userId?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 /**

@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useTranslation } from "react-i18next";
 import { useSession } from "@/integrations/supabase/auth";
 import { useErrorHandler } from "@/hooks/use-error-handler";
@@ -14,52 +14,158 @@ import {
 } from '@/types/group-suggestions';
 
 // توابع کمکی برای محاسبه شباهت
-const normalizeName = (name: string) => {
-  return name
+const normalizeName = (name: string, commonCompanyTerms: string[] = []) => {
+  if (!name) return '';
+  
+  // تبدیل به حروف کوچک و نرمال‌سازی یونیکد
+  let normalized = name
     .toLowerCase()
-    .replace(/شرکت|سازمان|موسسه|مجموعه/g, '') // حذف کلمات اضافه
-    .replace(/[^\w\s]/g, '') // حذف کاراکترهای خاص
-    .trim();
+    .normalize('NFKD')
+    // حذف اعداد و علائم نگارشی
+    .replace(/[\u06F0-\u06F9\u0660-\u06690-9\u200C\u200F\u0640\u200b\s\-_،؛,.]/g, ' ')
+    // حذف اعراب
+    .replace(/[\u064B-\u065F\u0670\u0610-\u061A\u06D6-\u06ED]/g, '');
+
+  // حذف کلمات رایج شرکت‌ها و اضافه‌کردن فاصله
+  if (commonCompanyTerms?.length > 0) {
+    const validTerms = commonCompanyTerms
+      .filter(term => term?.trim())
+      .map(term => term.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+      
+    if (validTerms.length > 0) {
+      const termsPattern = `(?:^|\\s)(${validTerms.join('|')})(?=\\s|$)`;
+      const regex = new RegExp(termsPattern, 'g');
+      normalized = normalized.replace(regex, ' ');
+    }
+  }
+  
+  // حذف فاصله‌های اضافی و نهایی
+  return normalized.replace(/\s+/g, ' ').trim();
 };
 
-const calculateSimilarity = (name1: string, name2: string) => {
-  const n1 = normalizeName(name1);
-  const n2 = normalizeName(name2);
+// محاسبه فاصله لونشتاین برای تطابق دقیق‌تر
+const levenshteinDistance = (a: string, b: string): number => {
+  if (a.length === 0) return b.length;
+  if (b.length === 0) return a.length;
 
-  if (n1 === n2) return 100; // کاملاً یکسان
-
-  // چک کردن اینکه یکی زیرمجموعه دیگری هست
-  if (n1.includes(n2) || n2.includes(n1)) return 80;
-
-  // چک کردن کلمات مشترک
-  const words1 = new Set(n1.split(/\s+/));
-  const words2 = new Set(n2.split(/\s+/));
-  const commonWords = [...words1].filter(word => words2.has(word));
-  const similarity = (commonWords.length / Math.max(words1.size, words2.size)) * 70;
-
-  return Math.round(similarity);
+  const matrix = [];
+  for (let i = 0; i <= b.length; i++) {
+    matrix[i] = [i];
+  }
+  for (let j = 0; j <= a.length; j++) {
+    matrix[0][j] = j;
+  }
+  for (let i = 1; i <= b.length; i++) {
+    for (let j = 1; j <= a.length; j++) {
+      if (b.charAt(i - 1) === a.charAt(j - 1)) {
+        matrix[i][j] = matrix[i - 1][j - 1];
+      } else {
+        matrix[i][j] = Math.min(
+          matrix[i - 1][j - 1] + 1,
+          matrix[i][j - 1] + 1,
+          matrix[i - 1][j] + 1
+        );
+      }
+    }
+  }
+  return matrix[b.length][a.length];
 };
 
-export const useGroupSuggestions = () => {
+const calculateSimilarity = (name1: string, name2: string, commonCompanyTerms: string[] = []) => {
+  if (!name1 || !name2) return 0;
+  
+  // نرمال‌سازی نام‌ها
+  const n1 = normalizeName(name1, commonCompanyTerms);
+  const n2 = normalizeName(name2, commonCompanyTerms);
+
+  // اگر دقیقاً یکسان بودند
+  if (n1 === n2) return 100;
+  
+  // اگر یکی از رشته‌ها خالی شد (بعد از نرمال‌سازی)
+  if (!n1 || !n2) return 0;
+
+  // اگر یکی زیرمجموعه دیگری باشد، امتیاز بالایی بده
+  if (n1.includes(n2) || n2.includes(n1)) {
+    return 90; // امتیاز ثابت برای زیرمجموعه‌ها
+  }
+
+  // بررسی تشابه کلمات
+  const words1 = n1.split(/\s+/).filter(Boolean);
+  const words2 = n2.split(/\s+/).filter(Boolean);
+  
+  // اگر حداقل یک کلمه مشترک وجود داشت
+  const commonWords = words1.filter(word => words2.includes(word));
+  if (commonWords.length > 0) {
+    // محاسبه درصد کلمات مشترک
+    const wordSimilarity = (commonWords.length / Math.max(words1.length, words2.length)) * 80;
+    return Math.min(90, Math.round(wordSimilarity));
+  }
+  
+  // اگر کلمه مشترکی نبود، از فاصله لونشتاین استفاده کن
+  const maxLength = Math.max(n1.length, n2.length);
+  const distance = levenshteinDistance(n1, n2);
+  const similarity = Math.max(0, 100 - (distance / maxLength) * 100);
+  
+  // اگر شباهت کمتر از 20% بود، صفر برگردان
+  return similarity >= 30 ? Math.round(similarity) : 0;
+};
+
+interface UseGroupSuggestionsProps {
+  initialSimilarityThreshold?: number;
+  initialCompanyTerms?: string[];
+}
+
+export const useGroupSuggestions = ({
+  initialSimilarityThreshold = 60,
+  initialCompanyTerms = []
+}: UseGroupSuggestionsProps = {}) => {
   const { t } = useTranslation();
   const { session, isLoading: isSessionLoading } = useSession();
-  const { groups, fetchGroups } = useGroups();
-
-  const [contactsWithoutGroup, setContactsWithoutGroup] = useState<ContactWithoutGroup[]>([]);
-  const [contactSuggestions, setContactSuggestions] = useState<ContactSuggestions[]>([]);
+  const { groups } = useGroups();
+  
   const [isGeneratingSuggestions, setIsGeneratingSuggestions] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [similarityThreshold, setSimilarityThreshold] = useState(initialSimilarityThreshold);
+  const [companyTerms, setCompanyTerms] = useState<string[]>(initialCompanyTerms);
+  const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
+  const [contactsWithoutGroup, setContactsWithoutGroup] = useState<ContactWithoutGroup[]>([]);
+  const [contactSuggestions, setContactSuggestions] = useState<ContactSuggestions[]>([]);
+  const [stats, setStats] = useState<GroupSuggestionStats>({
+    totalContacts: 0,
+    totalSuggestions: 0,
+    successRate: 0,
+    uniqueGroups: 0,
+    avgConfidence: 0,
+    processingTime: 0,
+    topCompanies: [],
+    recentSuggestions: 0
+  });
 
-  // محاسبات آماری پیشرفته با useMemo برای عملکرد بهتر
-  const stats: GroupSuggestionStats = useMemo(() => ({
-    totalContacts: contactsWithoutGroup.length,
-    totalSuggestions: contactSuggestions.reduce((sum, cs) => sum + cs.suggestions.length, 0),
-    uniqueGroups: new Set(contactSuggestions.flatMap(cs => cs.suggestions.map(s => s.suggested_group_id))).size,
-    successRate: contactSuggestions.length > 0 ? Math.round((contactSuggestions.length / contactsWithoutGroup.length) * 100) : 0,
-    avgConfidence: contactSuggestions.length > 0 ? Math.round(contactSuggestions.reduce((sum, cs) => sum + cs.suggestions.reduce((s, sug) => s + (sug.confidence || 0), 0), 0) / contactSuggestions.reduce((sum, cs) => sum + cs.suggestions.length, 0)) : 0,
-    topCompanies: [...new Set(contactsWithoutGroup.map(c => c.company).filter(Boolean))].slice(0, 3),
-    recentSuggestions: contactSuggestions.filter(() => Date.now() - (new Date().getTime() - 3600000) < 3600000).length // Last hour
-  }), [contactsWithoutGroup, contactSuggestions]);
+  // Update stats when contacts or suggestions change
+  useEffect(() => {
+    setStats({
+      totalContacts: contactsWithoutGroup.length,
+      totalSuggestions: contactSuggestions.reduce((sum, cs) => sum + cs.suggestions.length, 0),
+      uniqueGroups: new Set(contactSuggestions.flatMap(cs => 
+        cs.suggestions.map(s => s.suggested_group_id)
+      )).size,
+      successRate: contactSuggestions.length > 0 
+        ? Math.round((contactSuggestions.length / contactsWithoutGroup.length) * 100) 
+        : 0,
+      avgConfidence: contactSuggestions.length > 0 
+        ? Math.round(contactSuggestions.reduce((sum, cs) => 
+            sum + cs.suggestions.reduce((s, sug) => s + (sug.confidence || 0), 0), 0) / 
+            contactSuggestions.reduce((sum, cs) => sum + cs.suggestions.length, 0)) 
+        : 0,
+      processingTime: 0, // Will be updated when suggestions are generated
+      topCompanies: [...new Set(contactsWithoutGroup
+        .map(c => c.company)
+        .filter(Boolean))].slice(0, 3) as string[],
+      recentSuggestions: contactSuggestions.filter(() => 
+        Date.now() - (new Date().getTime() - 3600000) < 3600000
+      ).length
+    });
+  }, [contactsWithoutGroup, contactSuggestions]);
 
   const onSuccessFetchContacts = useCallback((result: { data: ContactWithoutGroup[] | null; error: string | null; fromCache: boolean }) => {
     if (result.data) {
@@ -73,7 +179,7 @@ export const useGroupSuggestions = () => {
   }, [t]);
 
   const {
-    isLoading: isLoadingContacts,
+    isLoading: isContactsLoading,
     executeAsync: executeFetchContacts,
   } = useErrorHandler(null, {
     showToast: false,
@@ -117,9 +223,13 @@ export const useGroupSuggestions = () => {
     });
   }, [session, isSessionLoading, executeFetchContacts]);
 
-  const generateGroupSuggestions = useCallback(() => {
+  const generateGroupSuggestions = useCallback((threshold: number, terms: string[]) => {
     setIsGeneratingSuggestions(true);
     setIsAnimating(true);
+    
+    // Update the local state with the provided values
+    setSimilarityThreshold(threshold);
+    setCompanyTerms(terms);
 
     setTimeout(async () => {
       const newContactSuggestions: ContactSuggestions[] = [];
@@ -142,21 +252,46 @@ export const useGroupSuggestions = () => {
 
         if (groupingsError) throw new Error(groupingsError.message);
 
-        // ساخت مپینگ شرکت -> گروه و سمت شغلی -> گروه
+        // ساخت مپینگ‌های مختلف برای یادگیری از گروه‌بندی‌های موجود
         const companyToGroup = new Map<string, { groupId: string; groupName: string; groupColor?: string; count: number }>();
         const positionToGroup = new Map<string, { groupId: string; groupName: string; groupColor?: string; count: number }>();
+        const companyPatterns = new Map<string, { pattern: string; groupId: string; count: number }>();
+        const groupNameWords = new Map<string, { word: string; groupId: string; count: number }>();
 
-        existingGroupings?.forEach(cg => {
-          if (cg.contacts) {
-            const contact = cg.contacts as any;
-            const groupId = cg.group_id;
-            const group = groups.find(g => g.id === groupId);
-
-            if (group && contact.company) {
-              const company = contact.company.trim().toLowerCase();
-              const existing = companyToGroup.get(company);
+        // استخراج الگوهای رایج از نام گروه‌ها
+        groups.forEach(group => {
+          const words = group.name.toLowerCase().split(/\s+/).filter(Boolean);
+          words.forEach(word => {
+            if (word.length > 2) { // فقط کلمات با طول بیشتر از 2 حرف
+              const existing = groupNameWords.get(word);
               if (existing) {
                 existing.count++;
+              } else {
+                groupNameWords.set(word, { word, groupId: group.id, count: 1 });
+              }
+            }
+          });
+        });
+
+        // تحلیل گروه‌بندی‌های موجود
+        existingGroupings?.forEach(cg => {
+          if (!cg.contacts) return;
+          
+          const contacts = Array.isArray(cg.contacts) ? cg.contacts : [cg.contacts];
+          const group = groups.find(g => g.id === cg.group_id);
+          if (!group) return;
+
+          contacts.forEach(contact => {
+            if (!contact || typeof contact !== 'object') return;
+            
+            // یادگیری بر اساس شرکت
+            if (contact.company) {
+              const company = contact.company.trim().toLowerCase();
+              
+              // ذخیره کل نام شرکت
+              const existingCompany = companyToGroup.get(company);
+              if (existingCompany) {
+                existingCompany.count++;
               } else {
                 companyToGroup.set(company, {
                   groupId: group.id,
@@ -165,11 +300,28 @@ export const useGroupSuggestions = () => {
                   count: 1
                 });
               }
+
+              // استخراج کلمات کلیدی از نام شرکت
+              const companyWords = company.split(/\s+/).filter((w: string) => w.length > 2);
+              companyWords.forEach((word: string) => {
+                const existing = companyPatterns.get(word);
+                if (existing) {
+                  existing.count++;
+                } else {
+                  companyPatterns.set(word, {
+                    pattern: word,
+                    groupId: group.id,
+                    count: 1
+                  });
+                }
+              });
             }
 
-            if (group && contact.position) {
+            // یادگیری بر اساس سمت شغلی
+            if (contact.position) {
               const position = contact.position.trim().toLowerCase();
               const existing = positionToGroup.get(position);
+              
               if (existing) {
                 existing.count++;
               } else {
@@ -181,7 +333,7 @@ export const useGroupSuggestions = () => {
                 });
               }
             }
-          }
+          });
         });
 
         // تولید پیشنهادات برای هر مخاطب
@@ -191,27 +343,102 @@ export const useGroupSuggestions = () => {
           const position = contact.position?.trim();
           let priorityCounter = 1;
 
-          // پیشنهادات بر اساس الگوهای فعلی (اولویت بالاتر)
+          // پیشنهادات بر اساس تطابق کامل شرکت (بالاترین اولویت)
           if (companyName) {
             const normalizedCompany = companyName.toLowerCase();
+            const companyWords = normalizedCompany.split(/\s+/).filter(Boolean);
 
+            // 1. تطابق کامل شرکت
+            const exactMatch = companyToGroup.get(normalizedCompany);
+            if (exactMatch) {
+              const confidence = Math.min(100, 90 + (exactMatch.count * 2));
+              suggestions.push({
+                contact_id: contact.id,
+                contact_name: `${contact.first_name} ${contact.last_name}`,
+                suggested_group_id: exactMatch.groupId,
+                suggested_group_name: exactMatch.groupName,
+                suggested_group_color: exactMatch.groupColor,
+                confidence,
+                reasoning: t('ai_suggestions.group_suggestion_reasoning_company_exact', {
+                  count: exactMatch.count,
+                  companyName,
+                  groupName: exactMatch.groupName
+                }),
+                priority: priorityCounter++
+              });
+            }
+
+            // 2. تطابق کلمات کلیدی شرکت
+            const companyWordMatches = new Map<string, { groupId: string; groupName: string; groupColor?: string; score: number }>();
+            
+            companyWords.forEach(word => {
+              if (word.length < 3) return;
+              
+              // جستجوی کلمات مشابه در الگوهای شرکت
+              for (const [pattern, info] of companyPatterns.entries()) {
+                const similarity = calculateSimilarity(word, pattern, companyTerms);
+                if (similarity >= 70) {
+                  const existing = companyWordMatches.get(info.groupId);
+                  const score = similarity * (info.count * 0.1);
+                  
+                  if (!existing || score > existing.score) {
+                    companyWordMatches.set(info.groupId, {
+                      groupId: info.groupId,
+                      groupName: groups.find(g => g.id === info.groupId)?.name || info.groupId,
+                      groupColor: groups.find(g => g.id === info.groupId)?.color,
+                      score
+                    });
+                  }
+                }
+              }
+            });
+
+            // اضافه کردن پیشنهادات کلمات کلیدی
+            companyWordMatches.forEach((match, groupId) => {
+              if (!suggestions.some(s => s.suggested_group_id === groupId)) {
+                const group = groups.find(g => g.id === groupId);
+                if (group) {
+                  suggestions.push({
+                    contact_id: contact.id,
+                    contact_name: `${contact.first_name} ${contact.last_name}`,
+                    suggested_group_id: groupId,
+                    suggested_group_name: group.name,
+                    suggested_group_color: group.color,
+                    confidence: Math.min(90, Math.round(match.score)),
+                    reasoning: t('ai_suggestions.group_suggestion_reasoning_company_pattern', {
+                      companyName,
+                      groupName: group.name
+                    }),
+                    priority: priorityCounter++
+                  });
+                }
+              }
+            });
+
+            // 3. تطابق جزئی شرکت
             for (const [existingCompany, groupInfo] of companyToGroup.entries()) {
-              const similarity = normalizedCompany === existingCompany ? 100 :
-                               normalizedCompany.includes(existingCompany) || existingCompany.includes(normalizedCompany) ? 80 :
-                               0;
-
-              if (similarity > 0) {
-                const confidence = Math.min(95, similarity + (groupInfo.count * 5));
-                suggestions.push({
-                  contact_id: contact.id,
-                  contact_name: `${contact.first_name} ${contact.last_name}`,
-                  suggested_group_id: groupInfo.groupId,
-                  suggested_group_name: groupInfo.groupName,
-                  suggested_group_color: groupInfo.groupColor,
-                  confidence,
-                  reasoning: `بر اساس الگوی فعلی: ${groupInfo.count} مخاطب از شرکت "${companyName}" در گروه "${groupInfo.groupName}" قرار دارن`,
-                  priority: priorityCounter++
-                });
+              if (normalizedCompany === existingCompany) continue; // از قبل اضافه شده
+              
+              const similarity = calculateSimilarity(normalizedCompany, existingCompany, companyTerms);
+              if (similarity >= 60) {
+                const confidence = Math.min(85, similarity + (groupInfo.count * 2));
+                if (!suggestions.some(s => s.suggested_group_id === groupInfo.groupId)) {
+                  suggestions.push({
+                    contact_id: contact.id,
+                    contact_name: `${contact.first_name} ${contact.last_name}`,
+                    suggested_group_id: groupInfo.groupId,
+                    suggested_group_name: groupInfo.groupName,
+                    suggested_group_color: groupInfo.groupColor,
+                    confidence,
+                    reasoning: t('ai_suggestions.group_suggestion_reasoning_company_similar', {
+                      companyName,
+                      existingCompany,
+                      groupName: groupInfo.groupName,
+                      similarity: Math.round(similarity)
+                    }),
+                    priority: priorityCounter++
+                  });
+                }
               }
             }
           }
@@ -219,24 +446,98 @@ export const useGroupSuggestions = () => {
           // پیشنهادات بر اساس سمت شغلی (اولویت پایین‌تر)
           if (position) {
             const normalizedPosition = position.toLowerCase();
+            const positionWords = normalizedPosition.split(/\s+/).filter(Boolean);
+            const positionWordMatches = new Map<string, { groupId: string; groupName: string; groupColor?: string; score: number }>();
 
-            for (const [existingPosition, groupInfo] of positionToGroup.entries()) {
-              const similarity = normalizedPosition === existingPosition ? 100 :
-                               normalizedPosition.includes(existingPosition) || existingPosition.includes(normalizedPosition) ? 70 :
-                               0;
-
-              if (similarity > 0) {
-                const confidence = Math.min(85, similarity + (groupInfo.count * 3));
+            // 1. تطابق کامل سمت شغلی
+            const exactPositionMatch = positionToGroup.get(normalizedPosition);
+            if (exactPositionMatch) {
+              const confidence = Math.min(100, 85 + (exactPositionMatch.count * 2));
+              if (!suggestions.some(s => s.suggested_group_id === exactPositionMatch.groupId)) {
                 suggestions.push({
                   contact_id: contact.id,
                   contact_name: `${contact.first_name} ${contact.last_name}`,
-                  suggested_group_id: groupInfo.groupId,
-                  suggested_group_name: groupInfo.groupName,
-                  suggested_group_color: groupInfo.groupColor,
+                  suggested_group_id: exactPositionMatch.groupId,
+                  suggested_group_name: exactPositionMatch.groupName,
+                  suggested_group_color: exactPositionMatch.groupColor,
                   confidence,
-                  reasoning: `بر اساس الگوی فعلی: ${groupInfo.count} مخاطب با سمت "${position}" در گروه "${groupInfo.groupName}" قرار دارن`,
+                  reasoning: t('ai_suggestions.group_suggestion_reasoning_position_exact', {
+                    position,
+                    groupName: exactPositionMatch.groupName,
+                    count: exactPositionMatch.count
+                  }),
                   priority: priorityCounter++
                 });
+              }
+            }
+
+            // 2. تطابق کلمات کلیدی سمت شغلی
+            positionWords.forEach((word: string) => {
+              if (word.length < 3) return;
+              
+              for (const [existingPosition, groupInfo] of positionToGroup.entries()) {
+                if (existingPosition.includes(word) || word.includes(existingPosition)) {
+                  const existing = positionWordMatches.get(groupInfo.groupId);
+                  const score = 70 + (groupInfo.count * 2);
+                  
+                  if (!existing || score > existing.score) {
+                    positionWordMatches.set(groupInfo.groupId, {
+                      groupId: groupInfo.groupId,
+                      groupName: groupInfo.groupName,
+                      groupColor: groupInfo.groupColor,
+                      score
+                    });
+                  }
+                }
+              }
+            });
+
+            // اضافه کردن پیشنهادات کلمات کلیدی سمت شغلی
+            positionWordMatches.forEach((match, groupId) => {
+              if (!suggestions.some(s => s.suggested_group_id === groupId)) {
+                const group = groups.find(g => g.id === groupId);
+                if (group) {
+                  suggestions.push({
+                    contact_id: contact.id,
+                    contact_name: `${contact.first_name} ${contact.last_name}`,
+                    suggested_group_id: groupId,
+                    suggested_group_name: group.name,
+                    suggested_group_color: group.color,
+                    confidence: Math.min(85, Math.round(match.score)),
+                    reasoning: t('ai_suggestions.group_suggestion_reasoning_position_pattern', {
+                      position,
+                      groupName: group.name
+                    }),
+                    priority: priorityCounter++
+                  });
+                }
+              }
+            });
+
+            // 3. تطابق جزئی سمت شغلی
+            for (const [existingPosition, groupInfo] of positionToGroup.entries()) {
+              if (normalizedPosition === existingPosition) continue; // از قبل اضافه شده
+              
+              const similarity = calculateSimilarity(normalizedPosition, existingPosition, companyTerms);
+              if (similarity >= 60) {
+                const confidence = Math.min(80, similarity + (groupInfo.count * 2));
+                if (!suggestions.some(s => s.suggested_group_id === groupInfo.groupId)) {
+                  suggestions.push({
+                    contact_id: contact.id,
+                    contact_name: `${contact.first_name} ${contact.last_name}`,
+                    suggested_group_id: groupInfo.groupId,
+                    suggested_group_name: groupInfo.groupName,
+                    suggested_group_color: groupInfo.groupColor,
+                    confidence,
+                    reasoning: t('ai_suggestions.group_suggestion_reasoning_position_similar', {
+                      position,
+                      existingPosition,
+                      groupName: groupInfo.groupName,
+                      similarity: Math.round(similarity)
+                    }),
+                    priority: priorityCounter++
+                  });
+                }
               }
             }
           }
@@ -246,7 +547,7 @@ export const useGroupSuggestions = () => {
             const companyMatches = groups
               .map(group => ({
                 group,
-                similarity: calculateSimilarity ? calculateSimilarity(companyName, group.name) : 0
+                similarity: calculateSimilarity ? calculateSimilarity(companyName, group.name, companyTerms) : 0
               }))
               .filter(match => match.similarity >= 60)
               .sort((a, b) => b.similarity - a.similarity)
@@ -261,18 +562,22 @@ export const useGroupSuggestions = () => {
                   suggested_group_name: match.group.name,
                   suggested_group_color: match.group.color,
                   confidence: Math.min(90, match.similarity + 15),
-                  reasoning: `نام شرکت "${companyName}" با گروه "${match.group.name}" مشابه است (${match.similarity}% تطابق)`,
+                  reasoning: t('ai_suggestions.group_suggestion_reasoning_company_similarity', {
+                    companyName,
+                    groupName: match.group.name,
+                    similarity: match.similarity
+                  }),
                   priority: priorityCounter++
                 });
               }
             });
           }
 
-          if (position && !suggestions.find(s => s.contact_id === contact.id && s.reasoning?.includes('سمت شغلی'))) {
+          if (position && !suggestions.find(s => s.contact_id === contact.id && s.reasoning?.includes(t('ai_suggestions.group_suggestion_reasoning_position_similarity', { position: '', groupName: '', similarity: 0 }).split(' ')[0]))) {
             const positionMatches = groups
               .map(group => ({
                 group,
-                similarity: calculateSimilarity ? calculateSimilarity(position, group.name) : 0
+                similarity: calculateSimilarity ? calculateSimilarity(position, group.name, companyTerms) : 0
               }))
               .filter(match => match.similarity >= 50)
               .sort((a, b) => b.similarity - a.similarity)
@@ -287,7 +592,11 @@ export const useGroupSuggestions = () => {
                   suggested_group_name: match.group.name,
                   suggested_group_color: match.group.color,
                   confidence: Math.min(75, match.similarity + 10),
-                  reasoning: `سمت شغلی "${position}" با گروه "${match.group.name}" مرتبط است (${match.similarity}% تطابق)`,
+                  reasoning: t('ai_suggestions.group_suggestion_reasoning_position_similarity', {
+                    position,
+                    groupName: match.group.name,
+                    similarity: match.similarity
+                  }),
                   priority: priorityCounter++
                 });
               }
@@ -296,9 +605,9 @@ export const useGroupSuggestions = () => {
 
           // پیشنهاد گروه عمومی (اولویت پایین‌ترین)
           const generalGroups = groups.filter(g =>
-            g.name.toLowerCase().includes('عمومی') ||
-            g.name.toLowerCase().includes('سایر') ||
-            g.name.toLowerCase().includes('متفرقه')
+            g.name.toLowerCase().includes(t('general_group_keywords.general')) ||
+            g.name.toLowerCase().includes(t('general_group_keywords.other')) ||
+            g.name.toLowerCase().includes(t('general_group_keywords.miscellaneous'))
           );
 
           if (generalGroups.length > 0 && suggestions.length === 0) {
@@ -310,13 +619,13 @@ export const useGroupSuggestions = () => {
               suggested_group_name: generalGroup.name,
               suggested_group_color: generalGroup.color,
               confidence: 30,
-              reasoning: `پیشنهاد گروه عمومی برای مخاطبی که اطلاعات خاصی ندارد`,
+              reasoning: t('ai_suggestions.group_suggestion_reasoning_general'),
               priority: priorityCounter++
             });
           }
 
           // مرتب‌سازی پیشنهادات بر اساس اولویت
-          suggestions.sort((a, b) => a.priority - b.priority);
+          suggestions.sort((a, b) => (b.confidence || 0) - (a.confidence || 0));
 
           if (suggestions.length > 0) {
             newContactSuggestions.push({
@@ -343,7 +652,7 @@ export const useGroupSuggestions = () => {
         ErrorManager.notifyUser(t('ai_suggestions.group_suggestions_generated'), 'success');
       }
     }, 2500);
-  }, [contactsWithoutGroup, groups, t, session]);
+  }, [contactsWithoutGroup, groups, t, session, companyTerms]);
 
   const handleApplySuggestion = useCallback(async (suggestion: GroupSuggestion) => {
     if (!session?.user) {
@@ -426,21 +735,33 @@ export const useGroupSuggestions = () => {
     }
   }, [session, contactSuggestions, fetchContactsWithoutGroup, t]);
 
+  // Update the generateGroupSuggestions function to use the new state
+  const generateGroupSuggestionsWithSettings = useCallback(() => {
+    // Use the current state values
+    return generateGroupSuggestions(similarityThreshold, companyTerms);
+  }, [generateGroupSuggestions, similarityThreshold, companyTerms]);
+
   return {
     // State
     contactsWithoutGroup,
     contactSuggestions,
     isGeneratingSuggestions,
     isAnimating,
-    isLoadingContacts,
+    isLoadingContacts: isContactsLoading,
     stats,
+    similarityThreshold,
+    companyTerms,
+    showAdvancedSettings,
 
     // Actions
     fetchContactsWithoutGroup,
-    generateGroupSuggestions,
+    generateGroupSuggestions: generateGroupSuggestionsWithSettings,
     handleApplySuggestion,
     handleDiscardSuggestion,
     applyAllSuggestions,
+    setSimilarityThreshold,
+    setCompanyTerms,
+    setShowAdvancedSettings,
 
     // Computed
     hasSuggestions: contactSuggestions.length > 0,

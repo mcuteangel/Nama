@@ -31,6 +31,7 @@ export interface GroupSuggestionStats {
   uniqueGroups: number;
   successRate: number;
   avgConfidence: number;
+  processingTime: number;
   topCompanies: string[];
   recentSuggestions: number;
 }

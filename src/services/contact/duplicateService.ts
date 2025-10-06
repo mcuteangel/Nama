@@ -2,6 +2,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { ContactCrudService } from '@/services/contact-crud-service';
 import { invalidateCache } from '@/utils/cache-helpers';
 import { ErrorManager } from '@/lib/error-manager';
+import i18n from 'i18next';
 import {
   DuplicateContact,
   DuplicatePair,
@@ -16,7 +17,7 @@ export interface DuplicateServiceResult<T> {
 
 export class DuplicateContactService {
   /**
-   * دریافت تمام تماس‌ها برای بررسی تکراری‌ها
+   * دریافت تمام مخاطبین برای بررسی تکراری‌ها
    */
   static async fetchContactsForDuplicates(userId: string): Promise<DuplicateServiceResult<DuplicateContact[]>> {
     try {
@@ -48,13 +49,13 @@ export class DuplicateContactService {
       });
       return {
         data: null,
-        error: error instanceof Error ? error.message : 'خطا در دریافت تماس‌ها'
+        error: error instanceof Error ? error.message : i18n.t('errors.fetch_contacts_error')
       };
     }
   }
 
   /**
-   * پیدا کردن تماس‌های تکراری
+   * پیدا کردن مخاطبین تکراری
    */
   static findDuplicates(contacts: DuplicateContact[]): DuplicatePair[] {
     const duplicates: DuplicatePair[] = [];
@@ -86,7 +87,7 @@ export class DuplicateContactService {
   }
 
   /**
-   * محاسبه دلیل تکراری بودن دو تماس
+   * محاسبه دلیل تکراری بودن دو مخاطب
    */
   private static getDuplicateReason(contact1: DuplicateContact, contact2: DuplicateContact): string | null {
     const namesMatch = contact1.first_name === contact2.first_name && contact1.last_name === contact2.last_name;
@@ -98,26 +99,26 @@ export class DuplicateContactService {
     );
 
     if (namesMatch && (emailsOverlap || phonesOverlap)) {
-      return 'نام و نام خانوادگی یکسان به همراه ایمیل یا تلفن مشابه';
+      return i18n.t('duplicate_reasons.same_name_and_contact');
     } else if (emailsOverlap) {
-      return 'ایمیل یکسان';
+      return i18n.t('duplicate_reasons.same_email');
     } else if (phonesOverlap) {
-      return 'تلفن یکسان';
+      return i18n.t('duplicate_reasons.same_phone');
     }
 
     return null;
   }
 
   /**
-   * محاسبه آمار مدیریت تماس‌های تکراری
+   * محاسبه آمار مدیریت مخاطبین تکراری
    */
   static calculateStats(duplicatePairs: DuplicatePair[]): DuplicateManagementStats {
     const total = duplicatePairs.length;
     const highConfidence = duplicatePairs.filter(p =>
-      p.reason.includes('نام') && (p.reason.includes('ایمیل') || p.reason.includes('تلفن'))
+      p.reason.includes(i18n.t('duplicate_reasons.name')) && (p.reason.includes(i18n.t('duplicate_reasons.email')) || p.reason.includes(i18n.t('duplicate_reasons.phone')))
     ).length;
     const mediumConfidence = duplicatePairs.filter(p =>
-      p.reason.includes('ایمیل') || p.reason.includes('تلفن')
+      p.reason.includes(i18n.t('duplicate_reasons.email')) || p.reason.includes(i18n.t('duplicate_reasons.phone'))
     ).length - highConfidence;
 
     return {
@@ -128,7 +129,7 @@ export class DuplicateContactService {
   }
 
   /**
-   * ادغام دو تماس
+   * ادغام دو مخاطب
    */
   static async mergeContacts(
     mainContact: DuplicateContact,
@@ -136,7 +137,7 @@ export class DuplicateContactService {
     userId: string
   ): Promise<DuplicateServiceResult<boolean>> {
     try {
-      // دریافت اطلاعات کامل تماس‌ها
+      // دریافت اطلاعات کامل مخاطبین
       const { data: mainContactFull, error: mainError } = await supabase
         .from('contacts')
         .select(`
@@ -167,14 +168,14 @@ export class DuplicateContactService {
         throw new Error(
           mainError?.message ||
           duplicateError?.message ||
-          'Failed to fetch full contact details for merging.'
+          i18n.t('errors.failed_to_fetch_contact_details')
         );
       }
 
       // ادغام اطلاعات
       const mergedData = this.mergeContactData(mainContactFull, duplicateContactFull);
 
-      // بروزرسانی تماس اصلی
+      // بروزرسانی مخاطب اصلی
       const { error: updateMainError } = await supabase
         .from('contacts')
         .update({
@@ -198,7 +199,7 @@ export class DuplicateContactService {
       // حذف اطلاعات قدیمی و اضافه کردن اطلاعات جدید
       await this.updateContactRelatedData(mainContact.id, userId, mergedData);
 
-      // حذف تماس تکراری
+      // حذف مخاطب تکراری
       const { error: deleteDuplicateError } = await ContactCrudService.deleteContact(duplicateContact.id);
       if (deleteDuplicateError) throw new Error(deleteDuplicateError);
 
@@ -216,13 +217,13 @@ export class DuplicateContactService {
       });
       return {
         data: null,
-        error: error instanceof Error ? error.message : 'خطا در ادغام تماس‌ها'
+        error: error instanceof Error ? error.message : i18n.t('errors.merge_contacts_error')
       };
     }
   }
 
   /**
-   * ادغام اطلاعات دو تماس
+   * ادغام اطلاعات دو مخاطب
    */
   private static mergeContactData(mainContact: FullContactData, duplicateContact: FullContactData): FullContactData {
     const mergedData: FullContactData = { ...mainContact };
@@ -246,7 +247,7 @@ export class DuplicateContactService {
   }
 
   /**
-   * بروزرسانی اطلاعات مرتبط با تماس (ایمیل، تلفن، گروه‌ها و ...)
+   * بروزرسانی اطلاعات مرتبط با مخاطب (ایمیل، تلفن، گروه‌ها و ...)
    */
   private static async updateContactRelatedData(
     contactId: string,

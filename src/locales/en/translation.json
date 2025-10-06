@@ -181,6 +181,10 @@
     "fid_suggestion": " Reduce JavaScript execution time and use code splitting"
   },
   "common": {
+    "advanced_settings": "Advanced Settings",
+    "hide_advanced": "Hide Advanced",
+    "add": "Add",
+    "refresh": "Refresh",
     "edit": "Edit",
     "discard": "Discard",
     "expand": "View Details",
@@ -253,6 +257,9 @@
     "not_specified": "Not specified"
   },
   "errors": {
+    "fetch_contacts_error": "Error fetching contacts",
+    "fetch_contacts_error_fa": "Error fetching contacts",
+    "unknown_processing_error": "Unknown error occurred while processing the contact list",
     "loading_group_colors": "Error loading existing group colors",
     "field_required": "{{field}} is required",
     "generic_error": "An error occurred",
@@ -291,7 +298,8 @@
     "delete_custom_field_failed": "Failed to delete custom field template",
     "create_custom_field_template_error": "Error creating custom field template",
     "edit_custom_field_template_error": "Error updating custom field template",
-    "max_retries_exceeded": "Maximum retry attempts exceeded. Please try again later.",
+    "merge_contacts_error": "Error merging contacts",
+    "failed_to_fetch_contact_details": "Failed to fetch full contact details for merging",
     "invalid_phone_format": "Invalid phone number format"
   },
   "actions": {
@@ -760,7 +768,32 @@
       "filter_by_color": "Filter by color"
     }
   },
+  "common_company_terms": ["Company", "Organization", "Institute", "Group"],
   "ai_suggestions": {
+    "similarity_threshold": "Similarity Threshold",
+    "similarity_threshold_help": "Adjust how similar contacts need to be to be grouped together (higher = more strict matching)",
+    "company_terms": "Company Terms",
+    "add_company_term": "Add company term (e.g., 'Inc', 'LLC')",
+    "company_terms_help": "Common company suffixes to ignore when comparing company names",
+    "suggestion_count": "{{count}} smart suggestion",
+    "suggestion_count_plural": "{{count}} smart suggestions",
+    "apply_suggestion": "Apply suggestion",
+    "discard_this_suggestion": "Discard this suggestion",
+    "error_generating_suggestions": "Error generating group suggestions",
+    "no_group_suggestions_found": "No group suggestions found for your contacts",
+    "group_suggestions_generated": "Group suggestions generated successfully",
+    "priority": "Priority {{number}}",
+    "apply_this_suggestion": "Apply this suggestion",
+    "suggestions_description": "Smart suggestions for grouping contacts",
+    "analyzing_contacts": "Analyzing contacts...",
+    "analyzing_patterns": "Analyzing organization patterns...",
+    "apply_all": "Apply All",
+    "processing_step": "Step: Analyzing contact data",
+    "all_contacts_grouped": "All Contacts Are Grouped",
+    "all_contacts_grouped_description": "All your contacts have been successfully organized into groups. No further action is needed at this time.",
+    "ungrouped_contacts": "Ungrouped Contacts",
+    "match_rate": "Match Rate",
+    "unique_groups": "Unique Groups",
     "new_contact": "New Contact",
     "update_contact": "Update Contact",
     "found_existing": "Found existing contact: {{name}}",
@@ -807,6 +840,12 @@
     "ready_to_start": "Ready to get started!",
     "enter_text_to_start": "Enter your text to get AI-powered suggestions",
     "enter_text_hint": "Type or paste your text in the input above",
+    "general_group_keywords": {
+      "general": "general",
+      "other": "other",
+      "miscellaneous": "miscellaneous"
+    },
+    "group_suggestion_reasoning_position_similarity": "Position '{{position}}' is similar to group '{{groupName}}' ({{similarity}}% match)",
     "smart_suggestions": "Smart Suggestions",
     "suggestions": "suggestions",
     "speech_recognition_not_supported": "Your browser does not support speech recognition.",

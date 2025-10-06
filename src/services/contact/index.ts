@@ -1,4 +1,5 @@
 import { fetchContacts } from "./contactQueryService";
+import i18n from "i18next";
 import { searchContacts } from "./searchService";
 import { sortContacts } from "@/utils/sort";
 import { DuplicateContactService } from "./duplicateService";
@@ -17,7 +18,7 @@ export const ContactService = {
       const { data, error } = await fetchContacts(userId, selectedGroup, companyFilter);
 
       if (error || !data) {
-        return { data: null, error: error || 'خطا در دریافت اطلاعات مخاطبین' };
+        return { data: null, error: error || i18n.t('errors.fetch_contacts_error') };
       }
 
       // اعمال جستجو
@@ -28,10 +29,10 @@ export const ContactService = {
 
       return { data: sortedData, error: null };
     } catch (error) {
-      console.error('خطا در پردازش لیست مخاطبین:', error);
+      console.error('Error processing contact list:', error);
       return {
         data: null,
-        error: error instanceof Error ? error.message : 'خطای ناشناخته در پردازش لیست مخاطبین'
+        error: error instanceof Error ? error.message : i18n.t('errors.unknown_processing_error')
       };
     }
   }

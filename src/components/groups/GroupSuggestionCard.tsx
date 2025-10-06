@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { designTokens } from '@/lib/design-tokens';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ModernTooltip, ModernTooltipContent, ModernTooltipProvider, ModernTooltipTrigger } from "@/components/ui/modern-tooltip";
-import { CheckCircle, XCircle, Star, Lightbulb, Users, ChevronDown, ChevronUp } from 'lucide-react';
+import { CheckCircle, XCircle, Star, Lightbulb, ChevronDown, ChevronUp } from 'lucide-react';
 import { useTranslation } from "react-i18next";
 import { GlassButton } from "@/components/ui/glass-button";
 import { GroupSuggestion } from '@/types/group-suggestions';
@@ -83,7 +83,7 @@ export const GroupSuggestionCard: React.FC<GroupSuggestionCardProps> = ({
                 {contactName}
               </p>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                {suggestions.length} پیشنهاد هوشمند
+                {t('ai_suggestions.suggestion_count', { count: suggestions.length })}
               </p>
             </div>
             <GlassButton
@@ -116,7 +116,7 @@ export const GroupSuggestionCard: React.FC<GroupSuggestionCardProps> = ({
                       suggestion.priority === 3 ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300' :
                       'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
                     }`}>
-                      اولویت {suggestion.priority}
+                      {t('ai_suggestions.priority', { number: suggestion.priority })}
                     </span>
                     <span
                       className="px-3 py-1.5 rounded-xl font-semibold shadow-sm flex items-center gap-2"

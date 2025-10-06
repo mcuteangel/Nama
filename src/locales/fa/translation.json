@@ -181,6 +181,11 @@
     "fid_suggestion": " زمان اجرای JavaScript را کاهش دهید و از تقسیم کد استفاده کنید"
   },
   "common": {
+    "advanced_settings": "تنظیمات پیشرفته",
+    "hide_advanced": "مخفی کردن پیشرفته",
+    "add": "افزودن",
+    "remove": "حذف",
+    "refresh": "بارگذاری مجدد",
     "edit": "ویرایش",
     "discard": "حذف",
     "expand": "مشاهده جزئیات",
@@ -458,6 +463,29 @@
     "users_loaded_success": "کاربران با موفقیت بارگذاری شدند."
   },
   "ai_suggestions": {
+    "similarity_threshold": "آستانه تشابه",
+    "similarity_threshold_help": "میزان تشابه مورد نیاز برای گروه‌بندی مخاطبین را تنظیم کنید (مقدار بالاتر = تطابق دقیق‌تر)",
+    "company_terms": "اصطلاحات شرکتی",
+    "add_company_term": "افزودن اصطلاح شرکتی (مثلاً 'شرکت', 'سهامی')",
+    "company_terms_help": "پسوندهای رایج شرکت‌ها که در مقایسه نام شرکت‌ها نادیده گرفته می‌شوند",
+    "suggestion_count": "{{count}} پیشنهاد هوشمند",
+    "suggestion_count_plural": "{{count}} پیشنهاد هوشمند",
+    "apply_suggestion": "اعمال پیشنهاد",
+    "discard_this_suggestion": "حذف این پیشنهاد",
+    "error_generating_suggestions": "خطا در تولید پیشنهادات گروه‌بندی",
+    "no_group_suggestions_found": "هیچ پیشنهاد گروه‌بندی برای مخاطبین شما یافت نشد",
+    "group_suggestions_generated": "پیشنهادات گروه‌بندی با موفقیت تولید شدند",
+    "priority": "اولویت {{number}}",
+    "apply_this_suggestion": "اعمال این پیشنهاد",
+    "suggestions_description": "پیشنهادات هوشمند برای گروه‌بندی مخاطبین",
+    "analyzing_contacts": "در حال تحلیل مخاطبین...",
+    "analyzing_patterns": "در حال تحلیل الگوهای سازماندهی...",
+    "apply_all": "اعمال همه",
+    "processing_step": "مرحله: تحلیل داده‌های مخاطبین",
+    "all_contacts_grouped_description": "تمام مخاطبین شما با موفقیت در گروه‌های مربوطه سازماندهی شده‌اند. در حال حاضر نیازی به اقدام دیگری نیست.",
+    "ungrouped_contacts": "مخاطبین بدون گروه",
+    "match_rate": "نرخ تطابق",
+    "unique_groups": "گروه‌های منحصر به فرد",
     "new_contact": "مخاطب جدید",
     "update_contact": "به‌روزرسانی مخاطب",
     "found_existing": "مخاطب موجود یافت شد: {{name}}",
@@ -506,6 +534,23 @@
     "error_enqueuing_text": "خطا در افزودن درخواست به صف استخراج اطلاعات.",
     "contact_processed_success": "مخاطب با موفقیت پردازش شد.",
     "error_processing_contact": "خطا در پردازش مخاطب.",
+    "error_applying_all_suggestions": "خطا در اعمال تمامی پیشنهادات",
+    "all_suggestions_applied_success": "همه پیشنهادات با موفقیت اعمال شدند",
+    "group_suggestion_reasoning_company": "بر اساس الگوی فعلی: {{count}} مخاطب از شرکت '{{companyName}}' در گروه '{{groupName}}' قرار دارند",
+    "group_suggestion_reasoning_company_exact": "تطابق کامل شرکت: {{count}} مخاطب دیگر از شرکت '{{companyName}}' در گروه '{{groupName}}' قرار دارند",
+    "group_suggestion_reasoning_company_pattern": "بر اساس الگوی شرکت: '{{companyName}}' با گروه '{{groupName}}' مطابقت دارد",
+    "group_suggestion_reasoning_company_similar": "شرکت مشابه: '{{companyName}}' شبیه به '{{existingCompany}}' در گروه '{{groupName}}' است ({{similarity}}% تشابه)",
+    "group_suggestion_reasoning_position_exact": "تطابق کامل سمت شغلی: {{count}} مخاطب با سمت '{{position}}' در گروه '{{groupName}}' قرار دارند",
+    "group_suggestion_reasoning_position_pattern": "بر اساس الگوی سمت شغلی: '{{position}}' با گروه '{{groupName}}' مطابقت دارد",
+    "group_suggestion_reasoning_position_similar": "سمت شغلی مشابه: '{{position}}' شبیه به '{{existingPosition}}' در گروه '{{groupName}}' است ({{similarity}}% تشابه)",
+    "group_suggestion_reasoning_position_similarity": "سمت شغلی '{{position}}' با گروه '{{groupName}}' مشابه است ({{similarity}}% تشابه)",
+    "group_suggestion_reasoning_position": "بر اساس الگوی فعلی: {{count}} مخاطب با سمت '{{position}}' در گروه '{{groupName}}' قرار دارند",
+    "group_suggestion_reasoning_company_similarity": "نام شرکت '{{companyName}}' با گروه '{{groupName}}' مشابه است ({{similarity}}% تطابق)",
+    "group_suggestion_reasoning_position_similarity_alt": "سمت شغلی '{{position}}' با گروه '{{groupName}}' مرتبط است ({{similarity}}% تطابق)",
+    "ai_suggestions.group_suggestion_reasoning_position_similarity": "سمت شغلی '{{position}}' با گروه '{{groupName}}' مشابه است ({{similarity}}% تشابه)",
+    "group_suggestion_reasoning_general": "گروه خاصی یافت نشد، به گروه عمومی اضافه می‌شود",
+    "group_suggestion_reasoning_duplicate": "مخاطب در حال حاضر در گروه '{{groupName}}' وجود دارد",
+    "group_suggestion_reasoning_existing_contact": "مخاطب از قبل در گروه '{{groupName}}' وجود دارد",
     "error_fetching_suggestions": "خطا در دریافت پیشنهادات.",
     "no_suggestions_found": "هیچ پیشنهاد جدیدی یافت نشد.",
     "no_suggestions_description": "در حال حاضر هیچ پیشنهاد هوش مصنوعی‌ای موجود نیست. سعی کنید اطلاعات تماس را از متن استخراج کنید یا بعداً برای پیشنهادات جدید برگردید.",
@@ -531,10 +576,10 @@
     "group_suggestion_applied_success": "پیشنهاد گروه‌بندی با موفقیت اعمال شد.",
     "error_applying_group_suggestion": "خطا در اعمال پیشنهاد گروه‌بندی",
     "group_suggestion_discarded": "پیشنهاد گروه‌بندی رد شد.",
-    "no_group_suggestions_found": "هیچ پیشنهاد گروه‌بندی یافت نشد.",
+    "no_group_suggestions_found_ungrouped": "هیچ پیشنهاد گروه‌بندی یافت نشد.",
     "all_contacts_grouped": "همه مخاطبین گروه‌بندی شده‌اند.",
     "error_fetching_ungrouped_contacts": "خطا در دریافت مخاطبین بدون گروه.",
-    "group_suggestions_generated": "پیشنهادات گروه‌بندی با موفقیت ایجاد شد.",
+    "group_suggestions_created": "پیشنهادات گروه‌بندی با موفقیت ایجاد شد.",
     "duplicate_contact_management_title": "مدیریت تماس‌های تکراری",
     "duplicate_contact_management_description": "شناسایی و ادغام تماس‌های تکراری برای حفظ یکپارچگی داده‌ها.",
     "scan_for_duplicates": "اسکن برای یافتن تکراری‌ها",
@@ -582,6 +627,7 @@
     "confirm_clear_learning_description": "این عمل باعث حذف تمام داده‌ای از پیشنهاد جنسیت یادگرفته شده از حافظه محلی مرورگر شما خواهد شد. این ممکن است دقت پیشنهادات آینده را کاهش دهد.",
     "learned_names_count": "تعداد نام‌های یادگرفته شده"
   },
+  "common_company_terms": ["شرکت", "سازمان", "موسسه", "مجموعه"],
   "gender": {
     "male": "مرد",
     "female": "زن",
@@ -623,7 +669,18 @@
     "reload_page": "بارگذاری مجدد صفحه",
     "report_error": "گزارش خطا"
   },
+  "duplicate_reasons": {
+    "same_name_and_contact": "نام و نام خانوادگی یکسان به همراه ایمیل یا تلفن مشابه",
+    "same_email": "ایمیل یکسان",
+    "same_phone": "تلفن یکسان",
+    "name": "نام",
+    "email": "ایمیل",
+    "phone": "تلفن"
+  },
   "errors": {
+    "fetch_contacts_error": "خطا در دریافت اطلاعات مخاطبین",
+    "fetch_contacts_error_fa": "خطا در دریافت مخاطبین",
+    "unknown_processing_error": "خطای ناشناخته در پردازش لیست مخاطبین",
     "help_text": "اگر مشکل ادامه داشت، لطفاً با پشتیبانی تماس بگیرید.",
     "async_error_occurred": "خطایی در بارگذاری داده‌ها رخ داد",
     "clearing_cache_retrying": "در حال پاک کردن حافظه نهان و تلاش مجدد",
@@ -673,8 +730,8 @@
     "delete_custom_field_failed": "خطا در حذف قالب فیلد سفارشی",
     "create_custom_field_template_error": "خطا در ایجاد قالب فیلد سفارشی",
     "edit_custom_field_template_error": "خطا در به‌روزرسانی قالب فیلد سفارشی",
-    "max_retries_exceeded": "حداکثر تلاش‌های مجدد انجام شد. لطفاً بعداً دوباره تلاش کنید.",
-    "invalid_phone_format": "فرمت شماره تلفن نامعتبر است"
+    "merge_contacts_error": "خطا در ادغام مخاطبین",
+    "failed_to_fetch_contact_details": "خطا در دریافت جزئیات کامل مخاطب برای ادغام"
   },
   "actions": {
     "add_new_group": "افزودن گروه جدید",
@@ -1400,5 +1457,10 @@
   },
   "component_names": {
     "groups": "گروه‌ها"
+  },
+  "general_group_keywords": {
+    "general": "عمومی",
+    "other": "متفرقه",
+    "miscellaneous": "سایر"
   }
 }

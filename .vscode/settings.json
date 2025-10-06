@@ -63,6 +63,16 @@
         "px-6 pt-4 pb-2",
         "AISuggestions",
         "Escape",
-        "%\n                  "
+        "%\n                  ",
+        "bg-blue-50/80 dark:bg-blue-900/30 border-blue-200/70 dark:border-blue-800/70",
+        "bg-white/80 dark:bg-gray-800/70 border-gray-200/70 dark:border-gray-700/70",
+        "bg-green-50/80 dark:bg-green-900/25 border-green-200/70 dark:border-green-800/70",
+        "bg-amber-50/80 dark:bg-amber-900/25 border-amber-200/70 dark:border-amber-800/70",
+        "bg-red-50/80 dark:bg-red-900/25 border-red-200/70 dark:border-red-800/70",
+        "bg-cyan-50/80 dark:bg-cyan-900/25 border-cyan-200/70 dark:border-cyan-800/70",
+        "bg-gradient-to-br from-purple-50/90 to-blue-50/90 dark:from-purple-900/25 dark:to-blue-900/25 border-purple-200/70 dark:border-purple-800/70",
+        "bg-gradient-to-br from-purple-50/90 to-blue-50/90 dark:from-purple-900/25 dark:to-blue-900/25 border-purple-200/70 dark:border-purple-800/70",
+        "%",
+        "|"
     ]
 }
