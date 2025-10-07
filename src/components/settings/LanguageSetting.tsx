@@ -24,36 +24,51 @@ const LanguageSetting: React.FC = () => {
   const currentLanguage = languages.find(lang => lang.value === i18n.language) || languages[0];
 
   return (
-    <div className="flex flex-col gap-3 p-4 rounded-lg bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-950/20 dark:to-red-950/20 border border-orange-200/50 dark:border-orange-800/50 transition-all duration-300 hover:shadow-md">
-      <Label htmlFor="language-select" className="text-gray-800 dark:text-gray-200 flex items-center gap-2 font-medium">
-        <div className="p-1.5 rounded-full bg-orange-100 dark:bg-orange-900/50">
-          <Globe className="h-4 w-4 text-orange-600 dark:text-orange-400" />
-        </div>
-        {t('settings.language')}
-      </Label>
-      <ModernSelect
-        value={i18n.language}
-        onValueChange={handleLanguageChange}
-      >
-        <ModernSelectTrigger id="language-select" variant="glass" className="w-full hover:bg-white/20 dark:hover:bg-white/5 transition-colors duration-200">
-          <ModernSelectValue placeholder={t('settings.language')}>
-            <span className="flex items-center gap-2">
-              <span className="text-lg">{currentLanguage.flag}</span>
-              <span className="font-medium">{currentLanguage.label}</span>
-            </span>
-          </ModernSelectValue>
-        </ModernSelectTrigger>
-        <ModernSelectContent variant="glass">
-          {languages.map((language) => (
-            <ModernSelectItem key={language.value} value={language.value} className="hover:bg-orange-50 dark:hover:bg-orange-950/30">
-              <span className="flex items-center gap-2">
-                <span className="text-lg">{language.flag}</span>
-                <span>{language.label}</span>
-              </span>
-            </ModernSelectItem>
-          ))}
-        </ModernSelectContent>
-      </ModernSelect>
+    <div className="space-y-4">
+      <div className="flex flex-col gap-2">
+        <Label htmlFor="language-select" className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-200">
+          <Globe className="h-4 w-4 text-orange-500" />
+          {t('settings.language')}
+        </Label>
+        
+        <ModernSelect
+          value={i18n.language}
+          onValueChange={handleLanguageChange}
+        >
+          <ModernSelectTrigger 
+            id="language-select"
+            variant="glass"
+            className="w-full border border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-800/80 hover:bg-white/90 dark:hover:bg-gray-700/90 transition-colors"
+          >
+            <ModernSelectValue>
+              <div className="flex items-center gap-2">
+                <span className="text-base">{currentLanguage.flag}</span>
+                <span className="text-gray-800 dark:text-gray-100">{currentLanguage.label}</span>
+              </div>
+            </ModernSelectValue>
+          </ModernSelectTrigger>
+          
+          <ModernSelectContent 
+            variant="glass"
+            className="mt-1 w-[var(--radix-select-trigger-width)] min-w-[180px] p-1"
+            position="popper"
+            sideOffset={8}
+          >
+            {languages.map((language) => (
+              <ModernSelectItem 
+                key={language.value} 
+                value={language.value}
+                className="px-3 py-2 text-sm rounded-md hover:bg-gray-100 dark:hover:bg-gray-700/50"
+              >
+                <div className="flex items-center gap-2">
+                  <span className="text-base">{language.flag}</span>
+                  <span className="text-gray-800 dark:text-gray-200">{language.label}</span>
+                </div>
+              </ModernSelectItem>
+            ))}
+          </ModernSelectContent>
+        </ModernSelect>
+      </div>
     </div>
   );
 };

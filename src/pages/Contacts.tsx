@@ -24,7 +24,7 @@ const Contacts = React.memo(() => {
   const { session } = useSession();
   const { t } = useTranslation();
   const { toast } = useToast();
-  const { settings } = useAppSettings();
+  const { settings, updateSettings } = useAppSettings();
   const isMobile = useIsMobile();
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -32,15 +32,7 @@ const Contacts = React.memo(() => {
   const [companyFilter, setCompanyFilter] = useState<string>("");
   const [sortOption, setSortOption] = useState<string>("last_name_asc");
   const [isExporting, setIsExporting] = useState(false);
-  const [displayMode, setDisplayMode] = useState<'grid' | 'list'>('grid');
-
-  // Load default display mode from localStorage
-  useEffect(() => {
-    const savedMode = localStorage.getItem('defaultContactDisplayMode');
-    if (savedMode === 'list' || savedMode === 'grid') {
-      setDisplayMode(savedMode);
-    }
-  }, []);
+  const displayMode = settings.contactDisplayMode || 'grid';
 
   // Debounce search terms for better performance
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
@@ -80,8 +72,8 @@ const Contacts = React.memo(() => {
   }, []);
 
   const handleDisplayModeChange = useCallback((mode: 'grid' | 'list') => {
-    setDisplayMode(mode);
-  }, []);
+    updateSettings({ contactDisplayMode: mode });
+  }, [updateSettings]);
 
   const handleExportClick = useCallback(async () => {
     if (!session?.user) {
@@ -383,7 +375,7 @@ const Contacts = React.memo(() => {
                           borderRadius: 0,
                           transition: `all ${designTokens.transitions.duration.normal} ${designTokens.transitions.easing.easeOut}`
                         }}
-                        onClick={() => handleDisplayModeChange('grid')}
+                        onClick={() => updateSettings({ contactDisplayMode: 'grid' })}
                       >
                         <Grid size={18} />
                       </GlassButton>
@@ -405,7 +397,7 @@ const Contacts = React.memo(() => {
                           borderRadius: 0,
                           transition: `all ${designTokens.transitions.duration.normal} ${designTokens.transitions.easing.easeOut}`
                         }}
-                        onClick={() => handleDisplayModeChange('list')}
+                        onClick={() => updateSettings({ contactDisplayMode: 'list' })}
                       >
                         <List size={18} />
                       </GlassButton>
