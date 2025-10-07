@@ -181,6 +181,13 @@
     "fid_suggestion": " زمان اجرای JavaScript را کاهش دهید و از تقسیم کد استفاده کنید"
   },
   "common": {
+    "created_on": "تاریخ ایجاد",
+    "first_page": "صفحه اول",
+    "last_page": "صفحه آخر",
+    "previous": "قبلی",
+    "next": "بعدی",
+    "showing_page": "نمایش {{current}} تا {{last}} از {{total}} مورد",
+    "search": "جستجو...",
     "advanced_settings": "تنظیمات پیشرفته",
     "hide_advanced": "مخفی کردن پیشرفته",
     "add": "افزودن",
@@ -289,6 +296,10 @@
     "button_label": "ورود",
     "social_provider_text": "یا با استفاده از",
     "link_text": "حساب کاربری ندارید؟ ثبت نام کنید"
+  },
+  "headers": {
+    "authorization": "احراز هویت",
+    "bearer_token": "حامل"
   },
   "settings": {
     "title": "تنظیمات",
@@ -441,13 +452,33 @@
   "user_management": {
     "title": "مدیریت کاربران",
     "description": "افزودن، ویرایش و حذف کاربران",
+    "sort": {
+      "newest": "جدیدترین",
+      "oldest": "قدیمی‌ترین",
+      "name_asc": "نام (الف-ی)",
+      "name_desc": "نام (ی-الف)",
+      "email_asc": "ایمیل (الف-ی)",
+      "email_desc": "ایمیل (ی-الف)"
+    },
+    "sort_placeholder": "مرتب‌سازی بر اساس",
+    "select_role_placeholder": "انتخاب نقش",
+    "all_roles": "همه نقش‌ها",
+    "roles": {
+      "admin": "مدیر",
+      "moderator": "ناظر",
+      "user": "کاربر"
+    },
+    "add_user_title": "افزودن کاربر جدید",
+    "add_user_description": "فرم برای افزودن کاربر جدید",
     "edit_user": "ویرایش کاربر",
+    "edit_user_description": "به‌روزرسانی اطلاعات و سطوح دسترسی کاربر",
     "add_new_user": "افزودن کاربر جدید",
     "leave_blank_for_no_change": "برای عدم تغییر خالی بگذارید",
     "role": "نقش",
     "select_role": "نقش را انتخاب کنید",
     "role_user": "کاربر",
     "role_admin": "مدیر",
+    "role_moderator": "ناظر",
     "error_updating_user": "خطا در به‌روزرسانی کاربر",
     "error_creating_user": "خطا در ایجاد کاربر",
     "user_updated_success": "کاربر با موفقیت به‌روزرسانی شد.",
@@ -710,6 +741,11 @@
     "phone": "تلفن"
   },
   "errors": {
+    "unknown_error": "خطای ناشناخته رخ داده است",
+    "invalid_user_id": "شناسه کاربر نامعتبر است",
+    "user_not_found": "کاربر مورد نظر یافت نشد",
+    "update_user_failed": "خطا در به‌روزرسانی کاربر: {{error}}",
+    "fetch_users_failed": "خطا در دریافت لیست کاربران: {{error}}",
     "fetch_contacts_error": "خطا در دریافت اطلاعات مخاطبین",
     "fetch_contacts_error_fa": "خطا در دریافت مخاطبین",
     "failed_parse_learned_names": "خطا در پردازش نام‌های یادگرفته شده فارسی",
@@ -729,6 +765,7 @@
     "upload_avatar_auth": "برای آپلود تصویر پروفایل باید وارد سیستم شوید",
     "select_image_file": "لطفاً یک فایل تصویری انتخاب کنید",
     "file_size_limit": "اندازه فایل نباید از 5 مگابایت بیشتر باشد",
+    "no_fields_to_update": "هیچ فیلدی برای به‌روزرسانی مشخص نشده است",
     "public_url_error": "خطا در دریافت آدرس عمومی تصویر",
     "upload_error": "خطا در آپلود تصویر: {{message}}",
     "delete_image_error": "خطا در حذف تصویر: {{message}}",
@@ -750,6 +787,7 @@
     "unknown_field_type": "نوع فیلد نامشخص",
     "edge_function_connection": "خطا در اتصال به سرور. لطفاً اتصال اینترنت خود را بررسی کنید",
     "session_expired": "لطفاً دوباره وارد سیستم شوید",
+    "no_active_session": "هیچ نشست فعالی یافت نشد. کاربر باید وارد سیستم شده باشد.",
     "server_processing_error": "خطا در پردازش درخواست سرور",
     "invalid_response_format": "فرمت پاسخ سرور نامعتبر",
     "profile_load_error": "خطا در بارگذاری پروفایل: {{message}}",
@@ -759,6 +797,7 @@
     "loading_ungrouped_contacts": "خطا در بارگذاری مخاطبین بدون گروه",
     "invalid_file_type": "لطفاً یک فایل تصویری معتبر انتخاب کنید",
     "file_too_large": "حجم فایل خیلی بزرگ است. لطفاً فایلی کوچکتر از 5 مگابایت انتخاب کنید",
+    "cannot_delete_current_user": "امکان حذف کاربر جاری وجود ندارد",
     "load_custom_fields_failed": "خطا در بارگذاری قالب‌های فیلد سفارشی",
     "delete_custom_field_failed": "خطا در حذف قالب فیلد سفارشی",
     "create_custom_field_template_error": "خطا در ایجاد قالب فیلد سفارشی",

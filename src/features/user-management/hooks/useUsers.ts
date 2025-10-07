@@ -163,8 +163,8 @@ export const useUpdateUserPassword = () => {
   
   return useMutation({
     mutationFn: (input: { userId: string; newPassword: string }) => 
-      UserManagementService.updateUserPassword(input.userId, input.newPassword),
-    onSuccess: (_, variables) => {
+      UserManagementService.updateUserPassword({ userId: input.userId, newPassword: input.newPassword }),
+    onSuccess: (_) => {
       // می‌توانید در اینجا نوتیفیکیشن یا سایر عملیات مورد نیاز را اضافه کنید
       console.log('رمز عبور کاربر با موفقیت به‌روزرسانی شد');
       

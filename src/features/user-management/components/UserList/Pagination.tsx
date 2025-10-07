@@ -116,7 +116,7 @@ const Pagination: React.FC<PaginationProps> = ({
             variant="ghost"
             size="sm"
             className="px-2 py-1"
-            title={t('common.first_page') || 'First page'}
+            title={t('common.first_page')}
           >
             <ChevronsLeft size={16} />
           </GlassButton>
@@ -126,7 +126,7 @@ const Pagination: React.FC<PaginationProps> = ({
             variant="ghost"
             size="sm"
             className="px-2 py-1"
-            title={t('common.previous') || 'Previous'}
+            title={t('common.previous')}
           >
             <ChevronLeft size={16} />
           </GlassButton>
@@ -143,7 +143,7 @@ const Pagination: React.FC<PaginationProps> = ({
             variant="ghost"
             size="sm"
             className="px-2 py-1"
-            title={t('common.next') || 'Next'}
+            title={t('common.next')}
           >
             <ChevronRight size={16} />
           </GlassButton>
@@ -153,7 +153,7 @@ const Pagination: React.FC<PaginationProps> = ({
             variant="ghost"
             size="sm"
             className="px-2 py-1"
-            title={t('common.last_page') || 'Last page'}
+            title={t('common.last_page')}
           >
             <ChevronsRight size={16} />
           </GlassButton>

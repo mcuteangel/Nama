@@ -11,13 +11,13 @@ import {
 } from '../types/user.types';
 
 class UserManagementServiceClass {
-  getUsers(filters: UserListFilters): { data: UserProfile[] | null; error: string | null; } | PromiseLike<{ data: UserProfile[] | null; error: string | null; }> {
+  getUsers(_filters: UserListFilters): { data: UserProfile[] | null; error: string | null; } | PromiseLike<{ data: UserProfile[] | null; error: string | null; }> {
       throw new Error('Method not implemented.');
   }
-  getUserById(userId: string): { data: UserProfile | null; error: string | null; } | PromiseLike<{ data: UserProfile | null; error: string | null; }> {
+  getUserById(_userId: string): { data: UserProfile | null; error: string | null; } | PromiseLike<{ data: UserProfile | null; error: string | null; }> {
       throw new Error('Method not implemented.');
   }
-  updateUser(userData: UpdateUserInput): { data: UserProfile | null; error: string | null; } | PromiseLike<{ data: UserProfile | null; error: string | null; }> {
+  updateUser(_userData: UpdateUserInput): { data: UserProfile | null; error: string | null; } | PromiseLike<{ data: UserProfile | null; error: string | null; }> {
       throw new Error('Method not implemented.');
   }
   /**

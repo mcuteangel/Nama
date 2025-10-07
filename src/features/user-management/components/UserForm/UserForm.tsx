@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo } from 'react';
-import { useForm, FormProvider, Form } from 'react-hook-form';
+import React, { useEffect } from 'react';
+import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useTranslation } from 'react-i18next';
@@ -8,13 +8,12 @@ import { User, Lock, UserCircle, Mail, Shield } from 'lucide-react';
 // UI Components
 import { ModernInput } from '@/components/ui/modern-input';
 import { ModernSelect, ModernSelectContent, ModernSelectItem, ModernSelectTrigger, ModernSelectValue } from '@/components/ui/modern-select';
-import { GlassButton, GradientGlassButton } from '@/components/ui/glass-button';
-import LoadingSpinner from '@/components/common/LoadingSpinner';
+import { GradientGlassButton } from '@/components/ui/glass-button';
 import { useCreateUser, useUpdateUserRole, useUpdateUserProfile, useUpdateUserPassword } from '@/features/user-management/hooks/useUsers';
 import { UserProfile } from '@/features/user-management/types/user.types';
 import { ErrorManager } from '@/lib/error-manager';
 import { useJalaliCalendar } from '@/hooks/use-jalali-calendar';
-import { ModernCard, FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui';
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui';
 import { CancelButton } from '@/components/common';
 
 interface UserFormProps {
@@ -26,32 +25,38 @@ interface UserFormProps {
 const UserForm: React.FC<UserFormProps> = ({ initialData, onSuccess, onCancel }) => {
   const { t } = useTranslation();
 
-  const formSchema = useMemo(() => {
-    const baseSchema = z.object({
-      email: z.string().email({ message: t('errors.invalid_email') }),
-      password: z.string().min(6, { message: t('errors.password_min_length') }).optional().or(z.literal('')),
-      first_name: z.string().min(1, { message: t('errors.first_name_required') }).optional().or(z.literal('')),
-      last_name: z.string().min(1, { message: t('errors.last_name_required') }).optional().or(z.literal('')),
-      role: z.enum(['user', 'admin'], { message: t('errors.invalid_role') }),
-    }).refine(data => data.first_name || data.last_name || data.email, {
-      message: t('errors.minimum_field_required'),
-      path: ['email'],
-    }); 
-    return baseSchema;
-  }, [t]);
+    const formSchema = z.object({
+    email: z.string().email({ message: t('errors.invalid_email') }),
+    password: z.string().min(6, { message: t('errors.password_min_length') }).optional().or(z.literal('')),
+    first_name: z.string().min(1, { message: t('errors.first_name_required') }).optional().or(z.literal('')),
+    last_name: z.string().min(1, { message: t('errors.last_name_required') }).optional().or(z.literal('')),
+    role: z.enum(['user', 'admin', 'moderator'] as const, { 
+      errorMap: () => ({ message: t('errors.invalid_role') }) 
+    }),
+  }).superRefine((data, ctx) => {
+    if (!data.first_name && !data.last_name && !data.email) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: t('errors.minimum_field_required'),
+        path: ['email'],
+      });
+    }
+  });
+
+  type FormValues = z.infer<typeof formSchema>;
   
-  const form = useForm<z.infer<ReturnType<typeof formSchema>>>({
+  const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: initialData?.email || '',
       password: '',
       first_name: initialData?.first_name || '',
       last_name: initialData?.last_name || '',
-      role: initialData?.role || 'user',
+      role: (initialData?.role as 'user' | 'admin' | 'moderator') || 'user',
     },
   });
   
-  const { handleSubmit, formState: { isSubmitting } } = form;
+  const { handleSubmit } = form;
   
   useEffect(() => {
     if (initialData) {

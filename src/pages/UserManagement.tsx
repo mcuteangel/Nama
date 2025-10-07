@@ -1,6 +1,6 @@
 import { UserList } from "@/features/user-management/components";
 import { useTranslation } from "react-i18next";
-import PageHeader from "@/components/ui/PageHeader";
+import { PageHeader } from "@/components/ui/page-header";
 import { useNavigate } from "react-router-dom";
 
 const UserManagement = () => {

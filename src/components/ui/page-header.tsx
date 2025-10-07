@@ -2,6 +2,7 @@ import { ArrowRight, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from './button';
 import { cn } from '@/lib/utils';
+import { useTranslation } from 'react-i18next';
 
 interface PageHeaderProps {
   title: string;
@@ -10,16 +11,20 @@ interface PageHeaderProps {
   backButtonLabel?: string;
   className?: string;
   children?: React.ReactNode;
+  onBackClick?: () => void;
 }
 
 export const PageHeader = ({
   title,
   description,
   showBackButton = true,
-  backButtonLabel = 'بازگشت',
+  backButtonLabel,
   className,
   children,
+  onBackClick,
 }: PageHeaderProps) => {
+  const { t } = useTranslation();
+  const defaultBackButtonLabel = t('common.back');
   const navigate = useNavigate();
   const isRtl = document.documentElement.dir === 'rtl';
   const BackIcon = isRtl ? ArrowRight : ArrowLeft;
@@ -32,12 +37,12 @@ export const PageHeader = ({
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => navigate(-1)}
+              onClick={onBackClick || (() => navigate(-1))}
               className="rounded-full h-9 w-9"
-              aria-label={backButtonLabel}
+              aria-label={backButtonLabel || defaultBackButtonLabel}
             >
               <BackIcon className="h-5 w-5" />
-              <span className="sr-only">{backButtonLabel}</span>
+              <span className="sr-only">{backButtonLabel || defaultBackButtonLabel}</span>
             </Button>
           )}
           <div>

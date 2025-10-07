@@ -73,11 +73,24 @@
         "bg-gradient-to-br from-purple-50/90 to-blue-50/90 dark:from-purple-900/25 dark:to-blue-900/25 border-purple-200/70 dark:border-purple-800/70",
         "bg-gradient-to-br from-purple-50/90 to-blue-50/90 dark:from-purple-900/25 dark:to-blue-900/25 border-purple-200/70 dark:border-purple-800/70",
         "%",
-        "|"
+        "|",
+        "translateY(-4px) scale(1.01)",
+        "0 8px 32px 0 rgba(31, 38, 135, 0.15)",
+        "0 8px 32px 0 rgba(31, 38, 135, 0.15)",
+        "translateY(0) scale(1)",
+        "0 15px 35px 0 rgba(31, 38, 135, 0.25)",
+        "jYYYY/jMM/jDD - HH:mm",
+        "0 0 24 24",
+        "M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z",
+        "M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z",
+        "*"
     ],
     "i18n-ally.extract.ignoredByFiles": {
         "src\\components\\ai\\GenderSuggestionManagement.tsx": [
             "id, first_name, last_name, gender"
+        ],
+        "src\\features\\user-management\\services\\user-management-service.ts": [
+            "Bearer ${session.access_token}"
         ]
     }
 }

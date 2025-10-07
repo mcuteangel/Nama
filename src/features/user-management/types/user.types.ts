@@ -7,7 +7,7 @@ export interface UserProfile {
   email: string;
   first_name: string | null;
   last_name: string | null;
-  role: 'user' | 'admin';
+  role: 'user' | 'admin' | 'moderator';
   created_at: string;
 }
 
@@ -16,12 +16,12 @@ export interface CreateUserInput {
   password?: string;
   first_name?: string;
   last_name?: string;
-  role: 'user' | 'admin';
+  role: 'user' | 'admin' | 'moderator';
 }
 
 export interface UpdateUserRoleInput {
   userId: string;
-  role: 'user' | 'admin';
+  role: 'user' | 'admin' | 'moderator';
 }
 
 export interface UpdateUserProfileInput {
@@ -40,12 +40,12 @@ export interface UpdateUserInput {
   email?: string;
   first_name?: string | null;
   last_name?: string | null;
-  role?: 'user' | 'admin';
+  role?: 'user' | 'admin' | 'moderator';
 }
 
 export interface UserListFilters {
   search?: string;
-  role?: 'user' | 'admin' | 'all';
+  role?: 'user' | 'admin' | 'moderator' | 'all';
   page?: number;
   limit?: number;
   sortBy?: 'email' | 'first_name' | 'last_name' | 'created_at';

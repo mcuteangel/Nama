@@ -4,7 +4,6 @@ import { Dialog, DialogTrigger } from '@/components/ui/dialog';
 import { useTranslation } from 'react-i18next';
 import { useSession } from '@/integrations/supabase/auth';
 import FormDialogWrapper from '@/components/common/FormDialogWrapper';
-import { GlassButton } from '@/components/ui/glass-button';
 import { ModernCard } from '@/components/ui/modern-card';
 import { useUsers } from '@/features/user-management/hooks/useUsers';
 import { ErrorManager } from '@/lib/error-manager';
@@ -143,8 +142,8 @@ const UserList: React.FC = () => {
               </button>
             </DialogTrigger>
         <FormDialogWrapper
-          title={t('user_management.add_user_title', 'Add User')}
-          description={t('user_management.add_user_description', 'Form for adding a new user')}
+          title={t('user_management.add_user_title')}
+          description={t('user_management.add_user_description')}
         >
           <UserForm
             onSuccess={() => {
@@ -170,7 +169,7 @@ const UserList: React.FC = () => {
             <div className="flex flex-col md:flex-row gap-4 items-center mb-4">
               <ModernInput
                 type="text"
-                placeholder={t('common.search') || 'Search...'}
+                placeholder={t('common.search')}
                 variant="glass"
                 className="w-full"
                 value={filters.search || ''}
@@ -184,7 +183,7 @@ const UserList: React.FC = () => {
                 onValueChange={(value) => setFilters(prev => ({ ...prev, role: value as UserListFilters['role'], page: 1 }))}
               >
                 <ModernSelectTrigger variant="glass" className="w-[180px]">
-                  <ModernSelectValue placeholder="انتخاب نقش" />
+                  <ModernSelectValue placeholder={t('user_management.select_role_placeholder')} />
                 </ModernSelectTrigger>
                 <ModernSelectContent>
                   <ModernSelectItem value="all">
@@ -211,7 +210,7 @@ const UserList: React.FC = () => {
                 }}
               >
                 <ModernSelectTrigger variant="glass" className="w-[200px]">
-                  <ModernSelectValue placeholder="مرتب‌سازی بر اساس" />
+                  <ModernSelectValue placeholder={t('user_management.sort_placeholder')} />
                 </ModernSelectTrigger>
                 <ModernSelectContent>
                   <ModernSelectItem value="created_at_desc">

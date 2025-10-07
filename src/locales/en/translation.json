@@ -181,6 +181,13 @@
     "fid_suggestion": " Reduce JavaScript execution time and use code splitting"
   },
   "common": {
+    "created_on": "Created on",
+    "first_page": "First page",
+    "last_page": "Last page",
+    "previous": "Previous",
+    "next": "Next",
+    "showing_page": "Showing {{current}}-{{last}} of {{total}} items",
+    "search": "Search...",
     "advanced_settings": "Advanced Settings",
     "hide_advanced": "Hide Advanced",
     "add": "Add",
@@ -257,6 +264,11 @@
     "not_specified": "Not specified"
   },
   "errors": {
+    "unknown_error": "An unknown error occurred",
+    "invalid_user_id": "Invalid user ID",
+    "user_not_found": "User not found",
+    "update_user_failed": "Failed to update user: {{error}}",
+    "fetch_users_failed": "Failed to fetch users: {{error}}",
     "fetch_contacts_error": "Error fetching contacts",
     "fetch_contacts_error_fa": "Error fetching contacts",
     "unknown_processing_error": "Unknown error occurred while processing the contact list",
@@ -266,6 +278,7 @@
     "upload_avatar_auth": "You must be logged in to upload profile picture",
     "select_image_file": "Please select an image file",
     "file_size_limit": "File size should not exceed 5 MB",
+    "no_fields_to_update": "No fields specified for update",
     "public_url_error": "Error getting public URL of image",
     "upload_error": "Error uploading image: {{message}}",
     "delete_image_error": "Error deleting image: {{message}}",
@@ -285,8 +298,10 @@
     "invalid_role": "Invalid role",
     "minimum_field_required": "At least one of name, last name, or email fields must be filled",
     "unknown_field_type": "Unknown field type",
+    "cannot_delete_current_user": "Cannot delete current user",
     "edge_function_connection": "Error connecting to server. Please check your internet connection",
     "session_expired": "Please log in again",
+    "no_active_session": "No active session found. User must be logged in.",
     "server_processing_error": "Error processing server request",
     "invalid_response_format": "Invalid server response format",
     "profile_load_error": "Error loading profile: {{message}}",
@@ -459,6 +474,47 @@
   },
   "email_change_notice": {
     "message": "Email can be changed through account settings."
+  },
+  "user_management": {
+    "title": "User Management",
+    "description": "Add, edit, and delete users",
+    "sort": {
+      "newest": "Newest",
+      "oldest": "Oldest",
+      "name_asc": "Name (A-Z)",
+      "name_desc": "Name (Z-A)",
+      "email_asc": "Email (A-Z)",
+      "email_desc": "Email (Z-A)"
+    },
+    "sort_placeholder": "Sort by",
+    "select_role_placeholder": "Select role",
+    "all_roles": "All Roles",
+    "roles": {
+      "admin": "Admin",
+      "moderator": "Moderator",
+      "user": "User"
+    },
+    "add_user_title": "Add New User",
+    "add_user_description": "Form for adding a new user",
+    "edit_user": "Edit User",
+    "edit_user_description": "Update user information and permissions",
+    "add_new_user": "Add New User",
+    "leave_blank_for_no_change": "Leave blank for no change",
+    "role": "Role",
+    "select_role": "Select Role",
+    "role_user": "User",
+    "role_admin": "Admin",
+    "role_moderator": "Moderator",
+    "error_updating_user": "Error updating user",
+    "error_creating_user": "Error creating user",
+    "user_updated_success": "User updated successfully",
+    "user_created_success": "User created successfully",
+    "confirm_delete_title": "Are you sure you want to delete this user?",
+    "confirm_delete_description": "This action cannot be undone. User {{email}} will be permanently deleted.",
+    "delete_success": "User deleted successfully",
+    "delete_error": "Error deleting user",
+    "password_updated_success": "Password updated successfully",
+    "password_updated_error": "Error updating password"
   },
   "shortcuts": {
     "add_contact": "Add New Contact",
@@ -886,6 +942,10 @@
     "suggestions": "suggestions",
     "speech_recognition_not_supported": "Your browser does not support speech recognition.",
     "speech_recognition_error": "Error occurred during speech recognition."
+  },
+  "headers": {
+    "authorization": "Authorization",
+    "bearer_token": "Bearer"
   },
   "settings": {
     "title": "Settings",
