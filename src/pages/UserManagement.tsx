@@ -1,31 +1,25 @@
-import {
-  ModernCard,
-  ModernCardContent,
-  ModernCardDescription,
-  ModernCardHeader,
-  ModernCardTitle
-} from "@/components/ui/modern-card";
 import { UserList } from "@/features/user-management/components";
 import { useTranslation } from "react-i18next";
+import PageHeader from "@/components/ui/PageHeader";
+import { useNavigate } from "react-router-dom";
 
 const UserManagement = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
   return (
-    <div className="flex flex-col items-center justify-center p-4 h-full w-full fade-in-up">
-      <ModernCard variant="glass" hover="lift" className="w-full max-w-4xl">
-        <ModernCardHeader className="text-center">
-          <ModernCardTitle className="text-4xl font-bold mb-2 text-gradient">
-            {t('user_management.title')}
-          </ModernCardTitle>
-          <ModernCardDescription className="text-lg">
-            {t('user_management.description')}
-          </ModernCardDescription>
-        </ModernCardHeader>
-        <ModernCardContent className="space-y-6">
-          <UserList />
-        </ModernCardContent>
-      </ModernCard>
+    <div className="container mx-auto p-4 max-w-7xl">
+      <PageHeader
+        title={t('user_management.title')}
+        description={t('user_management.description')}
+        showBackButton={true}
+        onBackClick={() => navigate(-1)}
+        className="mb-6"
+      />
+      
+      <div className="mt-6">
+        <UserList />
+      </div>
     </div>
   );
 };

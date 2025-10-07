@@ -18,7 +18,7 @@ const FormDialogWrapper: React.FC<FormDialogWrapperProps> = ({
   description = "Form content"
 }) => {
   return (
-    <DialogContent className={cn("sm:max-w-[500px] p-0 border-none bg-transparent shadow-none", className)}>
+    <DialogContent className={cn("sm:max-w-[500px] p-0 bg-transparent shadow-none [&>div]:rounded-xl [&>div]:overflow-hidden", className)}>
       <DialogTitle className="sr-only">{title}</DialogTitle>
       <DialogDescription className="sr-only">{description}</DialogDescription>
       {children}
