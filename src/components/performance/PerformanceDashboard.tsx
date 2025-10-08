@@ -1,32 +1,34 @@
 import React, { useState, useEffect } from 'react';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { 
-  RefreshCw, 
-  Download, 
-  Zap, 
-  MousePointer, 
-  Image, 
+import {
+  RefreshCw,
+  Download,
+  Activity,
+  Layout,
+  Zap,
+  MousePointer,
+  Image,
   Server,
   AlertTriangle,
   CheckCircle,
   TrendingUp,
-  Layout,
-  Lightbulb
+  Lightbulb,
+  BarChart3,
+  Clock,
+  Cpu,
+  Wifi
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassButton } from '@/components/ui/glass-button';
-import { 
-  ModernCard,
-  ModernCardTitle, 
-  ModernCardContent} from '@/components/ui/modern-card';
+import SettingsSection from '@/components/settings/SettingsSection';
+import SettingsCard from '@/components/settings/SettingsCard';
 import { useAppSettings } from '@/hooks/use-app-settings';
+import { onCLS, onFCP, onINP, onLCP, onTTFB, Metric } from 'web-vitals';
 
 // Types for performance metrics
 interface WebVitalsMetrics {
   cls: number | null;  // Cumulative Layout Shift
   fcp: number | null;  // First Contentful Paint
-  fid: number | null;  // First Input Delay
+  inp: number | null;  // Interaction to Next Paint (replaces FID)
   lcp: number | null;  // Largest Contentful Paint
   ttfb: number | null; // Time to First Byte
 }
@@ -41,54 +43,88 @@ const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({ className }
   const [metrics, setMetrics] = useState<WebVitalsMetrics>({
     cls: null,
     fcp: null,
-    fid: null,
+    inp: null,
     lcp: null,
     ttfb: null
   });
   const [isLoading, setIsLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
+  const [error, setError] = useState<string | null>(null);
 
-  // Simulate fetching performance metrics
-  const fetchMetrics = () => {
+  // Function to get Web Vitals metrics
+  const getWebVitals = () => {
     setIsLoading(true);
-    
-    // Simulate API call delay
-    setTimeout(() => {
-      setMetrics({
-        cls: Math.random() * 0.25,   // Good threshold: < 0.1
-        fcp: Math.random() * 3000,    // Good threshold: < 1800ms
-        fid: Math.random() * 100,     // Good threshold: < 100ms
-        lcp: Math.random() * 4000,    // Good threshold: < 2500ms
-        ttfb: Math.random() * 500     // Good threshold: < 200ms
+    setError(null);
+
+    try {
+      // Get all Web Vitals metrics
+      onCLS((metric) => {
+        setMetrics(prev => ({ ...prev, cls: metric.value }));
       });
-      setLastUpdated(new Date());
+      onFCP((metric) => {
+        setMetrics(prev => ({ ...prev, fcp: metric.value }));
+      });
+      onINP((metric) => {
+        setMetrics(prev => ({ ...prev, inp: metric.value }));
+      });
+      onLCP((metric) => {
+        setMetrics(prev => ({ ...prev, lcp: metric.value }));
+      });
+      onTTFB((metric) => {
+        setMetrics(prev => ({ ...prev, ttfb: metric.value }));
+      });
+
+      // Set loading to false after a short delay to allow metrics to be collected
+      setTimeout(() => {
+        setIsLoading(false);
+        setLastUpdated(new Date());
+      }, 2000);
+    } catch (err) {
+      setError('Failed to collect performance metrics');
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   useEffect(() => {
-    fetchMetrics();
+    getWebVitals();
   }, []);
 
   const refreshMetrics = () => {
-    fetchMetrics();
+    getWebVitals();
   };
 
   const exportData = () => {
-    // In a real app, this would export the performance data
-    alert(t('performance.export_alert', 'Performance data export functionality would be implemented here'));
+    const dataStr = JSON.stringify({
+      metrics,
+      overallScore,
+      status,
+      exportedAt: new Date().toISOString(),
+      url: window.location.href
+    }, null, 2);
+    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+
+    const exportFileDefaultName = `performance-metrics-${new Date().toISOString().slice(0, 10)}.json`;
+
+    const linkElement = document.createElement('a');
+    linkElement.setAttribute('href', dataUri);
+    linkElement.setAttribute('download', exportFileDefaultName);
+    linkElement.click();
   };
 
-  // Calculate overall performance score (simplified)
-  const overallScore = Math.round(
-    ([
-      metrics.cls !== null ? (metrics.cls < 0.1 ? 100 : metrics.cls < 0.25 ? 50 : 0) : 0,
-      metrics.fcp !== null ? (metrics.fcp < 1800 ? 100 : metrics.fcp < 3000 ? 50 : 0) : 0,
-      metrics.fid !== null ? (metrics.fid < 100 ? 100 : metrics.fid < 300 ? 50 : 0) : 0,
-      metrics.lcp !== null ? (metrics.lcp < 2500 ? 100 : metrics.lcp < 4000 ? 50 : 0) : 0,
-      metrics.ttfb !== null ? (metrics.ttfb < 200 ? 100 : metrics.ttfb < 500 ? 50 : 0) : 0,
-    ].reduce((sum, score) => sum + score, 0) / 5)
-  );
+  // Calculate overall performance score based on real Web Vitals
+  const overallScore = React.useMemo(() => {
+    const scores = [
+      metrics.cls !== null ? (metrics.cls < 0.1 ? 100 : metrics.cls < 0.25 ? 50 : 0) : null,
+      metrics.fcp !== null ? (metrics.fcp < 1800 ? 100 : metrics.fcp < 3000 ? 50 : 0) : null,
+      metrics.inp !== null ? (metrics.inp < 200 ? 100 : metrics.inp < 500 ? 50 : 0) : null,
+      metrics.lcp !== null ? (metrics.lcp < 2500 ? 100 : metrics.lcp < 4000 ? 50 : 0) : null,
+      metrics.ttfb !== null ? (metrics.ttfb < 200 ? 100 : metrics.ttfb < 500 ? 50 : 0) : null,
+    ].filter(score => score !== null);
+
+    if (scores.length === 0) return 0;
+
+    return Math.round(scores.reduce((sum, score) => sum + score, 0) / scores.length);
+  }, [metrics]);
 
   // Get performance status based on score
   const getPerformanceStatus = () => {
@@ -102,301 +138,342 @@ const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({ className }
 
   // Format time based on calendar settings
   const formatTime = (date: Date) => {
-    return appSettings.calendarType === 'jalali' 
-      ? date.toLocaleTimeString('fa-IR') 
+    return appSettings.calendarType === 'jalali'
+      ? date.toLocaleTimeString('fa-IR')
       : date.toLocaleTimeString('en-US');
   };
 
+  // Get status color for badges and indicators
+  const getStatusColor = () => {
+    switch (status) {
+      case 'excellent': return 'green';
+      case 'good': return 'blue';
+      case 'needs_improvement': return 'orange';
+      case 'poor': return 'orange';
+      default: return 'blue';
+    }
+  };
+
+  const statusColor = getStatusColor();
+
   return (
-    <ModernCard className={className}>
-      <div className="p-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className={`p-2 rounded-full ${
-              status === 'excellent' ? 'bg-green-500/20 text-green-500' :
-              status === 'good' ? 'bg-blue-500/20 text-blue-500' :
-              status === 'needs_improvement' ? 'bg-yellow-500/20 text-yellow-500' :
-              'bg-red-500/20 text-red-500'
-            }`}>
-              {status === 'excellent' ? <CheckCircle className="h-5 w-5" /> :
-               status === 'good' ? <TrendingUp className="h-5 w-5" /> :
-               <AlertTriangle className="h-5 w-5" />}
-            </div>
-            <div>
-              <ModernCardTitle>{t('performance.title', 'Performance Dashboard')}</ModernCardTitle>
-              <Badge 
-                variant={
-                  status === 'excellent' ? 'default' :
-                  status === 'good' ? 'secondary' :
-                  'destructive'
-                }
-                className="mt-1"
-              >
-                {t(`performance.${status}`, status === 'excellent' ? 'Excellent' : 
-                  status === 'good' ? 'Good' : 
-                  status === 'needs_improvement' ? 'Needs Improvement' : 'Poor')}
-              </Badge>
-            </div>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <Badge variant="outline" className="flex items-center gap-1">
-              {t('performance.score', 'Score')}: {overallScore}/100
-            </Badge>
-            <GlassButton variant="outline" size="sm" onClick={refreshMetrics} disabled={isLoading}>
-              <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
-              {t('performance.refresh', 'Refresh')}
-            </GlassButton>
-            <GlassButton variant="outline" size="sm" onClick={exportData}>
-              <Download className="h-4 w-4 mr-2" />
-              {t('performance.export', 'Export')}
-            </GlassButton>
-          </div>
-        </div>
-        <p className="text-sm text-gray-500 mt-2">
-          {t('performance.description', 'Real-time Web Vitals and performance metrics monitoring')}
-        </p>
+    <SettingsSection
+      title={t('performance.title', 'Performance Dashboard')}
+      description={t('performance.description', 'Real-time Web Vitals and performance metrics monitoring')}
+      icon={<Activity size={20} />}
+      variant="glass"
+      className={className}
+    >
+      {/* Header Controls */}
+      <div className="flex flex-wrap gap-3 mb-6">
+        <GlassButton
+          onClick={refreshMetrics}
+          disabled={isLoading}
+          variant="3d-gradient-primary"
+          size="sm"
+          effect="lift"
+          className="flex items-center gap-2 font-medium"
+        >
+          <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+          {t('performance.refresh', 'Refresh')}
+        </GlassButton>
+        <GlassButton
+          onClick={exportData}
+          variant="3d-gradient-ocean"
+          size="sm"
+          effect="lift"
+          className="flex items-center gap-2 font-medium"
+        >
+          <Download className="h-4 w-4" />
+          {t('performance.export', 'Export')}
+        </GlassButton>
       </div>
-      <div className="p-6 pt-0">
-        <div className="mb-4">
-          <div className="flex items-center justify-between mb-2">
-            <span className="font-medium">{t('performance.overall_health', 'Overall Performance Health')}</span>
-            <span className="text-sm text-gray-500">
-              {t('performance.last_updated', 'Last updated')}: {formatTime(lastUpdated)}
+
+      {/* Error Display */}
+      {error && (
+        <SettingsCard
+          title={t('performance.error', 'Error')}
+          description={error}
+          icon={<AlertTriangle size={16} />}
+          gradient="orange"
+          className="mb-4"
+        >
+          <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
+            <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+          </div>
+        </SettingsCard>
+      )}
+
+      {/* Overall Score */}
+      <SettingsCard
+        title={t('performance.overall_health', 'Overall Performance Health')}
+        description={`${t('performance.last_updated', 'Last updated')}: ${formatTime(lastUpdated)}`}
+        icon={<BarChart3 size={16} />}
+        gradient={statusColor as 'blue' | 'green' | 'orange' | 'purple' | 'pink' | 'cyan'}
+        className="mb-4"
+      >
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium">
+              {t('performance.score', 'Score')}: {overallScore}/100
+            </span>
+            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+              status === 'excellent' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' :
+              status === 'good' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' :
+              status === 'needs_improvement' ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300' :
+              'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300'
+            }`}>
+              {t(`performance.${status}`, status === 'excellent' ? 'Excellent' :
+                status === 'good' ? 'Good' :
+                status === 'needs_improvement' ? 'Needs Improvement' : 'Poor')}
             </span>
           </div>
-          <Progress value={overallScore} className="h-3" />
-          <div className="flex justify-between text-sm text-gray-500 mt-1">
-            <span>{t('performance.poor', 'Poor')}</span>
-            <span>{t('performance.excellent', 'Excellent')}</span>
+          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
+            <div
+              className={`h-3 rounded-full transition-all duration-500 ${
+                status === 'excellent' ? 'bg-green-500' :
+                status === 'good' ? 'bg-blue-500' :
+                status === 'needs_improvement' ? 'bg-orange-500' : 'bg-red-500'
+              }`}
+              style={{ width: `${overallScore}%` }}
+            />
           </div>
         </div>
+      </SettingsCard>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-          {/* CLS Metric */}
-          <ModernCard>
-            <div className="p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <Layout className="h-4 w-4 text-purple-500" />
-                <span className="font-medium text-sm">CLS</span>
-              </div>
-              <div className="text-2xl font-bold">
-                {isLoading ? '...' : metrics.cls !== null ? metrics.cls.toFixed(3) : 'N/A'}
-              </div>
-              <div className="text-xs text-gray-500 mt-1">
-                {t('performance.cls_description', 'Visual stability')}
-              </div>
-              <div className="relative">
-                <Progress 
-                  value={metrics.cls !== null ? Math.min(metrics.cls * 400, 100) : 0} 
-                  className="h-1 mt-2"
-                />
-                <div 
-                  className={`absolute top-0 left-0 h-1 mt-2 rounded-full ${
-                    metrics.cls !== null && metrics.cls < 0.1 ? 'bg-green-500' : 
-                    metrics.cls !== null && metrics.cls < 0.25 ? 'bg-yellow-500' : 'bg-red-500'
-                  }`}
-                  style={{ width: `${metrics.cls !== null ? Math.min(metrics.cls * 400, 100) : 0}%` }}
-                />
-              </div>
+      {/* Web Vitals Metrics */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+        {/* CLS Metric */}
+        <SettingsCard
+          title="CLS"
+          description={t('performance.cls_description', 'Visual stability')}
+          icon={<Layout size={16} />}
+          gradient="purple"
+        >
+          <div className="text-center">
+            <div className="text-2xl font-bold text-purple-600 dark:text-purple-300">
+              {isLoading ? (
+                <div className="flex items-center justify-center gap-2">
+                  <div className="w-4 h-4 border-2 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+                  <span className="text-sm">Loading...</span>
+                </div>
+              ) : metrics.cls !== null ? metrics.cls.toFixed(3) : 'N/A'}
             </div>
-          </ModernCard>
+            <div className="w-full bg-purple-100 dark:bg-purple-900/30 rounded-full h-2 mt-2">
+              <div
+                className={`h-2 rounded-full transition-all duration-500 ${
+                  metrics.cls !== null && metrics.cls < 0.1 ? 'bg-green-500' :
+                  metrics.cls !== null && metrics.cls < 0.25 ? 'bg-yellow-500' : 'bg-red-500'
+                }`}
+                style={{ width: `${metrics.cls !== null ? Math.min(metrics.cls * 400, 100) : 0}%` }}
+              />
+            </div>
+          </div>
+        </SettingsCard>
 
-          {/* FCP Metric */}
-          <ModernCard>
-            <div className="p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <Zap className="h-4 w-4 text-blue-500" />
-                <span className="font-medium text-sm">FCP</span>
-              </div>
-              <div className="text-2xl font-bold">
-                {isLoading ? '...' : metrics.fcp !== null ? `${Math.round(metrics.fcp)}ms` : 'N/A'}
-              </div>
-              <div className="text-xs text-gray-500 mt-1">
-                {t('performance.fcp_description', 'First content paint')}
-              </div>
-              <div className="relative">
-                <Progress 
-                  value={metrics.fcp !== null ? Math.min((metrics.fcp / 30), 100) : 0} 
-                  className="h-1 mt-2"
-                />
-                <div 
-                  className={`absolute top-0 left-0 h-1 mt-2 rounded-full ${
-                    metrics.fcp !== null && metrics.fcp < 1800 ? 'bg-green-500' : 
-                    metrics.fcp !== null && metrics.fcp < 3000 ? 'bg-yellow-500' : 'bg-red-500'
-                  }`}
-                  style={{ width: `${metrics.fcp !== null ? Math.min((metrics.fcp / 30), 100) : 0}%` }}
-                />
-              </div>
+        {/* FCP Metric */}
+        <SettingsCard
+          title="FCP"
+          description={t('performance.fcp_description', 'First content paint')}
+          icon={<Zap size={16} />}
+          gradient="blue"
+        >
+          <div className="text-center">
+            <div className="text-2xl font-bold text-blue-600 dark:text-blue-300">
+              {isLoading ? (
+                <div className="flex items-center justify-center gap-2">
+                  <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                  <span className="text-sm">Loading...</span>
+                </div>
+              ) : metrics.fcp !== null ? `${Math.round(metrics.fcp)}ms` : 'N/A'}
             </div>
-          </ModernCard>
+            <div className="w-full bg-blue-100 dark:bg-blue-900/30 rounded-full h-2 mt-2">
+              <div
+                className={`h-2 rounded-full transition-all duration-500 ${
+                  metrics.fcp !== null && metrics.fcp < 1800 ? 'bg-green-500' :
+                  metrics.fcp !== null && metrics.fcp < 3000 ? 'bg-yellow-500' : 'bg-red-500'
+                }`}
+                style={{ width: `${metrics.fcp !== null ? Math.min((metrics.fcp / 30), 100) : 0}%` }}
+              />
+            </div>
+          </div>
+        </SettingsCard>
 
-          {/* FID Metric */}
-          <ModernCard>
-            <div className="p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <MousePointer className="h-4 w-4 text-green-500" />
-                <span className="font-medium text-sm">FID</span>
-              </div>
-              <div className="text-2xl font-bold">
-                {isLoading ? '...' : metrics.fid !== null ? `${Math.round(metrics.fid)}ms` : 'N/A'}
-              </div>
-              <div className="text-xs text-gray-500 mt-1">
-                {t('performance.fid_description', 'First input delay')}
-              </div>
-              <div className="relative">
-                <Progress 
-                  value={metrics.fid !== null ? Math.min(metrics.fid, 100) : 0} 
-                  className="h-1 mt-2"
-                />
-                <div 
-                  className={`absolute top-0 left-0 h-1 mt-2 rounded-full ${
-                    metrics.fid !== null && metrics.fid < 100 ? 'bg-green-500' : 
-                    metrics.fid !== null && metrics.fid < 300 ? 'bg-yellow-500' : 'bg-red-500'
-                  }`}
-                  style={{ width: `${metrics.fid !== null ? Math.min(metrics.fid, 100) : 0}%` }}
-                />
-              </div>
+        {/* INP Metric */}
+        <SettingsCard
+          title="INP"
+          description={t('performance.inp_description', 'Interaction to Next Paint')}
+          icon={<MousePointer size={16} />}
+          gradient="green"
+        >
+          <div className="text-center">
+            <div className="text-2xl font-bold text-green-600 dark:text-green-300">
+              {isLoading ? (
+                <div className="flex items-center justify-center gap-2">
+                  <div className="w-4 h-4 border-2 border-green-500 border-t-transparent rounded-full animate-spin"></div>
+                  <span className="text-sm">Loading...</span>
+                </div>
+              ) : metrics.inp !== null ? `${Math.round(metrics.inp)}ms` : 'N/A'}
             </div>
-          </ModernCard>
+            <div className="w-full bg-green-100 dark:bg-green-900/30 rounded-full h-2 mt-2">
+              <div
+                className={`h-2 rounded-full transition-all duration-500 ${
+                  metrics.inp !== null && metrics.inp < 200 ? 'bg-green-500' :
+                  metrics.inp !== null && metrics.inp < 500 ? 'bg-yellow-500' : 'bg-red-500'
+                }`}
+                style={{ width: `${metrics.inp !== null ? Math.min((metrics.inp / 5), 100) : 0}%` }}
+              />
+            </div>
+          </div>
+        </SettingsCard>
 
-          {/* LCP Metric */}
-          <ModernCard>
-            <div className="p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <Image className="h-4 w-4 text-orange-500" />
-                <span className="font-medium text-sm">LCP</span>
-              </div>
-              <div className="text-2xl font-bold">
-                {isLoading ? '...' : metrics.lcp !== null ? `${Math.round(metrics.lcp)}ms` : 'N/A'}
-              </div>
-              <div className="text-xs text-gray-500 mt-1">
-                {t('performance.lcp_description', 'Largest content paint')}
-              </div>
-              <div className="relative">
-                <Progress 
-                  value={metrics.lcp !== null ? Math.min((metrics.lcp / 40), 100) : 0} 
-                  className="h-1 mt-2"
-                />
-                <div 
-                  className={`absolute top-0 left-0 h-1 mt-2 rounded-full ${
-                    metrics.lcp !== null && metrics.lcp < 2500 ? 'bg-green-500' : 
-                    metrics.lcp !== null && metrics.lcp < 4000 ? 'bg-yellow-500' : 'bg-red-500'
-                  }`}
-                  style={{ width: `${metrics.lcp !== null ? Math.min((metrics.lcp / 40), 100) : 0}%` }}
-                />
-              </div>
+        {/* LCP Metric */}
+        <SettingsCard
+          title="LCP"
+          description={t('performance.lcp_description', 'Largest content paint')}
+          icon={<Image size={16} />}
+          gradient="orange"
+        >
+          <div className="text-center">
+            <div className="text-2xl font-bold text-orange-600 dark:text-orange-300">
+              {isLoading ? (
+                <div className="flex items-center justify-center gap-2">
+                  <div className="w-4 h-4 border-2 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+                  <span className="text-sm">Loading...</span>
+                </div>
+              ) : metrics.lcp !== null ? `${Math.round(metrics.lcp)}ms` : 'N/A'}
             </div>
-          </ModernCard>
+            <div className="w-full bg-orange-100 dark:bg-orange-900/30 rounded-full h-2 mt-2">
+              <div
+                className={`h-2 rounded-full transition-all duration-500 ${
+                  metrics.lcp !== null && metrics.lcp < 2500 ? 'bg-green-500' :
+                  metrics.lcp !== null && metrics.lcp < 4000 ? 'bg-yellow-500' : 'bg-red-500'
+                }`}
+                style={{ width: `${metrics.lcp !== null ? Math.min((metrics.lcp / 40), 100) : 0}%` }}
+              />
+            </div>
+          </div>
+        </SettingsCard>
 
-          {/* TTFB Metric */}
-          <ModernCard>
-            <div className="p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <Server className="h-4 w-4 text-cyan-500" />
-                <span className="font-medium text-sm">TTFB</span>
-              </div>
-              <div className="text-2xl font-bold">
-                {isLoading ? '...' : metrics.ttfb !== null ? `${Math.round(metrics.ttfb)}ms` : 'N/A'}
-              </div>
-              <div className="text-xs text-gray-500 mt-1">
-                {t('performance.ttfb_description', 'Time to first byte')}
-              </div>
-              <div className="relative">
-                <Progress 
-                  value={metrics.ttfb !== null ? Math.min(metrics.ttfb / 5, 100) : 0} 
-                  className="h-1 mt-2"
-                />
-                <div 
-                  className={`absolute top-0 left-0 h-1 mt-2 rounded-full ${
-                    metrics.ttfb !== null && metrics.ttfb < 200 ? 'bg-green-500' : 
-                    metrics.ttfb !== null && metrics.ttfb < 500 ? 'bg-yellow-500' : 'bg-red-500'
-                  }`}
-                  style={{ width: `${metrics.ttfb !== null ? Math.min(metrics.ttfb / 5, 100) : 0}%` }}
-                />
-              </div>
+        {/* TTFB Metric */}
+        <SettingsCard
+          title="TTFB"
+          description={t('performance.ttfb_description', 'Time to first byte')}
+          icon={<Wifi size={16} />}
+          gradient="cyan"
+        >
+          <div className="text-center">
+            <div className="text-2xl font-bold text-cyan-600 dark:text-cyan-300">
+              {isLoading ? (
+                <div className="flex items-center justify-center gap-2">
+                  <div className="w-4 h-4 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin"></div>
+                  <span className="text-sm">Loading...</span>
+                </div>
+              ) : metrics.ttfb !== null ? `${Math.round(metrics.ttfb)}ms` : 'N/A'}
             </div>
-          </ModernCard>
-        </div>
-
-        {/* Performance Insights */}
-        <ModernCard className="mt-6">
-          <ModernCardContent className="p-4">
-            <h3 className="font-semibold flex items-center gap-2 mb-3">
-              <Lightbulb className="h-4 w-4 text-yellow-500" />
-              {t('performance.insights', 'Performance Insights')}
-            </h3>
-            
-            {status === 'excellent' && (
-              <div className="p-3 bg-green-500/10 rounded-lg border border-green-500/20">
-                <h4 className="font-medium text-green-700 dark:text-green-300 flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4" />
-                  {t('performance.excellent_performance', 'Excellent Performance!')}
-                </h4>
-                <p className="text-sm text-green-600 dark:text-green-400 mt-1">
-                  {t('performance.excellent_message', 'Your application meets all performance standards')}
-                </p>
-              </div>
-            )}
-            
-            {status === 'poor' && (
-              <div className="p-3 bg-red-500/10 rounded-lg border border-red-500/20">
-                <h4 className="font-medium text-red-700 dark:text-red-300 flex items-center gap-2">
-                  <AlertTriangle className="h-4 w-4" />
-                  {t('performance.critical_issues', 'Critical Performance Issues Detected')}
-                </h4>
-                <p className="text-sm text-red-600 dark:text-red-400 mt-1">
-                  {t('performance.critical_message', 'Some metrics are in the poor range and need immediate attention')}
-                </p>
-              </div>
-            )}
-            
-            {status === 'needs_improvement' && (
-              <div className="p-3 bg-yellow-500/10 rounded-lg border border-yellow-500/20">
-                <h4 className="font-medium text-yellow-700 dark:text-yellow-300 flex items-center gap-2">
-                  <TrendingUp className="h-4 w-4" />
-                  {t('performance.room_for_improvement', 'Room for Improvement')}
-                </h4>
-                <p className="text-sm text-yellow-600 dark:text-yellow-400 mt-1">
-                  {t('performance.improvement_message', 'Some metrics can be optimized for better user experience')}
-                </p>
-              </div>
-            )}
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-4">
-              <div className="p-3 bg-blue-500/10 rounded-lg">
-                <h4 className="font-medium text-blue-700 dark:text-blue-300 flex items-center gap-2">
-                  <Zap className="h-4 w-4" />
-                  {t('performance.lcp_tip', 'LCP Optimization Tip')}
-                </h4>
-                <p className="text-sm text-blue-600 dark:text-blue-400 mt-1">
-                  {t('performance.lcp_suggestion', 'Consider optimizing images, fonts, and critical resource loading')}
-                </p>
-              </div>
-              
-              <div className="p-3 bg-purple-500/10 rounded-lg">
-                <h4 className="font-medium text-purple-700 dark:text-purple-300 flex items-center gap-2">
-                  <Layout className="h-4 w-4" />
-                  {t('performance.cls_tip', 'CLS Optimization Tip')}
-                </h4>
-                <p className="text-sm text-purple-600 dark:text-purple-400 mt-1">
-                  {t('performance.cls_suggestion', 'Ensure images and ads have defined dimensions')}
-                </p>
-              </div>
-              
-              <div className="p-3 bg-green-500/10 rounded-lg">
-                <h4 className="font-medium text-green-700 dark:text-green-300 flex items-center gap-2">
-                  <MousePointer className="h-4 w-4" />
-                  {t('performance.fid_tip', 'FID Optimization Tip')}
-                </h4>
-                <p className="text-sm text-green-600 dark:text-green-400 mt-1">
-                  {t('performance.fid_suggestion', 'Reduce JavaScript execution time and use code splitting')}
-                </p>
-              </div>
+            <div className="w-full bg-cyan-100 dark:bg-cyan-900/30 rounded-full h-2 mt-2">
+              <div
+                className={`h-2 rounded-full transition-all duration-500 ${
+                  metrics.ttfb !== null && metrics.ttfb < 200 ? 'bg-green-500' :
+                  metrics.ttfb !== null && metrics.ttfb < 500 ? 'bg-yellow-500' : 'bg-red-500'
+                }`}
+                style={{ width: `${metrics.ttfb !== null ? Math.min(metrics.ttfb / 5, 100) : 0}%` }}
+              />
             </div>
-          </ModernCardContent>
-        </ModernCard>
+          </div>
+        </SettingsCard>
       </div>
-    </ModernCard>
+
+      {/* Performance Insights */}
+      <SettingsCard
+        title={t('performance.insights', 'Performance Insights')}
+        description={t('performance.insights_description', 'Optimization tips and recommendations')}
+        icon={<Lightbulb size={16} />}
+        gradient="purple"
+      >
+        <div className="space-y-3">
+          {status === 'excellent' && (
+            <div className="p-3 bg-green-500/10 border border-green-500/20 rounded-lg">
+              <div className="flex items-center gap-2 mb-1">
+                <CheckCircle className="h-4 w-4 text-green-600" />
+                <span className="font-medium text-green-700 dark:text-green-300">
+                  {t('performance.excellent_performance', 'Excellent Performance!')}
+                </span>
+              </div>
+              <p className="text-sm text-green-600 dark:text-green-400">
+                {t('performance.excellent_message', 'Your application meets all performance standards')}
+              </p>
+            </div>
+          )}
+
+          {status === 'poor' && (
+            <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
+              <div className="flex items-center gap-2 mb-1">
+                <AlertTriangle className="h-4 w-4 text-red-600" />
+                <span className="font-medium text-red-700 dark:text-red-300">
+                  {t('performance.critical_issues', 'Critical Performance Issues Detected')}
+                </span>
+              </div>
+              <p className="text-sm text-red-600 dark:text-red-400">
+                {t('performance.critical_message', 'Some metrics are in the poor range and need immediate attention')}
+              </p>
+            </div>
+          )}
+
+          {status === 'needs_improvement' && (
+            <div className="p-3 bg-orange-500/10 border border-orange-500/20 rounded-lg">
+              <div className="flex items-center gap-2 mb-1">
+                <TrendingUp className="h-4 w-4 text-orange-600" />
+                <span className="font-medium text-orange-700 dark:text-orange-300">
+                  {t('performance.room_for_improvement', 'Room for Improvement')}
+                </span>
+              </div>
+              <p className="text-sm text-orange-600 dark:text-orange-400">
+                {t('performance.improvement_message', 'Some metrics can be optimized for better user experience')}
+              </p>
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div className="p-3 bg-blue-500/10 rounded-lg border border-blue-500/20">
+              <div className="flex items-center gap-2 mb-1">
+                <Zap className="h-4 w-4 text-blue-600" />
+                <span className="font-medium text-blue-700 dark:text-blue-300">
+                  {t('performance.lcp_tip', 'LCP Optimization')}
+                </span>
+              </div>
+              <p className="text-sm text-blue-600 dark:text-blue-400">
+                {t('performance.lcp_suggestion', 'Consider optimizing images, fonts, and critical resource loading')}
+              </p>
+            </div>
+
+            <div className="p-3 bg-purple-500/10 rounded-lg border border-purple-500/20">
+              <div className="flex items-center gap-2 mb-1">
+                <Layout className="h-4 w-4 text-purple-600" />
+                <span className="font-medium text-purple-700 dark:text-purple-300">
+                  {t('performance.cls_tip', 'CLS Optimization')}
+                </span>
+              </div>
+              <p className="text-sm text-purple-600 dark:text-purple-400">
+                {t('performance.cls_suggestion', 'Ensure images and ads have defined dimensions')}
+              </p>
+            </div>
+
+            <div className="p-3 bg-green-500/10 rounded-lg border border-green-500/20">
+              <div className="flex items-center gap-2 mb-1">
+                <MousePointer className="h-4 w-4 text-green-600" />
+                <span className="font-medium text-green-700 dark:text-green-300">
+                  {t('performance.inp_tip', 'INP Optimization')}
+                </span>
+              </div>
+              <p className="text-sm text-green-600 dark:text-green-400">
+                {t('performance.inp_suggestion', 'Reduce JavaScript execution time and use code splitting')}
+              </p>
+            </div>
+          </div>
+        </div>
+      </SettingsCard>
+    </SettingsSection>
   );
 };
 

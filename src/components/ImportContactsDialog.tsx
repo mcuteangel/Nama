@@ -134,10 +134,13 @@ const ImportContactsDialog: React.FC<ImportContactsDialogProps> = ({ onImportSuc
       <DialogTrigger asChild>
         <GlassButton
           variant="outline"
-          className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-semibold"
+          className="w-full group relative overflow-hidden rounded-2xl font-medium text-sm transition-all duration-300 hover:scale-105 active:scale-95 shadow-2xl hover:shadow-3xl bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 text-emerald-800 hover:text-emerald-900 border-2 border-emerald-400/50 hover:border-emerald-300 backdrop-blur-sm before:absolute before:inset-0 before:bg-gradient-to-r before:from-white/20 before:to-transparent before:opacity-0 hover:before:opacity-100 before:transition-opacity before:duration-300 disabled:opacity-60 disabled:cursor-not-allowed disabled:shadow-md"
+          aria-label={t('settings.import_contacts')}
         >
-          <UploadCloud size={20} />
-          {t('settings.import_contacts')}
+          <div className="relative z-10 flex items-center justify-center gap-2">
+            <UploadCloud size={16} />
+            {t('settings.import_contacts')}
+          </div>
         </GlassButton>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px] glass rounded-xl p-6">
@@ -153,10 +156,12 @@ const ImportContactsDialog: React.FC<ImportContactsDialogProps> = ({ onImportSuc
           <GlassButton
             variant="outline"
             onClick={handleDownloadTemplate}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-semibold"
+            className="w-full group relative overflow-hidden rounded-2xl font-medium text-sm transition-all duration-300 hover:scale-105 active:scale-95 shadow-2xl hover:shadow-3xl bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-purple-800 dark:text-purple-200 hover:text-purple-900 dark:hover:text-purple-100 border-2 border-purple-400/50 hover:border-purple-300 backdrop-blur-sm before:absolute before:inset-0 before:bg-gradient-to-r before:from-white/20 before:to-transparent before:opacity-0 hover:before:opacity-100 before:transition-opacity before:duration-300"
           >
-            <FileText size={20} />
-            {t('import.download_template')}
+            <div className="relative z-10 flex items-center justify-center gap-2">
+              <FileText size={16} />
+              {t('import.download_template')}
+            </div>
           </GlassButton>
 
           <div className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700">
@@ -179,9 +184,11 @@ const ImportContactsDialog: React.FC<ImportContactsDialogProps> = ({ onImportSuc
                   size="icon"
                   onClick={handleRemoveFile}
                   disabled={isImporting}
-                  className="text-red-500 hover:bg-red-100 dark:hover:bg-gray-600/50"
+                  className="group relative overflow-hidden rounded-full font-medium text-xs transition-all duration-300 hover:scale-110 active:scale-95 shadow-lg hover:shadow-xl bg-gradient-to-r from-red-50 to-pink-50 dark:from-red-900/20 dark:to-pink-900/20 border-2 border-red-200/50 dark:border-red-700/50 hover:border-red-300 dark:hover:border-red-600 text-red-700 dark:text-red-300 hover:text-red-800 dark:hover:text-red-200 backdrop-blur-sm before:absolute before:inset-0 before:bg-gradient-to-r before:from-white/20 before:to-transparent before:opacity-0 hover:before:opacity-100 before:transition-opacity before:duration-300"
                 >
-                  <XCircle size={20} />
+                  <div className="relative z-10">
+                    <XCircle size={16} />
+                  </div>
                 </GlassButton>
               </div>
             ) : (
@@ -200,11 +207,12 @@ const ImportContactsDialog: React.FC<ImportContactsDialogProps> = ({ onImportSuc
             <GlassButton
               onClick={handleImportClick}
               disabled={!selectedFile || isImporting}
-              variant="outline"
-              className="px-6 py-2 rounded-lg font-semibold"
+              className="group relative overflow-hidden rounded-2xl font-medium text-sm transition-all duration-300 hover:scale-105 active:scale-95 shadow-2xl hover:shadow-3xl bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 text-emerald-800 hover:text-emerald-900 border-2 border-emerald-400/50 hover:border-emerald-300 backdrop-blur-sm before:absolute before:inset-0 before:bg-gradient-to-r before:from-white/20 before:to-transparent before:opacity-0 hover:before:opacity-100 before:transition-opacity before:duration-300 disabled:opacity-60 disabled:cursor-not-allowed disabled:shadow-lg"
             >
-              {isImporting && <LoadingSpinner size={16} className="me-2" />}
-              {t('import.import_button')}
+              <div className="relative z-10 flex items-center gap-2 font-semibold">
+                {isImporting && <LoadingSpinner size={14} />}
+                {t('import.import_button')}
+              </div>
             </GlassButton>
           </div>
         </div>
