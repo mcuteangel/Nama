@@ -5,10 +5,10 @@ import { useProfile } from '@/hooks/useProfile';
 import { useSession } from '@/integrations/supabase/auth';
 import LoadingMessage from '../common/LoadingMessage';
 import { GlassButton } from "@/components/ui/glass-button";
-import { Edit3, User, Mail, Phone, FileText, MapPin, Gift } from 'lucide-react';
+import { Edit3, User, Phone, FileText, MapPin, Gift, Heart } from 'lucide-react';
 import ProfileAvatar from './ProfileAvatar';
 import UserProfileFormNew from './UserProfileFormNew';
-import { designTokens } from '@/lib/design-tokens';
+import { ModernCard, ModernCardContent, ModernCardHeader, ModernCardTitle, ModernCardDescription } from '@/components/ui/modern-card';
 
 const UserProfileDisplay: React.FC = () => {
   const { t } = useTranslation();
@@ -72,332 +72,169 @@ const UserProfileDisplay: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col items-center justify-start w-full">
-      {/* Profile Avatar */}
-      <div className="mb-8">
-        <ProfileAvatar
-          avatarUrl={profile?.avatar_url}
-          onAvatarUpdate={() => {
-            // Profile will be refreshed automatically by the hook
-          }}
-          size="xl"
-          editable={true}
-        />
+    <div className="w-full space-y-8 mt-8">
+      {/* Profile Header Card */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+      >
+          <ModernCard className="backdrop-blur-lg bg-white/90 dark:bg-gray-900/90 p-6 rounded-2xl shadow-lg">
+          <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
+            {/* Avatar Section */}
+            <div className="flex-shrink-0">
+              <ProfileAvatar
+                avatarUrl={profile?.avatar_url}
+                onAvatarUpdate={() => {
+                  // Profile will be refreshed automatically by the hook
+                }}
+                size="lg"
+                editable={true}
+              />
+            </div>
+
+            {/* Profile Info */}
+            <div className="flex-1 text-center md:text-right">
+              <div className="flex items-center justify-center md:justify-end gap-2 mb-3">
+                <Heart className="w-4 h-4 text-pink-500" />
+                <span className="text-sm font-medium text-gray-600 dark:text-gray-400">پروفایل شخصی</span>
+              </div>
+              <ModernCardTitle className="text-2xl md:text-3xl mb-2">
+                {profile?.first_name && profile?.last_name
+                  ? `${profile.first_name} ${profile.last_name}`
+                  : t('common.not_specified')
+                }
+              </ModernCardTitle>
+              <ModernCardDescription className="text-base mb-3">
+                {session?.user?.email || t('common.not_specified')}
+              </ModernCardDescription>
+              <div className="flex flex-wrap justify-center md:justify-end gap-3 text-sm text-gray-500 dark:text-gray-400">
+                <div className="flex items-center gap-1">
+                  <MapPin className="w-3 h-3" />
+                  <span>{profile?.location || t('common.not_specified')}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Gift className="w-3 h-3" />
+                  <span>{profile?.birthday || t('common.not_specified')}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ModernCard>
+      </motion.div>
+
+      {/* Information Cards Grid */}
+      <div className="grid gap-4 md:grid-cols-2">
+        {/* Personal Information */}
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+        >
+          <ModernCard className="backdrop-blur-lg bg-blue-50/20 dark:bg-gray-900/90 p-4 rounded-2xl shadow-lg h-full">
+            <ModernCardHeader>
+              <div className="flex items-center gap-2 mb-4">
+                <div className="p-2 bg-blue-400 rounded-xl shadow-lg">
+                  <User className="w-4 h-4 text-white" />
+                </div>
+                <div>
+                  <ModernCardTitle className="text-lg">اطلاعات شخصی</ModernCardTitle>
+                  <ModernCardDescription className="text-xs">اطلاعات پایه حساب</ModernCardDescription>
+                </div>
+              </div>
+            </ModernCardHeader>
+            <ModernCardContent className="space-y-3">
+              <div className="flex justify-between items-center p-3 bg-gray-50/50 dark:bg-gray-800/50 rounded-lg">
+                <span className="text-xs font-medium text-gray-600 dark:text-gray-400">نام:</span>
+                <span className="font-semibold text-gray-900 dark:text-white text-sm">{profile?.first_name || t('common.not_specified')}</span>
+              </div>
+              <div className="flex justify-between items-center p-3 bg-gray-50/50 dark:bg-gray-800/50 rounded-lg">
+                <span className="text-xs font-medium text-gray-600 dark:text-gray-400">نام خانوادگی:</span>
+                <span className="font-semibold text-gray-900 dark:text-white text-sm">{profile?.last_name || t('common.not_specified')}</span>
+              </div>
+              <div className="flex justify-between items-center p-3 bg-gray-50/50 dark:bg-gray-800/50 rounded-lg">
+                <span className="text-xs font-medium text-gray-600 dark:text-gray-400">ایمیل:</span>
+                <span className="font-semibold text-gray-900 dark:text-white text-sm">{session?.user?.email || t('common.not_specified')}</span>
+              </div>
+            </ModernCardContent>
+          </ModernCard>
+        </motion.div>
+
+        {/* Contact Information */}
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+        >
+          <ModernCard className="backdrop-blur-lg bg-green-50/20 dark:bg-gray-900/90 p-4 rounded-2xl shadow-lg h-full">
+            <ModernCardHeader>
+              <div className="flex items-center gap-2 mb-4">
+                <div className="p-2 bg-green-400 rounded-xl shadow-lg">
+                  <Phone className="w-4 h-4 text-white" />
+                </div>
+                <div>
+                  <ModernCardTitle className="text-lg">اطلاعات تماس</ModernCardTitle>
+                  <ModernCardDescription className="text-xs">راه‌های ارتباطی</ModernCardDescription>
+                </div>
+              </div>
+            </ModernCardHeader>
+            <ModernCardContent className="space-y-3">
+              <div className="flex justify-between items-center p-3 bg-gray-50/50 dark:bg-gray-800/50 rounded-lg">
+                <span className="text-xs font-medium text-gray-600 dark:text-gray-400">تلفن:</span>
+                <span className="font-semibold text-gray-900 dark:text-white text-sm">{profile?.phone || t('common.not_specified')}</span>
+              </div>
+              <div className="flex justify-between items-center p-3 bg-gray-50/50 dark:bg-gray-800/50 rounded-lg">
+                <span className="text-xs font-medium text-gray-600 dark:text-gray-400">مکان:</span>
+                <span className="font-semibold text-gray-900 dark:text-white text-sm">{profile?.location || t('common.not_specified')}</span>
+              </div>
+              <div className="flex justify-between items-center p-3 bg-gray-50/50 dark:bg-gray-800/50 rounded-lg">
+                <span className="text-xs font-medium text-gray-600 dark:text-gray-400">تولد:</span>
+                <span className="font-semibold text-gray-900 dark:text-white text-sm">{profile?.birthday || t('common.not_specified')}</span>
+              </div>
+            </ModernCardContent>
+          </ModernCard>
+        </motion.div>
       </div>
 
-      {/* Profile Information Cards */}
-      <div className="w-full max-w-4xl">
-        <div className="grid gap-4 md:gap-6" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))' }}>
-          {/* Basic Information */}
-          <div className="relative group">
-            {/* Background Glow */}
-            <div
-              className="absolute -inset-1 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-              style={{
-                background: `linear-gradient(135deg, ${designTokens.colors.primary[500]}20, ${designTokens.colors.secondary[500]}20)`,
-                filter: 'blur(20px)',
-              }}
-            />
-
-            {/* Main Card */}
-            <div
-              className="relative rounded-3xl overflow-hidden"
-              style={{
-                background: `linear-gradient(135deg,
-                  rgba(255, 255, 255, 0.1) 0%,
-                  rgba(255, 255, 255, 0.05) 50%,
-                  rgba(255, 255, 255, 0.02) 100%)`,
-                backdropFilter: 'blur(20px)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                boxShadow: `0 20px 40px -12px rgba(0, 0, 0, 0.2),
-                           0 8px 16px -8px rgba(0, 0, 0, 0.1),
-                           inset 0 1px 0 0 rgba(255, 255, 255, 0.1)`,
-              }}
-            >
-              <div
-                className="px-4 py-3 border-b border-white/10"
-                style={{
-                  background: 'linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02))',
-                }}
-              >
-                <h2 className="flex items-center gap-3 text-xl font-bold text-gray-800 dark:text-gray-100">
-                  <div
-                    className="p-2 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 shadow-lg"
-                  >
-                    <User size={20} className="text-white" />
-                  </div>
-                  <span>{t('contact_detail.basic_info')}</span>
-                </h2>
-              </div>
-
-              {/* Content */}
-              <div className="p-4 space-y-4">
-                {/* First Name */}
-                <div className="group/field">
-                  <label className="flex items-center gap-2 mb-3 text-sm font-medium text-gray-700 dark:text-gray-300">
-                    <User size={16} className="text-primary" />
-                    <span>{t('form_labels.first_name')}</span>
-                  </label>
-                  <div
-                    className="px-4 py-3 rounded-xl bg-white/70 dark:bg-gray-800/70 border border-gray-200/50 dark:border-gray-700/50 shadow-sm"
-                  >
-                    <span className="text-gray-800 dark:text-gray-200 font-medium">
-                      {profile?.first_name || t('common.not_specified')}
-                    </span>
-                  </div>
+      {/* Bio Section */}
+      {profile?.bio && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+        >
+          <ModernCard className="backdrop-blur-lg bg-purple-50/20 dark:bg-gray-900/90 p-4 rounded-2xl shadow-lg">
+            <ModernCardHeader>
+              <div className="flex items-center gap-2 mb-4">
+                <div className="p-2 bg-purple-400 rounded-xl shadow-lg">
+                  <FileText className="w-4 h-4 text-white" />
                 </div>
-
-                {/* Last Name */}
-                <div className="group/field">
-                  <label className="flex items-center gap-2 mb-3 text-sm font-medium text-gray-700 dark:text-gray-300">
-                    <User size={16} className="text-primary" />
-                    <span>{t('form_labels.last_name')}</span>
-                  </label>
-                  <div
-                    className="px-4 py-3 rounded-xl bg-white/70 dark:bg-gray-800/70 border border-gray-200/50 dark:border-gray-700/50 shadow-sm"
-                  >
-                    <span className="text-gray-800 dark:text-gray-200 font-medium">
-                      {profile?.last_name || t('common.not_specified')}
-                    </span>
-                  </div>
+                <div>
+                  <ModernCardTitle className="text-lg">درباره من</ModernCardTitle>
+                  <ModernCardDescription className="text-xs">توضیح مختصر</ModernCardDescription>
                 </div>
               </div>
-            </div>
-          </div>
-
-          {/* Contact Information */}
-          <div className="relative group">
-            {/* Background Glow */}
-            <div
-              className="absolute -inset-1 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-              style={{
-                background: `linear-gradient(135deg, ${designTokens.colors.semantic.success[500]}20, ${designTokens.colors.info[500]}20)`,
-                filter: 'blur(20px)',
-              }}
-            />
-
-            {/* Main Card */}
-            <div
-              className="relative rounded-3xl overflow-hidden"
-              style={{
-                background: `linear-gradient(135deg,
-                  rgba(255, 255, 255, 0.1) 0%,
-                  rgba(255, 255, 255, 0.05) 50%,
-                  rgba(255, 255, 255, 0.02) 100%)`,
-                backdropFilter: 'blur(20px)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                boxShadow: `0 20px 40px -12px rgba(0, 0, 0, 0.2),
-                           0 8px 16px -8px rgba(0, 0, 0, 0.1),
-                           inset 0 1px 0 0 rgba(255, 255, 255, 0.1)`,
-              }}
-            >
-              {/* Header */}
-              <div
-                className="px-4 py-3 border-b border-white/10"
-                style={{
-                  background: 'linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02))',
-                }}
-              >
-                <h2 className="flex items-center gap-3 text-xl font-bold text-gray-800 dark:text-gray-100">
-                  <div
-                    className="p-2 rounded-xl bg-gradient-to-br from-green-500 to-blue-600 shadow-lg"
-                  >
-                    <Phone size={20} className="text-white" />
-                  </div>
-                  <span>{t('contact_detail.contact_methods')}</span>
-                </h2>
-              </div>
-
-              {/* Content */}
-              <div className="p-4 space-y-4">
-                {/* Email */}
-                <div className="group/field">
-                  <label className="flex items-center gap-2 mb-3 text-sm font-medium text-gray-700 dark:text-gray-300">
-                    <Mail size={16} className="text-primary" />
-                    <span>{t('form_labels.user_email')}</span>
-                  </label>
-                  <div
-                    className="px-4 py-3 rounded-xl bg-white/70 dark:bg-gray-800/70 border border-gray-200/50 dark:border-gray-700/50 shadow-sm"
-                  >
-                    <span className="text-gray-800 dark:text-gray-200 font-medium">
-                      {session?.user?.email || t('common.not_specified')}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Phone */}
-                <div className="group/field">
-                  <label className="flex items-center gap-2 mb-3 text-sm font-medium text-gray-700 dark:text-gray-300">
-                    <Phone size={16} className="text-primary" />
-                    <span>{t('form_labels.phone')}</span>
-                  </label>
-                  <div
-                    className="px-4 py-3 rounded-xl bg-white/70 dark:bg-gray-800/70 border border-gray-200/50 dark:border-gray-700/50 shadow-sm"
-                  >
-                    <span className="text-gray-800 dark:text-gray-200 font-medium">
-                      {profile?.phone || t('common.not_specified')}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Additional Information */}
-          <div className="relative group">
-            {/* Background Glow */}
-            <div
-              className="absolute -inset-1 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-              style={{
-                background: `linear-gradient(135deg, ${designTokens.colors.secondary[500]}20, ${designTokens.colors.accent[500]}20)`,
-                filter: 'blur(20px)',
-              }}
-            />
-
-            {/* Main Card */}
-            <div
-              className="relative rounded-3xl overflow-hidden"
-              style={{
-                background: `linear-gradient(135deg,
-                  rgba(255, 255, 255, 0.1) 0%,
-                  rgba(255, 255, 255, 0.05) 50%,
-                  rgba(255, 255, 255, 0.02) 100%)`,
-                backdropFilter: 'blur(20px)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                boxShadow: `0 20px 40px -12px rgba(0, 0, 0, 0.2),
-                           0 8px 16px -8px rgba(0, 0, 0, 0.1),
-                           inset 0 1px 0 0 rgba(255, 255, 255, 0.1)`,
-              }}
-            >
-              {/* Header */}
-              <div
-                className="px-4 py-3 border-b border-white/10"
-                style={{
-                  background: 'linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02))',
-                }}
-              >
-                <h2 className="flex items-center gap-3 text-xl font-bold text-gray-800 dark:text-gray-100">
-                  <div
-                    className="p-2 rounded-xl bg-gradient-to-br from-purple-500 to-pink-600 shadow-lg"
-                  >
-                    <MapPin size={20} className="text-white" />
-                  </div>
-                  <span>اطلاعات تکمیلی</span>
-                </h2>
-              </div>
-
-              {/* Content */}
-              <div className="p-4 space-y-4">
-                {/* Location */}
-                <div className="group/field">
-                  <label className="flex items-center gap-2 mb-3 text-sm font-medium text-gray-700 dark:text-gray-300">
-                    <MapPin size={16} className="text-primary" />
-                    <span>{t('form_labels.location')}</span>
-                  </label>
-                  <div
-                    className="px-4 py-3 rounded-xl bg-white/70 dark:bg-gray-800/70 border border-gray-200/50 dark:border-gray-700/50 shadow-sm"
-                  >
-                    <span className="text-gray-800 dark:text-gray-200 font-medium">
-                      {profile?.location || t('common.not_specified')}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Birthday */}
-                <div className="group/field">
-                  <label className="flex items-center gap-2 mb-3 text-sm font-medium text-gray-700 dark:text-gray-300">
-                    <Gift size={16} className="text-primary" />
-                    <span>{t('form_labels.birthday')}</span>
-                  </label>
-                  <div
-                    className="px-4 py-3 rounded-xl bg-white/70 dark:bg-gray-800/70 border border-gray-200/50 dark:border-gray-700/50 shadow-sm"
-                  >
-                    <span className="text-gray-800 dark:text-gray-200 font-medium">
-                      {profile?.birthday || t('common.not_specified')}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Bio Section */}
-          <div className="relative group">
-            {/* Background Glow */}
-            <div
-              className="absolute -inset-1 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-              style={{
-                background: `linear-gradient(135deg, ${designTokens.colors.semantic.warning[500]}20, ${designTokens.colors.semantic.error[500]}20)`,
-                filter: 'blur(20px)',
-              }}
-            />
-
-            {/* Main Card */}
-            <div
-              className="relative rounded-3xl overflow-hidden"
-              style={{
-                background: `linear-gradient(135deg,
-                  rgba(255, 255, 255, 0.1) 0%,
-                  rgba(255, 255, 255, 0.05) 50%,
-                  rgba(255, 255, 255, 0.02) 100%)`,
-                backdropFilter: 'blur(20px)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                boxShadow: `0 20px 40px -12px rgba(0, 0, 0, 0.2),
-                           0 8px 16px -8px rgba(0, 0, 0, 0.1),
-                           inset 0 1px 0 0 rgba(255, 255, 255, 0.1)`,
-              }}
-            >
-              {/* Header */}
-              <div
-                className="px-4 py-3 border-b border-white/10"
-                style={{
-                  background: 'linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02))',
-                }}
-              >
-                <h2 className="flex items-center gap-3 text-xl font-bold text-gray-800 dark:text-gray-100">
-                  <div
-                    className="p-2 rounded-xl bg-gradient-to-br from-orange-500 to-red-600 shadow-lg"
-                  >
-                    <FileText size={20} className="text-white" />
-                  </div>
-                  <span>{t('form_labels.bio')}</span>
-                </h2>
-              </div>
-
-              {/* Content */}
-              <div className="p-4 space-y-4">
-                <div className="group/field">
-                  <label className="flex items-center gap-2 mb-3 text-sm font-medium text-gray-700 dark:text-gray-300">
-                    <FileText size={16} className="text-primary" />
-                    <span>{t('form_labels.bio')}</span>
-                  </label>
-                  <div
-                    className="px-4 py-3 rounded-xl bg-white/70 dark:bg-gray-800/70 border border-gray-200/50 dark:border-gray-700/50 shadow-sm min-h-[100px]"
-                  >
-                    <span className="text-gray-800 dark:text-gray-200 font-medium leading-relaxed">
-                      {profile?.bio || t('common.not_specified')}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+            </ModernCardHeader>
+            <ModernCardContent>
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed text-sm">{profile.bio}</p>
+            </ModernCardContent>
+          </ModernCard>
+        </motion.div>
+      )}
 
       {/* Edit Button */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, delay: 0.5 }}
-        className="mt-8"
+        transition={{ duration: 0.6, delay: 0.5 }}
+        className="flex justify-center"
       >
         <GlassButton
           onClick={() => setIsEditing(true)}
-          className="px-8 py-3 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-semibold transition-all duration-300 hover:shadow-lg"
+          className="px-6 py-3 rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-black font-semibold transition-all duration-300 hover:shadow-lg hover:scale-105 border-0"
         >
-          <div className="flex items-center gap-3">
-            <Edit3 size={20} className="text-primary-foreground" />
+          <div className="flex items-center gap-2">
+            <Edit3 size={18} />
             <span>{t('actions.edit')}</span>
           </div>
         </GlassButton>
@@ -406,4 +243,4 @@ const UserProfileDisplay: React.FC = () => {
   );
 };
 
-export default UserProfileDisplay;
+export default UserProfileDisplay; 

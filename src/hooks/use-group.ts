@@ -16,6 +16,7 @@ interface Group {
   name: string;
   description?: string;
   color?: string;
+  created_at?: string;
   contacts: ContactPreview[];
 }
 

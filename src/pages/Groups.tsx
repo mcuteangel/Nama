@@ -15,6 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { useAppSettings } from '@/hooks/use-app-settings';
 import { useIsMobile } from '@/hooks/use-mobile';
 import PageHeader from "@/components/ui/PageHeader";
+import { motion } from 'framer-motion';
 
 const Groups = React.memo(() => {
   const navigate = useNavigate();
@@ -84,8 +85,10 @@ const Groups = React.memo(() => {
         <PageHeader
           title={t('pages.groups.management')}
           description={t('pages.groups.management_description')}
-          className="mb-6"
+          className="mb-"
         />
+
+        <div className="mb-12"></div>
 
         <div
           className="rounded-3xl overflow-hidden"
@@ -335,6 +338,36 @@ const Groups = React.memo(() => {
           </div>
         </div>
       </div>
+
+      {/* Floating Action Button */}
+      {!isMobile && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.5 }}
+          className="fixed bottom-6 left-6 z-50"
+        >
+          <ModernTooltip>
+            <ModernTooltipTrigger asChild>
+              <GlassButton
+                onClick={handleAddGroupClick}
+                className="w-14 h-14 rounded-full shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-110"
+                style={{
+                  background: designTokens.gradients.primary,
+                  border: `2px solid rgba(255,255,255,0.2)`,
+                  backdropFilter: 'blur(15px)',
+                  boxShadow: `0 20px 40px -12px ${designTokens.colors.primary[500]}40`
+                }}
+              >
+                <PlusCircle size={24} style={{ color: 'white' }} />
+              </GlassButton>
+            </ModernTooltipTrigger>
+            <ModernTooltipContent>
+              <p>{t('actions.add_group')}</p>
+            </ModernTooltipContent>
+          </ModernTooltip>
+        </motion.div>
+      )}
     </div>
   );
 });

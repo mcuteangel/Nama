@@ -777,14 +777,11 @@
     "days_until_birthday": "Days Until Birthday"
   },
   "profile": {
-    "tabs": {
-      "profile": "Profile",
-      "profile_desc": "Manage your profile information",
-      "settings": "Settings",
-      "settings_desc": "Customize your user experience",
-      "notifications": "Notifications",
-      "notifications_desc": "Manage notification settings"
+    "hero": {
+      "badge": "Professional Profile",
+      "subtitle": "Manage your personal information and profile settings with our advanced user interface"
     },
+    "additional_info": "Additional Information",
     "notifications": {
       "title": "Notification Settings",
       "description": "Customize how you receive notifications from the app",

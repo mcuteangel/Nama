@@ -94,7 +94,7 @@ const StatisticsOverviewCards: React.FC<StatisticsOverviewCardsProps> = ({
       {cards.map((card, index) => (
         <Card
           key={card.title}
-          className={`group relative overflow-hidden bg-gradient-to-br ${card.bgGradient} backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.01] animate-in fade-in-50 slide-in-from-bottom-4`}
+          className={`group relative overflow-hidden bg-gradient-to-br ${card.bgGradient} backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.01] animate-in fade-in-50 slide-in-from-bottom-4 rounded-2xl`}
           style={{ animationDelay: `${index * 80}ms` }}
         >
           {/* Background Pattern */}

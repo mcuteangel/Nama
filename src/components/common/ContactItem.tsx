@@ -279,21 +279,18 @@ export const ContactItem = React.memo<ContactItemProps>(({
           </div>
         </div>
 
-        <div className="absolute top-2 left-2 flex flex-col gap-1">
+        <div className="absolute top-0 left-3 bottom-0 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-all duration-300 transform -translate-x-2 group-hover:translate-x-0">
           <GlassButton
             variant="ghost"
             size="icon"
-            className="opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110 rounded-lg shadow-md"
+            className="w-9 h-9 hover:scale-105 rounded-xl shadow-md backdrop-blur-md border-0 hover:shadow-lg transition-all duration-200"
             style={{
-              background: 'rgba(59, 130, 246, 0.9)',
-              border: `1px solid ${designTokens.colors.primary[300]}`,
-              width: '32px',
-              height: '32px',
-              backdropFilter: 'blur(10px)'
+              background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.95), rgba(37, 99, 235, 0.95))',
+              boxShadow: '0 6px 20px -6px rgba(59, 130, 246, 0.4)'
             }}
             onClick={handleEditClick}
           >
-            <Edit size={14} style={{ color: 'white' }} />
+            <Edit size={15} style={{ color: 'white' }} />
           </GlassButton>
 
           <ModernAlertDialog>
@@ -301,21 +298,18 @@ export const ContactItem = React.memo<ContactItemProps>(({
               <GlassButton
                 variant="ghost"
                 size="icon"
-                className="opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110 rounded-lg shadow-md"
+                className="w-9 h-9 hover:scale-105 rounded-xl shadow-md backdrop-blur-md border-0 hover:shadow-lg transition-all duration-200"
                 style={{
-                  background: 'rgba(239, 68, 68, 0.9)',
-                  border: `1px solid ${designTokens.colors.error[300]}`,
-                  width: '32px',
-                  height: '32px',
-                  backdropFilter: 'blur(10px)'
+                  background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.95), rgba(220, 38, 38, 0.95))',
+                  boxShadow: '0 6px 20px -6px rgba(239, 68, 68, 0.4)'
                 }}
                 onClick={(e) => e.stopPropagation()}
                 disabled={isDeleting}
               >
                 {isDeleting ? (
-                  <LoadingSpinner size={20} />
+                  <LoadingSpinner size={16} className="text-white" />
                 ) : (
-                  <Trash2 size={14} style={{ color: 'white' }} />
+                  <Trash2 size={15} style={{ color: 'white' }} />
                 )}
               </GlassButton>
             </ModernAlertDialogTrigger>
@@ -395,6 +389,8 @@ export const ContactItem = React.memo<ContactItemProps>(({
     avatarFallback,
     displayPhoneNumber,
     displayEmail,
+    displayGender.color,
+    displayGender.icon,
     handleEditClick,
     isDeleting,
     t,

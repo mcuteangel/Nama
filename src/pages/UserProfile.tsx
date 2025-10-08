@@ -2,9 +2,6 @@ import React, { useMemo } from 'react';
 import UserProfileDisplay from "@/components/user-management/UserProfileDisplay";
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft } from 'lucide-react';
-import { GlassButton } from "@/components/ui/glass-button";
-import { ModernCard, ModernCardContent, ModernCardHeader, ModernCardTitle } from "@/components/ui/modern-card";
 import useAppSettings from '@/hooks/use-app-settings';
 import PageHeader from '@/components/ui/PageHeader';
 
@@ -15,64 +12,30 @@ const UserProfile: React.FC = () => {
   // Determine if we're in RTL mode based on the current language setting
   const isRTL = useMemo(() => settings.language === 'fa', [settings.language]);
 
-
   return (
-    <div className="min-h-screen p-3 sm:p-4 md:p-6 lg:p-8 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800" dir={isRTL ? 'rtl' : 'ltr'}>
-      <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8">
-        {/* Header */}
-        <PageHeader
-          title={t('pages.user_profile.title')}
-          description={t('profile.subtitle')}
-          showBackButton={true}
-        />
-
-        {/* Floating Action Button */}
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900" dir={isRTL ? 'rtl' : 'ltr'}>
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {/* Page Header */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.3, delay: 0.6 }}
-          className="fixed bottom-6 right-6 z-20"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
         >
-          <GlassButton
-            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-            variant="ghost"
-            size="sm"
-            className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110"
-          >
-            <ArrowLeft size={20} className="rotate-90" />
-          </GlassButton>
+          <PageHeader
+            title={t('pages.user_profile.title')}
+            description={t('profile.hero.subtitle')}
+            showBackButton={true}
+          />
         </motion.div>
 
-        {/* Profile Information Section */}
+        {/* Profile Content */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
+          transition={{ duration: 0.7, delay: 0.3 }}
+          className="max-w-4xl mx-auto"
         >
-          <ModernCard
-            variant="glass"
-            hover="lift"
-            className="glass-advanced glass-3d-hover backdrop-blur-2xl border border-white/30 shadow-2xl"
-          >
-            <ModernCardHeader>
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-blue-50 dark:bg-blue-900/20 rounded-xl flex items-center justify-center">
-                  <span className="text-blue-500 text-xl">👤</span>
-                </div>
-                <div>
-                  <ModernCardTitle className="text-xl font-bold text-gray-800 dark:text-gray-100">
-                    {t('profile.tabs.profile')}
-                  </ModernCardTitle>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                    {t('profile.tabs.profile_desc')}
-                  </p>
-                </div>
-              </div>
-            </ModernCardHeader>
-            <ModernCardContent>
-              <UserProfileDisplay />
-            </ModernCardContent>
-          </ModernCard>
+          <UserProfileDisplay />
         </motion.div>
       </div>
     </div>

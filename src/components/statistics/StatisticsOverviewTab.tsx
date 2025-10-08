@@ -25,7 +25,7 @@ const StatisticsOverviewTab: React.FC<StatisticsOverviewTabProps> = ({
   if (isLoading) {
     return (
       <div className="grid gap-6 md:grid-cols-2">
-        <Card className="relative overflow-hidden bg-gradient-to-br from-blue-50/50 via-white/80 to-blue-50/30 backdrop-blur-sm border-0 shadow-xl">
+        <Card className="relative overflow-hidden bg-gradient-to-br from-blue-50/50 via-white/80 to-blue-50/30 backdrop-blur-sm border-0 shadow-xl rounded-2xl">
           <CardHeader>
             <div className="h-6 w-[150px] bg-gradient-to-r from-slate-200 to-slate-300 rounded-lg animate-pulse mb-2" />
             <div className="h-4 w-[200px] bg-gradient-to-r from-slate-100 to-slate-200 rounded-lg animate-pulse" />
@@ -34,7 +34,7 @@ const StatisticsOverviewTab: React.FC<StatisticsOverviewTabProps> = ({
             <div className="h-[240px] w-full bg-gradient-to-br from-slate-100/50 to-slate-200/30 rounded-xl animate-pulse" />
           </CardContent>
         </Card>
-        <Card className="relative overflow-hidden bg-gradient-to-br from-green-50/50 via-white/80 to-green-50/30 backdrop-blur-sm border-0 shadow-xl">
+        <Card className="relative overflow-hidden bg-gradient-to-br from-green-50/50 via-white/80 to-green-50/30 backdrop-blur-sm border-0 shadow-xl rounded-2xl">
           <CardHeader>
             <div className="h-6 w-[200px] bg-gradient-to-r from-slate-200 to-slate-300 rounded-lg animate-pulse mb-2" />
             <div className="h-4 w-[250px] bg-gradient-to-r from-slate-100 to-slate-200 rounded-lg animate-pulse" />
@@ -50,7 +50,7 @@ const StatisticsOverviewTab: React.FC<StatisticsOverviewTabProps> = ({
   if (error) {
     return (
       <div className="grid gap-6 md:grid-cols-2">
-        <Card className="relative overflow-hidden bg-gradient-to-br from-red-50/50 via-white/80 to-red-50/30 backdrop-blur-sm border-0 shadow-xl">
+        <Card className="relative overflow-hidden bg-gradient-to-br from-red-50/50 via-white/80 to-red-50/30 backdrop-blur-sm border-0 shadow-xl rounded-2xl">
           <CardContent className="flex items-center justify-center h-[300px] p-4">
             <div className="text-center text-slate-500">
               <p className="text-sm font-medium">خطا در بارگذاری آمار جنسیت</p>
@@ -58,7 +58,7 @@ const StatisticsOverviewTab: React.FC<StatisticsOverviewTabProps> = ({
             </div>
           </CardContent>
         </Card>
-        <Card className="relative overflow-hidden bg-gradient-to-br from-red-50/50 via-white/80 to-red-50/30 backdrop-blur-sm border-0 shadow-xl">
+        <Card className="relative overflow-hidden bg-gradient-to-br from-red-50/50 via-white/80 to-red-50/30 backdrop-blur-sm border-0 shadow-xl rounded-2xl">
           <CardContent className="flex items-center justify-center h-[300px] p-4">
             <div className="text-center text-slate-500">
               <p className="text-sm font-medium">خطا در بارگذاری روش‌های ارتباط</p>
@@ -73,7 +73,7 @@ const StatisticsOverviewTab: React.FC<StatisticsOverviewTabProps> = ({
   return (
     <div className="grid gap-8 md:grid-cols-2 animate-in fade-in-50 slide-in-from-bottom-4 duration-500" dir={document.documentElement.dir === 'rtl' ? 'rtl' : 'ltr'}>
       {/* Gender Distribution Card */}
-      <Card className="group relative overflow-hidden bg-gradient-to-br from-blue-50/60 via-white/90 to-blue-50/40 backdrop-blur-sm border-0 shadow-2xl hover:shadow-3xl transition-all duration-500 hover:scale-[1.02] hover:-translate-y-1">
+      <Card className="group relative overflow-hidden bg-gradient-to-br from-blue-50/60 via-white/90 to-blue-50/40 backdrop-blur-sm border-0 shadow-2xl hover:shadow-3xl transition-all duration-500 hover:scale-[1.02] hover:-translate-y-1 rounded-2xl">
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-5">
           <div className="absolute inset-0 bg-gradient-to-br from-blue-200/20 to-transparent" />
@@ -150,7 +150,7 @@ const StatisticsOverviewTab: React.FC<StatisticsOverviewTabProps> = ({
       </Card>
 
       {/* Contact Method Card */}
-      <Card className="group relative overflow-hidden bg-gradient-to-br from-emerald-50/60 via-white/90 to-emerald-50/40 backdrop-blur-sm border-0 shadow-2xl hover:shadow-3xl transition-all duration-500 hover:scale-[1.02] hover:-translate-y-1">
+      <Card className="group relative overflow-hidden bg-gradient-to-br from-emerald-50/60 via-white/90 to-emerald-50/40 backdrop-blur-sm border-0 shadow-2xl hover:shadow-3xl transition-all duration-500 hover:scale-[1.02] hover:-translate-y-1 rounded-2xl">
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-5">
           <div className="absolute inset-0 bg-gradient-to-br from-emerald-200/20 to-transparent" />

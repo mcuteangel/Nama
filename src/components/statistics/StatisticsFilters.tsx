@@ -66,7 +66,7 @@ const StatisticsFilters: React.FC<StatisticsFiltersProps> = ({
   ];
 
   return (
-    <Card className="relative overflow-hidden bg-gradient-to-br from-slate-50/90 via-white/95 to-slate-50/70 backdrop-blur-xl border-0 shadow-2xl">
+    <Card className="relative overflow-hidden bg-gradient-to-br from-slate-50/90 via-white/95 to-slate-50/70 backdrop-blur-xl border-0 shadow-2xl rounded-2xl">
       <CardContent className="p-6">
         {/* Decorative Background Elements */}
         <div className="absolute inset-0 bg-gradient-to-br from-blue-50/40 via-transparent to-purple-50/30 rounded-2xl" />
@@ -286,7 +286,7 @@ const StatisticsFilters: React.FC<StatisticsFiltersProps> = ({
                   onPositionChange?.(undefined);
                   onContactMethodChange?.(undefined);
                 }}
-                className="px-4 py-2 text-sm font-medium text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg transition-all duration-300 glass-3d-hover"
+                className="px-4 py-2 text-sm font-medium text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-xl transition-all duration-300 glass-3d-hover"
               >
                 {t('statistics.filters.clear_filters')}
               </button>
