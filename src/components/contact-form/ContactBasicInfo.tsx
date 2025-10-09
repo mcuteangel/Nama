@@ -114,14 +114,13 @@ const ContactBasicInfo: React.FC = React.memo(() => {
   return (
     <FormCard
       title="اطلاعات پایه"
-      description="اطلاعات اصلی مخاطب را وارد کنید"
       icon={User}
       iconColor="#3b82f6"
       className="space-y-6"
     >
       <div className="space-y-6">
-        {/* Personal Information */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {/* All fields in one responsive grid - 2 for mobile, up to 6 for larger screens */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
           <FormField
             control={form.control}
             name="firstName"
@@ -173,10 +172,7 @@ const ContactBasicInfo: React.FC = React.memo(() => {
               </div>
             )}
           />
-        </div>
 
-        {/* Professional Information */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <FormField
             control={form.control}
             name="position"
@@ -226,10 +222,7 @@ const ContactBasicInfo: React.FC = React.memo(() => {
               </div>
             )}
           />
-        </div>
 
-        {/* Additional Information */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <FormField
             control={form.control}
             name="gender"
