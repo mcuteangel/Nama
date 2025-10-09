@@ -53,33 +53,19 @@ const ContactPhoneNumbers: React.FC = React.memo(() => {
       icon={Phone}
       iconColor="#f97316"
     >
-      <div className="space-y-6">
-        {/* Add Phone Button */}
-        <div className="flex justify-start">
-          <GlassButton
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={handleAddPhoneNumber}
-            className="bg-primary-500/10 hover:bg-primary-500/20 text-primary-700 dark:text-primary-300 px-4 py-2 rounded-lg border border-primary-200 dark:border-primary-800 transition-all duration-200"
-          >
-            <Plus size={16} className="ml-2" />
-            افزودن شماره تلفن
-          </GlassButton>
-        </div>
-
+      <div className="space-y-3">
         {/* Phone Numbers List */}
-        <div className="space-y-4">
+        <div className="space-y-3">
           {fields.map((item, index) => (
             <FormSection
               key={item.id}
               variant="card"
               className="relative group"
             >
-              <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
                   <div className="w-6 h-6 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center">
-                    <Phone size={12} className="text-primary-600 dark:text-primary-400" />
+                    <Phone size={10} className="text-primary-600 dark:text-primary-400" />
                   </div>
                   <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
                     شماره تلفن {index + 1}
@@ -93,22 +79,22 @@ const ContactPhoneNumbers: React.FC = React.memo(() => {
                     variant="ghost"
                     size="icon"
                     onClick={() => handleRemovePhoneNumber(index)}
-                    className="text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 h-8 w-8 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-200"
+                    className="text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 h-6 w-6 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-200"
                     aria-label="حذف شماره تلفن"
                   >
-                    <X size={16} />
+                    <X size={12} />
                   </GlassButton>
                 )}
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-12 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
                 {/* Phone Type */}
                 <div className="sm:col-span-4">
                   <FormField
                     control={form.control}
                     name={`phoneNumbers.${index}.phone_type`}
                     render={({ field, fieldState }) => (
-                      <div className="space-y-2">
+                      <div className="space-y-1">
                         <FormLabel className="text-sm font-medium text-slate-700 dark:text-slate-300">
                           نوع تلفن
                         </FormLabel>
@@ -125,7 +111,7 @@ const ContactPhoneNumbers: React.FC = React.memo(() => {
                               {phoneTypeOptions.map(option => (
                                 <ModernSelectItem key={option.value} value={option.value}>
                                   <div className="flex items-center gap-2">
-                                    <option.icon size={16} />
+                                    <option.icon size={14} />
                                     {option.label}
                                   </div>
                                 </ModernSelectItem>
@@ -135,7 +121,7 @@ const ContactPhoneNumbers: React.FC = React.memo(() => {
                         </FormControl>
                         {fieldState.error && (
                           <p className="text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
-                            <AlertCircle size={14} />
+                            <AlertCircle size={12} />
                             {fieldState.error.message}
                           </p>
                         )}
@@ -150,7 +136,7 @@ const ContactPhoneNumbers: React.FC = React.memo(() => {
                     control={form.control}
                     name={`phoneNumbers.${index}.phone_number`}
                     render={({ field, fieldState }) => (
-                      <div className="space-y-2">
+                      <div className="space-y-1">
                         <FormLabel className="text-sm font-medium text-slate-700 dark:text-slate-300">
                           شماره تلفن
                         </FormLabel>
@@ -164,7 +150,7 @@ const ContactPhoneNumbers: React.FC = React.memo(() => {
                         </FormControl>
                         {fieldState.error && (
                           <p className="text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
-                            <AlertCircle size={14} />
+                            <AlertCircle size={12} />
                             {fieldState.error.message}
                           </p>
                         )}
@@ -179,7 +165,7 @@ const ContactPhoneNumbers: React.FC = React.memo(() => {
                     control={form.control}
                     name={`phoneNumbers.${index}.extension`}
                     render={({ field, fieldState }) => (
-                      <div className="space-y-2">
+                      <div className="space-y-1">
                         <FormLabel className="text-sm font-medium text-slate-700 dark:text-slate-300">
                           داخلی (اختیاری)
                         </FormLabel>
@@ -194,7 +180,7 @@ const ContactPhoneNumbers: React.FC = React.memo(() => {
                         </FormControl>
                         {fieldState.error && (
                           <p className="text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
-                            <AlertCircle size={14} />
+                            <AlertCircle size={12} />
                             {fieldState.error.message}
                           </p>
                         )}
@@ -207,11 +193,25 @@ const ContactPhoneNumbers: React.FC = React.memo(() => {
           ))}
         </div>
 
+        {/* Add Phone Button */}
+        <div className="flex justify-start pt-2">
+          <GlassButton
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={handleAddPhoneNumber}
+            className="bg-primary-500/10 hover:bg-primary-500/20 text-primary-700 dark:text-primary-300 px-3 py-1.5 rounded-xl border border-primary-200 dark:border-primary-800 transition-all duration-200"
+          >
+            <Plus size={14} className="ml-2" />
+            افزودن شماره تلفن
+          </GlassButton>
+        </div>
+
         {fields.length === 0 && (
-          <div className="text-center py-8 text-slate-500 dark:text-slate-400">
-            <Phone size={48} className="mx-auto mb-4 opacity-50" />
+          <div className="text-center py-4 text-slate-500 dark:text-slate-400">
+            <Phone size={32} className="mx-auto mb-4 opacity-50" />
             <p>هنوز شماره تلفنی اضافه نشده است</p>
-            <p className="text-sm mt-1">برای اضافه کردن شماره تلفن جدید، دکمه بالا را کلیک کنید</p>
+            <p className="text-sm mt-1">برای اضافه کردن شماره تلفن جدید، دکمه پایین را کلیک کنید</p>
           </div>
         )}
       </div>
