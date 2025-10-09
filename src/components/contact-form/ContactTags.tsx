@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Tag, Loader2, CheckCircle, XCircle } from 'lucide-react';
+import { Tag, Loader2, CheckCircle, XCircle, Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Tag as TagType, TagWithCount } from '@/types/tag';
 import { TagsService } from '@/services/tags-service';
@@ -7,7 +7,8 @@ import { TagInput, TagList } from '@/components/ui/tag';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { useSession } from '@/integrations/supabase/auth';
-import { designTokens } from '@/lib/design-tokens';
+import { FormSection } from '@/components/ui/FormSection';
+import { FormCard } from '@/components/ui/FormCard';
 
 export interface ContactTagsProps {
   contactId?: string;
@@ -128,151 +129,116 @@ const ContactTags: React.FC<ContactTagsProps> = ({
   };
 
   return (
-    <div className={cn('space-y-4 sm:space-y-6', className)}>
-      {/* Header Section with New Design */}
-      <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl"
-           style={{
-             background: designTokens.gradients.warning,
-             boxShadow: designTokens.shadows.glass3d
-           }}>
-        <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/20 to-orange-500/20"></div>
-        <div className="relative p-4 sm:p-6 lg:p-8">
-          <div className="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
-            <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 rounded-xl sm:rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center shadow-lg">
-              <Tag size={24} className="sm:w-8 text-white animate-pulse" />
-            </div>
-            <div>
-              <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-1 sm:mb-2"
-                  style={{ fontFamily: designTokens.typography.fonts.primary }}>
-                تگ‌ها
-              </h2>
-              <p className="text-white/80 text-sm sm:text-base lg:text-lg">
-                تگ‌های مرتبط با مخاطب را انتخاب یا ایجاد کنید
-              </p>
-            </div>
+    <FormSection
+      icon={Tag}
+      title="تگ‌ها"
+      description="تگ‌های مرتبط با مخاطب را انتخاب یا ایجاد کنید"
+      className={cn('space-y-4', className)}
+    >
+      {loading ? (
+        <FormCard
+          title="در حال بارگذاری..."
+          description="تگ‌ها در حال بارگذاری هستند"
+          icon={Loader2}
+          iconColor="#f59e0b"
+        >
+          <div className="flex items-center justify-center py-8">
+            <Loader2 size={24} className="text-orange-500 animate-spin ml-2" />
+            <span className="text-slate-600 dark:text-slate-400">در حال بارگذاری تگ‌ها...</span>
           </div>
-
-          <div className="space-y-4 sm:space-y-6">
-            {/* Selected tags */}
-            {selectedTags.length > 0 && (
-              <div className="bg-white/10 backdrop-blur-md rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-white/20">
-                <h4 className="text-lg sm:text-xl font-bold text-white mb-3 sm:mb-4"
-                    style={{ fontFamily: designTokens.typography.fonts.primary }}>
-                  تگ‌های انتخاب شده
-                </h4>
-                <TagList
-                  tags={selectedTags}
-                  onRemove={handleRemoveTag}
-                  removable={true}
-                  size="lg"
-                  className="gap-2 sm:gap-3"
-                />
-              </div>
-            )}
-
-            {/* Add new tag */}
-            <div className="bg-white/10 backdrop-blur-md rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-white/20">
-              <h4 className="text-lg sm:text-xl font-bold text-white mb-3 sm:mb-4"
-                  style={{ fontFamily: designTokens.typography.fonts.primary }}>
-                ایجاد تگ جدید
-              </h4>
-              <TagInput
-                tags={[]}
-                onAdd={handleAddTag}
-                placeholder="نام تگ جدید را وارد کنید..."
-                className="bg-white/20 border-white/30 text-white placeholder-white/60"
+        </FormCard>
+      ) : error ? (
+        <FormCard
+          title="خطا در بارگذاری"
+          description={error}
+          icon={XCircle}
+          iconColor="#ef4444"
+        >
+          <div className="text-center py-8">
+            <XCircle size={48} className="mx-auto mb-4 text-red-500" />
+            <p className="text-slate-600 dark:text-slate-400">بارگذاری تگ‌ها با خطا مواجه شد</p>
+          </div>
+        </FormCard>
+      ) : (
+        <>
+          {/* Selected tags */}
+          {selectedTags.length > 0 && (
+            <FormCard
+              title="تگ‌های انتخاب شده"
+              description="تگ‌هایی که برای این مخاطب انتخاب شده‌اند"
+              icon={CheckCircle}
+              iconColor="#22c55e"
+            >
+              <TagList
+                tags={selectedTags}
+                onRemove={handleRemoveTag}
+                removable={true}
+                size="lg"
+                className="gap-2"
               />
-            </div>
+            </FormCard>
+          )}
 
-            {/* Available tags */}
-            {availableTags.length > 0 && (
-              <div className="bg-white/10 backdrop-blur-md rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-white/20">
-                <h4 className="text-lg sm:text-xl font-bold text-white mb-3 sm:mb-4"
-                    style={{ fontFamily: designTokens.typography.fonts.primary }}>
-                  تگ‌های موجود
-                </h4>
-                <div className="flex flex-wrap gap-2 sm:gap-3">
-                  {availableTags.map((tag) => (
-                    <button
-                      key={tag.id}
-                      onClick={() => handleSelectExistingTag(tag)}
-                      disabled={selectedTags.some(t => t.id === tag.id)}
-                      className={cn(
-                        'inline-flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm rounded-xl sm:rounded-2xl border transition-all duration-300',
-                        'hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl',
-                        'backdrop-blur-md',
-                        selectedTags.some(t => t.id === tag.id)
-                          ? 'bg-white/20 border-white/40 text-white cursor-default'
-                          : 'bg-white/10 border-white/30 hover:bg-white/20 hover:border-white/40 text-white'
-                      )}
-                      style={{
-                        backgroundColor: selectedTags.some(t => t.id === tag.id)
-                          ? `${tag.color}40`
-                          : undefined,
-                        borderColor: selectedTags.some(t => t.id === tag.id)
-                          ? tag.color
-                          : undefined,
-                        color: selectedTags.some(t => t.id === tag.id)
-                          ? tag.color
-                          : undefined
-                      }}
-                    >
-                      <div
-                        className="w-3 h-3 sm:w-4 sm:h-4 rounded-full shadow-sm"
-                        style={{ backgroundColor: tag.color }}
-                      />
-                      <span className="font-medium"
-                            style={{ fontFamily: designTokens.typography.fonts.secondary }}>
-                        {tag.name}
+          {/* Add new tag */}
+          <FormCard
+            title="ایجاد تگ جدید"
+            description="تگ جدیدی برای این مخاطب ایجاد کنید"
+            icon={Plus}
+            iconColor="#3b82f6"
+          >
+            <TagInput
+              tags={[]}
+              onAdd={handleAddTag}
+              placeholder="نام تگ جدید را وارد کنید..."
+              className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-600"
+            />
+          </FormCard>
+
+          {/* Available tags */}
+          {availableTags.length > 0 && (
+            <FormCard
+              title="تگ‌های موجود"
+              description="از تگ‌های موجود انتخاب کنید"
+              icon={Tag}
+              iconColor="#8b5cf6"
+            >
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                {availableTags.map((tag) => (
+                  <button
+                    key={tag.id}
+                    onClick={() => handleSelectExistingTag(tag)}
+                    disabled={selectedTags.some(t => t.id === tag.id)}
+                    className={cn(
+                      'inline-flex items-center gap-2 px-3 py-2 text-sm rounded-lg border transition-all duration-300',
+                      'hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl',
+                      selectedTags.some(t => t.id === tag.id)
+                        ? 'bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-600 text-slate-500 cursor-default'
+                        : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300'
+                    )}
+                  >
+                    <div
+                      className="w-3 h-3 rounded-full shadow-sm"
+                      style={{ backgroundColor: tag.color }}
+                    />
+                    <span className="font-medium truncate">
+                      {tag.name}
+                    </span>
+                    {tag.contact_count !== undefined && tag.contact_count > 0 && (
+                      <span className="text-xs opacity-80 px-1.5 py-0.5 rounded-full bg-slate-200 dark:bg-slate-700">
+                        ({tag.contact_count})
                       </span>
-                      {tag.contact_count !== undefined && tag.contact_count > 0 && (
-                        <span className="text-xs opacity-80 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full bg-black/20">
-                          ({tag.contact_count})
-                        </span>
-                      )}
-                      {selectedTags.some(t => t.id === tag.id) && (
-                        <CheckCircle size={14} className="sm:w-4 text-green-400" />
-                      )}
-                    </button>
-                  ))}
-                </div>
+                    )}
+                    {selectedTags.some(t => t.id === tag.id) && (
+                      <CheckCircle size={14} className="text-green-500" />
+                    )}
+                  </button>
+                ))}
               </div>
-            )}
-
-            {/* Loading state */}
-            {loading && (
-              <div className="flex items-center justify-center py-6 sm:py-8">
-                <div className="relative">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-gradient-to-br from-yellow-500 to-orange-500 flex items-center justify-center shadow-lg">
-                    <Loader2 size={20} className="sm:w-6 text-white animate-spin" />
-                  </div>
-                  <div className="absolute -inset-1 bg-gradient-to-r from-yellow-600 to-orange-600 rounded-xl sm:rounded-2xl animate-pulse"></div>
-                </div>
-                <div className="mr-3 sm:mr-4">
-                  <p className="text-base sm:text-lg font-bold text-white mb-1">در حال بارگذاری...</p>
-                  <p className="text-white/80 text-sm sm:text-base">تگ‌ها در حال بارگذاری هستند</p>
-                </div>
-              </div>
-            )}
-
-            {/* Error state */}
-            {error && (
-              <div className="bg-red-50/10 backdrop-blur-md border border-red-200/30 rounded-xl sm:rounded-2xl p-4 sm:p-6">
-                <div className="flex items-center gap-2 sm:gap-3">
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-red-500/20 flex items-center justify-center">
-                    <XCircle size={16} className="sm:w-5 text-red-400" />
-                  </div>
-                  <div>
-                    <p className="text-base sm:text-lg font-bold text-red-400 mb-1">خطا در بارگذاری</p>
-                    <p className="text-red-300 text-sm sm:text-base">{error}</p>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
+            </FormCard>
+          )}
+        </>
+      )}
+    </FormSection>
   );
 };
 
