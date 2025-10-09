@@ -20,9 +20,10 @@ import { FormSkeleton, FormSubmissionLoader } from "./contact-form/loading-compo
 import { FormErrorDisplay, ProgressIndicator, SimpleError } from "./contact-form/error-components";
 import PageHeader from "@/components/ui/PageHeader";
 import { ModernCard, ModernCardContent } from "./ui";
+import { ContactFormValues } from "@/types/contact";
 
 interface ContactFormProps {
-  initialData?: any;
+  initialData?: ContactFormValues;
   contactId?: string;
 }
 
@@ -44,6 +45,13 @@ const ContactForm: React.FC<ContactFormProps> = React.memo(({ initialData, conta
     context: { availableTemplates: formState.availableTemplates },
   });
 
+  // Reset form when initialData changes (for edit mode)
+  useEffect(() => {
+    if (initialData) {
+      form.reset(initialData);
+    }
+  }, [initialData, form]);
+
   // Sync custom fields with templates
   useContactFormCustomFieldsSync(
     form,
@@ -63,7 +71,7 @@ const ContactForm: React.FC<ContactFormProps> = React.memo(({ initialData, conta
   );
 
   // Handle form submission wrapper
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: ContactFormValues) => {
     try {
       formState.setFormError(null);
       await formLogic.onSubmit(data);

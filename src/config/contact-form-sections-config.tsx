@@ -17,6 +17,8 @@ const ContactCustomFields = lazy(() => import('@/components/contact-form/Contact
 const ContactPreviewCard = lazy(() => import('@/components/contact-form/ContactPreviewCard.tsx'));
 const ContactHistory = lazy(() => import('@/components/contact-form/ContactHistory.tsx'));
 const ContactTags = lazy(() => import('@/components/contact-form/ContactTags.tsx'));
+const ContactAvatarUpload = lazy(() => import('@/components/ContactAvatarUpload.tsx'));
+const ContactFormActions = lazy(() => import('@/components/contact-form/ContactFormActions.tsx'));
 
 // Loading component for sections
 const SectionLoader = () => (
@@ -61,10 +63,15 @@ export const useContactFormSections = (): ContactFormSectionsConfig => {
       id: 'avatar',
       title: t('accessibility.avatar_section', 'Avatar Section'),
       component: (
-        <div>
-          {/* ContactAvatarUpload component will be added here */}
-          <div>ContactAvatarUpload Component</div>
-        </div>
+        <Suspense fallback={<SectionLoader />}>
+          <ContactAvatarUpload
+            initialAvatarUrl={form.watch('avatarUrl') || null}
+            onAvatarChange={(url) => {
+              form.setValue('avatarUrl', url, { shouldValidate: true, shouldDirty: true });
+            }}
+            disabled={isSubmitting}
+          />
+        </Suspense>
       )
     },
     {
@@ -178,10 +185,13 @@ export const useContactFormSections = (): ContactFormSectionsConfig => {
       id: 'actions',
       title: t('accessibility.form_actions_section', 'Form Actions Section'),
       component: (
-        <div>
-          {/* ContactFormActions component will be added here */}
-          <div>ContactFormActions Component</div>
-        </div>
+        <Suspense fallback={<SectionLoader />}>
+          <ContactFormActions
+            isSubmitting={isSubmitting}
+            onCancel={handleCancel}
+            contactId={contactId}
+          />
+        </Suspense>
       )
     }
   ];
