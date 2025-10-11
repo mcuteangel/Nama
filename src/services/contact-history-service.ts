@@ -49,7 +49,7 @@ export const ContactHistoryService = {
           old_value: null,
           new_value: `${data.first_name} ${data.last_name}`,
           timestamp: data.created_at,
-          user_email: 'user@example.com'
+          user_email: 'کاربر فعلی' // We'll use a placeholder since we don't have access to user email in this context
         }
       ];
 
@@ -64,7 +64,7 @@ export const ContactHistoryService = {
           old_value: null,
           new_value: 'Contact information updated',
           timestamp: data.updated_at,
-          user_email: 'user@example.com'
+          user_email: 'کاربر فعلی'
         });
       }
 

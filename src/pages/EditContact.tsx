@@ -264,8 +264,10 @@ const EditContact = () => {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center p-4 h-full w-full">
-      <ContactForm initialData={initialContactData} contactId={id} />
+    <div className="flex flex-col items-center p-4 md:p-6 h-full w-full fade-in-up">
+      <div className="w-full max-w-4xl">
+        <ContactForm initialData={initialContactData} contactId={id} />
+      </div>
     </div>
   );
 };
