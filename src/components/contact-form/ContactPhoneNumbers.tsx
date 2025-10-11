@@ -90,7 +90,7 @@ const ContactPhoneNumbers: React.FC = React.memo(() => {
 
               <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
                 {/* Phone Type */}
-                <div className="sm:col-span-4">
+                <div className="sm:col-span-3">
                   <FormField
                     control={form.control}
                     name={`phoneNumbers.${index}.phone_type`}
@@ -132,7 +132,7 @@ const ContactPhoneNumbers: React.FC = React.memo(() => {
                 </div>
 
                 {/* Phone Number */}
-                <div className="sm:col-span-5">
+                <div className="sm:col-span-6">
                   <FormField
                     control={form.control}
                     name={`phoneNumbers.${index}.phone_number`}

@@ -174,17 +174,31 @@ export const TagInput: React.FC<TagInputProps> = ({
 
       {/* Add new tag */}
       <div className="relative">
-        <div className="flex items-center gap-2 p-3 rounded-xl bg-slate-50/80 dark:bg-slate-800/60 border-2 border-slate-200/60 dark:border-slate-600/60 backdrop-blur-md transition-all duration-300 ease-out focus-within:ring-4 focus-within:ring-primary-500/30 focus-within:border-primary-400 hover:bg-slate-100/90 dark:hover:bg-slate-700/70 shadow-lg hover:shadow-xl">
-          <input
-            ref={inputRef}
-            type="text"
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyDown={handleKeyDown}
-            onFocus={() => setIsOpen(true)}
-            placeholder={placeholder}
-            className="flex-1 bg-transparent border-none outline-none text-sm placeholder:text-slate-500 dark:placeholder:text-slate-400 text-slate-700 dark:text-slate-300"
-          />
+        <div className="flex flex-col gap-2 p-3 rounded-xl bg-slate-50/80 dark:bg-slate-800/60 border-2 border-slate-200/60 dark:border-slate-600/60 backdrop-blur-md transition-all duration-300 ease-out focus-within:ring-4 focus-within:ring-primary-500/30 focus-within:border-primary-400 hover:bg-slate-100/90 dark:hover:bg-slate-700/70 shadow-lg hover:shadow-xl w-full">
+          <div className="flex items-center gap-2">
+            <input
+              ref={inputRef}
+              type="text"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyDown={handleKeyDown}
+              onFocus={() => setIsOpen(true)}
+              placeholder={placeholder}
+              className="flex-1 min-w-0 bg-transparent border-none outline-none text-sm placeholder:text-slate-500 dark:placeholder:text-slate-400 text-slate-700 dark:text-slate-300"
+            />
+
+            <GlassButton
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={handleAddTag}
+              disabled={!inputValue.trim()}
+              className="bg-slate-100/80 hover:bg-slate-200/90 dark:bg-slate-700/80 dark:hover:bg-slate-600/90 text-slate-700 dark:text-slate-300 border border-slate-200/60 dark:border-slate-600/60 rounded-xl px-3 py-1.5 transition-all duration-200 hover:scale-105 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+            >
+              <Plus size={14} className="ml-2" />
+              اضافه
+            </GlassButton>
+          </div>
 
           {/* Color picker */}
           <div className="flex items-center gap-1">
@@ -204,18 +218,6 @@ export const TagInput: React.FC<TagInputProps> = ({
               />
             ))}
           </div>
-
-          <GlassButton
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={handleAddTag}
-            disabled={!inputValue.trim()}
-            className="bg-slate-100/80 hover:bg-slate-200/90 dark:bg-slate-700/80 dark:hover:bg-slate-600/90 text-slate-700 dark:text-slate-300 border border-slate-200/60 dark:border-slate-600/60 rounded-xl px-3 py-1.5 transition-all duration-200 hover:scale-105 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
-          >
-            <Plus size={14} className="ml-2" />
-            اضافه
-          </GlassButton>
         </div>
       </div>
 

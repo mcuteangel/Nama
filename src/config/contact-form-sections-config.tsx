@@ -85,109 +85,79 @@ export const useContactFormSections = (): ContactFormSectionsConfig => {
       )
     },
     {
-      id: 'phone',
-      title: t('accessibility.phone_section', 'Phone Numbers Section'),
+      id: 'contact-info',
+      title: t('accessibility.contact_info_section', 'Contact Information Section'),
       component: (
         <Suspense fallback={<SectionLoader />}>
-          <ContactPhoneNumbers />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <ContactPhoneNumbers />
+            <ContactEmailAddresses />
+          </div>
         </Suspense>
       )
     },
     {
-      id: 'email',
-      title: t('accessibility.email_section', 'Email Addresses Section'),
+      id: 'social-dates',
+      title: t('accessibility.social_dates_section', 'Social Links and Important Dates Section'),
       component: (
         <Suspense fallback={<SectionLoader />}>
-          <ContactEmailAddresses />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <ContactSocialLinks />
+            <ContactImportantDates />
+          </div>
         </Suspense>
       )
     },
     {
-      id: 'social',
-      title: t('accessibility.social_section', 'Social Links Section'),
+      id: 'address-notes',
+      title: t('accessibility.address_notes_section', 'Address and Notes Section'),
       component: (
         <Suspense fallback={<SectionLoader />}>
-          <ContactSocialLinks />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <ContactAddress />
+            <ContactNotes />
+          </div>
         </Suspense>
       )
     },
     {
-      id: 'dates',
-      title: t('accessibility.dates_section', 'Important Dates Section'),
+      id: 'fields-tags',
+      title: t('accessibility.fields_tags_section', 'Custom Fields and Tags Section'),
       component: (
         <Suspense fallback={<SectionLoader />}>
-          <ContactImportantDates />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <ContactCustomFields
+              availableTemplates={availableTemplates}
+              loadingTemplates={loadingTemplates}
+              fetchTemplates={fetchTemplates}
+            />
+            <ContactTags
+              contactId={contactId}
+              selectedTags={(form.watch('tags') || []).map(tag => ({
+                id: tag.id,
+                name: tag.name,
+                color: tag.color,
+                user_id: tag.user_id || 'temp-user',
+                created_at: tag.created_at || new Date().toISOString(),
+                updated_at: tag.updated_at || new Date().toISOString()
+              }))}
+              onTagsChange={(tags) => {
+                form.setValue('tags', tags, { shouldValidate: true, shouldDirty: true });
+              }}
+            />
+          </div>
         </Suspense>
       )
     },
     {
-      id: 'address',
-      title: t('accessibility.address_section', 'Address Section'),
+      id: 'preview-history',
+      title: t('accessibility.preview_history_section', 'Preview and History Section'),
       component: (
         <Suspense fallback={<SectionLoader />}>
-          <ContactAddress />
-        </Suspense>
-      )
-    },
-    {
-      id: 'notes',
-      title: t('accessibility.notes_section', 'Notes Section'),
-      component: (
-        <Suspense fallback={<SectionLoader />}>
-          <ContactNotes />
-        </Suspense>
-      )
-    },
-    {
-      id: 'custom-fields',
-      title: t('accessibility.custom_fields_section', 'Custom Fields Section'),
-      component: (
-        <Suspense fallback={<SectionLoader />}>
-          <ContactCustomFields
-            availableTemplates={availableTemplates}
-            loadingTemplates={loadingTemplates}
-            fetchTemplates={fetchTemplates}
-          />
-        </Suspense>
-      )
-    },
-    {
-      id: 'tags',
-      title: t('accessibility.tags_section', 'Tags Section'),
-      component: (
-        <Suspense fallback={<SectionLoader />}>
-          <ContactTags
-            contactId={contactId}
-            selectedTags={(form.watch('tags') || []).map(tag => ({
-              id: tag.id,
-              name: tag.name,
-              color: tag.color,
-              user_id: tag.user_id || 'temp-user',
-              created_at: tag.created_at || new Date().toISOString(),
-              updated_at: tag.updated_at || new Date().toISOString()
-            }))}
-            onTagsChange={(tags) => {
-              form.setValue('tags', tags, { shouldValidate: true, shouldDirty: true });
-            }}
-          />
-        </Suspense>
-      )
-    },
-    {
-      id: 'preview',
-      title: t('accessibility.preview_section', 'Preview Section'),
-      component: (
-        <Suspense fallback={<SectionLoader />}>
-          <ContactPreviewCard contact={form.getValues()} />
-        </Suspense>
-      )
-    },
-    {
-      id: 'history',
-      title: t('accessibility.history_section', 'History Section'),
-      component: (
-        <Suspense fallback={<SectionLoader />}>
-          <ContactHistory contactId={contactId || 'new'} />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <ContactPreviewCard contact={form.getValues()} />
+            <ContactHistory contactId={contactId || 'new'} />
+          </div>
         </Suspense>
       )
     },
