@@ -7,8 +7,8 @@ import { TagInput, TagList } from '@/components/ui/tag';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { useSession } from '@/integrations/supabase/auth';
-import { FormSection } from '@/components/ui/FormSection';
 import { FormCard } from '@/components/ui/FormCard';
+import { FormSection } from '@/components/ui/FormSection';
 
 export interface ContactTagsProps {
   contactId?: string;
@@ -129,116 +129,116 @@ const ContactTags: React.FC<ContactTagsProps> = ({
   };
 
   return (
-    <FormSection
-      icon={Tag}
+    <FormCard
       title="تگ‌ها"
       description="تگ‌های مرتبط با مخاطب را انتخاب یا ایجاد کنید"
-      className={cn('space-y-4', className)}
+      icon={Tag}
+      iconColor="#8b5cf6"
     >
-      {loading ? (
-        <FormCard
-          title="در حال بارگذاری..."
-          description="تگ‌ها در حال بارگذاری هستند"
-          icon={Loader2}
-          iconColor="#f59e0b"
-        >
-          <div className="flex items-center justify-center py-8">
-            <Loader2 size={24} className="text-orange-500 animate-spin ml-2" />
-            <span className="text-slate-600 dark:text-slate-400">در حال بارگذاری تگ‌ها...</span>
+      <div className="space-y-3">
+        {loading ? (
+          <div className="text-center py-8 text-slate-500 dark:text-slate-400">
+            <Loader2 size={24} className="mx-auto mb-2 opacity-50 animate-spin" />
+            <p className="text-sm">در حال بارگذاری تگ‌ها...</p>
           </div>
-        </FormCard>
-      ) : error ? (
-        <FormCard
-          title="خطا در بارگذاری"
-          description={error}
-          icon={XCircle}
-          iconColor="#ef4444"
-        >
-          <div className="text-center py-8">
-            <XCircle size={48} className="mx-auto mb-4 text-red-500" />
-            <p className="text-slate-600 dark:text-slate-400">بارگذاری تگ‌ها با خطا مواجه شد</p>
+        ) : error ? (
+          <div className="text-center py-8 text-slate-500 dark:text-slate-400">
+            <XCircle size={24} className="mx-auto mb-2 opacity-50" />
+            <p className="text-sm">بارگذاری تگ‌ها با خطا مواجه شد</p>
           </div>
-        </FormCard>
-      ) : (
-        <>
-          {/* Selected tags */}
-          {selectedTags.length > 0 && (
-            <FormCard
-              title="تگ‌های انتخاب شده"
-              description="تگ‌هایی که برای این مخاطب انتخاب شده‌اند"
-              icon={CheckCircle}
-              iconColor="#22c55e"
+        ) : (
+          <>
+            {/* Selected tags */}
+            {selectedTags.length > 0 && (
+              <FormSection
+                variant="card"
+                title=""
+                className="relative"
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-6 h-6 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center">
+                    <CheckCircle size={10} className="text-primary-600 dark:text-primary-400" />
+                  </div>
+                  <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                    تگ‌های انتخاب شده
+                  </span>
+                </div>
+                <TagList
+                  tags={selectedTags}
+                  onRemove={handleRemoveTag}
+                  removable={true}
+                  size="lg"
+                  className="gap-2"
+                />
+              </FormSection>
+            )}
+
+            {/* Add new tag */}
+            <FormSection
+              variant="card"
+              title=""
+              className="relative"
             >
-              <TagList
-                tags={selectedTags}
-                onRemove={handleRemoveTag}
-                removable={true}
-                size="lg"
-                className="gap-2"
+              <TagInput
+                tags={[]}
+                onAdd={handleAddTag}
+                placeholder="نام تگ جدید را وارد کنید..."
+                label="ایجاد تگ جدید"
               />
-            </FormCard>
-          )}
+            </FormSection>
 
-          {/* Add new tag */}
-          <FormCard
-            title="ایجاد تگ جدید"
-            description="تگ جدیدی برای این مخاطب ایجاد کنید"
-            icon={Plus}
-            iconColor="#3b82f6"
-          >
-            <TagInput
-              tags={[]}
-              onAdd={handleAddTag}
-              placeholder="نام تگ جدید را وارد کنید..."
-              className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-600"
-            />
-          </FormCard>
-
-          {/* Available tags */}
-          {availableTags.length > 0 && (
-            <FormCard
-              title="تگ‌های موجود"
-              description="از تگ‌های موجود انتخاب کنید"
-              icon={Tag}
-              iconColor="#8b5cf6"
-            >
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                {availableTags.map((tag) => (
-                  <button
-                    key={tag.id}
-                    onClick={() => handleSelectExistingTag(tag)}
-                    disabled={selectedTags.some(t => t.id === tag.id)}
-                    className={cn(
-                      'inline-flex items-center gap-2 px-3 py-2 text-sm rounded-lg border transition-all duration-300',
-                      'hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl',
-                      selectedTags.some(t => t.id === tag.id)
-                        ? 'bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-600 text-slate-500 cursor-default'
-                        : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300'
-                    )}
-                  >
-                    <div
-                      className="w-3 h-3 rounded-full shadow-sm"
-                      style={{ backgroundColor: tag.color }}
-                    />
-                    <span className="font-medium truncate">
-                      {tag.name}
-                    </span>
-                    {tag.contact_count !== undefined && tag.contact_count > 0 && (
-                      <span className="text-xs opacity-80 px-1.5 py-0.5 rounded-full bg-slate-200 dark:bg-slate-700">
-                        ({tag.contact_count})
+            {/* Available tags */}
+            {availableTags.length > 0 && (
+              <FormSection
+                variant="card"
+                title=""
+                className="relative"
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-6 h-6 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center">
+                    <Tag size={10} className="text-primary-600 dark:text-primary-400" />
+                  </div>
+                  <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                    تگ‌های موجود
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                  {availableTags.map((tag) => (
+                    <button
+                      key={tag.id}
+                      onClick={() => handleSelectExistingTag(tag)}
+                      disabled={selectedTags.some(t => t.id === tag.id)}
+                      className={cn(
+                        'inline-flex items-center gap-2 px-3 py-2 text-sm rounded-lg border transition-all duration-200',
+                        selectedTags.some(t => t.id === tag.id)
+                          ? 'bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-600 text-slate-500 cursor-default'
+                          : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 hover:scale-105'
+                      )}
+                    >
+                      <div
+                        className="w-3 h-3 rounded-full shadow-sm"
+                        style={{ backgroundColor: tag.color }}
+                      />
+                      <span className="font-medium truncate">
+                        {tag.name}
                       </span>
-                    )}
-                    {selectedTags.some(t => t.id === tag.id) && (
-                      <CheckCircle size={14} className="text-green-500" />
-                    )}
-                  </button>
-                ))}
-              </div>
-            </FormCard>
-          )}
-        </>
-      )}
-    </FormSection>
+                      {tag.contact_count !== undefined && tag.contact_count > 0 && (
+                        <span className="text-xs opacity-80 px-1.5 py-0.5 rounded-full bg-slate-200 dark:bg-slate-700">
+                          ({tag.contact_count})
+                        </span>
+                      )}
+                      {selectedTags.some(t => t.id === tag.id) && (
+                        <CheckCircle size={14} className="text-green-500" />
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </FormSection>
+            )}
+          </>
+        )}
+      </div>
+    </FormCard>
   );
 };
 

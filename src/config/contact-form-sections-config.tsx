@@ -14,7 +14,6 @@ const ContactSocialLinks = lazy(() => import('@/components/contact-form/ContactS
 const ContactImportantDates = lazy(() => import('@/components/contact-form/ContactImportantDates.tsx'));
 const ContactAddress = lazy(() => import('@/components/contact-form/ContactAddress.tsx'));
 const ContactNotes = lazy(() => import('@/components/contact-form/ContactNotes.tsx'));
-const ContactOtherDetails = lazy(() => import('@/components/contact-form/ContactOtherDetails.tsx'));
 const ContactCustomFields = lazy(() => import('@/components/contact-form/ContactCustomFields.tsx'));
 const ContactPreviewCard = lazy(() => import('@/components/contact-form/ContactPreviewCard.tsx'));
 const ContactHistory = lazy(() => import('@/components/contact-form/ContactHistory.tsx'));

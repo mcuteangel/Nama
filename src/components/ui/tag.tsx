@@ -1,7 +1,8 @@
 import React from 'react';
-import { X } from 'lucide-react';
+import { X, AlertCircle, Plus } from 'lucide-react';
 import { Tag as TagType, TAG_COLOR_VARIANTS } from '@/types/tag';
 import { cn } from '@/lib/utils';
+import { GlassButton } from "@/components/ui/glass-button";
 
 export interface TagProps {
   tag: TagType;
@@ -112,6 +113,9 @@ export interface TagInputProps {
   availableColors?: string[];
   placeholder?: string;
   className?: string;
+  error?: string;
+  label?: string;
+  required?: boolean;
 }
 
 export const TagInput: React.FC<TagInputProps> = ({
@@ -120,7 +124,10 @@ export const TagInput: React.FC<TagInputProps> = ({
   onRemove,
   availableColors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'],
   placeholder = 'تگ جدید اضافه کنید...',
-  className
+  className,
+  error,
+  label = 'تگ‌ها',
+  required = false
 }) => {
   const [inputValue, setInputValue] = React.useState('');
   const [selectedColor, setSelectedColor] = React.useState(availableColors[0]);
@@ -146,7 +153,15 @@ export const TagInput: React.FC<TagInputProps> = ({
   };
 
   return (
-    <div className={cn('space-y-3', className)}>
+    <div className={cn('space-y-2', className)}>
+      {/* Label */}
+      <div className="flex items-center gap-2">
+        <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+          {label}
+        </span>
+        {required && <span className="text-red-500">*</span>}
+      </div>
+
       {/* Existing tags */}
       {tags.length > 0 && (
         <TagList
@@ -159,7 +174,7 @@ export const TagInput: React.FC<TagInputProps> = ({
 
       {/* Add new tag */}
       <div className="relative">
-        <div className="flex items-center gap-2 p-3 border border-dashed border-muted-foreground/30 rounded-lg bg-muted/20">
+        <div className="flex items-center gap-2 p-3 rounded-xl bg-slate-50/80 dark:bg-slate-800/60 border-2 border-slate-200/60 dark:border-slate-600/60 backdrop-blur-md transition-all duration-300 ease-out focus-within:ring-4 focus-within:ring-primary-500/30 focus-within:border-primary-400 hover:bg-slate-100/90 dark:hover:bg-slate-700/70 shadow-lg hover:shadow-xl">
           <input
             ref={inputRef}
             type="text"
@@ -168,7 +183,7 @@ export const TagInput: React.FC<TagInputProps> = ({
             onKeyDown={handleKeyDown}
             onFocus={() => setIsOpen(true)}
             placeholder={placeholder}
-            className="flex-1 bg-transparent border-none outline-none text-sm placeholder:text-muted-foreground"
+            className="flex-1 bg-transparent border-none outline-none text-sm placeholder:text-slate-500 dark:placeholder:text-slate-400 text-slate-700 dark:text-slate-300"
           />
 
           {/* Color picker */}
@@ -179,10 +194,10 @@ export const TagInput: React.FC<TagInputProps> = ({
                 type="button"
                 onClick={() => setSelectedColor(color)}
                 className={cn(
-                  'w-6 h-6 rounded-full border-2 transition-all',
+                  'w-5 h-5 rounded-full border-2 transition-all hover:scale-110 shadow-lg',
                   selectedColor === color
-                    ? 'border-foreground scale-110'
-                    : 'border-muted-foreground/30 hover:border-muted-foreground/60'
+                    ? 'border-slate-900 dark:border-slate-100 scale-110 shadow-xl'
+                    : 'border-slate-300/60 dark:border-slate-600/60 hover:border-slate-400 dark:hover:border-slate-500 hover:shadow-lg'
                 )}
                 style={{ backgroundColor: color }}
                 aria-label={`انتخاب رنگ ${color}`}
@@ -190,16 +205,27 @@ export const TagInput: React.FC<TagInputProps> = ({
             ))}
           </div>
 
-          <button
+          <GlassButton
             type="button"
+            variant="ghost"
+            size="sm"
             onClick={handleAddTag}
             disabled={!inputValue.trim()}
-            className="px-3 py-1.5 text-sm bg-primary text-primary-foreground rounded-md hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="bg-slate-100/80 hover:bg-slate-200/90 dark:bg-slate-700/80 dark:hover:bg-slate-600/90 text-slate-700 dark:text-slate-300 border border-slate-200/60 dark:border-slate-600/60 rounded-xl px-3 py-1.5 transition-all duration-200 hover:scale-105 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
           >
+            <Plus size={14} className="ml-2" />
             اضافه
-          </button>
+          </GlassButton>
         </div>
       </div>
+
+      {/* Error message */}
+      {error && (
+        <p className="text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+          <AlertCircle size={12} />
+          {error}
+        </p>
+      )}
     </div>
   );
 };
