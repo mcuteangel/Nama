@@ -1,6 +1,15 @@
 import { QueryClient, DefaultOptions, MutationCache, QueryCache } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
+// Types for mutation meta
+interface MutationMeta {
+  silent?: boolean;
+  showSuccessToast?: boolean;
+  successMessage?: string;
+  invalidates?: string | readonly unknown[] | readonly unknown[][];
+  queryClient?: QueryClient;
+}
+
 // Default query options with optimized caching and retry strategies
 const queryConfig: DefaultOptions = {
   queries: {
@@ -11,9 +20,10 @@ const queryConfig: DefaultOptions = {
     gcTime: 10 * 60 * 1000, // formerly cacheTime
     
     // Retry configuration
-    retry: (failureCount, error: any) => {
+    retry: (failureCount: number, error: unknown) => {
       // Don't retry on 4xx errors (client errors)
-      if (error?.status >= 400 && error?.status < 500) {
+      const errorWithStatus = error as { status?: number };
+      if (errorWithStatus.status && errorWithStatus.status >= 400 && errorWithStatus.status < 500) {
         return false;
       }
       // Retry up to 3 times for other errors
@@ -35,19 +45,13 @@ const queryConfig: DefaultOptions = {
     
     // Network-aware settings
     networkMode: 'online',
-    
-    // Disable refetch on window focus for mobile to save battery
-    refetchOnWindowFocus: () => {
-      // Check if device is mobile
-      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-      return !isMobile;
-    },
   },
   mutations: {
     // Retry mutations up to 2 times
-    retry: (failureCount, error: any) => {
+    retry: (failureCount: number, error: unknown) => {
       // Don't retry on 4xx errors (client errors)
-      if (error?.status >= 400 && error?.status < 500) {
+      const errorWithStatus = error as { status?: number };
+      if (errorWithStatus.status && errorWithStatus.status >= 400 && errorWithStatus.status < 500) {
         return false;
       }
       return failureCount < 2;
@@ -65,7 +69,7 @@ const queryConfig: DefaultOptions = {
 
 // Enhanced error handling for queries
 const queryCache = new QueryCache({
-  onError: (error: any, query) => {
+  onError: (error: unknown, query) => {
     console.error('Query error:', error, query);
     
     // Don't show toast for background refetches
@@ -77,7 +81,7 @@ const queryCache = new QueryCache({
     const errorMessage = getErrorMessage(error);
     
     // Only show error toast if it's not a network error during background refetch
-    if (!query.state.isFetching || query.state.error) {
+    if (query.state.status !== 'pending' || query.state.error) {
       toast.error(errorMessage, {
         duration: 5000,
         id: `query-error-${query.queryHash}`, // Prevent duplicate toasts
@@ -95,7 +99,7 @@ const queryCache = new QueryCache({
 
 // Enhanced error handling for mutations
 const mutationCache = new MutationCache({
-  onError: (error: any, variables, context, mutation) => {
+  onError: (error: unknown, _variables, _context, mutation) => {
     console.error('Mutation error:', error, mutation);
     
     // Don't show toast for silent mutations
@@ -110,10 +114,10 @@ const mutationCache = new MutationCache({
     });
   },
   
-  onSuccess: (data, variables, context, mutation) => {
+  onSuccess: (data, _variables, _context, mutation) => {
     // Show success message for important mutations
     if (mutation.meta?.showSuccessToast) {
-      const successMessage = mutation.meta.successMessage || 'Operation completed successfully';
+      const successMessage = (mutation.meta as MutationMeta).successMessage ?? 'Operation completed successfully';
       toast.success(successMessage, {
         duration: 3000,
       });
@@ -125,44 +129,48 @@ const mutationCache = new MutationCache({
     }
   },
   
-  onSettled: (data, error, variables, context, mutation) => {
+  onSettled: (_data, _error, _variables, _context, mutation) => {
     // Invalidate related queries after mutations
     if (mutation.meta?.invalidates) {
-      const queryClient = mutation.meta.queryClient;
+      const queryClient = (mutation.meta as MutationMeta).queryClient;
       const invalidatePatterns = Array.isArray(mutation.meta.invalidates) 
         ? mutation.meta.invalidates 
         : [mutation.meta.invalidates];
       
       invalidatePatterns.forEach(pattern => {
-        queryClient?.invalidateQueries({ queryKey: pattern });
+        if (queryClient && typeof queryClient.invalidateQueries === 'function') {
+          queryClient.invalidateQueries({ queryKey: pattern });
+        }
       });
     }
   },
 });
 
 // Utility function to extract user-friendly error messages
-function getErrorMessage(error: any): string {
+function getErrorMessage(error: unknown): string {
   // Handle Supabase errors
-  if (error?.message) {
+  if (error && typeof error === 'object' && 'message' in error) {
+    const errorObj = error as { message: string };
     // Common Supabase error patterns
-    if (error.message.includes('JWT')) {
+    if (errorObj.message.includes('JWT')) {
       return 'Session expired. Please log in again.';
     }
-    if (error.message.includes('permission')) {
+    if (errorObj.message.includes('permission')) {
       return 'You do not have permission to perform this action.';
     }
-    if (error.message.includes('network')) {
+    if (errorObj.message.includes('network')) {
       return 'Network error. Please check your connection.';
     }
-    if (error.message.includes('timeout')) {
+    if (errorObj.message.includes('timeout')) {
       return 'Request timed out. Please try again.';
     }
-    return error.message;
+    return errorObj.message;
   }
   
   // Handle HTTP status codes
-  if (error?.status) {
-    switch (error.status) {
+  if (error && typeof error === 'object' && 'status' in error) {
+    const errorObj = error as { status: number };
+    switch (errorObj.status) {
       case 400:
         return 'Invalid request. Please check your input.';
       case 401:
@@ -182,13 +190,16 @@ function getErrorMessage(error: any): string {
       case 503:
         return 'Service unavailable. Please try again later.';
       default:
-        return `Request failed with status ${error.status}`;
+        return `Request failed with status ${errorObj.status}`;
     }
   }
   
   // Generic network errors
-  if (error?.code === 'NETWORK_ERROR' || !navigator.onLine) {
-    return 'Network error. Please check your connection.';
+  if (error && typeof error === 'object' && 'code' in error) {
+    const errorObj = error as { code: string };
+    if (errorObj.code === 'NETWORK_ERROR' || !navigator.onLine) {
+      return 'Network error. Please check your connection.';
+    }
   }
   
   // Fallback
@@ -208,7 +219,7 @@ export const queryKeys = {
   contacts: {
     all: ['contacts'] as const,
     lists: () => [...queryKeys.contacts.all, 'list'] as const,
-    list: (filters: Record<string, any>) => [...queryKeys.contacts.lists(), { filters }] as const,
+    list: (filters: Record<string, unknown>) => [...queryKeys.contacts.lists(), { filters }] as const,
     details: () => [...queryKeys.contacts.all, 'detail'] as const,
     detail: (id: string) => [...queryKeys.contacts.details(), id] as const,
     search: (term: string) => [...queryKeys.contacts.all, 'search', term] as const,
@@ -218,7 +229,7 @@ export const queryKeys = {
   groups: {
     all: ['groups'] as const,
     lists: () => [...queryKeys.groups.all, 'list'] as const,
-    list: (filters?: Record<string, any>) => [...queryKeys.groups.lists(), { filters }] as const,
+    list: (filters?: Record<string, unknown>) => [...queryKeys.groups.lists(), { filters }] as const,
     details: () => [...queryKeys.groups.all, 'detail'] as const,
     detail: (id: string) => [...queryKeys.groups.details(), id] as const,
   },
@@ -227,7 +238,7 @@ export const queryKeys = {
   users: {
     all: ['users'] as const,
     lists: () => [...queryKeys.users.all, 'list'] as const,
-    list: (filters?: Record<string, any>) => [...queryKeys.users.lists(), { filters }] as const,
+    list: (filters?: Record<string, unknown>) => [...queryKeys.users.lists(), { filters }] as const,
     details: () => [...queryKeys.users.all, 'detail'] as const,
     detail: (id: string) => [...queryKeys.users.details(), id] as const,
     profile: (id: string) => [...queryKeys.users.all, 'profile', id] as const,
@@ -319,9 +330,21 @@ export const networkUtils = {
 // Development tools
 if (process.env.NODE_ENV === 'development') {
   // Make queryClient available globally for debugging
-  (window as any).queryClient = queryClient;
-  (window as any).queryKeys = queryKeys;
-  (window as any).queryUtils = queryUtils;
+  (window as typeof window & {
+    queryClient: typeof queryClient;
+    queryKeys: typeof queryKeys;
+    queryUtils: typeof queryUtils;
+  }).queryClient = queryClient;
+  (window as typeof window & {
+    queryClient: typeof queryClient;
+    queryKeys: typeof queryKeys;
+    queryUtils: typeof queryUtils;
+  }).queryKeys = queryKeys;
+  (window as typeof window & {
+    queryClient: typeof queryClient;
+    queryKeys: typeof queryKeys;
+    queryUtils: typeof queryUtils;
+  }).queryUtils = queryUtils;
 }
 
 export default queryClient;

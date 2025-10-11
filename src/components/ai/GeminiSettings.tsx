@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { GlassButton } from "@/components/ui/glass-button";
 import { ModernInput } from '@/components/ui/modern-input';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { ModernSelect, ModernSelectContent, ModernSelectItem, ModernSelectTrigger, ModernSelectValue } from '@/components/ui/modern-select';
 import { useTranslation } from 'react-i18next';
 import { useSession } from '@/integrations/supabase/auth';
@@ -16,7 +16,6 @@ import { SettingsService } from '@/services/settings-service';
 import { fetchWithCache, invalidateCache } from '@/utils/cache-helpers';
 import LoadingSpinner from '../common/LoadingSpinner';
 import { Key, Brain, Shield, CheckCircle, AlertTriangle, Zap, Info, Eye, EyeOff, RefreshCw, TestTube, Sparkles, Trash2 } from 'lucide-react';
-import SettingsSection from '../settings/SettingsSection';
 import SettingsCard from '../settings/SettingsCard';
 
 interface GeminiModel {
@@ -132,7 +131,38 @@ const GeminiSettings: React.FC = React.memo(() => {
     onError: onErrorFetchSettings,
   });
 
-  // تابع تست اتصال به API
+  const onSuccessTestConnection = useCallback((result: { success: boolean; message: string }) => {
+    setConnectionStatus(result.success ? 'connected' : 'error');
+    setTestResults({
+      success: result.success,
+      message: result.message,
+      timestamp: new Date(),
+    });
+    ErrorManager.notifyUser(
+      result.success ? t('settings.test_success') : t('settings.test_failed'),
+      result.success ? 'success' : 'error'
+    );
+  }, [t]);
+
+  const onErrorTestConnection = useCallback((err: Error) => {
+    setConnectionStatus('error');
+    setTestResults({
+      success: false,
+      message: err.message,
+      timestamp: new Date(),
+    });
+    ErrorManager.notifyUser(t('settings.test_failed'), 'error');
+  }, [t]);
+
+  const {
+    isLoading: isTesting,
+    executeAsync: executeTest,
+  } = useErrorHandler<{ success: boolean; message: string }>(null, {
+    showToast: false,
+    onSuccess: onSuccessTestConnection,
+    onError: onErrorTestConnection,
+  });
+
   const testConnection = useCallback(async () => {
     if (!session?.user || !form.watch('geminiApiKey')) {
       ErrorManager.notifyUser(t('settings.enter_api_key_first'), 'warning');
@@ -142,45 +172,25 @@ const GeminiSettings: React.FC = React.memo(() => {
     setConnectionStatus('testing');
     setTestResults(null);
 
-    const {
-      isLoading: isTesting,
-      executeAsync: executeTest,
-    } = useErrorHandler<{ success: boolean; message: string }>(null, {
-      showToast: false,
-      onSuccess: (result) => {
-        setConnectionStatus(result.success ? 'connected' : 'error');
-        setTestResults({
-          success: result.success,
-          message: result.message,
-          timestamp: new Date(),
-        });
-        ErrorManager.notifyUser(
-          result.success ? t('settings.test_success') : t('settings.test_failed'),
-          result.success ? 'success' : 'error'
-        );
-      },
-      onError: (err) => {
-        setConnectionStatus('error');
-        setTestResults({
-          success: false,
-          message: err.message,
-          timestamp: new Date(),
-        });
-        ErrorManager.notifyUser(t('settings.test_failed'), 'error');
-      },
-    });
-
     await executeTest(async () => {
+      const apiKey = form.watch('geminiApiKey');
+      const model = form.watch('geminiModel');
+
+      if (!apiKey || !model) {
+        throw new Error(t('settings.api_key_and_model_required'));
+      }
+
       const res = await SettingsService.testGeminiConnection({
-        apiKey: form.watch('geminiApiKey'),
-        model: form.watch('geminiModel'),
+        apiKey,
+        model,
       });
       if (res.error) {
         throw new Error(res.error);
       }
-      return res.data;
+      // Return a simple object since the actual result is handled by callbacks
+      return { success: res.success, message: res.message };
     });
-  }, [session, form, t]);
+  }, [session, form, t, executeTest]);
 
   useEffect(() => {
     const fetchAllSettings = async () => {
@@ -283,17 +293,17 @@ const GeminiSettings: React.FC = React.memo(() => {
                 <CheckCircle size={14} className="text-green-600" />
               ) : stats.connectionStatus === 'error' ? (
                 <AlertTriangle size={14} className="text-red-600" />
-              ) : stats.connectionStatus === 'testing' ? (
+              ) : stats.connectionStatus === 'testing' || isTesting ? (
                 <RefreshCw size={14} className="text-blue-600 animate-spin" />
               ) : (
                 <Shield size={14} className="text-gray-600" />
               )}
             </div>
             <div className="text-xs font-bold text-green-600 dark:text-green-400">
-              {stats.connectionStatus === 'connected' ? t('settings.connected', 'متصل') :
-               stats.connectionStatus === 'error' ? t('settings.error', 'خطا') :
-               stats.connectionStatus === 'testing' ? t('settings.testing', 'در حال تست') :
-               t('settings.not_configured', 'پیکربندی نشده')}
+              {stats.connectionStatus === 'connected' ? t('settings.connected') :
+               stats.connectionStatus === 'error' ? t('settings.error') :
+               (stats.connectionStatus === 'testing' || isTesting) ? t('settings.testing') :
+               t('settings.not_configured')}
             </div>
             <div className="text-xs text-gray-600 dark:text-gray-400 mt-1">
               وضعیت اتصال
@@ -302,7 +312,7 @@ const GeminiSettings: React.FC = React.memo(() => {
 
           <div className="text-center p-3 bg-gradient-to-r from-blue-50/60 to-indigo-50/60 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-lg border border-blue-200/30 dark:border-blue-700/30">
             <div className="text-lg font-bold text-blue-600 dark:text-blue-400">{stats.totalModels}</div>
-            <div className="text-xs text-blue-500 dark:text-blue-300">{t('settings.available_models', 'مدل موجود')}</div>
+            <div className="text-xs text-blue-500 dark:text-blue-300">{t('settings.available_models')}</div>
           </div>
 
           <div className="text-center p-3 bg-gradient-to-r from-purple-50/60 to-pink-50/60 dark:from-purple-900/30 dark:to-pink-900/30 rounded-lg border border-purple-200/30 dark:border-purple-700/30">
@@ -310,7 +320,7 @@ const GeminiSettings: React.FC = React.memo(() => {
               {stats.isConfigured ? '✓' : '?'}
             </div>
             <div className={`text-xs ${stats.isConfigured ? 'text-green-500 dark:text-green-300' : 'text-gray-500 dark:text-gray-400'}`}>
-              {t('settings.configured', 'پیکربندی شده')}
+              {t('settings.configured')}
             </div>
           </div>
         </div>
@@ -453,12 +463,12 @@ const GeminiSettings: React.FC = React.memo(() => {
                 type="button"
                 variant="outline"
                 onClick={testConnection}
-                disabled={isSubmitting || !stats.hasApiKey}
+                disabled={isSubmitting || !stats.hasApiKey || isTesting}
                 className="group relative overflow-hidden rounded-xl font-medium text-sm transition-all duration-300 hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-2 border-blue-200/50 dark:border-blue-700/50 hover:border-blue-300 dark:hover:border-blue-600 text-blue-700 dark:text-blue-300 hover:text-blue-800 dark:hover:text-blue-200 backdrop-blur-sm before:absolute before:inset-0 before:bg-gradient-to-r before:from-white/20 before:to-transparent before:opacity-0 hover:before:opacity-100 before:transition-opacity before:duration-300"
                 aria-label={t('settings.test_connection')}
               >
                 <div className="relative z-10 flex items-center justify-center gap-2">
-                  {connectionStatus === 'testing' ? (
+                  {isTesting ? (
                     <LoadingSpinner size={14} />
                   ) : (
                     <TestTube size={14} />

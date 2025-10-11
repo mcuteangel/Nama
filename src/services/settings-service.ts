@@ -1,14 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import { ErrorManager } from '@/lib/error-manager';
 
-interface UserSettings {
-  user_id: string;
-  gemini_api_key: string | null;
-  gemini_model: string | null; // Added gemini_model
-  created_at: string;
-  updated_at: string;
-}
-
 interface UpdateUserSettingsInput {
   userId: string;
   gemini_api_key?: string | null;
@@ -108,6 +100,53 @@ export const SettingsService = {
     } catch (err: any) {
       ErrorManager.logError(err, { context: 'SettingsService.listGeminiModels' });
       return { data: null, error: ErrorManager.getErrorMessage(err) };
+    }
+  },
+
+  async testGeminiConnection({ apiKey, model }: { apiKey: string; model: string }): Promise<{ success: boolean; message: string; error?: string }> {
+    try {
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError || !session) {
+        throw new Error("No active session found. User must be logged in to test Gemini connection.");
+      }
+
+      const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+      const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
+      const edgeFunctionUrl = `${SUPABASE_URL}/functions/v1/test-gemini-connection`;
+
+      const response = await fetch(edgeFunctionUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+          'apikey': SUPABASE_ANON_KEY,
+        },
+        body: JSON.stringify({ apiKey, model }),
+      });
+
+      if (!response.ok) {
+        let errorBody = null;
+        try {
+          errorBody = await response.json();
+        } catch (jsonParseError) {
+          throw new Error(`HTTP error! Status: ${response.status}, StatusText: ${response.statusText}`);
+        }
+        throw new Error(errorBody.error || `HTTP error! Status: ${response.status}, StatusText: ${response.statusText}`);
+      }
+
+      const responseData = await response.json();
+
+      return {
+        success: responseData.success,
+        message: responseData.message,
+      };
+    } catch (err: any) {
+      ErrorManager.logError(err, { context: 'SettingsService.testGeminiConnection', apiKey: '[HIDDEN]', model });
+      return {
+        success: false,
+        message: ErrorManager.getErrorMessage(err),
+        error: err.message,
+      };
     }
   },
 };

@@ -1,19 +1,6 @@
 import * as React from "react";
-import * as LabelPrimitive from "@radix-ui/react-label";
-import { Slot } from "@radix-ui/react-slot";
-import {
-  Controller,
-  ControllerProps,
-  FieldPath,
-  FieldValues,
-  FormProvider,
-  useFormContext,
-} from "react-hook-form";
-
 import { cn } from "@/lib/utils";
-import { Label } from "@/components/ui/label";
 import { 
-  useModernFormField,
   ModernForm,
   ModernFormControl,
   ModernFormDescription,
@@ -21,25 +8,17 @@ import {
   ModernFormItem,
   ModernFormMessage,
   ModernFormField,
-  type ModernFormItemProps
 } from "@/components/ui/modern-form";
+
+interface ModernFormItemProps {
+  glassEffect?: import("@/types/global-style-types").GlassEffect;
+  gradientType?: import("@/types/global-style-types").GradientType;
+  neomorphism?: boolean;
+}
 
 const Form = ModernForm;
 
-interface FormFieldContextValue<
-  TFieldValues extends FieldValues = FieldValues,
-  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
-> {
-  name: TName;
-}
-
-const FormFieldContext = React.createContext<FormFieldContextValue>(
-  {} as FormFieldContextValue
-);
-
 const FormField = ModernFormField;
-
-const useFormField = useModernFormField;
 
 interface FormItemContextValue {
   id: string;
@@ -76,7 +55,6 @@ const FormDescription = ModernFormDescription;
 const FormMessage = ModernFormMessage;
 
 export {
-  useFormField,
   Form,
   FormControl,
   FormDescription,

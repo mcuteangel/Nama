@@ -24,6 +24,13 @@ const defaultSettings: AppSettings = {
   twoFactorAuth: false,
 };
 
+// Error messages
+const ERROR_MESSAGES = {
+  LOAD_FAILED: 'Failed to load settings',
+  SAVE_FAILED: 'Failed to save settings',
+  RESET_FAILED: 'Failed to reset settings',
+} as const;
+
 export const useAppSettings = () => {
   const [settings, setSettings] = useState<AppSettings>(defaultSettings);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -40,7 +47,7 @@ export const useAppSettings = () => {
         }
       } catch (error) {
         console.warn('Failed to load app settings:', error);
-        setError('Failed to load settings');
+        setError(ERROR_MESSAGES.LOAD_FAILED);
       } finally {
         setIsLoaded(true);
       }
@@ -65,7 +72,7 @@ export const useAppSettings = () => {
       });
     } catch (error) {
       console.error('Failed to save app settings:', error);
-      setError('Failed to save settings');
+      setError(ERROR_MESSAGES.SAVE_FAILED);
     }
   };
 
@@ -82,7 +89,7 @@ export const useAppSettings = () => {
       window.dispatchEvent(new CustomEvent('settingsReset'));
     } catch (error) {
       console.error('Failed to reset app settings:', error);
-      setError('Failed to reset settings');
+      setError(ERROR_MESSAGES.RESET_FAILED);
     }
   };
 
