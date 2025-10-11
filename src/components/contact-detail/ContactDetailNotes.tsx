@@ -28,7 +28,7 @@ export const ContactDetailNotes: React.FC<ContactDetailNotesProps> = ({ notes })
         iconColor="#06b6d4"
       >
         <ContactSection variant="simple">
-          <div className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
+          <div className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed bg-slate-50/40 dark:bg-slate-800/20 backdrop-blur-sm p-4 rounded-xl shadow-md border border-slate-200/50 dark:border-slate-700/50">
             {notes}
           </div>
         </ContactSection>

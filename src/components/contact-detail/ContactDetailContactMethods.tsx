@@ -44,7 +44,9 @@ export const ContactDetailContactMethods: React.FC<ContactDetailContactMethodsPr
             <div key={phone.id} className="flex justify-between items-center">
               <div className="flex items-center gap-2">
                 <Phone size={16} className="text-slate-500" />
-                <span className="text-sm text-slate-600 dark:text-slate-400">{phone.phone_type}:</span>
+                <div className="bg-slate-50/40 dark:bg-slate-800/20 backdrop-blur-sm p-3 rounded-xl shadow-md border border-slate-200/50 dark:border-slate-700/50">
+                  <span className="text-sm text-slate-600 dark:text-slate-400">{phone.phone_type}:</span>
+                </div>
               </div>
               <span className="font-medium text-slate-900 dark:text-slate-100">
                 {phone.phone_number}
@@ -56,7 +58,9 @@ export const ContactDetailContactMethods: React.FC<ContactDetailContactMethodsPr
             <div key={email.id} className="flex justify-between items-center">
               <div className="flex items-center gap-2">
                 <Mail size={16} className="text-slate-500" />
-                <span className="text-sm text-slate-600 dark:text-slate-400">{email.email_type}:</span>
+                <div className="bg-slate-50/40 dark:bg-slate-800/20 backdrop-blur-sm p-3 rounded-xl shadow-md border border-slate-200/50 dark:border-slate-700/50">
+                  <span className="text-sm text-slate-600 dark:text-slate-400">{email.email_type}:</span>
+                </div>
               </div>
               <span className="font-medium text-slate-900 dark:text-slate-100">{email.email_address}</span>
             </div>

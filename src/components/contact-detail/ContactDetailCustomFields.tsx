@@ -38,9 +38,11 @@ export const ContactDetailCustomFields: React.FC<ContactDetailCustomFieldsProps>
             <div key={field.id} className="flex justify-between items-center">
               <div className="flex items-center gap-2">
                 <Tags size={16} className="text-slate-500" />
-                <span className="text-sm text-slate-600 dark:text-slate-400">
-                  {field.custom_field_templates?.[0]?.name || t('common.field')}:
-                </span>
+                <div className="bg-slate-50/40 dark:bg-slate-800/20 backdrop-blur-sm p-3 rounded-xl shadow-md border border-slate-200/50 dark:border-slate-700/50">
+                  <span className="text-sm text-slate-600 dark:text-slate-400">
+                    {field.custom_field_templates?.[0]?.name || t('common.field')}:
+                  </span>
+                </div>
               </div>
               <span className="font-medium text-slate-900 dark:text-slate-100">{field.field_value}</span>
             </div>

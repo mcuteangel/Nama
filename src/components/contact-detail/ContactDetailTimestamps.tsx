@@ -24,16 +24,20 @@ export const ContactDetailTimestamps: React.FC<ContactDetailTimestampsProps> = (
       <ContactSection variant="simple">
         <div className="space-y-3">
           <div className="flex justify-between items-center">
-            <span className="text-sm text-slate-600 dark:text-slate-400">{t('contact.created_at')}:</span>
-            <span className="font-medium text-slate-900 dark:text-slate-100">
-              {new Date(created_at).toLocaleDateString('fa-IR')}
-            </span>
+            <div className="bg-slate-50/40 dark:bg-slate-800/20 backdrop-blur-sm p-3 rounded-xl shadow-md border border-slate-200/50 dark:border-slate-700/50">
+              <span className="text-sm text-slate-600 dark:text-slate-400">{t('contact.created_at')}:</span>
+              <span className="font-medium text-slate-900 dark:text-slate-100">
+                {new Date(created_at).toLocaleDateString('fa-IR')}
+              </span>
+            </div>
           </div>
           <div className="flex justify-between items-center">
-            <span className="text-sm text-slate-600 dark:text-slate-400">{t('contact.updated_at')}:</span>
-            <span className="font-medium text-slate-900 dark:text-slate-100">
-              {new Date(updated_at).toLocaleDateString('fa-IR')}
-            </span>
+            <div className="bg-slate-50/40 dark:bg-slate-800/20 backdrop-blur-sm p-3 rounded-xl shadow-md border border-slate-200/50 dark:border-slate-700/50">
+              <span className="text-sm text-slate-600 dark:text-slate-400">{t('contact.updated_at')}:</span>
+              <span className="font-medium text-slate-900 dark:text-slate-100">
+                {new Date(updated_at).toLocaleDateString('fa-IR')}
+              </span>
+            </div>
           </div>
         </div>
       </ContactSection>

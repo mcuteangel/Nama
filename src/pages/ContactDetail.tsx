@@ -16,9 +16,10 @@ import { ContactDetailSocialLinks } from '@/components/contact-detail/ContactDet
 import { ContactDetailCustomFields } from '@/components/contact-detail/ContactDetailCustomFields';
 import { ContactDetailNotes } from '@/components/contact-detail/ContactDetailNotes';
 import { ContactDetailTimestamps } from '@/components/contact-detail/ContactDetailTimestamps';
-import { ModernTooltip, ModernTooltipTrigger, GradientButton, ModernTooltipContent } from "@/components/ui";
+import { FaMale, FaFemale } from "react-icons/fa";
 import { Edit } from "lucide-react";
-import PageHeader from "@/components/ui/PageHeader";
+import { ModernTooltip, ModernTooltipTrigger, GradientButton, ModernTooltipContent } from "@/components/ui";
+import { PageHeader } from "@/components/ui/page-header";
 
 // Interfaces
 interface PhoneNumber {
@@ -235,6 +236,50 @@ const ContactDetail = () => {
 
         {/* Cards Grid - Auto-fill */}
         <div className="w-full max-w-6xl mt-6">
+          {/* Avatar Section - وسط صفحه زیر هدر */}
+          <div className="flex justify-center mb-8">
+            <div className="relative">
+              <div
+                className="relative h-24 w-24 rounded-full flex items-center justify-center text-2xl font-bold overflow-hidden shadow-lg"
+                style={{
+                  background: `radial-gradient(circle at center, ${designTokens.colors.primary[500]}, ${designTokens.colors.secondary[500]})`,
+                  boxShadow: `0 8px 24px -4px rgba(0, 0, 0, 0.3)`,
+                  border: `3px solid rgba(255, 255, 255, 0.1)`,
+                }}
+              >
+                {contact.avatar_url ? (
+                  <img
+                    src={contact.avatar_url}
+                    alt={`${contact.first_name} ${contact.last_name}`}
+                    className="h-full w-full object-cover rounded-full"
+                  />
+                ) : (
+                  <span style={{ color: 'white' }}>
+                    {contact.first_name?.[0]} {contact.last_name?.[0]}
+                  </span>
+                )}
+              </div>
+
+              {/* Gender Badge */}
+              <div
+                className="absolute -top-1 -left-1 w-8 h-8 rounded-full border-3 border-white flex items-center justify-center shadow-md"
+                style={{
+                  background: designTokens.colors.glass.background,
+                  border: `2px solid ${designTokens.colors.glass.border}`,
+                  backdropFilter: 'blur(10px)',
+                }}
+              >
+                {contact.gender === 'male' ? (
+                  <FaMale size={14} style={{ color: designTokens.colors.primary[500] }} />
+                ) : contact.gender === 'female' ? (
+                  <FaFemale size={14} style={{ color: designTokens.colors.secondary[500] }} />
+                ) : (
+                  <div className="w-3 h-3 rounded-full" style={{ background: designTokens.colors.gray[400] }} />
+                )}
+              </div>
+            </div>
+          </div>
+
           <div
             className="grid gap-4 md:gap-6"
             style={{
