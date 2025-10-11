@@ -105,50 +105,48 @@ const PageHeader: React.FC<PageHeaderProps> = ({
         className={className}
       >
         <ModernCardHeader className="p-0">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <div className="flex-1">
-              <div className="flex items-center gap-3 mb-3">
-                {showBackButton && (
-                  <GlassButton
-                    onClick={() => navigate(-1)}
-                    size="icon"
-                    variant="ghost"
-                    className="rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border border-white/40 dark:border-gray-700/40 flex-shrink-0"
-                    aria-label={t('common.back', 'بازگشت')}
-                  >
-                    <ArrowLeft
-                      className={`w-5 h-5 transition-transform duration-300 ${isRTL ? 'rotate-180' : ''}`}
-                    />
-                  </GlassButton>
-                )}
-                <div className="flex-1 min-w-0">
-                  <ModernCardTitle className="text-2xl font-bold bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent mb-1">
-                    {title}
-                  </ModernCardTitle>
-                  <ModernCardDescription className="text-gray-600 dark:text-gray-300 text-base">
-                    {description}
-                  </ModernCardDescription>
-                </div>
+          <div className="flex items-center justify-between gap-2 min-h-[3.5rem]">
+            <div className="flex items-center gap-3 flex-1 min-w-0">
+              {showBackButton && (
+                <GlassButton
+                  onClick={() => navigate(-1)}
+                  size="icon"
+                  variant="ghost"
+                  className="rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border border-white/40 dark:border-gray-700/40 flex-shrink-0"
+                  aria-label={t('common.back', 'بازگشت')}
+                >
+                  <ArrowLeft
+                    className={`w-5 h-5 transition-transform duration-300 ${isRTL ? 'rotate-180' : ''}`}
+                  />
+                </GlassButton>
+              )}
+              <div className="flex-1 min-w-0">
+                <ModernCardTitle className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent truncate">
+                  {title}
+                </ModernCardTitle>
+                <ModernCardDescription className="text-sm sm:text-base text-gray-600 dark:text-gray-300 truncate">
+                  {description}
+                </ModernCardDescription>
               </div>
             </div>
-            <div className="flex items-center gap-2 mt-4 sm:mt-0">
+            <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
               {showThemeToggle && (
                 <ModernDropdownMenu>
                   <ModernDropdownMenuTrigger asChild>
                     <GlassButton
                       variant="ghost"
                       size="icon"
-                      className="h-10 w-10 hover:bg-white/20 dark:hover:bg-black/20 transition-all duration-200"
+                      className="h-8 w-8 sm:h-10 sm:w-10 hover:bg-white/20 dark:hover:bg-black/20 transition-all duration-200"
                       aria-label={t('settings.toggle_theme')}
                     >
                       {currentTheme.value === 'light' && (
-                        <Sun className="h-5 w-5 text-yellow-600 dark:text-yellow-400 transition-transform duration-300 hover:rotate-12" />
+                        <Sun className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-600 dark:text-yellow-400 transition-transform duration-300 hover:rotate-12" />
                       )}
                       {currentTheme.value === 'dark' && (
-                        <Moon className="h-5 w-5 text-indigo-300 transition-transform duration-300 hover:rotate-12" />
+                        <Moon className="h-4 w-4 sm:h-5 sm:w-5 text-indigo-300 transition-transform duration-300 hover:rotate-12" />
                       )}
                       {currentTheme.value === 'system' && (
-                        <Monitor className="h-5 w-5 text-blue-500 transition-transform duration-300 hover:scale-110" />
+                        <Monitor className="h-4 w-4 sm:h-5 sm:w-5 text-blue-500 transition-transform duration-300 hover:scale-110" />
                       )}
                       <span className="sr-only">{t('settings.toggle_theme')}</span>
                     </GlassButton>
@@ -210,7 +208,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
                     <GradientButton
                       gradientType="primary"
                       onClick={onAddClick}
-                      className="flex items-center gap-2 px-4 py-2.5 font-medium rounded-xl text-white hover:text-white/90"
+                      className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2.5 font-medium rounded-xl text-white hover:text-white/90 text-sm sm:text-base h-8 sm:h-auto"
                       style={{
                         fontFamily: 'var(--font-sans)',
                       }}

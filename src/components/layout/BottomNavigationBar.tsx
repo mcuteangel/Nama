@@ -5,7 +5,7 @@ import { ModernLoader } from "@/components/ui/modern-loader";
 import { useToast } from "@/components/ui/use-toast";
 import { cn } from "@/lib/utils";
 import { useTranslation } from 'react-i18next';
-import { Home, PlusCircle, Users, Sparkles, Settings, ShieldCheck, LogOut } from "lucide-react";
+import { Home, Users, Sparkles, Settings, ShieldCheck, LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 
@@ -21,7 +21,6 @@ const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({ isAdmin }) =>
 
   const navItems = [
     { name: t('common.home'), icon: Home, path: "/" },
-    { name: t('common.add_contact'), icon: PlusCircle, path: "/add-contact" },
     { name: t('common.groups'), icon: Users, path: "/groups" },
     { name: t('ai_suggestions.title'), icon: Sparkles, path: "/ai-suggestions" },
     { name: t('common.settings'), icon: Settings, path: "/settings" },

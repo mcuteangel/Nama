@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { GlassButton } from "@/components/ui/glass-button";
 import { ModernLoader } from '@/components/ui/modern-loader';
@@ -16,6 +16,26 @@ interface ContactFormActionsProps {
 const ContactFormActions: React.FC<ContactFormActionsProps> = React.memo(({ isSubmitting, onCancel, contactId }) => {
   useTranslation();
   const isMobile = useIsMobile();
+  const [isVisible, setIsVisible] = useState(true);
+
+  // Handle scroll visibility for mobile FABs
+  useEffect(() => {
+    if (!isMobile) return;
+
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      const windowHeight = window.innerHeight;
+      const documentHeight = document.documentElement.scrollHeight;
+
+      // Show FABs when near bottom or when scrolled up
+      setIsVisible(scrollY < windowHeight * 0.3 || scrollY > documentHeight - windowHeight * 1.5);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll(); // Initial check
+
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [isMobile]);
 
   // Memoize button labels to prevent unnecessary re-renders
   const buttonLabels = useMemo(() => ({
@@ -60,24 +80,24 @@ const ContactFormActions: React.FC<ContactFormActionsProps> = React.memo(({ isSu
 
       {/* Enhanced Mobile Floating Action Buttons */}
       {isMobile && (
-        <div className="fixed bottom-6 right-6 flex flex-col gap-4 z-50">
+        <div className={`fixed bottom-6 left-6 flex flex-col gap-3 z-50 transition-all duration-300 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-30 translate-y-2'}`}>
           <GlassButton
             type="button"
             variant="glass"
             effect="lift"
             onClick={onCancel}
             disabled={isSubmitting}
-            className="w-16 h-16 rounded-2xl p-0 flex items-center justify-center shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-110 bg-white/90 dark:bg-gray-800/90 border border-white/30 dark:border-gray-600/30 backdrop-blur-xl"
+            className="w-12 h-12 rounded-xl p-0 flex items-center justify-center shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 bg-white/90 dark:bg-gray-800/90 border border-white/30 dark:border-gray-600/30 backdrop-blur-xl"
             aria-label={buttonLabels.cancel}
           >
-            <X size={28} className="text-gray-700 dark:text-gray-300" />
+            <X size={20} className="text-gray-700 dark:text-gray-300" />
           </GlassButton>
 
           <GlassButton
             type="submit"
             variant="gradient-primary"
             effect="lift"
-            className="w-16 h-16 rounded-2xl p-0 flex items-center justify-center shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-110 relative overflow-hidden"
+            className="w-12 h-12 rounded-xl p-0 flex items-center justify-center shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 relative overflow-hidden"
             disabled={isSubmitting}
             aria-label={buttonLabels.submit}
             style={{
@@ -89,7 +109,7 @@ const ContactFormActions: React.FC<ContactFormActionsProps> = React.memo(({ isSu
               {isSubmitting ? (
                 <ModernLoader variant="spinner" size="sm" />
               ) : (
-                <Save size={28} className="text-white" />
+                <Save size={20} className="text-white" />
               )}
             </div>
           </GlassButton>

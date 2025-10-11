@@ -221,7 +221,7 @@ const Contacts = React.memo(() => {
             }}
           >
             <div className={`flex ${isMobile ? 'flex-col' : 'flex-row'} items-stretch ${isMobile ? '' : 'lg:items-center'} gap-4 ${isMobile ? '' : 'lg:justify-between'}`}>
-              <div className={`flex ${isMobile ? 'flex-col' : 'flex-row'} items-stretch ${isMobile ? '' : 'sm:items-center'} gap-4`}>
+              <div className={`flex ${isMobile ? 'flex-row items-center justify-between' : 'flex-row'} items-stretch ${isMobile ? '' : 'sm:items-center'} gap-4`}>
                 {/* Group Filter */}
                 <ModernTooltip>
                   <ModernTooltipTrigger asChild>
@@ -286,14 +286,17 @@ const Contacts = React.memo(() => {
                     <p>{t('contact_form.company')}</p>
                   </ModernTooltipContent>
                 </ModernTooltip>
+              </div>
 
+              {/* Sort and Display Controls Row */}
+              <div className={`flex ${isMobile ? 'flex-row items-center justify-center' : 'flex-row items-center justify-end'} gap-3`}>
                 {/* Sort Filter */}
                 <ModernTooltip>
                   <ModernTooltipTrigger asChild>
                     <div className="flex items-center gap-2">
                       <ModernSelect onValueChange={handleSortChange} value={sortOption}>
                         <ModernSelectTrigger
-                          className="w-full sm:w-48 rounded-xl focus:ring-4 focus:ring-blue-500/30 text-gray-800 dark:text-gray-100 rtl:text-right ltr:text-left"
+                          className={`${isMobile ? 'w-32' : 'w-full sm:w-48'} rounded-xl focus:ring-4 focus:ring-blue-500/30 text-gray-800 dark:text-gray-100 rtl:text-right ltr:text-left`}
                           style={{
                             background: 'rgba(255,255,255,0.1)',
                             border: `2px solid ${designTokens.colors.glass.border}`,
@@ -326,62 +329,62 @@ const Contacts = React.memo(() => {
                     <p>{t('actions.sort')}</p>
                   </ModernTooltipContent>
                 </ModernTooltip>
-              </div>
 
-              {/* Display Mode Toggle */}
-              <div className={`flex items-center ${isMobile ? 'justify-center' : 'justify-end'} gap-2`}>
-                <div
-                  className="flex rounded-xl overflow-hidden border-2"
-                  style={{
-                    borderColor: designTokens.colors.glass.border,
-                    background: 'rgba(255,255,255,0.1)',
-                    backdropFilter: 'blur(10px)',
-                    boxShadow: designTokens.shadows.glass
-                  }}
-                >
-                  <ModernTooltip>
-                    <ModernTooltipTrigger asChild>
-                      <GlassButton
-                        variant={displayMode === 'grid' ? "default" : "ghost"}
-                        size="sm"
-                        className="flex items-center justify-center p-3"
-                        style={{
-                          background: displayMode === 'grid' ? designTokens.colors.primary[500] : 'transparent',
-                          color: displayMode === 'grid' ? 'white' : 'gray',
-                          borderRadius: 0,
-                          transition: `all ${designTokens.transitions.duration.normal} ${designTokens.transitions.easing.easeOut}`
-                        }}
-                        onClick={() => updateSettings({ contactDisplayMode: 'grid' })}
-                      >
-                        <Grid size={18} />
-                      </GlassButton>
-                    </ModernTooltipTrigger>
-                    <ModernTooltipContent>
-                      <p>نمایش کارتی</p>
-                    </ModernTooltipContent>
-                  </ModernTooltip>
+                {/* Display Mode Toggle */}
+                <div className={`flex items-center ${isMobile ? 'justify-center' : 'justify-end'} gap-2`}>
+                  <div
+                    className="flex rounded-xl overflow-hidden border-2"
+                    style={{
+                      borderColor: designTokens.colors.glass.border,
+                      background: 'rgba(255,255,255,0.1)',
+                      backdropFilter: 'blur(10px)',
+                      boxShadow: designTokens.shadows.glass
+                    }}
+                  >
+                    <ModernTooltip>
+                      <ModernTooltipTrigger asChild>
+                        <GlassButton
+                          variant={displayMode === 'grid' ? "default" : "ghost"}
+                          size="sm"
+                          className="flex items-center justify-center p-3"
+                          style={{
+                            background: displayMode === 'grid' ? designTokens.colors.primary[500] : 'transparent',
+                            color: displayMode === 'grid' ? 'white' : 'gray',
+                            borderRadius: 0,
+                            transition: `all ${designTokens.transitions.duration.normal} ${designTokens.transitions.easing.easeOut}`
+                          }}
+                          onClick={() => updateSettings({ contactDisplayMode: 'grid' })}
+                        >
+                          <Grid size={18} />
+                        </GlassButton>
+                      </ModernTooltipTrigger>
+                      <ModernTooltipContent>
+                        <p>نمایش کارتی</p>
+                      </ModernTooltipContent>
+                    </ModernTooltip>
 
-                  <ModernTooltip>
-                    <ModernTooltipTrigger asChild>
-                      <GlassButton
-                        variant={displayMode === 'list' ? "default" : "ghost"}
-                        size="sm"
-                        className="flex items-center justify-center p-3"
-                        style={{
-                          background: displayMode === 'list' ? designTokens.colors.primary[500] : 'transparent',
-                          color: displayMode === 'list' ? 'white' : designTokens.colors.gray[600],
-                          borderRadius: 0,
-                          transition: `all ${designTokens.transitions.duration.normal} ${designTokens.transitions.easing.easeOut}`
-                        }}
-                        onClick={() => updateSettings({ contactDisplayMode: 'list' })}
-                      >
-                        <List size={18} />
-                      </GlassButton>
-                    </ModernTooltipTrigger>
-                    <ModernTooltipContent>
-                      <p>نمایش لیستی</p>
-                    </ModernTooltipContent>
-                  </ModernTooltip>
+                    <ModernTooltip>
+                      <ModernTooltipTrigger asChild>
+                        <GlassButton
+                          variant={displayMode === 'list' ? "default" : "ghost"}
+                          size="sm"
+                          className="flex items-center justify-center p-3"
+                          style={{
+                            background: displayMode === 'list' ? designTokens.colors.primary[500] : 'transparent',
+                            color: displayMode === 'list' ? 'white' : designTokens.colors.gray[600],
+                            borderRadius: 0,
+                            transition: `all ${designTokens.transitions.duration.normal} ${designTokens.transitions.easing.easeOut}`
+                          }}
+                          onClick={() => updateSettings({ contactDisplayMode: 'list' })}
+                        >
+                          <List size={18} />
+                        </GlassButton>
+                      </ModernTooltipTrigger>
+                      <ModernTooltipContent>
+                        <p>نمایش لیستی</p>
+                      </ModernTooltipContent>
+                    </ModernTooltip>
+                  </div>
                 </div>
               </div>
             </div>

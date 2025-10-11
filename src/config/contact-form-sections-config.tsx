@@ -156,7 +156,7 @@ export const useContactFormSections = (): ContactFormSectionsConfig => {
         <Suspense fallback={<SectionLoader />}>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <ContactPreviewCard contact={form.getValues()} />
-            <ContactHistory contactId={contactId || 'new'} />
+            {contactId && <ContactHistory contactId={contactId} />}
           </div>
         </Suspense>
       )
