@@ -1,13 +1,13 @@
 import React from 'react';
 import { ContactFormValues } from '@/types/contact';
-import { useTranslation } from 'react-i18next';
 import { Phone, Mail, Building, MapPin, Calendar, Users, Tag, Sparkles, Heart, Briefcase } from 'lucide-react';
-import { FormSection } from '@/components/ui/FormSection';
 import { FormCard } from '@/components/ui/FormCard';
+import { FormSection } from '@/components/ui/FormSection';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Tag as TagComponent } from '@/components/ui/tag';
 import { cn } from '@/lib/utils';
+import { useGroups } from '@/hooks/use-groups';
 
 interface ContactPreviewCardProps {
   contact: ContactFormValues;
@@ -15,7 +15,7 @@ interface ContactPreviewCardProps {
 }
 
 const ContactPreviewCard: React.FC<ContactPreviewCardProps> = ({ contact, className }) => {
-  useTranslation();
+  const { groups } = useGroups();
 
   // Get the first phone number and email for preview
   const primaryPhone = contact.phoneNumbers?.[0];
@@ -25,46 +25,47 @@ const ContactPreviewCard: React.FC<ContactPreviewCardProps> = ({ contact, classN
   const fullName = `${contact.firstName || ''} ${contact.lastName || ''}`.trim();
 
   // Get the first letter of the name for avatar fallback
-  const initials = fullName.split(' ').map(n => n[0]).join('').toUpperCase() || 'U';
+  const initials = fullName.split(' ').map(n => n[0]).join(' ').toUpperCase() || 'U';
 
   // Format birthday for display
   const formattedBirthday = contact.birthday
     ? new Date(contact.birthday).toLocaleDateString('fa-IR')
     : null;
 
+  // Get group info
+  const groupInfo = contact.groupId ? groups.find(g => g.id === contact.groupId) : null;
+
   return (
-    <FormSection
-      icon={Sparkles}
+    <FormCard
       title="پیش نمایش مخاطب"
       description="اطلاعات مخاطب را قبل از ذخیره مشاهده کنید"
-      className="space-y-4"
+      icon={Sparkles}
+      iconColor="#3b82f6"
     >
-      <FormCard
-        title={fullName || 'مخاطب بدون نام'}
-        description={contact.position ? `${contact.position}${contact.company ? ` در ${contact.company}` : ''}` : contact.company || 'اطلاعات شغلی مشخص نشده'}
-        icon={Heart}
-        iconColor="#3b82f6"
-        className="group"
-      >
-        <div className="space-y-6">
-          {/* Header with avatar and name */}
-          <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
+      <div className="space-y-2">
+        {/* Header Section */}
+        <FormSection
+          variant="card"
+          title=""
+          className="relative"
+        >
+          <div className="flex flex-col sm:flex-row items-center sm:items-start gap-3">
             <div className="relative flex-shrink-0">
-              <Avatar className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl border-4 border-slate-200 dark:border-slate-700 shadow-xl">
+              <Avatar className="w-16 h-16 sm:w-20 sm:h-20 rounded-full border-2 border-slate-200 dark:border-slate-700 shadow-lg">
                 {contact.avatarUrl ? (
-                  <AvatarImage src={contact.avatarUrl} alt={fullName} className="object-cover rounded-2xl" />
+                  <AvatarImage src={contact.avatarUrl} alt={fullName} className="object-cover rounded-full" />
                 ) : (
-                  <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-500 text-white rounded-2xl text-xl font-bold">
+                  <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-500 text-white rounded-full text-lg font-bold">
                     {initials}
                   </AvatarFallback>
                 )}
               </Avatar>
               {contact.gender && contact.gender !== 'not_specified' && (
-                <div className="absolute -bottom-2 -right-2 w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-white shadow-lg flex items-center justify-center">
+                <div className="absolute -bottom-1 -right-1 w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-white shadow-md flex items-center justify-center">
                   <Heart
-                    size={12}
+                    size={10}
                     className={cn(
-                      'sm:w-4',
+                      'sm:w-3',
                       contact.gender === 'male' ? 'text-blue-500' : 'text-pink-500'
                     )}
                   />
@@ -73,16 +74,16 @@ const ContactPreviewCard: React.FC<ContactPreviewCardProps> = ({ contact, classN
             </div>
 
             <div className="flex-1 text-center sm:text-left">
-              <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white mb-2">
+              <h2 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white mb-1">
                 {fullName || 'مخاطب بدون نام'}
               </h2>
 
               {contact.position && (
-                <div className="flex items-center justify-center sm:justify-start gap-2 mb-2">
-                  <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center">
-                    <Briefcase size={12} className="sm:w-4 text-white" />
+                <div className="flex items-center justify-center sm:justify-start gap-2 mb-1">
+                  <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-lg bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center shadow-sm">
+                    <Briefcase size={10} className="sm:w-3 text-white" />
                   </div>
-                  <p className="text-base sm:text-lg text-slate-700 dark:text-slate-300 font-medium">
+                  <p className="text-sm sm:text-base text-slate-700 dark:text-slate-300 font-medium">
                     {contact.position}
                     {contact.company && ` در ${contact.company}`}
                   </p>
@@ -90,155 +91,213 @@ const ContactPreviewCard: React.FC<ContactPreviewCardProps> = ({ contact, classN
               )}
 
               {contact.company && !contact.position && (
-                <div className="flex items-center justify-center sm:justify-start gap-2 mb-2">
-                  <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg bg-gradient-to-br from-green-500 to-teal-500 flex items-center justify-center">
-                    <Building size={12} className="sm:w-4 text-white" />
+                <div className="flex items-center justify-center sm:justify-start gap-2 mb-1">
+                  <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-lg bg-gradient-to-br from-green-500 to-teal-500 flex items-center justify-center shadow-sm">
+                    <Building size={10} className="sm:w-3 text-white" />
                   </div>
-                  <p className="text-base sm:text-lg text-slate-700 dark:text-slate-300 font-medium">
+                  <p className="text-sm sm:text-base text-slate-700 dark:text-slate-300 font-medium">
                     {contact.company}
                   </p>
                 </div>
               )}
             </div>
           </div>
+        </FormSection>
 
-          {/* Contact information cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {primaryPhone && (
-              <FormCard
-                title="شماره تلفن"
-                description={primaryPhone.phone_type}
-                icon={Phone}
-                iconColor="#3b82f6"
-              >
-                <div className="space-y-2">
-                  <p className="text-lg font-bold text-slate-900 dark:text-white">
-                    {primaryPhone.phone_number}
-                    {primaryPhone.extension && ` (داخلی: ${primaryPhone.extension})`}
-                  </p>
-                </div>
-              </FormCard>
-            )}
-
-            {primaryEmail && (
-              <FormCard
-                title="آدرس ایمیل"
-                description={primaryEmail.email_type}
-                icon={Mail}
-                iconColor="#22c55e"
-              >
-                <div className="space-y-2">
-                  <p className="text-sm font-bold text-slate-900 dark:text-white break-all">
-                    {primaryEmail.email_address}
-                  </p>
-                </div>
-              </FormCard>
-            )}
-
-            {(contact.street || contact.city || contact.state || contact.zipCode || contact.country) && (
-              <div className="sm:col-span-2">
-                <FormCard
-                  title="آدرس"
-                  description="آدرس کامل مخاطب"
-                  icon={MapPin}
-                  iconColor="#8b5cf6"
-                >
-                  <div className="space-y-2">
-                    <p className="text-base font-bold text-slate-900 dark:text-white">
-                      {[contact.street, contact.city, contact.state, contact.zipCode, contact.country]
-                        .filter(Boolean)
-                        .join('، ')}
-                    </p>
-                  </div>
-                </FormCard>
-              </div>
-            )}
-
-            {formattedBirthday && (
-              <FormCard
-                title="تاریخ تولد"
-                description="تاریخ تولد مخاطب"
-                icon={Calendar}
-                iconColor="#f97316"
-              >
-                <div className="space-y-2">
-                  <p className="text-base font-bold text-slate-900 dark:text-white">
-                    {formattedBirthday}
-                  </p>
-                </div>
-              </FormCard>
-            )}
-
-            {contact.groupId && (
-              <FormCard
-                title="گروه"
-                description="گروه مخاطب"
-                icon={Users}
-                iconColor="#06b6d4"
-              >
-                <div className="space-y-2">
-                  <Badge variant="secondary" className="text-sm font-bold px-3 py-1 bg-gradient-to-r from-cyan-500 to-blue-500 text-white border-0">
-                    {contact.groupId}
-                  </Badge>
-                </div>
-              </FormCard>
-            )}
-          </div>
-
-          {/* Tags */}
-          {contact.tags && contact.tags.length > 0 && (
-            <FormCard
-              title="تگ‌ها"
-              description="تگ‌های مرتبط با مخاطب"
-              icon={Tag}
-              iconColor="#eab308"
+        {/* Contact Information Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {/* Phone */}
+          {primaryPhone && (
+            <FormSection
+              variant="card"
+              title=""
+              className="relative"
             >
-              <div className="flex flex-wrap gap-2">
-                {contact.tags.map((tag) => (
-                  <TagComponent
-                    key={tag.id}
-                    tag={{
-                      id: tag.id,
-                      name: tag.name,
-                      color: tag.color,
-                      user_id: tag.user_id || 'temp-user',
-                      created_at: tag.created_at || new Date().toISOString(),
-                      updated_at: tag.updated_at || new Date().toISOString()
-                    }}
-                    size="sm"
-                    className="text-sm font-medium"
-                  />
-                ))}
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-6 h-6 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center">
+                  <Phone size={10} className="text-primary-600 dark:text-primary-400" />
+                </div>
+                <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                  شماره تلفن
+                </span>
               </div>
-            </FormCard>
+              <div className="space-y-1">
+                <p className="text-base font-bold text-slate-900 dark:text-white">
+                  {primaryPhone.phone_number}
+                  {primaryPhone.extension && ` (داخلی: ${primaryPhone.extension})`}
+                </p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 capitalize">
+                  {primaryPhone.phone_type}
+                </p>
+              </div>
+            </FormSection>
           )}
 
-          {/* Gender badge */}
-          {contact.gender && contact.gender !== 'not_specified' && (
-            <FormCard
-              title="جنسیت"
-              description="جنسیت مخاطب"
-              icon={Heart}
-              iconColor="#ec4899"
+          {/* Email */}
+          {primaryEmail && (
+            <FormSection
+              variant="card"
+              title=""
+              className="relative"
             >
-              <div className="space-y-2">
-                <Badge
-                  variant={contact.gender === 'male' ? 'default' : 'secondary'}
-                  className={cn(
-                    "px-4 py-2 text-sm font-bold rounded-xl border-0",
-                    contact.gender === 'male'
-                      ? "bg-gradient-to-r from-blue-500 to-cyan-500 text-white"
-                      : "bg-gradient-to-r from-pink-500 to-rose-500 text-white"
-                  )}
-                >
-                  {contact.gender === 'male' ? 'آقا' : 'خانم'}
-                </Badge>
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-6 h-6 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center">
+                  <Mail size={10} className="text-primary-600 dark:text-primary-400" />
+                </div>
+                <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                  آدرس ایمیل
+                </span>
               </div>
-            </FormCard>
+              <div className="space-y-1">
+                <p className="text-sm font-bold text-slate-900 dark:text-white break-all">
+                  {primaryEmail.email_address}
+                </p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 capitalize">
+                  {primaryEmail.email_type}
+                </p>
+              </div>
+            </FormSection>
+          )}
+
+          {/* Address */}
+          {(contact.street || contact.city || contact.state || contact.zipCode || contact.country) && (
+            <FormSection
+              variant="card"
+              title=""
+              className="relative sm:col-span-2"
+            >
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-6 h-6 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center">
+                  <MapPin size={10} className="text-primary-600 dark:text-primary-400" />
+                </div>
+                <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                  آدرس
+                </span>
+              </div>
+              <p className="text-sm font-bold text-slate-900 dark:text-white">
+                {[contact.street, contact.city, contact.state, contact.zipCode, contact.country]
+                  .filter(Boolean)
+                  .join('، ')}
+              </p>
+            </FormSection>
+          )}
+
+          {/* Birthday */}
+          {formattedBirthday && (
+            <FormSection
+              variant="card"
+              title=""
+              className="relative"
+            >
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-6 h-6 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center">
+                  <Calendar size={10} className="text-primary-600 dark:text-primary-400" />
+                </div>
+                <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                  تاریخ تولد
+                </span>
+              </div>
+              <p className="text-sm font-bold text-slate-900 dark:text-white">
+                {formattedBirthday}
+              </p>
+            </FormSection>
+          )}
+
+          {/* Group */}
+          {contact.groupId && (
+            <FormSection
+              variant="card"
+              title=""
+              className="relative"
+            >
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-6 h-6 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center">
+                  <Users size={10} className="text-primary-600 dark:text-primary-400" />
+                </div>
+                <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                  گروه
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span
+                  className="text-sm font-bold px-2 py-1 rounded-lg"
+                  style={{
+                    color: groupInfo?.color || '#3b82f6',
+                    backgroundColor: `${groupInfo?.color || '#3b82f6'}20`
+                  }}
+                >
+                  {groupInfo?.name || contact.groupId}
+                </span>
+              </div>
+            </FormSection>
           )}
         </div>
-      </FormCard>
-    </FormSection>
+
+        {/* Tags */}
+        {contact.tags && contact.tags.length > 0 && (
+          <FormSection
+            variant="card"
+            title=""
+            className="relative"
+          >
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-6 h-6 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center">
+                <Tag size={10} className="text-primary-600 dark:text-primary-400" />
+              </div>
+              <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                تگ‌ها
+              </span>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {contact.tags.map((tag) => (
+                <TagComponent
+                  key={tag.id}
+                  tag={{
+                    id: tag.id,
+                    name: tag.name,
+                    color: tag.color,
+                    user_id: tag.user_id || 'temp-user',
+                    created_at: tag.created_at || new Date().toISOString(),
+                    updated_at: tag.updated_at || new Date().toISOString()
+                  }}
+                  size="sm"
+                  className="text-sm font-medium"
+                />
+              ))}
+            </div>
+          </FormSection>
+        )}
+
+        {/* Gender */}
+        {contact.gender && contact.gender !== 'not_specified' && (
+          <FormSection
+            variant="card"
+            title=""
+            className="relative"
+          >
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-6 h-6 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center">
+                <Heart size={10} className="text-primary-600 dark:text-primary-400" />
+              </div>
+              <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                جنسیت
+              </span>
+            </div>
+            <Badge
+              variant={contact.gender === 'male' ? 'default' : 'secondary'}
+              className={cn(
+                "px-3 py-1 text-sm font-bold rounded-lg border-0",
+                contact.gender === 'male'
+                  ? "bg-gradient-to-r from-blue-500 to-cyan-500 text-white"
+                  : "bg-gradient-to-r from-pink-500 to-rose-500 text-white"
+              )}
+            >
+              {contact.gender === 'male' ? 'آقا' : 'خانم'}
+            </Badge>
+          </FormSection>
+        )}
+      </div>
+    </FormCard>
   );
 };
 
