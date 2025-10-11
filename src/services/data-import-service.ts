@@ -121,19 +121,21 @@ export const DataImportService = {
                 }
               });
               break;
-            case 'گروه':
+            case 'گروه': {
               const group = existingGroups.find(g => g.name === value);
               if (group) {
                 groupId = group.id;
               }
               break;
-            default:
+            }
+            default: {
               // Handle custom fields
               const template = customFieldTemplates.find(t => t.name === header);
               if (template) {
                 customFields.push({ template_id: template.id!, value: value });
               }
               break;
+            }
           }
         }
 
@@ -171,9 +173,10 @@ export const DataImportService = {
           socialLinks: contact.socialLinks,
           groupId: contact.groupId || null,
           customFields: contact.customFields,
+          tags: [],
         };
 
-        const { data, error } = await ContactCrudService.addContact(contactFormValues); // Updated service call
+        const { error } = await ContactCrudService.addContact(contactFormValues); // Updated service call
         if (error) {
           console.error(`Error importing contact ${contact.firstName} ${contact.lastName}:`, error);
           // Continue with other contacts even if one fails
@@ -186,7 +189,7 @@ export const DataImportService = {
       invalidateCache(`statistics_dashboard_${userId}`);
 
       return { success: true, importedCount, error: null };
-    } catch (err: any) {
+    } catch (err: unknown) {
       ErrorManager.logError(err, { context: 'DataImportService.importContactsFromCsv' });
       return { success: false, importedCount: 0, error: ErrorManager.getErrorMessage(err) };
     }

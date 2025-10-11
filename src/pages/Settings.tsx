@@ -1,11 +1,9 @@
 import { useState } from "react";
 import { useTranslation } from 'react-i18next';
-import i18n from '@/integrations/i18n';
-import { Settings as SettingsIcon, Palette, Sparkles, TestTube, UserCircle, Database, ChevronRight } from "lucide-react";
+import { Settings as SettingsIcon, Palette, Sparkles, TestTube, UserCircle, Database } from "lucide-react";
 import { cn } from '@/lib/utils';
 import PageHeader from "@/components/ui/PageHeader";
 import { ModernCard, ModernCardContent } from "@/components/ui/modern-card";
-import { useMediaQuery } from '../hooks/use-media-query';
 
 // Import new organized settings components
 import AppearanceSettings from '@/components/settings/AppearanceSettings';
@@ -16,8 +14,6 @@ import UserProfileSettings from '@/components/settings/UserProfileSettings';
 
 const Settings = () => {
   const { t } = useTranslation();
-  const isRTL = i18n.language === 'fa';
-  const isMobile = useMediaQuery('(max-width: 768px)');
 
   const handleImportSuccess = () => {
     console.log("Contacts imported successfully, refreshing data...");

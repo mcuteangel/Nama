@@ -1,6 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
 import { ContactFormValues } from '@/types/contact';
-import { invalidateCache } from '@/utils/cache-helpers';
 import {
   syncPhoneNumbers,
   syncEmailAddresses,
@@ -62,9 +61,9 @@ export const ContactCrudService = {
       }
 
       return { data: { id: currentContactId }, error: null };
-    } catch (error: any) {
-      console.error("ContactCrudService.addContact: Caught an error during add process:", error.message);
-      return { data: null, error: error.message };
+    } catch (error: unknown) {
+      console.error("ContactCrudService.addContact: Caught an error during add process:", error);
+      return { data: null, error: error instanceof Error ? error.message : "Unknown error" };
     }
   },
 
@@ -107,9 +106,9 @@ export const ContactCrudService = {
       await syncCustomFields(supabase, user.id, contactId, values.customFields || []);
 
       return { success: true, error: null };
-    } catch (error: any) {
-      console.error("ContactCrudService.updateContact: Caught an error during update process:", error.message);
-      return { success: false, error: error.message };
+    } catch (error: unknown) {
+      console.error("ContactCrudService.updateContact: Caught an error during update process:", error);
+      return { success: false, error: error instanceof Error ? error.message : "Unknown error" };
     }
   },
 
@@ -128,9 +127,9 @@ export const ContactCrudService = {
 
       if (error) throw error;
       return { success: true, error: null };
-    } catch (error: any) {
-      console.error("ContactCrudService.deleteContact: Caught an error during delete process:", error.message);
-      return { success: false, error: error.message };
+    } catch (error: unknown) {
+      console.error("ContactCrudService.deleteContact: Caught an error during delete process:", error);
+      return { success: false, error: error instanceof Error ? error.message : "Unknown error" };
     }
   },
 };

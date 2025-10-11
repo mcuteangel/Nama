@@ -1,5 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
-import { Contact, ContactListResponse } from "@/types/contact.types";
+import { ContactListResponse } from "@/types/contact.types";
 
 export const fetchContacts = async (
   userId: string,

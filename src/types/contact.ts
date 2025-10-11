@@ -1,6 +1,4 @@
 import * as z from "zod";
-import { CustomFieldTemplate } from "@/domain/schemas/custom-field-template";
-import { Tag } from "@/types/tag";
 
 export const contactFormSchema = z.object({
   firstName: z.string().min(1, { message: "نام الزامی است." }),

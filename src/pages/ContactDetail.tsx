@@ -111,9 +111,6 @@ const ContactDetail = () => {
   const { t } = useTranslation();
   const [contact, setContact] = useState<ContactDetailType | null>(null);
 
-  // Extract assigned group from contact data
-  const assignedGroup = contact?.contact_groups?.[0]?.groups || null;
-
   const onSuccessFetchContact = useCallback((result: { data: ContactDetailType | null; error: string | null; fromCache: boolean }) => {
     setContact(result.data || null);
     if (!result.data) {

@@ -151,7 +151,7 @@ export function applyHoverEffect(
  */
 export function applyAnimation(
   className: string | undefined,
-  animation: "fade-in-up" | "fade-in-down" | "fade-in-left" | "fade-in-right" | "scale-in" | "scale-out" | "floating" | "pulse-glow" | "none" = "none"
+  animation: "fade-in" | "fade-in-up" | "fade-in-down" | "fade-in-left" | "fade-in-right" | "scale-in" | "scale-out" | "floating" | "pulse-glow" | "none" = "none"
 ) {
   if (animation === "none") return className;
   return cn(animation, className);

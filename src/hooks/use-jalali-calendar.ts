@@ -29,7 +29,6 @@ const CALENDAR_TYPE_STORAGE_KEY = 'calendarType';
 export function useJalaliCalendar(options: CalendarOptions = {}): CalendarHookReturn {
   const { 
     type = 'jalali', 
-    defaultDate, 
     format: formatString = 'jYYYY/jMM/jDD' 
   } = options;
 

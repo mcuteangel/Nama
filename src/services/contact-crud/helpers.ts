@@ -30,11 +30,11 @@ export async function syncPhoneNumbers(
     if (newPhone.id && existingMap.has(newPhone.id)) {
       // Existing phone, check for updates
       const oldPhone = existingMap.get(newPhone.id);
-      if (
+      if (oldPhone && (
         oldPhone.phone_type !== newPhone.phone_type ||
         oldPhone.phone_number !== newPhone.phone_number ||
         oldPhone.extension !== (newPhone.extension || null)
-      ) {
+      )) {
         phonesToUpdate.push({ ...newPhone, id: newPhone.id });
       }
       phonesToDeleteIds.delete(newPhone.id); // Keep this one
@@ -104,10 +104,10 @@ export async function syncEmailAddresses(
     if (newEmail.id && existingMap.has(newEmail.id)) {
       // Existing email, check for updates
       const oldEmail = existingMap.get(newEmail.id);
-      if (
+      if (oldEmail && (
         oldEmail.email_type !== newEmail.email_type ||
         oldEmail.email_address !== newEmail.email_address
-      ) {
+      )) {
         emailsToUpdate.push({ ...newEmail, id: newEmail.id });
       }
       emailsToDeleteIds.delete(newEmail.id); // Keep this one
@@ -175,10 +175,10 @@ export async function syncSocialLinks(
     if (newLink.id && existingMap.has(newLink.id)) {
       // Existing link, check for updates
       const oldLink = existingMap.get(newLink.id);
-      if (
+      if (oldLink && (
         oldLink.type !== newLink.type ||
         oldLink.url !== newLink.url
-      ) {
+      )) {
         linksToUpdate.push({ ...newLink, id: newLink.id });
       }
       linksToDeleteIds.delete(newLink.id); // Keep this one

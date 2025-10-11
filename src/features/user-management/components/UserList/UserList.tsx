@@ -29,7 +29,7 @@ interface UserListState {
   limit: number;
   sortBy: SortField;
   sortOrder: SortOrder;
-  role?: 'user' | 'admin' | 'all';
+  role?: 'user' | 'admin' | 'moderator' | 'all';
   search?: string;
 }
 
@@ -191,6 +191,9 @@ const UserList: React.FC = () => {
                   </ModernSelectItem>
                   <ModernSelectItem value="admin">
                     {t('user_management.roles.admin')}
+                  </ModernSelectItem>
+                  <ModernSelectItem value="moderator">
+                    {t('user_management.roles.moderator')}
                   </ModernSelectItem>
                   <ModernSelectItem value="user">
                     {t('user_management.roles.user')}

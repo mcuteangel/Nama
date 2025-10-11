@@ -72,9 +72,6 @@ const Contacts = React.memo(() => {
     setSortOption(value);
   }, []);
 
-  const handleDisplayModeChange = useCallback((mode: 'grid' | 'list') => {
-    updateSettings({ contactDisplayMode: mode });
-  }, [updateSettings]);
 
   const handleExportClick = useCallback(async () => {
     if (!session?.user) {

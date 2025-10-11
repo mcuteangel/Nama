@@ -6,6 +6,23 @@ import { X } from "lucide-react";
 import { cn, applyGlassEffect, applyGradientEffect, applyNeomorphismEffect, applyAnimation } from "@/lib/utils";
 import { GlassEffect, GradientType, AnimationType } from "@/types/global-style-types";
 
+// Helper function to map GlassEffect to sheetVariants glassEffect values
+function mapGlassEffectToVariant(glassEffect: GlassEffect | undefined): "none" | "default" | "advanced" | "card" | "background" | "button" {
+  if (!glassEffect || glassEffect === "none") return "none";
+
+  // Map GlassEffect values to sheetVariants values
+  const mapping: Record<GlassEffect, "none" | "default" | "advanced" | "card" | "background" | "button"> = {
+    "none": "none",
+    "default": "default",
+    "advanced": "advanced",
+    "card": "card",
+    "background": "background",
+    "button": "button"
+  };
+
+  return mapping[glassEffect];
+}
+
 const Sheet = SheetPrimitive.Root;
 
 const SheetTrigger = SheetPrimitive.Trigger;
@@ -60,6 +77,11 @@ const sheetVariants = cva(
         glass: "backdrop-blur-md bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30",
         glassAdvanced: "backdrop-blur-md bg-white/20 dark:bg-gray-800/20 border border-white/20 dark:border-gray-700/20 shadow-glass",
         glassCard: "backdrop-blur-md bg-white/10 dark:bg-gray-900/10 border border-white/10 dark:border-gray-800/10 shadow-glass-card",
+        default: "backdrop-blur-md bg-white/30 dark:bg-gray-700/30 border border-white/30 dark:border-gray-600/30",
+        advanced: "backdrop-blur-md bg-white/20 dark:bg-gray-800/20 border border-white/20 dark:border-gray-700/20 shadow-glass",
+        card: "backdrop-blur-md bg-white/10 dark:bg-gray-900/10 border border-white/10 dark:border-gray-800/10 shadow-glass-card",
+        background: "backdrop-blur-md bg-white/5 dark:bg-gray-900/5 border border-white/5 dark:border-gray-800/5",
+        button: "backdrop-blur-md bg-white/20 dark:bg-gray-800/20 border border-white/20 dark:border-gray-700/20 shadow-glass",
       },
       gradient: {
         none: "",
@@ -68,10 +90,13 @@ const sheetVariants = cva(
         sunset: "bg-gradient-sunset",
         success: "bg-gradient-success",
         info: "bg-gradient-info",
+        warning: "bg-gradient-warning",
+        danger: "bg-gradient-danger",
         fire: "bg-gradient-fire",
         royal: "bg-gradient-royal",
         mint: "bg-gradient-mint",
         purple: "bg-gradient-purple",
+        forest: "bg-gradient-forest",
       },
     },
     defaultVariants: {
@@ -84,7 +109,7 @@ const sheetVariants = cva(
 
 interface SheetContentProps
   extends React.ComponentPropsWithoutRef<typeof SheetPrimitive.Content>,
-    VariantProps<typeof sheetVariants> {
+    Omit<VariantProps<typeof sheetVariants>, 'glassEffect'> {
   glassEffect?: GlassEffect;
   gradientType?: GradientType;
   neomorphism?: boolean;
@@ -96,7 +121,7 @@ const SheetContent = React.forwardRef<
   SheetContentProps
 >(({ 
   side = "right", 
-  glassEffect = "glassCard",
+  glassEffect = "card",
   gradientType = "none",
   neomorphism = false,
   animation = "scale-in",
@@ -110,14 +135,15 @@ const SheetContent = React.forwardRef<
   
   return (
     <SheetPortal>
-      <SheetOverlay glassEffect={glassEffect} animation={animation} />
+      <SheetOverlay glassEffect={glassEffect ?? undefined} animation={animation} />
       <SheetPrimitive.Content
         ref={ref}
         className={cn(
-          sheetVariants({ side, glassEffect, gradient: gradientType }),
-          shouldApplyGlass && applyGlassEffect(glassEffect),
-          shouldApplyNeomorphism && applyNeomorphismEffect(),
-          shouldApplyGradient && applyGradientEffect(gradientType),
+          sheetVariants({ side, glassEffect: mapGlassEffectToVariant(glassEffect), gradient: gradientType }),
+          shouldApplyGlass && applyGlassEffect(glassEffect ?? undefined),
+          shouldApplyNeomorphism && applyNeomorphismEffect(undefined),
+          shouldApplyGradient && applyGradientEffect(gradientType ?? undefined),
+          applyAnimation(undefined, animation),
           className,
         )}
         {...props}

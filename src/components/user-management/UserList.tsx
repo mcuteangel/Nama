@@ -15,7 +15,7 @@ import LoadingSpinner from '../common/LoadingSpinner';
 import StandardizedDeleteDialog from "@/components/common/StandardizedDeleteDialog";
 import { GlassButton } from "@/components/ui/glass-button";
 import { ModernCard } from "@/components/ui/modern-card";
-import { useDebugMode } from '@/hooks/use-debug-mode';
+import { useDebugMode } from '@/hooks/useDebugMode';
 import { EdgeFunctionDebugger } from '@/utils/edge-function-debugger';
 
 interface UserProfile {

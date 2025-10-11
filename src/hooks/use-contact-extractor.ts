@@ -1,7 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
-import { ContactFormValues, PhoneNumberFormData, EmailAddressFormData, SocialLinkFormData } from '@/types/contact';
+import { useState, useCallback } from 'react';
+import { PhoneNumberFormData, EmailAddressFormData, SocialLinkFormData } from '@/types/contact';
 import { ErrorManager } from '@/lib/error-manager';
-import { supabase } from '@/integrations/supabase/client';
 import { useSession } from '@/integrations/supabase/auth'; // Import useSession to get the access token
 
 // Define ExtractedContactInfo here as it's the core output of the AI
@@ -64,11 +63,12 @@ export function useContactExtractor() {
       } else {
         throw new Error('پاسخ نامعتبر از تابع Edge.');
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Error during contact info extraction enqueue:", err);
-      setError(err.message || 'خطا در افزودن درخواست به صف استخراج اطلاعات.');
-      ErrorManager.notifyUser(err.message || 'خطا در افزودن درخواست به صف استخراج اطلاعات.', 'error');
-      return { success: false, error: err.message || 'خطا در افزودن درخواست به صف استخراج اطلاعات.' };
+      const errorMessage = err instanceof Error ? err.message : 'خطا در افزودن درخواست به صف استخراج اطلاعات.';
+      setError(errorMessage);
+      ErrorManager.notifyUser(errorMessage, 'error');
+      return { success: false, error: errorMessage };
     } finally {
       setIsLoading(false);
     }

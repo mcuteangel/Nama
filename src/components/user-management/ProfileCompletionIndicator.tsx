@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 import { CheckCircle, Circle, Award, TrendingUp, AlertCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
