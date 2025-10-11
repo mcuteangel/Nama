@@ -19,7 +19,7 @@ import { ContactDetailTimestamps } from '@/components/contact-detail/ContactDeta
 import { FaMale, FaFemale } from "react-icons/fa";
 import { Edit } from "lucide-react";
 import { ModernTooltip, ModernTooltipTrigger, GradientButton, ModernTooltipContent } from "@/components/ui";
-import { PageHeader } from "@/components/ui/page-header";
+import PageHeader from "@/components/ui/PageHeader";
 
 // Interfaces
 interface PhoneNumber {

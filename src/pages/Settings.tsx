@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import i18n from '@/integrations/i18n';
 import { Settings as SettingsIcon, Palette, Sparkles, TestTube, UserCircle, Database, ChevronRight } from "lucide-react";
 import { cn } from '@/lib/utils';
-import { PageHeader } from "@/components/ui/page-header";
+import PageHeader from "@/components/ui/PageHeader";
 import { ModernCard, ModernCardContent } from "@/components/ui/modern-card";
 import { useMediaQuery } from '../hooks/use-media-query';
 
@@ -82,13 +82,16 @@ const Settings = () => {
 
   return (
     <div className="flex flex-col h-full w-full min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-700">
-      <div className="container mx-auto max-w-5xl p-2">
+      <div className="container mx-auto max-w-5xl p-6">
         <PageHeader
           title={t('settings.title')}
           description={t('settings.description')}
           showBackButton={true}
-          className="mb-6"
+          className="mb-0"
         />
+
+        {/* Spacer */}
+        <div className="h-8" />
 
         <ModernCard className="w-full rounded-3xl shadow-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-0 overflow-hidden">
           <ModernCardContent className="p-0">

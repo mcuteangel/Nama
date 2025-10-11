@@ -6,7 +6,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { showError, showSuccess, showLoading, dismissToast } from "@/utils/toast";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { ThemeToggle } from "../settings";
 import { useTranslation } from 'react-i18next';
 import LoadingSpinner from '../common/LoadingSpinner';
 
@@ -140,7 +139,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isAdmin }) => {
             <TooltipContent side="left">{t('common.logout')}</TooltipContent>
           </Tooltip>
         )}
-        <ThemeToggle />
       </div>
     </aside>
   );

@@ -35,8 +35,6 @@ const AISuggestions = React.lazy(() => import('./pages/AISuggestions'));
 const NotFound = React.lazy(() => import('./pages/NotFound'));
 import { SessionContextProvider } from './integrations/supabase/auth';
 import { supabase } from './integrations/supabase/client';
-import MobileHeader from './components/layout/MobileHeader';
-import BottomNavigationBar from './components/layout/BottomNavigationBar';
 import Sidebar from './components/layout/Sidebar';
 import LoadingMessage from './components/common/LoadingMessage';
 import SuspenseWrapper from './components/common/SuspenseWrapper';
@@ -56,16 +54,14 @@ function App() {
 
   function AppLayout() {
     const location = useLocation();
-    const mobileBreakpoint = 768; // Tailwind's 'md' breakpoint
     const { i18n } = useTranslation();
     const { session } = useSession();
 
-    const [isMobile, setIsMobile] = useState(() => window.innerWidth < mobileBreakpoint);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     useEffect(() => {
       const handleResize = () => {
-        setIsMobile(window.innerWidth < mobileBreakpoint);
+        // Handle responsive layout if needed
       };
 
       window.addEventListener('resize', handleResize);
@@ -121,7 +117,7 @@ function App() {
 
     const isAuthPage = location.pathname === '/login';
 
-    const mainContentPaddingRight = !isAuthPage && !isMobile
+    const mainContentPaddingRight = !isAuthPage
       ? (isSidebarOpen ? "pr-64" : "pr-20")
       : "";
 
@@ -130,14 +126,11 @@ function App() {
     return (
       <div className="flex flex-col min-h-screen bg-background">
         {!isAuthPage && (
-          <>
-            {isMobile ? <MobileHeader /> : <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} isAdmin={isAdmin} />}
-            {isMobile && <BottomNavigationBar isAdmin={isAdmin} />}
-          </>
+          <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} isAdmin={isAdmin} />
         )}
         <div className={cn(
           "flex-grow",
-          !isAuthPage && (isMobile ? "pt-[64px] pb-16" : mainContentPaddingRight)
+          !isAuthPage && mainContentPaddingRight
         )}>
           <main className="h-full w-full flex flex-col items-stretch justify-center p-0 sm:p-4" id="main-content" role="main">
             <KeyboardNavigationHandler scope="global">
