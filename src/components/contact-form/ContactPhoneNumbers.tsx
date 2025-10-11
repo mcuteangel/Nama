@@ -53,13 +53,14 @@ const ContactPhoneNumbers: React.FC = React.memo(() => {
       icon={Phone}
       iconColor="#f97316"
     >
-      <div className="space-y-3">
+      <div className="space-y-2">
         {/* Phone Numbers List */}
         <div className="space-y-3">
           {fields.map((item, index) => (
             <FormSection
               key={item.id}
               variant="card"
+              title=""
               className="relative group"
             >
               <div className="flex items-center justify-between mb-2">
@@ -208,10 +209,9 @@ const ContactPhoneNumbers: React.FC = React.memo(() => {
         </div>
 
         {fields.length === 0 && (
-          <div className="text-center py-4 text-slate-500 dark:text-slate-400">
-            <Phone size={32} className="mx-auto mb-4 opacity-50" />
-            <p>هنوز شماره تلفنی اضافه نشده است</p>
-            <p className="text-sm mt-1">برای اضافه کردن شماره تلفن جدید، دکمه پایین را کلیک کنید</p>
+          <div className="text-center py-2 text-slate-500 dark:text-slate-400">
+            <Phone size={18} className="mx-auto mb-1 opacity-50" />
+            <p className="text-xs">شماره‌ای اضافه نشده</p>
           </div>
         )}
       </div>
