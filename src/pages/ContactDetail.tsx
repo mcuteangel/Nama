@@ -8,15 +8,17 @@ import LoadingMessage from "@/components/common/LoadingMessage";
 import CancelButton from "@/components/common/CancelButton";
 import { ErrorManager } from "@/lib/error-manager";
 import { useErrorHandler } from "@/hooks/use-error-handler";
-import { ContactHeader } from "./contact-detail/ContactHeader";
-import { BasicInfoCard } from "./contact-detail/BasicInfoCard";
-import { AddressCard } from "./contact-detail/AddressCard";
-import { ContactMethodsCard } from "./contact-detail/ContactMethodsCard";
-import { SocialLinksCard } from "./contact-detail/SocialLinksCard";
-import { CustomFieldsCard } from "./contact-detail/CustomFieldsCard";
-import { NotesCard } from "./contact-detail/NotesCard";
-import { TimestampsCard } from "./contact-detail/TimestampsCard";
 import { useTranslation } from "react-i18next";
+import { ContactDetailBasicInfo } from '@/components/contact-detail/ContactDetailBasicInfo';
+import { ContactDetailContactMethods } from '@/components/contact-detail/ContactDetailContactMethods';
+import { ContactDetailAddress } from '@/components/contact-detail/ContactDetailAddress';
+import { ContactDetailSocialLinks } from '@/components/contact-detail/ContactDetailSocialLinks';
+import { ContactDetailCustomFields } from '@/components/contact-detail/ContactDetailCustomFields';
+import { ContactDetailNotes } from '@/components/contact-detail/ContactDetailNotes';
+import { ContactDetailTimestamps } from '@/components/contact-detail/ContactDetailTimestamps';
+import { ModernTooltip, ModernTooltipTrigger, GradientButton, ModernTooltipContent } from "@/components/ui";
+import { Edit } from "lucide-react";
+import PageHeader from "@/components/ui/PageHeader";
 
 // Interfaces
 interface PhoneNumber {
@@ -83,8 +85,6 @@ interface ContactDetailType {
   created_at: string;
   updated_at: string;
 }
-
-// Helper functions
 const getGenderLabel = (gender: string, t: (key: string) => string) => {
   switch (gender) {
     case "male": return t('gender.male');
@@ -109,6 +109,9 @@ const ContactDetail = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [contact, setContact] = useState<ContactDetailType | null>(null);
+
+  // Extract assigned group from contact data
+  const assignedGroup = contact?.contact_groups?.[0]?.groups || null;
 
   const onSuccessFetchContact = useCallback((result: { data: ContactDetailType | null; error: string | null; fromCache: boolean }) => {
     setContact(result.data || null);
@@ -197,56 +200,38 @@ const ContactDetail = () => {
   // Main content
   return (
     <div className="relative min-h-screen w-full overflow-hidden">
-      {/* Animated Background */}
-      <div className="absolute inset-0">
-        {/* Gradient Background */}
-        <div
-          className="absolute inset-0"
-          style={{
-            background: `linear-gradient(135deg,
-              ${designTokens.colors.primary[900]} 0%,
-              ${designTokens.colors.primary[800]} 25%,
-              ${designTokens.colors.secondary[900]} 50%,
-              ${designTokens.colors.secondary[800]} 75%,
-              ${designTokens.colors.accent[900]} 100%)`,
-          }}
-        />
-
-        {/* Floating Particles */}
-        <div className="absolute inset-0">
-          {[...Array(20)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute rounded-full opacity-10 animate-pulse"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                width: `${Math.random() * 4 + 2}px`,
-                height: `${Math.random() * 4 + 2}px`,
-                background: designTokens.colors.primary[400],
-                animationDelay: `${Math.random() * 3}s`,
-                animationDuration: `${Math.random() * 3 + 2}s`,
-              }}
-            />
-          ))}
-        </div>
-
-        {/* Grid Pattern Overlay */}
-        <div
-          className="absolute inset-0 opacity-5"
-          style={{
-            backgroundImage: `
-              linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)
-            `,
-            backgroundSize: '50px 50px',
-          }}
-        />
-      </div>
-
       {/* Content Container */}
       <div className="relative z-10 flex flex-col items-center justify-start min-h-screen w-full py-8 px-4 md:px-8">
-        <ContactHeader contact={contact} />
+        <div className="w-full max-w-6xl">
+          <PageHeader
+            title={`${contact.first_name} ${contact.last_name}`}
+            description={contact.position && contact.company ?
+              `${contact.position} در ${contact.company}` :
+              contact.position || contact.company || t('contact_detail.contact_details')
+            }
+            showBackButton={true}
+            className="mb-6 w-full"
+          >
+            <ModernTooltip>
+              <ModernTooltipTrigger asChild>
+                <GradientButton
+                  gradientType="primary"
+                  onClick={() => navigate(`/contacts/edit/${contact.id}`)}
+                  className="flex items-center gap-2 px-4 py-2.5 font-medium rounded-xl text-white hover:text-white/90"
+                  style={{
+                    fontFamily: 'var(--font-sans)',
+                  }}
+                >
+                  <Edit size={16} />
+                  <span className="hidden sm:inline">{t('contact_detail.edit')}</span>
+                </GradientButton>
+              </ModernTooltipTrigger>
+              <ModernTooltipContent>
+                <p>{t('contact_detail.edit')}</p>
+              </ModernTooltipContent>
+            </ModernTooltip>
+          </PageHeader>
+        </div>
 
         {/* Cards Grid - Auto-fill */}
         <div className="w-full max-w-6xl mt-6">
@@ -258,49 +243,32 @@ const ContactDetail = () => {
             }}
           >
             {/* Basic Info - Always shown */}
-            <BasicInfoCard
+            <ContactDetailBasicInfo
               contact={contact}
-              getGenderLabel={(gender) => getGenderLabel(gender, t)}
-              getPreferredContactMethodLabel={(method) => getPreferredContactMethodLabel(method, t)}
+              getGenderLabel={getGenderLabel}
+              getPreferredContactMethodLabel={getPreferredContactMethodLabel}
             />
 
             {/* Contact Methods */}
-            {(contact.phone_numbers.length > 0 || contact.email_addresses.length > 0) && (
-              <ContactMethodsCard
-                phone_numbers={contact.phone_numbers}
-                email_addresses={contact.email_addresses}
-              />
-            )}
+            <ContactDetailContactMethods
+              phone_numbers={contact.phone_numbers}
+              email_addresses={contact.email_addresses}
+            />
 
             {/* Address */}
-            {(contact.street || contact.city || contact.state || contact.zip_code || contact.country) && (
-              <AddressCard contact={contact} />
-            )}
+            <ContactDetailAddress contact={contact} />
 
             {/* Social Links */}
-            {contact.social_links.length > 0 && (
-              <SocialLinksCard social_links={contact.social_links} />
-            )}
+            <ContactDetailSocialLinks social_links={contact.social_links} />
 
             {/* Custom Fields */}
-            {contact.custom_fields.length > 0 && (
-              <CustomFieldsCard custom_fields={contact.custom_fields} />
-            )}
+            <ContactDetailCustomFields custom_fields={contact.custom_fields} />
 
             {/* Notes - Full Width when present */}
-            {contact.notes && (
-              <div
-                className="col-span-full"
-                style={{
-                  gridColumn: '1 / -1',
-                }}
-              >
-                <NotesCard notes={contact.notes} />
-              </div>
-            )}
+            <ContactDetailNotes notes={contact.notes} />
 
             {/* Timestamps - Always shown */}
-            <TimestampsCard
+            <ContactDetailTimestamps
               created_at={contact.created_at}
               updated_at={contact.updated_at}
             />

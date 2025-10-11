@@ -1,3 +1,4 @@
+import PageHeader from "@/components/ui/PageHeader";
 import { GradientButton, GlassButton } from "@/components/ui/glass-button";
 import { ModernLoader } from "@/components/ui/modern-loader";
 import { useToast } from "@/components/ui/use-toast";
@@ -97,42 +98,17 @@ const Contacts = React.memo(() => {
     <div
       className={`min-h-screen w-full ${settings.theme === 'dark' ? 'dark' : ''}`}
       style={{
-        background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
         padding: designTokens.spacing[6]
       }}
     >
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Compact Header Section */}
-        <div
-          className="text-center py-8 px-6 rounded-2xl"
-          style={{
-            background: designTokens.colors.glass.background,
-            border: `1px solid ${designTokens.colors.glass.border}`,
-            backdropFilter: 'blur(15px)',
-            boxShadow: designTokens.shadows.glass
-          }}
-        >
-          <h1
-            className="text-3xl md:text-4xl font-bold mb-3"
-            style={{
-              background: designTokens.gradients.primary,
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
-              fontFamily: designTokens.typography.fonts.primary
-            }}
-          >
-            {t('pages.contacts.management')}
-          </h1>
-          <p
-            className="text-base text-gray-600 dark:text-gray-300 max-w-2xl mx-auto"
-            style={{
-              fontFamily: designTokens.typography.fonts.secondary
-            }}
-          >
-            {t('pages.contacts.management_description')}
-          </p>
-        </div>
+        {/* Page Header */}
+        <PageHeader
+          title={t('pages.contacts.management')}
+          description={t('pages.contacts.management_description')}
+          showBackButton={false}
+        />
 
         <div
           className="rounded-3xl overflow-hidden"
@@ -429,6 +405,30 @@ const Contacts = React.memo(() => {
               />
             </SuspenseWrapper>
           </div>
+        </div>
+
+        {/* Floating Action Button */}
+        <div className={`fixed ${isMobile ? 'bottom-20' : 'bottom-6'} left-6 z-50`}>
+          <ModernTooltip>
+            <ModernTooltipTrigger asChild>
+              <GradientButton
+                gradientType="primary"
+                onClick={handleAddContactClick}
+                className="w-14 h-14 rounded-full shadow-2xl hover:scale-110 transition-all duration-300 flex items-center justify-center"
+                style={{
+                  background: designTokens.gradients.primary,
+                  boxShadow: '0 10px 25px rgba(59, 130, 246, 0.4), 0 4px 10px rgba(0, 0, 0, 0.1)',
+                  fontFamily: designTokens.typography.fonts.primary
+                }}
+                aria-label={t('actions.add_contact')}
+              >
+                <PlusCircle size={24} className="text-white" />
+              </GradientButton>
+            </ModernTooltipTrigger>
+            <ModernTooltipContent side="right">
+              <p>{t('actions.add_contact')}</p>
+            </ModernTooltipContent>
+          </ModernTooltip>
         </div>
       </div>
     </div>
