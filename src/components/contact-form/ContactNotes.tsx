@@ -1,96 +1,72 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { ModernTextarea } from '@/components/ui/modern-textarea';
 import { FormField, FormLabel, FormControl } from '@/components/ui/form';
-import { FormSection } from '@/components/ui/FormSection';
 import { FormCard } from '@/components/ui/FormCard';
+import { FormSection } from '@/components/ui/FormSection';
 import { ContactFormValues } from '@/types/contact';
-import { FileText, AlertCircle, CheckCircle, XCircle, PenTool } from 'lucide-react';
+import { FileText, AlertCircle, PenTool } from 'lucide-react';
 
 const ContactNotes: React.FC = React.memo(() => {
+  const { i18n } = useTranslation();
   const form = useFormContext<ContactFormValues>();
-  useTranslation();
-  const [focusedField, setFocusedField] = useState<string | null>(null);
+
+  // Determine text direction based on language
+  const isRTL = i18n.language === 'fa' || i18n.language === 'ar';
 
   return (
-    <FormSection
-      icon={FileText}
+    <FormCard
       title="یادداشت‌ها"
       description="اطلاعات اضافی و یادداشت‌های مربوط به مخاطب را وارد کنید"
-      className="space-y-4"
+      icon={FileText}
+      iconColor="#22c55e"
     >
-      <FormCard
-        title="یادداشت‌ها"
-        description="هر اطلاعاتی که می‌خواهید درباره این مخاطب یادداشت کنید"
-        icon={PenTool}
-        iconColor="#22c55e"
-        className="group"
-      >
-        <FormField
-          control={form.control}
-          name="notes"
-          render={({ field, fieldState }) => (
-            <div className="space-y-4">
-              <div className="relative">
+      <div className="space-y-3">
+        <FormSection
+          variant="card"
+          title=""
+          className="relative"
+        >
+          <FormField
+            control={form.control}
+            name="notes"
+            render={({ field, fieldState }) => (
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-6 h-6 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center">
+                    <PenTool size={10} className="text-primary-600 dark:text-primary-400" />
+                  </div>
+                  <FormLabel className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                    یادداشت‌ها
+                  </FormLabel>
+                </div>
                 <FormControl>
                   <ModernTextarea
                     placeholder="یادداشت‌های خود را درباره این مخاطب اینجا بنویسید..."
                     variant="glass"
-                    className={`
-                      w-full px-4 py-3 text-base rounded-lg
-                      bg-white/80 dark:bg-gray-700/80
-                      border-2 border-slate-200 dark:border-slate-600
-                      backdrop-blur-md
-                      transition-all duration-300 ease-out
-                      focus:ring-4 focus:ring-green-500/30 focus:border-green-400
-                      hover:bg-white/95 dark:hover:bg-gray-600/95
-                      hover:shadow-xl hover:shadow-green-500/20
-                      hover:scale-[1.005]
-                      ${fieldState.error ? 'border-red-400 focus:ring-red-500/30' : ''}
-                      ${focusedField === 'notes' ? 'scale-105 shadow-2xl ring-4 ring-green-500/20' : ''}
-                      ${field.value && !fieldState.error ? 'border-green-400 shadow-green-500/20' : ''}
-                      min-h-[160px] resize-none
-                    `}
-                    style={{
-                      fontSize: '16px' // Prevents zoom on iOS
-                    }}
+                    className={`w-full px-3 py-2 text-sm rounded-lg border-2 bg-white/80 dark:bg-gray-700/80 backdrop-blur-md transition-all duration-300 ease-out focus:ring-4 focus:ring-green-500/30 focus:border-green-400 hover:bg-white/95 dark:hover:bg-gray-600/95 hover:shadow-xl hover:shadow-green-500/20 min-h-[120px] resize-none ${fieldState.error ? 'border-red-300 focus:border-red-500' : 'border-slate-200 dark:border-slate-600'}`}
                     {...field}
                     value={field.value || ''}
-                    onFocus={() => setFocusedField('notes')}
-                    onBlur={() => setFocusedField(null)}
                   />
                 </FormControl>
-
-                <div className="absolute right-3 top-3 flex items-center gap-2">
-                  {field.value && !fieldState.error && (
-                    <CheckCircle size={16} className="text-green-500 animate-bounce" />
-                  )}
-                  {fieldState.error && (
-                    <XCircle size={16} className="text-red-500 animate-pulse" />
-                  )}
-                </div>
-
                 {field.value && (
-                  <div className="absolute left-3 bottom-3 text-sm text-slate-500 dark:text-slate-400">
+                  <div className="text-xs text-slate-500 dark:text-slate-400 text-left">
                     {field.value.length} کاراکتر
                   </div>
                 )}
-
                 {fieldState.error && (
-                  <div className="mt-4 p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/30">
-                    <p className="text-sm text-red-600 dark:text-red-400 flex items-center gap-2">
-                      <AlertCircle size={14} />
-                      {fieldState.error.message}
-                    </p>
-                  </div>
+                  <p className="text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                    <AlertCircle size={12} />
+                    {fieldState.error.message}
+                  </p>
                 )}
               </div>
-            </div>
-          )}
-        />
-      </FormCard>
-    </FormSection>
+            )}
+          />
+        </FormSection>
+      </div>
+    </FormCard>
   );
 });
 

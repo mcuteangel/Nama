@@ -6,6 +6,7 @@ const ContactOtherDetails: React.FC = React.memo(() => {
   return (
     <>
       <ContactAddress />
+      <div className="h-8"></div>
       <ContactNotes />
     </>
   );

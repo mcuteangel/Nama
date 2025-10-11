@@ -12,6 +12,8 @@ const ContactPhoneNumbers = lazy(() => import('@/components/contact-form/Contact
 const ContactEmailAddresses = lazy(() => import('@/components/contact-form/ContactEmailAddresses.tsx'));
 const ContactSocialLinks = lazy(() => import('@/components/contact-form/ContactSocialLinks.tsx'));
 const ContactImportantDates = lazy(() => import('@/components/contact-form/ContactImportantDates.tsx'));
+const ContactAddress = lazy(() => import('@/components/contact-form/ContactAddress.tsx'));
+const ContactNotes = lazy(() => import('@/components/contact-form/ContactNotes.tsx'));
 const ContactOtherDetails = lazy(() => import('@/components/contact-form/ContactOtherDetails.tsx'));
 const ContactCustomFields = lazy(() => import('@/components/contact-form/ContactCustomFields.tsx'));
 const ContactPreviewCard = lazy(() => import('@/components/contact-form/ContactPreviewCard.tsx'));
@@ -120,11 +122,20 @@ export const useContactFormSections = (): ContactFormSectionsConfig => {
       )
     },
     {
-      id: 'other-details',
-      title: t('accessibility.other_details_section', 'Other Details Section'),
+      id: 'address',
+      title: t('accessibility.address_section', 'Address Section'),
       component: (
         <Suspense fallback={<SectionLoader />}>
-          <ContactOtherDetails />
+          <ContactAddress />
+        </Suspense>
+      )
+    },
+    {
+      id: 'notes',
+      title: t('accessibility.notes_section', 'Notes Section'),
+      component: (
+        <Suspense fallback={<SectionLoader />}>
+          <ContactNotes />
         </Suspense>
       )
     },

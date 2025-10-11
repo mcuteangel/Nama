@@ -1,349 +1,226 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { ModernInput } from '@/components/ui/modern-input';
 import { FormField, FormLabel, FormControl } from '@/components/ui/form';
-import { FormSection } from '@/components/ui/FormSection';
 import { FormCard } from '@/components/ui/FormCard';
+import { FormSection } from '@/components/ui/FormSection';
 import { ContactFormValues } from '@/types/contact';
-import { MapPin, AlertCircle, CheckCircle, XCircle, Home, Building, Globe } from 'lucide-react';
+import { MapPin, AlertCircle, Home, Building, Globe } from 'lucide-react';
 
 const ContactAddress: React.FC = React.memo(() => {
+  const { i18n } = useTranslation();
   const form = useFormContext<ContactFormValues>();
-  useTranslation();
-  const [focusedField, setFocusedField] = useState<string | null>(null);
+
+  // Determine text direction based on language
+  const isRTL = i18n.language === 'fa' || i18n.language === 'ar';
 
   return (
-    <FormSection
-      icon={MapPin}
+    <FormCard
       title="آدرس"
       description="اطلاعات آدرس مخاطب را وارد کنید"
-      className="space-y-4"
+      icon={MapPin}
+      iconColor="#10b981"
     >
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {/* Street Field */}
-        <FormCard
-          title="خیابان"
-          description="آدرس خیابان را وارد کنید"
-          icon={Home}
-          iconColor="#10b981"
-        >
-          <FormField
-            control={form.control}
-            name="street"
-            render={({ field, fieldState }) => (
-              <div className="space-y-3">
-                <div className="relative">
+      <div className="space-y-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* Street Field */}
+          <FormSection
+            variant="card"
+            title=""
+            className="relative"
+          >
+            <FormField
+              control={form.control}
+              name="street"
+              render={({ field, fieldState }) => (
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-6 h-6 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center">
+                      <Home size={10} className="text-primary-600 dark:text-primary-400" />
+                    </div>
+                    <FormLabel className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                      خیابان
+                    </FormLabel>
+                  </div>
                   <FormControl>
                     <ModernInput
                       placeholder="مثال: خیابان ولیعصر، پلاک ۱۲۳"
                       variant="glass"
-                      className={`
-                        w-full px-4 py-3 text-base rounded-lg
-                        bg-white/80 dark:bg-gray-700/80
-                        border-2 border-slate-200 dark:border-slate-600
-                        backdrop-blur-md
-                        transition-all duration-300 ease-out
-                        focus:ring-4 focus:ring-emerald-500/30 focus:border-emerald-400
-                        hover:bg-white/95 dark:hover:bg-gray-600/95
-                        hover:shadow-xl hover:shadow-emerald-500/20
-                        hover:scale-[1.005]
-                        ${fieldState.error ? 'border-red-400 focus:ring-red-500/30' : ''}
-                        ${focusedField === 'street' ? 'scale-105 shadow-2xl ring-4 ring-emerald-500/20' : ''}
-                        ${field.value && !fieldState.error ? 'border-green-400 shadow-green-500/20' : ''}
-                      `}
-                      style={{
-                        fontSize: '16px' // Prevents zoom on iOS
-                      }}
+                      className={`w-full px-3 py-2 text-sm rounded-lg border-2 bg-white/80 dark:bg-gray-700/80 backdrop-blur-md transition-all duration-300 ease-out focus:ring-4 focus:ring-emerald-500/30 focus:border-emerald-400 hover:bg-white/95 dark:hover:bg-gray-600/95 hover:shadow-xl hover:shadow-emerald-500/20 ${fieldState.error ? 'border-red-300 focus:border-red-500' : 'border-slate-200 dark:border-slate-600'}`}
                       {...field}
                       value={field.value || ''}
-                      onFocus={() => setFocusedField('street')}
-                      onBlur={() => setFocusedField(null)}
                     />
                   </FormControl>
-
-                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center gap-2">
-                    {field.value && !fieldState.error && (
-                      <CheckCircle size={18} className="text-green-500 animate-bounce" />
-                    )}
-                    {fieldState.error && (
-                      <XCircle size={18} className="text-red-500 animate-pulse" />
-                    )}
-                  </div>
-
                   {fieldState.error && (
-                    <div className="mt-3 p-2 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/30">
-                      <p className="text-sm text-red-600 dark:text-red-400 flex items-center gap-2">
-                        <AlertCircle size={14} />
-                        {fieldState.error.message}
-                      </p>
-                    </div>
+                    <p className="text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                      <AlertCircle size={12} />
+                      {fieldState.error.message}
+                    </p>
                   )}
                 </div>
-              </div>
-            )}
-          />
-        </FormCard>
+              )}
+            />
+          </FormSection>
 
-        {/* City Field */}
-        <FormCard
-          title="شهر"
-          description="نام شهر را وارد کنید"
-          icon={Building}
-          iconColor="#06b6d4"
-        >
-          <FormField
-            control={form.control}
-            name="city"
-            render={({ field, fieldState }) => (
-              <div className="space-y-3">
-                <div className="relative">
+          {/* City Field */}
+          <FormSection
+            variant="card"
+            title=""
+            className="relative"
+          >
+            <FormField
+              control={form.control}
+              name="city"
+              render={({ field, fieldState }) => (
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-6 h-6 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center">
+                      <Building size={10} className="text-primary-600 dark:text-primary-400" />
+                    </div>
+                    <FormLabel className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                      شهر
+                    </FormLabel>
+                  </div>
                   <FormControl>
                     <ModernInput
                       placeholder="مثال: تهران"
                       variant="glass"
-                      className={`
-                        w-full px-4 py-3 text-base rounded-lg
-                        bg-white/80 dark:bg-gray-700/80
-                        border-2 border-slate-200 dark:border-slate-600
-                        backdrop-blur-md
-                        transition-all duration-300 ease-out
-                        focus:ring-4 focus:ring-cyan-500/30 focus:border-cyan-400
-                        hover:bg-white/95 dark:hover:bg-gray-600/95
-                        hover:shadow-xl hover:shadow-cyan-500/20
-                        hover:scale-[1.005]
-                        ${fieldState.error ? 'border-red-400 focus:ring-red-500/30' : ''}
-                        ${focusedField === 'city' ? 'scale-105 shadow-2xl ring-4 ring-cyan-500/20' : ''}
-                        ${field.value && !fieldState.error ? 'border-green-400 shadow-green-500/20' : ''}
-                      `}
-                      style={{
-                        fontSize: '16px' // Prevents zoom on iOS
-                      }}
+                      className={`w-full px-3 py-2 text-sm rounded-lg border-2 bg-white/80 dark:bg-gray-700/80 backdrop-blur-md transition-all duration-300 ease-out focus:ring-4 focus:ring-cyan-500/30 focus:border-cyan-400 hover:bg-white/95 dark:hover:bg-gray-600/95 hover:shadow-xl hover:shadow-cyan-500/20 ${fieldState.error ? 'border-red-300 focus:border-red-500' : 'border-slate-200 dark:border-slate-600'}`}
                       {...field}
                       value={field.value || ''}
-                      onFocus={() => setFocusedField('city')}
-                      onBlur={() => setFocusedField(null)}
                     />
                   </FormControl>
-
-                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center gap-2">
-                    {field.value && !fieldState.error && (
-                      <CheckCircle size={18} className="text-green-500 animate-bounce" />
-                    )}
-                    {fieldState.error && (
-                      <XCircle size={18} className="text-red-500 animate-pulse" />
-                    )}
-                  </div>
-
                   {fieldState.error && (
-                    <div className="mt-3 p-2 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/30">
-                      <p className="text-sm text-red-600 dark:text-red-400 flex items-center gap-2">
-                        <AlertCircle size={14} />
-                        {fieldState.error.message}
-                      </p>
-                    </div>
+                    <p className="text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                      <AlertCircle size={12} />
+                      {fieldState.error.message}
+                    </p>
                   )}
                 </div>
-              </div>
-            )}
-          />
-        </FormCard>
+              )}
+            />
+          </FormSection>
 
-        {/* State Field */}
-        <FormCard
-          title="استان"
-          description="نام استان را وارد کنید"
-          icon={MapPin}
-          iconColor="#8b5cf6"
-        >
-          <FormField
-            control={form.control}
-            name="state"
-            render={({ field, fieldState }) => (
-              <div className="space-y-3">
-                <div className="relative">
+          {/* State Field */}
+          <FormSection
+            variant="card"
+            title=""
+            className="relative"
+          >
+            <FormField
+              control={form.control}
+              name="state"
+              render={({ field, fieldState }) => (
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-6 h-6 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center">
+                      <MapPin size={10} className="text-primary-600 dark:text-primary-400" />
+                    </div>
+                    <FormLabel className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                      استان
+                    </FormLabel>
+                  </div>
                   <FormControl>
                     <ModernInput
                       placeholder="مثال: تهران"
                       variant="glass"
-                      className={`
-                        w-full px-4 py-3 text-base rounded-lg
-                        bg-white/80 dark:bg-gray-700/80
-                        border-2 border-slate-200 dark:border-slate-600
-                        backdrop-blur-md
-                        transition-all duration-300 ease-out
-                        focus:ring-4 focus:ring-indigo-500/30 focus:border-indigo-400
-                        hover:bg-white/95 dark:hover:bg-gray-600/95
-                        hover:shadow-xl hover:shadow-indigo-500/20
-                        hover:scale-[1.005]
-                        ${fieldState.error ? 'border-red-400 focus:ring-red-500/30' : ''}
-                        ${focusedField === 'state' ? 'scale-105 shadow-2xl ring-4 ring-indigo-500/20' : ''}
-                        ${field.value && !fieldState.error ? 'border-green-400 shadow-green-500/20' : ''}
-                      `}
-                      style={{
-                        fontSize: '16px' // Prevents zoom on iOS
-                      }}
+                      className={`w-full px-3 py-2 text-sm rounded-lg border-2 bg-white/80 dark:bg-gray-700/80 backdrop-blur-md transition-all duration-300 ease-out focus:ring-4 focus:ring-indigo-500/30 focus:border-indigo-400 hover:bg-white/95 dark:hover:bg-gray-600/95 hover:shadow-xl hover:shadow-indigo-500/20 ${fieldState.error ? 'border-red-300 focus:border-red-500' : 'border-slate-200 dark:border-slate-600'}`}
                       {...field}
                       value={field.value || ''}
-                      onFocus={() => setFocusedField('state')}
-                      onBlur={() => setFocusedField(null)}
                     />
                   </FormControl>
-
-                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center gap-2">
-                    {field.value && !fieldState.error && (
-                      <CheckCircle size={18} className="text-green-500 animate-bounce" />
-                    )}
-                    {fieldState.error && (
-                      <XCircle size={18} className="text-red-500 animate-pulse" />
-                    )}
-                  </div>
-
                   {fieldState.error && (
-                    <div className="mt-3 p-2 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/30">
-                      <p className="text-sm text-red-600 dark:text-red-400 flex items-center gap-2">
-                        <AlertCircle size={14} />
-                        {fieldState.error.message}
-                      </p>
-                    </div>
+                    <p className="text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                      <AlertCircle size={12} />
+                      {fieldState.error.message}
+                    </p>
                   )}
                 </div>
-              </div>
-            )}
-          />
-        </FormCard>
+              )}
+            />
+          </FormSection>
 
-        {/* Zip Code Field */}
-        <FormCard
-          title="کد پستی"
-          description="کد پستی را وارد کنید"
-          icon={MapPin}
-          iconColor="#a855f7"
-        >
-          <FormField
-            control={form.control}
-            name="zipCode"
-            render={({ field, fieldState }) => (
-              <div className="space-y-3">
-                <div className="relative">
+          {/* Zip Code Field */}
+          <FormSection
+            variant="card"
+            title=""
+            className="relative"
+          >
+            <FormField
+              control={form.control}
+              name="zipCode"
+              render={({ field, fieldState }) => (
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-6 h-6 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center">
+                      <MapPin size={10} className="text-primary-600 dark:text-primary-400" />
+                    </div>
+                    <FormLabel className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                      کد پستی
+                    </FormLabel>
+                  </div>
                   <FormControl>
                     <ModernInput
                       placeholder="مثال: ۱۲۳۴۵۶۷۸۹۰"
                       variant="glass"
-                      className={`
-                        w-full px-4 py-3 text-base rounded-lg
-                        bg-white/80 dark:bg-gray-700/80
-                        border-2 border-slate-200 dark:border-slate-600
-                        backdrop-blur-md
-                        transition-all duration-300 ease-out
-                        focus:ring-4 focus:ring-violet-500/30 focus:border-violet-400
-                        hover:bg-white/95 dark:hover:bg-gray-600/95
-                        hover:shadow-xl hover:shadow-violet-500/20
-                        hover:scale-[1.005]
-                        ${fieldState.error ? 'border-red-400 focus:ring-red-500/30' : ''}
-                        ${focusedField === 'zipCode' ? 'scale-105 shadow-2xl ring-4 ring-violet-500/20' : ''}
-                        ${field.value && !fieldState.error ? 'border-green-400 shadow-green-500/20' : ''}
-                      `}
-                      style={{
-                        fontSize: '16px' // Prevents zoom on iOS
-                      }}
+                      className={`w-full px-3 py-2 text-sm rounded-lg border-2 bg-white/80 dark:bg-gray-700/80 backdrop-blur-md transition-all duration-300 ease-out focus:ring-4 focus:ring-violet-500/30 focus:border-violet-400 hover:bg-white/95 dark:hover:bg-gray-600/95 hover:shadow-xl hover:shadow-violet-500/20 ${fieldState.error ? 'border-red-300 focus:border-red-500' : 'border-slate-200 dark:border-slate-600'}`}
                       {...field}
                       value={field.value || ''}
-                      onFocus={() => setFocusedField('zipCode')}
-                      onBlur={() => setFocusedField(null)}
                     />
                   </FormControl>
-
-                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center gap-2">
-                    {field.value && !fieldState.error && (
-                      <CheckCircle size={18} className="text-green-500 animate-bounce" />
-                    )}
-                    {fieldState.error && (
-                      <XCircle size={18} className="text-red-500 animate-pulse" />
-                    )}
-                  </div>
-
                   {fieldState.error && (
-                    <div className="mt-3 p-2 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/30">
-                      <p className="text-sm text-red-600 dark:text-red-400 flex items-center gap-2">
-                        <AlertCircle size={14} />
-                        {fieldState.error.message}
-                      </p>
-                    </div>
+                    <p className="text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                      <AlertCircle size={12} />
+                      {fieldState.error.message}
+                    </p>
                   )}
-                </div>
-              </div>
-            )}
-          />
-        </FormCard>
-
-        {/* Country Field - Full Width */}
-        <div className="sm:col-span-2">
-          <FormCard
-            title="کشور"
-            description="نام کشور را وارد کنید"
-            icon={Globe}
-            iconColor="#64748b"
-          >
-            <FormField
-              control={form.control}
-              name="country"
-              render={({ field, fieldState }) => (
-                <div className="space-y-3">
-                  <div className="relative">
-                    <FormControl>
-                      <ModernInput
-                        placeholder="مثال: ایران"
-                        variant="glass"
-                        className={`
-                          w-full px-4 py-3 text-base rounded-lg
-                          bg-white/80 dark:bg-gray-700/80
-                          border-2 border-slate-200 dark:border-slate-600
-                          backdrop-blur-md
-                          transition-all duration-300 ease-out
-                          focus:ring-4 focus:ring-slate-500/30 focus:border-slate-400
-                          hover:bg-white/95 dark:hover:bg-gray-600/95
-                          hover:shadow-xl hover:shadow-slate-500/20
-                          hover:scale-[1.005]
-                          ${fieldState.error ? 'border-red-400 focus:ring-red-500/30' : ''}
-                          ${focusedField === 'country' ? 'scale-105 shadow-2xl ring-4 ring-slate-500/20' : ''}
-                          ${field.value && !fieldState.error ? 'border-green-400 shadow-green-500/20' : ''}
-                        `}
-                        style={{
-                          fontSize: '16px' // Prevents zoom on iOS
-                        }}
-                        {...field}
-                        value={field.value || ''}
-                        onFocus={() => setFocusedField('country')}
-                        onBlur={() => setFocusedField(null)}
-                      />
-                    </FormControl>
-
-                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center gap-2">
-                      {field.value && !fieldState.error && (
-                        <CheckCircle size={18} className="text-green-500 animate-bounce" />
-                      )}
-                      {fieldState.error && (
-                        <XCircle size={18} className="text-red-500 animate-pulse" />
-                      )}
-                    </div>
-
-                    {fieldState.error && (
-                      <div className="mt-3 p-2 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/30">
-                        <p className="text-sm text-red-600 dark:text-red-400 flex items-center gap-2">
-                          <AlertCircle size={14} />
-                          {fieldState.error.message}
-                        </p>
-                      </div>
-                    )}
-                  </div>
                 </div>
               )}
             />
-          </FormCard>
+          </FormSection>
         </div>
+
+        {/* Country Field - Full Width */}
+        <FormSection
+          variant="card"
+          title=""
+          className="relative"
+        >
+          <FormField
+            control={form.control}
+            name="country"
+            render={({ field, fieldState }) => (
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-6 h-6 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center">
+                    <Globe size={10} className="text-primary-600 dark:text-primary-400" />
+                  </div>
+                  <FormLabel className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                    کشور
+                  </FormLabel>
+                </div>
+                <FormControl>
+                  <ModernInput
+                    placeholder="مثال: ایران"
+                    variant="glass"
+                    className={`w-full px-3 py-2 text-sm rounded-lg border-2 bg-white/80 dark:bg-gray-700/80 backdrop-blur-md transition-all duration-300 ease-out focus:ring-4 focus:ring-slate-500/30 focus:border-slate-400 hover:bg-white/95 dark:hover:bg-gray-600/95 hover:shadow-xl hover:shadow-slate-500/20 ${fieldState.error ? 'border-red-300 focus:border-red-500' : 'border-slate-200 dark:border-slate-600'}`}
+                    {...field}
+                    value={field.value || ''}
+                  />
+                </FormControl>
+                {fieldState.error && (
+                  <p className="text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                    <AlertCircle size={12} />
+                    {fieldState.error.message}
+                  </p>
+                )}
+              </div>
+            )}
+          />
+        </FormSection>
       </div>
-    </FormSection>
+    </FormCard>
   );
 });
 

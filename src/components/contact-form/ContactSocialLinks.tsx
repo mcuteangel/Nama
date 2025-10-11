@@ -49,8 +49,6 @@ const ContactSocialLinks: React.FC = React.memo(() => {
         {/* Social Links List */}
         <div className="space-y-3">
           {fields.map((item, index) => {
-            const selectedOption = socialLinkTypeOptions.find(opt => opt.value === form.watch(`socialLinks.${index}.type`));
-
             return (
               <FormSection
                 key={item.id}
