@@ -320,8 +320,8 @@ const CustomFieldForm: React.FC<CustomFieldFormProps> = ({ initialData, onSucces
             </ModernCardTitle>
             <p className="text-gray-600 dark:text-gray-400 mt-2 text-sm sm:text-base">
               {initialData
-                ? 'ویرایش فیلد سفارشی موجود'
-                : 'ایجاد فیلد سفارشی جدید برای مخاطبین'}
+                ? t('custom_field_template.existing_field_edit')
+                : t('custom_field_template.new_field_create')}
             </p>
           </motion.div>
 
@@ -460,11 +460,11 @@ const CustomFieldForm: React.FC<CustomFieldFormProps> = ({ initialData, onSucces
                   className="rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl shadow-2xl"
                 >
                   {[
-                    { value: 'text', label: t('contact_form.text'), icon: getFieldIcon('text'), desc: 'متن ساده' },
-                    { value: 'number', label: t('contact_form.number'), icon: getFieldIcon('number'), desc: 'عدد' },
-                    { value: 'date', label: t('contact_form.date'), icon: getFieldIcon('date'), desc: 'تاریخ' },
-                    { value: 'list', label: t('contact_form.list'), icon: getFieldIcon('list'), desc: 'لیست گزینه‌ها (تک انتخابی)' },
-                    { value: 'checklist', label: t('contact_form.checklist'), icon: getFieldIcon('checklist'), desc: 'لیست گزینه‌ها (چند انتخابی)' }
+                    { value: 'text', label: t('contact_form.text'), icon: getFieldIcon('text'), desc: t('custom_field_template.field_descriptions.text') },
+                    { value: 'number', label: t('contact_form.number'), icon: getFieldIcon('number'), desc: t('custom_field_template.field_descriptions.number') },
+                    { value: 'date', label: t('contact_form.date'), icon: getFieldIcon('date'), desc: t('custom_field_template.field_descriptions.date') },
+                    { value: 'list', label: t('contact_form.list'), icon: getFieldIcon('list'), desc: t('custom_field_template.field_descriptions.list') },
+                    { value: 'checklist', label: t('contact_form.checklist'), icon: getFieldIcon('checklist'), desc: t('custom_field_template.field_descriptions.checklist') }
                   ].map((option) => (
                     <ModernSelectItem
                       key={option.value}
@@ -639,7 +639,7 @@ const CustomFieldForm: React.FC<CustomFieldFormProps> = ({ initialData, onSucces
                 <AlertTriangle className="w-5 h-5 text-yellow-500" />
                 {t('contact_form.required_field')}
                 <span className="text-sm text-gray-500 dark:text-gray-400">
-                  (اختیاری)
+                  {t('custom_field_template.optional_label')}
                 </span>
               </Label>
             </motion.div>
@@ -653,20 +653,20 @@ const CustomFieldForm: React.FC<CustomFieldFormProps> = ({ initialData, onSucces
             >
               <div className="flex items-center gap-2 text-gray-700 dark:text-gray-200 font-semibold">
                 <Eye className="w-5 h-5" />
-                پیش‌نمایش فیلد
+                {t('custom_field_template.preview_title')}
               </div>
               <Card className="bg-white/50 dark:bg-gray-800/50 border border-dashed border-gray-300 dark:border-gray-600">
                 <CardContent className="p-4">
                   <div className="space-y-4">
                     <div>
                       <Label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        {formData.name || 'نام فیلد'}
+                        {formData.name || t('custom_field_template.field_name_placeholder')}
                         {formData.required && <span className="text-red-500 mr-1">*</span>}
                       </Label>
                       
                       {formData.type === 'text' && (
                         <ModernInput
-                          placeholder="مقدار را وارد کنید..."
+                          placeholder={t('custom_field_template.text_placeholder')}
                           variant="glass"
                           className="w-full"
                           disabled
@@ -676,7 +676,7 @@ const CustomFieldForm: React.FC<CustomFieldFormProps> = ({ initialData, onSucces
                       {formData.type === 'number' && (
                         <ModernInput
                           type="number"
-                          placeholder="عدد وارد کنید..."
+                          placeholder={t('custom_field_template.number_placeholder')}
                           variant="glass"
                           className="w-full"
                           disabled
@@ -695,10 +695,10 @@ const CustomFieldForm: React.FC<CustomFieldFormProps> = ({ initialData, onSucces
                       {formData.type === 'list' && (
                         <ModernSelect>
                           <ModernSelectTrigger className="w-full">
-                            <ModernSelectValue placeholder="انتخاب کنید..." />
+                            <ModernSelectValue placeholder={t('custom_field_template.select_placeholder')} />
                           </ModernSelectTrigger>
                           <ModernSelectContent>
-                            {formData.options?.map((option, index) => (
+                            {(formData.options || []).filter(option => option.trim()).map((option, index) => (
                               <ModernSelectItem key={index} value={option}>
                                 {option}
                               </ModernSelectItem>
@@ -731,7 +731,7 @@ const CustomFieldForm: React.FC<CustomFieldFormProps> = ({ initialData, onSucces
               type="button"
               variant="ghost"
               onClick={() => {
-                if (confirm('آیا از حذف پیش‌نویس فعلی اطمینان دارید؟')) {
+                if (confirm(t('custom_field_template.confirm_clear_draft'))) {
                   clearDraft();
                   setFormData({
                     name: '',
@@ -746,7 +746,7 @@ const CustomFieldForm: React.FC<CustomFieldFormProps> = ({ initialData, onSucces
               disabled={!isDirty || isSubmitting}
               className="text-red-500 hover:bg-red-100 dark:hover:bg-red-900/20"
             >
-              حذف پیش‌نویس
+              {t('custom_field_template.clear_draft')}
             </GlassButton>
             <CancelButton 
               onClick={onCancel} 
