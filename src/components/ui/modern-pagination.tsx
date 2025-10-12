@@ -3,7 +3,6 @@ import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react";
 
 import { cn, applyGlassEffect, applyGradientEffect, applyNeomorphismEffect, applyHoverEffect } from "@/lib/utils";
 import { GlassEffect, GradientType, HoverEffect } from "@/types/global-style-types";
-import { GlassButton } from "@/components/ui/glass-button";
 
 const ModernPagination = ({ className, ...props }: React.ComponentProps<"nav">) => (
   <nav
@@ -41,6 +40,7 @@ type ModernPaginationLinkProps = {
   gradientType?: GradientType;
   neomorphism?: boolean;
   hoverEffect?: HoverEffect;
+  size?: "default" | "sm" | "lg" | "icon";
 } & React.ComponentProps<"a">;
 
 const ModernPaginationLink = ({
@@ -50,11 +50,19 @@ const ModernPaginationLink = ({
   gradientType = "none",
   neomorphism = false,
   hoverEffect = "lift",
+  size = "icon",
   ...props
 }: ModernPaginationLinkProps) => {
   const shouldApplyGlass = glassEffect !== "none";
   const shouldApplyGradient = gradientType !== "none";
   const shouldApplyNeomorphism = neomorphism;
+  
+  const sizeClasses = {
+    default: "h-10 px-4 py-2",
+    sm: "h-9 rounded-md px-3",
+    lg: "h-11 rounded-md px-8",
+    icon: "h-10 w-10"
+  };
   
   return (
     <a
@@ -62,12 +70,13 @@ const ModernPaginationLink = ({
       className={cn(
         "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
         isActive 
-          ? "bg-primary text-primary-foreground hover:bg-primary/90 h-10 w-10" 
-          : "hover:bg-muted h-10 w-10",
-        shouldApplyGlass && applyGlassEffect(glassEffect),
-        shouldApplyNeomorphism && applyNeomorphismEffect(),
-        shouldApplyGradient && applyGradientEffect(gradientType),
-        applyHoverEffect(hoverEffect),
+          ? "bg-primary text-primary-foreground hover:bg-primary/90" 
+          : "hover:bg-muted",
+        sizeClasses[size],
+        shouldApplyGlass && applyGlassEffect(undefined, { variant: glassEffect }),
+        shouldApplyNeomorphism && applyNeomorphismEffect(undefined),
+        shouldApplyGradient && applyGradientEffect(undefined, gradientType),
+        applyHoverEffect(undefined, hoverEffect),
         className,
       )}
       {...props}
@@ -93,10 +102,10 @@ const ModernPaginationPrevious = ({
       aria-label="Go to previous page"
       className={cn(
         "gap-1 pl-2.5",
-        shouldApplyGlass && applyGlassEffect(glassEffect),
-        shouldApplyNeomorphism && applyNeomorphismEffect(),
-        shouldApplyGradient && applyGradientEffect(gradientType),
-        applyHoverEffect(hoverEffect),
+        shouldApplyGlass && applyGlassEffect(undefined, { variant: glassEffect }),
+        shouldApplyNeomorphism && applyNeomorphismEffect(undefined),
+        shouldApplyGradient && applyGradientEffect(undefined, gradientType),
+        applyHoverEffect(undefined, hoverEffect),
         className,
       )}
       {...props}
@@ -125,10 +134,10 @@ const ModernPaginationNext = ({
       aria-label="Go to next page"
       className={cn(
         "gap-1 pr-2.5",
-        shouldApplyGlass && applyGlassEffect(glassEffect),
-        shouldApplyNeomorphism && applyNeomorphismEffect(),
-        shouldApplyGradient && applyGradientEffect(gradientType),
-        applyHoverEffect(hoverEffect),
+        shouldApplyGlass && applyGlassEffect(undefined, { variant: glassEffect }),
+        shouldApplyNeomorphism && applyNeomorphismEffect(undefined),
+        shouldApplyGradient && applyGradientEffect(undefined, gradientType),
+        applyHoverEffect(undefined, hoverEffect),
         className,
       )}
       {...props}
@@ -160,9 +169,9 @@ const ModernPaginationEllipsis = ({
       aria-hidden
       className={cn(
         "flex h-10 w-10 items-center justify-center",
-        shouldApplyGlass && applyGlassEffect(glassEffect),
-        shouldApplyNeomorphism && applyNeomorphismEffect(),
-        shouldApplyGradient && applyGradientEffect(gradientType),
+        shouldApplyGlass && applyGlassEffect(undefined, { variant: glassEffect }),
+        shouldApplyNeomorphism && applyNeomorphismEffect(undefined),
+        shouldApplyGradient && applyGradientEffect(undefined, gradientType),
         className,
       )}
       {...props}
@@ -183,3 +192,5 @@ export {
   ModernPaginationNext,
   ModernPaginationPrevious,
 };
+
+export type { ModernPaginationLinkProps };

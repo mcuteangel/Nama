@@ -96,9 +96,9 @@ const ModernFormItem = React.forwardRef<
         ref={ref}
         className={cn(
           "space-y-2",
-          shouldApplyGlass && applyGlassEffect(glassEffect),
-          shouldApplyNeomorphism && applyNeomorphismEffect(),
-          shouldApplyGradient && applyGradientEffect(gradientType),
+          shouldApplyGlass && applyGlassEffect(undefined, { variant: glassEffect }),
+          shouldApplyNeomorphism && applyNeomorphismEffect(undefined),
+          shouldApplyGradient && applyGradientEffect(undefined, gradientType),
           className,
         )}
         {...props}
@@ -167,9 +167,9 @@ const ModernFormDescription = React.forwardRef<
       id={formDescriptionId}
       className={cn(
         "text-sm text-muted-foreground",
-        shouldApplyGlass && applyGlassEffect(glassEffect),
-        shouldApplyNeomorphism && applyNeomorphismEffect(),
-        shouldApplyGradient && applyGradientEffect(gradientType),
+        shouldApplyGlass && applyGlassEffect(undefined, { variant: glassEffect }),
+        shouldApplyNeomorphism && applyNeomorphismEffect(undefined),
+        shouldApplyGradient && applyGradientEffect(undefined, gradientType),
         className,
       )}
       {...props}
@@ -210,9 +210,9 @@ const ModernFormMessage = React.forwardRef<
       id={formMessageId}
       className={cn(
         "text-sm font-medium text-destructive",
-        shouldApplyGlass && applyGlassEffect(glassEffect),
-        shouldApplyNeomorphism && applyNeomorphismEffect(),
-        shouldApplyGradient && applyGradientEffect(gradientType),
+        shouldApplyGlass && applyGlassEffect(undefined, { variant: glassEffect }),
+        shouldApplyNeomorphism && applyNeomorphismEffect(undefined),
+        shouldApplyGradient && applyGradientEffect(undefined, gradientType),
         className,
       )}
       {...props}
@@ -224,7 +224,6 @@ const ModernFormMessage = React.forwardRef<
 ModernFormMessage.displayName = "ModernFormMessage";
 
 export {
-  useModernFormField,
   ModernForm,
   ModernFormControl,
   ModernFormDescription,

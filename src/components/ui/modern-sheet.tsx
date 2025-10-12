@@ -39,7 +39,7 @@ const SheetOverlay = React.forwardRef<
   }
 >(({ 
   className, 
-  glassEffect = "glassAdvanced",
+  glassEffect = "advanced" as GlassEffect,
   animation = "fade-in",
   ...props 
 }, ref) => {
@@ -49,7 +49,7 @@ const SheetOverlay = React.forwardRef<
     <SheetPrimitive.Overlay
       className={cn(
         "fixed inset-0 z-50 bg-black/80",
-        shouldApplyGlass && applyGlassEffect(glassEffect),
+        shouldApplyGlass && applyGlassEffect(undefined, { variant: glassEffect }),
         applyAnimation(undefined, animation),
         className,
       )}
@@ -101,7 +101,7 @@ const sheetVariants = cva(
     },
     defaultVariants: {
       side: "right",
-      glassEffect: "glassCard",
+      glassEffect: "card",
       gradient: "none",
     },
   },

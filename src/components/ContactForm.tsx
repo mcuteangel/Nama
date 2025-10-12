@@ -93,7 +93,6 @@ const ContactForm: React.FC<ContactFormProps> = React.memo(({ initialData, conta
   const formSections = sectionsConfig.getFormSections(
     form,
     formLogic.isSubmitting,
-    accessibility.announce,
     formState.availableTemplates,
     formState.loadingTemplates,
     formState.fetchTemplates,

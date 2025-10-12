@@ -4,6 +4,7 @@ import { Suspense } from 'react';
 import { CustomFieldTemplate } from '@/domain/schemas/custom-field-template';
 import { UseFormReturn } from 'react-hook-form';
 import { ContactFormValues } from '@/types/contact';
+import SectionLoader from '@/components/contact-form/SectionLoader';
 
 // Lazy load form sections to improve initial loading performance
 import { lazy } from 'react';
@@ -22,11 +23,6 @@ const ContactAvatarUpload = lazy(() => import('@/components/ContactAvatarUpload.
 const ContactFormActions = lazy(() => import('@/components/contact-form/ContactFormActions.tsx'));
 
 // Loading component for sections
-const SectionLoader = () => (
-  <div className="flex justify-center items-center p-4">
-    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 animate-pulse"></div>
-  </div>
-);
 
 export interface FormSection {
   id: string;
@@ -38,7 +34,6 @@ export interface ContactFormSectionsConfig {
   getFormSections: (
     form: UseFormReturn<ContactFormValues>,
     isSubmitting: boolean,
-    announce: (message: string, priority?: 'polite' | 'assertive') => void,
     availableTemplates: CustomFieldTemplate[],
     loadingTemplates: boolean,
     fetchTemplates: () => Promise<void>,
@@ -53,7 +48,6 @@ export const useContactFormSections = (): ContactFormSectionsConfig => {
   const getFormSections = (
     form: UseFormReturn<ContactFormValues>,
     isSubmitting: boolean,
-    announce: (message: string, priority?: 'polite' | 'assertive') => void,
     availableTemplates: CustomFieldTemplate[],
     loadingTemplates: boolean,
     fetchTemplates: () => Promise<void>,

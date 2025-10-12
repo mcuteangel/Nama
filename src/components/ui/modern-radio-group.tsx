@@ -3,7 +3,14 @@ import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
 import { Circle } from "lucide-react";
 
 import { cn, applyGlassEffect, applyGradientEffect, applyNeomorphismEffect, applyHoverEffect } from "@/lib/utils";
-import { GradientType, HoverEffect } from "@/types/global-style-types";
+import { GlassEffect, GradientType, HoverEffect } from "@/types/global-style-types";
+
+export type ModernRadioGroupItemProps = React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Item> & {
+  glassEffect?: GlassEffect;
+  gradientType?: GradientType;
+  neomorphism?: boolean;
+  hoverEffect?: HoverEffect;
+};
 
 interface ModernRadioGroupProps extends React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Root> {
   options?: Array<{ value: string; label: string }>;
@@ -36,12 +43,7 @@ ModernRadioGroup.displayName = RadioGroupPrimitive.Root.displayName;
 
 const ModernRadioGroupItem = React.forwardRef<
   React.ElementRef<typeof RadioGroupPrimitive.Item>,
-  React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Item> & {
-    glassEffect?: 'none' | 'default' | 'advanced' | 'card' | 'background' | 'button';
-    gradientType?: GradientType;
-    neomorphism?: boolean;
-    hoverEffect?: HoverEffect;
-  }
+  ModernRadioGroupItemProps
 >(({ 
   className, 
   glassEffect = "none",
@@ -59,8 +61,8 @@ const ModernRadioGroupItem = React.forwardRef<
       ref={ref}
       className={cn(
         "aspect-square h-4 w-4 rounded-full border border-primary text-primary ring-offset-background focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
-        shouldApplyGlass && applyGlassEffect(undefined, { variant: glassEffect as any }),
-        shouldApplyNeomorphism && applyNeomorphismEffect(undefined, false),
+        shouldApplyGlass && applyGlassEffect(undefined, { variant: glassEffect }),
+        shouldApplyNeomorphism && applyNeomorphismEffect(undefined),
         shouldApplyGradient && applyGradientEffect(undefined, gradientType),
         applyHoverEffect(undefined, hoverEffect),
         className,

@@ -131,7 +131,7 @@ export const TagInput: React.FC<TagInputProps> = ({
 }) => {
   const [inputValue, setInputValue] = React.useState('');
   const [selectedColor, setSelectedColor] = React.useState(availableColors[0]);
-  const [isOpen, setIsOpen] = React.useState(false);
+  const [, setIsOpen] = React.useState(false);
   const inputRef = React.useRef<HTMLInputElement>(null);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {

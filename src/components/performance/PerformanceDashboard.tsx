@@ -7,14 +7,11 @@ import {
   Zap,
   MousePointer,
   Image,
-  Server,
   AlertTriangle,
   CheckCircle,
   TrendingUp,
   Lightbulb,
   BarChart3,
-  Clock,
-  Cpu,
   Wifi
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -22,7 +19,7 @@ import { GlassButton } from '@/components/ui/glass-button';
 import SettingsSection from '@/components/settings/SettingsSection';
 import SettingsCard from '@/components/settings/SettingsCard';
 import { useAppSettings } from '@/hooks/use-app-settings';
-import { onCLS, onFCP, onINP, onLCP, onTTFB, Metric } from 'web-vitals';
+import { onCLS, onFCP, onINP, onLCP, onTTFB } from 'web-vitals';
 
 // Types for performance metrics
 interface WebVitalsMetrics {

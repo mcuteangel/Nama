@@ -100,7 +100,7 @@ export function Toast({
         'pointer-events-auto relative flex w-full max-w-sm items-center space-x-4 rounded-xl border p-4 shadow-lg transition-all duration-300',
         bgClass,
         borderClass,
-        isVisible && !isLeaving ? 'translate-x-0 opacity-100 scale-100' : 'translate-x-full opacity-0 scale-95'
+        isVisible && !isLeaving ? 'translate-x-0 opacity-100 scale-100' : '-translate-x-full opacity-0 scale-95'
       )}
       role="alert"
       aria-live="polite"
@@ -183,7 +183,7 @@ export function ToastProvider({ children }: ToastProviderProps) {
       {children}
       
       {/* Toast Container */}
-      <div className="fixed top-4 right-4 z-50 flex flex-col space-y-2 max-w-sm w-full">
+      <div className="fixed top-4 left-4 z-50 flex flex-col space-y-2 max-w-sm w-full">
         {toasts.map(toast => (
           <Toast
             key={toast.id}

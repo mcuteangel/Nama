@@ -1,5 +1,4 @@
 import React from 'react';
-import { ToastProps } from './modern-toast';
 import { ToastContext, ToastState } from './toast-context';
 
 type ToastVariant = 'default' | 'success' | 'error' | 'warning' | 'info';
@@ -20,35 +19,35 @@ export function useToast() {
 
   const toast = {
     success: (message: string, options?: Partial<Omit<ToastState, 'id' | 'variant'>>) => {
-      addToast({ 
-        variant: 'success', 
-        title: 'موفق', 
-        description: message, 
-        ...options 
+      addToast({
+        variant: 'success' as ToastVariant,
+        title: 'موفق',
+        description: message,
+        ...options
       });
     },
     error: (message: string, options?: Partial<Omit<ToastState, 'id' | 'variant'>>) => {
-      addToast({ 
-        variant: 'error', 
-        title: 'خطا', 
-        description: message, 
-        ...options 
+      addToast({
+        variant: 'error' as ToastVariant,
+        title: 'خطا',
+        description: message,
+        ...options
       });
     },
     warning: (message: string, options?: Partial<Omit<ToastState, 'id' | 'variant'>>) => {
-      addToast({ 
-        variant: 'warning', 
-        title: 'هشدار', 
-        description: message, 
-        ...options 
+      addToast({
+        variant: 'warning' as ToastVariant,
+        title: 'هشدار',
+        description: message,
+        ...options
       });
     },
     info: (message: string, options?: Partial<Omit<ToastState, 'id' | 'variant'>>) => {
-      addToast({ 
-        variant: 'info', 
-        title: 'اطلاع', 
-        description: message, 
-        ...options 
+      addToast({
+        variant: 'info' as ToastVariant,
+        title: 'اطلاع',
+        description: message,
+        ...options
       });
     },
     custom: (options: Omit<ToastState, 'id'>) => {

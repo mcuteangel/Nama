@@ -20,7 +20,7 @@ const ModernTooltipContent = React.forwardRef<
   }
 >(({ 
   className, 
-  glassEffect = "glassAdvanced",
+  glassEffect = "advanced" as GlassEffect,
   gradientType = "none",
   neomorphism = false,
   animation = "fade-in",
@@ -37,9 +37,9 @@ const ModernTooltipContent = React.forwardRef<
       sideOffset={sideOffset}
       className={cn(
         "z-50 overflow-hidden rounded-md border bg-popover px-3 py-1.5 text-sm text-popover-foreground shadow-md",
-        shouldApplyGlass && applyGlassEffect(glassEffect),
-        shouldApplyNeomorphism && applyNeomorphismEffect(),
-        shouldApplyGradient && applyGradientEffect(gradientType),
+        shouldApplyGlass && applyGlassEffect(undefined, { variant: glassEffect }),
+        shouldApplyNeomorphism && applyNeomorphismEffect(undefined),
+        shouldApplyGradient && applyGradientEffect(undefined, gradientType),
         applyAnimation(undefined, animation),
         className,
       )}
@@ -48,5 +48,12 @@ const ModernTooltipContent = React.forwardRef<
   );
 });
 ModernTooltipContent.displayName = TooltipPrimitive.Content.displayName;
+
+export type ModernTooltipContentProps = React.ComponentPropsWithoutRef<typeof TooltipPrimitive.Content> & {
+  glassEffect?: GlassEffect;
+  gradientType?: GradientType;
+  neomorphism?: boolean;
+  animation?: AnimationType;
+};
 
 export { ModernTooltip, ModernTooltipTrigger, ModernTooltipContent, ModernTooltipProvider };
