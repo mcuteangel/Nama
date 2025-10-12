@@ -97,7 +97,9 @@ const UserProfileDisplay: React.FC = () => {
             <div className="flex-1 text-center md:text-right">
               <div className="flex items-center justify-center md:justify-end gap-2 mb-3">
                 <Heart className="w-4 h-4 text-pink-500" />
-                <span className="text-sm font-medium text-gray-600 dark:text-gray-400">پروفایل شخصی</span>
+                <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                  {t('profile.hero.personal_profile')}
+                </span>
               </div>
               <ModernCardTitle className="text-2xl md:text-3xl mb-2">
                 {profile?.first_name && profile?.last_name
@@ -138,23 +140,37 @@ const UserProfileDisplay: React.FC = () => {
                   <User className="w-4 h-4 text-white" />
                 </div>
                 <div>
-                  <ModernCardTitle className="text-lg">اطلاعات شخصی</ModernCardTitle>
-                  <ModernCardDescription className="text-xs">اطلاعات پایه حساب</ModernCardDescription>
+                  <ModernCardTitle className="text-lg">
+                    {t('profile.sections.personal_info')}
+                  </ModernCardTitle>
+                  <ModernCardDescription className="text-xs">
+                    {t('profile.sections.basic_account_info')}
+                  </ModernCardDescription>
                 </div>
               </div>
             </ModernCardHeader>
             <ModernCardContent className="space-y-3">
               <div className="flex justify-between items-center p-3 bg-gray-50/50 dark:bg-gray-800/50 rounded-lg">
-                <span className="text-xs font-medium text-gray-600 dark:text-gray-400">نام:</span>
-                <span className="font-semibold text-gray-900 dark:text-white text-sm">{profile?.first_name || t('common.not_specified')}</span>
+                <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
+                  {t('profile.sections.first_name')}:
+                </span>
+                <span className="font-semibold text-gray-900 dark:text-white text-sm">
+                  {profile?.first_name || t('common.not_specified')}
+                </span>
               </div>
               <div className="flex justify-between items-center p-3 bg-gray-50/50 dark:bg-gray-800/50 rounded-lg">
-                <span className="text-xs font-medium text-gray-600 dark:text-gray-400">نام خانوادگی:</span>
+                <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
+                  {t('profile.sections.last_name')}:
+                </span>
                 <span className="font-semibold text-gray-900 dark:text-white text-sm">{profile?.last_name || t('common.not_specified')}</span>
               </div>
               <div className="flex justify-between items-center p-3 bg-gray-50/50 dark:bg-gray-800/50 rounded-lg">
-                <span className="text-xs font-medium text-gray-600 dark:text-gray-400">ایمیل:</span>
-                <span className="font-semibold text-gray-900 dark:text-white text-sm">{session?.user?.email || t('common.not_specified')}</span>
+                <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
+                  {t('profile.sections.email')}:
+                </span>
+                <span className="font-semibold text-gray-900 dark:text-white text-sm">
+                  {session?.user?.email || t('common.not_specified')}
+                </span>
               </div>
             </ModernCardContent>
           </ModernCard>
@@ -173,23 +189,39 @@ const UserProfileDisplay: React.FC = () => {
                   <Phone className="w-4 h-4 text-white" />
                 </div>
                 <div>
-                  <ModernCardTitle className="text-lg">اطلاعات تماس</ModernCardTitle>
-                  <ModernCardDescription className="text-xs">راه‌های ارتباطی</ModernCardDescription>
+                  <ModernCardTitle className="text-lg">
+                    {t('profile.sections.contact_info')}
+                  </ModernCardTitle>
+                  <ModernCardDescription className="text-xs">
+                    {t('profile.sections.contact_methods')}
+                  </ModernCardDescription>
                 </div>
               </div>
             </ModernCardHeader>
             <ModernCardContent className="space-y-3">
               <div className="flex justify-between items-center p-3 bg-gray-50/50 dark:bg-gray-800/50 rounded-lg">
-                <span className="text-xs font-medium text-gray-600 dark:text-gray-400">تلفن:</span>
-                <span className="font-semibold text-gray-900 dark:text-white text-sm">{profile?.phone || t('common.not_specified')}</span>
+                <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
+                  {t('profile.sections.phone')}:
+                </span>
+                <span className="font-semibold text-gray-900 dark:text-white text-sm">
+                  {profile?.phone || t('common.not_specified')}
+                </span>
               </div>
               <div className="flex justify-between items-center p-3 bg-gray-50/50 dark:bg-gray-800/50 rounded-lg">
-                <span className="text-xs font-medium text-gray-600 dark:text-gray-400">مکان:</span>
-                <span className="font-semibold text-gray-900 dark:text-white text-sm">{profile?.location || t('common.not_specified')}</span>
+                <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
+                  {t('profile.sections.location')}:
+                </span>
+                <span className="font-semibold text-gray-900 dark:text-white text-sm">
+                  {profile?.location || t('common.not_specified')}
+                </span>
               </div>
               <div className="flex justify-between items-center p-3 bg-gray-50/50 dark:bg-gray-800/50 rounded-lg">
-                <span className="text-xs font-medium text-gray-600 dark:text-gray-400">تولد:</span>
-                <span className="font-semibold text-gray-900 dark:text-white text-sm">{profile?.birthday || t('common.not_specified')}</span>
+                <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
+                  {t('profile.sections.birthday')}:
+                </span>
+                <span className="font-semibold text-gray-900 dark:text-white text-sm">
+                  {profile?.birthday || t('common.not_specified')}
+                </span>
               </div>
             </ModernCardContent>
           </ModernCard>
@@ -210,8 +242,12 @@ const UserProfileDisplay: React.FC = () => {
                   <FileText className="w-4 h-4 text-white" />
                 </div>
                 <div>
-                  <ModernCardTitle className="text-lg">درباره من</ModernCardTitle>
-                  <ModernCardDescription className="text-xs">توضیح مختصر</ModernCardDescription>
+                  <ModernCardTitle className="text-lg">
+                    {t('profile.sections.about_me')}
+                  </ModernCardTitle>
+                  <ModernCardDescription className="text-xs">
+                    {t('profile.sections.brief_description')}
+                  </ModernCardDescription>
                 </div>
               </div>
             </ModernCardHeader>

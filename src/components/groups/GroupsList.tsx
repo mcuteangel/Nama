@@ -7,6 +7,7 @@ import GroupListItem from './GroupListItem';
 import { useTranslation } from 'react-i18next';
 import StandardizedDeleteDialog from '../common/StandardizedDeleteDialog';
 import { useGroups } from "@/hooks/use-groups";
+import { useNavigate } from "react-router-dom";
 
 interface Group {
   id: string;
@@ -41,6 +42,7 @@ const GroupsList: React.FC<GroupsListProps> = ({
 }) => {
   const { t } = useTranslation();
   const { deleteGroup } = useGroups();
+  const navigate = useNavigate();
 
   // State for delete dialog
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -52,6 +54,11 @@ const GroupsList: React.FC<GroupsListProps> = ({
     setGroupToDelete({ id: groupId, name: groupName });
     setDeleteDialogOpen(true);
   }, []);
+
+  // Handler to edit group
+  const handleEditClick = useCallback((group: Group) => {
+    navigate(`/groups/${group.id}/edit`);
+  }, [navigate]);
 
   // Handler to confirm delete
   const handleDeleteConfirm = useCallback(async () => {
@@ -118,6 +125,7 @@ const GroupsList: React.FC<GroupsListProps> = ({
               key={group.id}
               group={group}
               onDelete={handleDeleteClick}
+              onEdit={handleEditClick}
             />
           ))}
         </div>
@@ -136,11 +144,12 @@ const GroupsList: React.FC<GroupsListProps> = ({
             key={group.id}
             group={group}
             onDelete={handleDeleteClick}
+            onEdit={handleEditClick}
           />
         ))}
       </ModernGrid>
     );
-  }, [filteredAndSortedGroups, displayMode, t, handleDeleteClick]);
+  }, [filteredAndSortedGroups, displayMode, t, handleDeleteClick, handleEditClick]);
 
   return (
     <>

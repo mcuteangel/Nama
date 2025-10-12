@@ -85,10 +85,11 @@
     "address": "Address"
   },
   "groups": {
-    "title": "Group Management",
-    "description": "Create, edit, and delete contact groups",
+    "title": "Groups Management",
+    "description": "Create, edit and manage your contact groups",
     "add_new": "Add New Group",
     "existing_groups": "Existing Groups",
+    "group_description": "Manage group contacts",
     "groups_list_description": "List of all your groups",
     "color": "Color",
     "empty_title": "No groups found.",
@@ -113,9 +114,9 @@
     "edit_title": "Edit Group",
     "add_title": "Add New Group",
     "add_description": "Form for creating a new contact group",
-    "name_label": "Group Name",
-    "color_label": "Group Color",
-    "name_placeholder": "Enter group name",
+    "group_name": "Group Name",
+    "group_name_placeholder": "Enter group name",
+    "group_color": "Group Color",
     "editing": "Editing...",
     "adding": "Adding..."
   },
@@ -181,6 +182,7 @@
     "fid_suggestion": " Reduce JavaScript execution time and use code splitting"
   },
   "common": {
+    "loading_page": "Loading page...",
     "created_on": "Created on",
     "first_page": "First page",
     "last_page": "Last page",
@@ -298,6 +300,7 @@
     "invalid_role": "Invalid role",
     "minimum_field_required": "At least one of name, last name, or email fields must be filled",
     "unknown_field_type": "Unknown field type",
+    "group_load_failed": "Failed to load group",
     "cannot_delete_current_user": "Cannot delete current user",
     "edge_function_connection": "Error connecting to server. Please check your internet connection",
     "session_expired": "Please log in again",
@@ -342,6 +345,7 @@
     "edit": "Edit",
     "delete": "Delete",
     "back": "Back",
+    "back_to_groups": "Back to Groups",
     "cancel": "Cancel",
     "confirm": "Confirm",
     "remove": "Remove",
@@ -792,9 +796,27 @@
     "days_until_birthday": "Days Until Birthday"
   },
   "profile": {
+    "tabs": {
+      "profile": "Profile"
+    },
     "hero": {
       "badge": "Professional Profile",
-      "subtitle": "Manage your personal information and profile settings with our advanced user interface"
+      "subtitle": "Manage your personal information and profile settings with our advanced user interface",
+      "personal_profile": "Personal Profile"
+    },
+    "sections": {
+      "personal_info": "Personal Information",
+      "basic_account_info": "Basic account information",
+      "first_name": "First Name",
+      "last_name": "Last Name",
+      "email": "Email",
+      "contact_info": "Contact Information",
+      "contact_methods": "Contact Methods",
+      "phone": "Phone",
+      "location": "Location",
+      "birthday": "Birthday",
+      "about_me": "About Me",
+      "brief_description": "Brief Description"
     },
     "additional_info": "Additional Information",
     "notifications": {
@@ -837,8 +859,8 @@
       "subtitle": "Manage your profile information"
     },
     "groups": {
-      "management": "Group Management",
-      "management_description": "Create, edit, and delete contact groups",
+      "management": "Groups Management",
+      "management_description": "Create, edit and manage your contact groups",
       "search_placeholder": "Search groups...",
       "all_colors": "All Colors",
       "filter_by_color": "Filter by color"

@@ -53,7 +53,7 @@ const Groups = React.memo(() => {
   }, [fetchGroups]);
 
   const handleAddGroupClick = useCallback(() => {
-    toast.success(t('notifications.navigating_to_add_group'));
+    toast.success(t('settings.notifications.navigating_to_add_group'));
     navigate("/add-group");
   }, [navigate, t, toast]);
 
@@ -189,7 +189,7 @@ const Groups = React.memo(() => {
                             boxShadow: designTokens.shadows.glass
                           }}
                         >
-                          <ModernSelectValue placeholder={t('groups.all_colors')} />
+                          <ModernSelectValue placeholder={t('pages.groups.all_colors')} />
                         </ModernSelectTrigger>
                         <ModernSelectContent
                           className="rtl:text-right ltr:text-left"
@@ -199,7 +199,7 @@ const Groups = React.memo(() => {
                             backdropFilter: 'blur(15px)'
                           }}
                         >
-                          <ModernSelectItem value="all">{t('groups.all_colors')}</ModernSelectItem>
+                          <ModernSelectItem value="all">{t('pages.groups.all_colors')}</ModernSelectItem>
                           {availableColors.map((color) => (
                             <ModernSelectItem key={color} value={color}>
                               <div className="flex items-center gap-2">
@@ -216,7 +216,7 @@ const Groups = React.memo(() => {
                     </div>
                   </ModernTooltipTrigger>
                   <ModernTooltipContent>
-                    <p>{t('groups.filter_by_color')}</p>
+                    <p>{t('pages.groups.filter_by_color')}</p>
                   </ModernTooltipContent>
                 </ModernTooltip>
 

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { QueryClientProvider } from '@tanstack/react-query';
 // import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { queryClient, networkUtils } from '@/lib/react-query-config';
+import { useTranslation } from 'react-i18next';
 import { AppErrorBoundary, AsyncErrorBoundary } from '@/components/EnhancedErrorBoundary';
 import './rtl-fixes.css'; // Import RTL-specific fixes
 // Import performance config utility in development
@@ -19,6 +19,7 @@ const EditContact = React.lazy(() => import('./pages/EditContact'));
 const Groups = React.lazy(() => import('./pages/Groups'));
 const GroupDetail = React.lazy(() => import('./pages/GroupDetail'));
 const AddGroup = React.lazy(() => import('./pages/AddGroup'));
+const EditGroup = React.lazy(() => import('./pages/EditGroup'));
 const CustomFields = React.lazy(() => import('./pages/CustomFields'));
 const UserProfile = React.lazy(() => import('./pages/UserProfile'));
 const Settings = React.lazy(() => 
@@ -40,7 +41,7 @@ import Sidebar from './components/layout/Sidebar';
 import { ToastProvider } from './components/ui/modern-toast';
 import { cn } from './lib/utils';
 import { useSession } from './integrations/supabase/auth';
-import { useTranslation } from 'react-i18next';
+import { queryClient, networkUtils } from '@/lib/react-query-config';
 import AccessibilityProvider from './components/AccessibilityProvider';
 import KeyboardNavigationHandler from './components/KeyboardNavigationHandler';
 import { TooltipProvider } from './components/ui/tooltip';
@@ -49,12 +50,10 @@ import { ProtectedRoute } from './components/auth';
 import { SuspenseWrapper, LoadingMessage } from './components/common';
 
 function App() {
-  useTranslation();
-
   function AppLayout() {
     const location = useLocation();
     const mobileBreakpoint = 768; // Tailwind's 'md' breakpoint
-    const { i18n } = useTranslation();
+    const { t, i18n } = useTranslation();
     const { session } = useSession();
 
     const [isMobile, setIsMobile] = useState(() => window.innerWidth < mobileBreakpoint);
@@ -138,7 +137,7 @@ function App() {
           <main className="h-full w-full flex flex-col items-stretch justify-center p-0 sm:p-4" id="main-content" role="main">
             <KeyboardNavigationHandler scope="global">
               <AsyncErrorBoundary>
-                <SuspenseWrapper fallback={<LoadingMessage message="Loading page..." />}>
+                <SuspenseWrapper fallback={<LoadingMessage message={t('common.loading_page')} />}>
                   <Routes>
                     <Route path="/login" element={<Login />} />
                     {/* Protected Routes */}
@@ -150,6 +149,7 @@ function App() {
                     <Route path="/groups" element={<ProtectedRoute><Groups /></ProtectedRoute>} />
                     <Route path="/add-group" element={<ProtectedRoute><AddGroup /></ProtectedRoute>} />
                     <Route path="/groups/:id" element={<ProtectedRoute><GroupDetail /></ProtectedRoute>} />
+                    <Route path="/groups/:id/edit" element={<ProtectedRoute><EditGroup /></ProtectedRoute>} />
                     <Route path="/custom-fields" element={<ProtectedRoute><CustomFields /></ProtectedRoute>} />
                     <Route path="/profile" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
                     <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />

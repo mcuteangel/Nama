@@ -83,7 +83,19 @@
         "0 0 24 24",
         "M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z",
         "M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z",
-        "*"
+        "*",
+        "M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831",
+        "0 0 36 36",
+        "${completionData.overallProgress}, 100",
+        "${completionData.overallProgress}, 100",
+        "0, 100",
+        "${completionData.overallProgress}%",
+        "${completionData.requiredProgress}%",
+        "${completionData.optionalProgress}%",
+        "${completionData.optionalProgress}%",
+        " (",
+        "%\r\n          ",
+        ")\r\n              "
     ],
     "i18n-ally.extract.ignoredByFiles": {
         "src\\components\\ai\\GenderSuggestionManagement.tsx": [
@@ -91,6 +103,12 @@
         ],
         "src\\features\\user-management\\services\\user-management-service.ts": [
             "Bearer ${session.access_token}"
+        ],
+        "src\\pages\\Groups.tsx": [
+            "Groups"
+        ],
+        "src\\components\\user-management\\ProfileCompletionIndicator.tsx": [
+            "%\r\n            "
         ]
     }
 }

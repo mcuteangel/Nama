@@ -1,7 +1,10 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useGroup } from '@/hooks/use-group';
+import { useGroups } from '@/hooks/use-groups';
 import LoadingMessage from '@/components/common/LoadingMessage';
 import ContactItem, { Contact } from '@/components/common/ContactItem';
+import StandardizedDeleteDialog from '@/components/common/StandardizedDeleteDialog';
+import { PhoneNumber } from '@/types/contact.types';
 import { motion } from 'framer-motion';
 import { Users, Calendar, Edit, Trash2, Palette } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
@@ -13,14 +16,16 @@ import { designTokens } from '@/lib/design-tokens';
 import { GlassButton, GradientButton } from '@/components/ui/glass-button';
 import { useToast } from '@/components/ui/use-toast';
 import PageHeader from '@/components/ui/PageHeader';
+import { ContactData } from '@/types/group.types';
+import { useState } from 'react';
 
 // Define a function to map our contact data to the Contact type expected by ContactItem
-const mapToContact = (contact: any): Contact => {
+const mapToContact = (contact: ContactData): Contact => {
   // Extract phone numbers if they exist in the contact data
-  let phoneNumbers: any[] = [];
+  let phoneNumbers: PhoneNumber[] = [];
 
   // If phone_numbers is an array, use it directly
-  if (Array.isArray(contact.phone_numbers)) {
+  if (contact.phone_numbers && Array.isArray(contact.phone_numbers)) {
     phoneNumbers = contact.phone_numbers;
   }
   // If there's a phone_number at the root level, add it to the array
@@ -48,16 +53,16 @@ const mapToContact = (contact: any): Contact => {
     id: contact.id,
     first_name: contact.first_name || '',
     last_name: contact.last_name || '',
-    gender: contact.gender || 'not_specified',
-    position: contact.position || null,
-    company: contact.company || null,
-    street: contact.street || null,
-    city: contact.city || null,
-    state: contact.state || null,
-    zip_code: contact.zip_code || null,
-    country: contact.country || null,
-    notes: contact.notes || null,
-    phone_numbers: phoneNumbers.filter(Boolean).map((p: any) => ({
+    gender: 'not_specified', // Default value since gender is not in ContactData
+    position: null, // Not in ContactData
+    company: null, // Not in ContactData
+    street: null, // Not in ContactData
+    city: null, // Not in ContactData
+    state: null, // Not in ContactData
+    zip_code: null, // Not in ContactData
+    country: null, // Not in ContactData
+    notes: null, // Not in ContactData
+    phone_numbers: phoneNumbers.filter(Boolean).map((p: PhoneNumber) => ({
       id: p.id || `temp-${Math.random().toString(36).substr(2, 9)}`,
       phone_number: p.phone_number || '',
       phone_type: p.phone_type || 'mobile',
@@ -75,9 +80,12 @@ const GroupDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { group, isLoading, error } = useGroup(id);
+  const { deleteGroup } = useGroups();
   const { t, i18n } = useTranslation();
   const { settings } = useAppSettings();
   const { toast } = useToast();
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   if (isLoading) {
     return (
@@ -167,8 +175,24 @@ const GroupDetail = () => {
   };
 
   const handleDeleteGroup = () => {
-    // TODO: Implement delete group functionality
-    toast.info(t('groups.delete_group_info'));
+    setShowDeleteDialog(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!group?.id) return;
+
+    setIsDeleting(true);
+    try {
+      await deleteGroup(group.id);
+      toast.success(t('groups.delete_success'));
+      navigate('/groups');
+    } catch (error) {
+      console.error('Error deleting group:', error);
+      toast.error(t('groups.delete_error'));
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteDialog(false);
+    }
   };
 
   const createdAt = group.created_at
@@ -186,7 +210,7 @@ const GroupDetail = () => {
         {/* Page Header */}
         <PageHeader
           title={group.name}
-          description={group.description || t('groups.group_description', 'مدیریت گروه مخاطبین')}
+          description={group.description || t('groups.group_description')}
           showBackButton={true}
           className="mb-"
         />
@@ -397,6 +421,16 @@ const GroupDetail = () => {
           </div>
         </motion.div>
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <StandardizedDeleteDialog
+        open={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+        onConfirm={handleConfirmDelete}
+        title={t('groups.confirm_delete_title')}
+        description={t('groups.confirm_delete_description', { name: group.name })}
+        isDeleting={isDeleting}
+      />
     </div>
   );
 };

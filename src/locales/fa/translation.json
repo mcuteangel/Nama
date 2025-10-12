@@ -89,6 +89,7 @@
     "description": "ایجاد، ویرایش و حذف گروه‌های مخاطبین",
     "add_new": "افزودن گروه جدید",
     "existing_groups": "گروه‌های موجود",
+    "group_description": "مدیریت مخاطبین گروه",
     "groups_list_description": "لیست تمام گروه‌های شما",
     "color": "رنگ",
     "empty_title": "هیچ گروهی یافت نشد.",
@@ -113,9 +114,9 @@
     "edit_title": "ویرایش گروه",
     "add_title": "افزودن گروه جدید",
     "add_description": "فرم برای ایجاد گروه مخاطبین جدید",
-    "name_label": "نام گروه",
-    "color_label": "رنگ گروه",
-    "name_placeholder": "نام گروه را وارد کنید",
+    "group_name": "نام گروه",
+    "group_name_placeholder": "نام گروه را وارد کنید",
+    "group_color": "رنگ گروه",
     "editing": "در حال ویرایش...",
     "adding": "در حال افزودن..."
   },
@@ -181,6 +182,7 @@
     "fid_suggestion": " زمان اجرای JavaScript را کاهش دهید و از تقسیم کد استفاده کنید"
   },
   "common": {
+    "loading_page": "در حال بارگذاری صفحه...",
     "created_on": "تاریخ ایجاد",
     "first_page": "صفحه اول",
     "last_page": "صفحه آخر",
@@ -793,7 +795,6 @@
       "loading_group_colors": "خطا در بارگذاری رنگ‌ههای گروه‌های موجود",
       "field_required": "{{field}} الزامی است",
       "generic_error": "خطایی رخ داد",
-      "generic": "خطایی رخ داد",
       "upload_avatar_auth": "برای آپلود تصویر پروفایل باید وارد سیستم شوید",
       "select_image_file": "لطفاً یک فایل تصویری انتخاب کنید",
       "file_size_limit": "اندازه فایل نباید از 5 مگابایت بیشتر باشد",
@@ -817,6 +818,7 @@
       "invalid_role": "نقش نامعتبر",
       "minimum_field_required": "حداقل یکی از فیلدهای نام، نام خانوادگی یا ایمیل باید پر شود",
       "unknown_field_type": "نوع فیلد نامشخص",
+      "group_load_failed": "خطا در بارگذاری گروه",
       "edge_function_connection": "خطا در اتصال به سرور. لطفاً اتصال اینترنت خود را بررسی کنید",
       "session_expired": "لطفاً دوباره وارد سیستم شوید",
       "no_active_session": "هیچ نشست فعالی یافت نشد. کاربر باید وارد سیستم شده باشد.",
@@ -850,19 +852,20 @@
     "add_group": "افزودن گروه",
     "close": "بستن",
     "save_changes": "ذخیره تغییرات",
-    "cancel_operation": "لغو عملیات",
+    "cancel_operation": "انصراف از عملیات",
     "add_new_field": "افزودن فیلد جدید",
     "upload_image": "آپلود تصویر",
     "delete_image": "حذف تصویر",
-    "retry_count": "تلاش مجدد ({{count}} از 3)",
+    "retry_count": "تلاش مجدد ({{count}} از ۳)",
     "uploading": "در حال آپلود...",
     "deleting_image": "در حال حذف تصویر...",
-    "saving_progress": "در حال ذخیره...",
-    "test_connection": "تست اتصال به تابع Edge",
+    "saving_progress": "در حال ذخیره‌سازی...",
+    "test_connection": "تست اتصال تابع Edge",
     "edit": "ویرایش",
     "delete": "حذف",
     "back": "بازگشت",
-    "cancel": "لغو",
+    "back_to_groups": "بازگشت به گروه‌ها",
+    "cancel": "انصراف",
     "confirm": "تایید",
     "remove": "حذف",
     "dismiss": "رد کردن",
@@ -1522,9 +1525,27 @@
     "days_until_birthday": "روز تا تولد"
   },
   "profile": {
+    "tabs": {
+      "profile": "پروفایل"
+    },
     "hero": {
       "badge": "پروفایل حرفه‌ای",
-      "subtitle": "اطلاعات شخصی و تنظیمات پروفایل خود را با رابط کاربری پیشرفته ما مدیریت کنید"
+      "subtitle": "اطلاعات شخصی و تنظیمات پروفایل خود را با رابط کاربری پیشرفته ما مدیریت کنید",
+      "personal_profile": "پروفایل شخصی"
+    },
+    "sections": {
+      "personal_info": "اطلاعات شخصی",
+      "basic_account_info": "اطلاعات پایه حساب",
+      "first_name": "نام",
+      "last_name": "نام خانوادگی",
+      "email": "ایمیل",
+      "contact_info": "اطلاعات تماس",
+      "contact_methods": "راه‌های ارتباطی",
+      "phone": "تلفن",
+      "location": "مکان",
+      "birthday": "تولد",
+      "about_me": "درباره من",
+      "brief_description": "توضیح مختصر"
     },
     "additional_info": "اطلاعات تکمیلی",
     "notifications": {
@@ -1568,7 +1589,7 @@
     },
     "groups": {
       "management": "مدیریت گروه‌ها",
-      "management_description": "ایجاد، ویرایش و حذف گروه‌های مخاطبین",
+      "management_description": "ایجاد، ویرایش و مدیریت گروه‌های مخاطبین شما",
       "search_placeholder": "جستجوی گروه‌ها...",
       "all_colors": "همه رنگ‌ها",
       "filter_by_color": "فیلتر بر اساس رنگ"
