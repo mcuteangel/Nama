@@ -89,8 +89,14 @@
     "description": "Create, edit and manage your contact groups",
     "add_new": "Add New Group",
     "existing_groups": "Existing Groups",
+    "not_found": "Group not found",
+    "not_found_description": "The group you're looking for doesn't exist or has been deleted.",
     "group_description": "Manage group contacts",
     "groups_list_description": "List of all your groups",
+    "group_contacts": "Group Contacts",
+    "contacts_in_group_count": "{{count}} contacts in this group",
+    "no_contacts_in_group": "No contacts in this group yet",
+    "contacts_count": "{{count}} contacts",
     "color": "Color",
     "empty_title": "No groups found.",
     "empty_description": "Add a new group to organize your contacts.",
@@ -101,8 +107,10 @@
     "deleting_group": "Deleting group...",
     "delete_success": "Group deleted successfully.",
     "delete_error": "Error deleting group",
-    "delete_confirm_title": "Are you sure you want to delete this group?",
-    "delete_confirm_description": "This action cannot be undone. This group will be permanently deleted.",
+    "confirm_delete_title": "Delete Group",
+    "confirm_delete_description": "Are you sure you want to delete \"{{name}}\"? This action cannot be undone.",
+    "no_contacts_title": "No Contacts Yet",
+    "no_contacts_description": "This group doesn't have any contacts yet. Add some contacts to get started!",
     "smart_suggestions_title": "Smart Group Suggestions",
     "smart_suggestions_description": "Automatic suggestions for grouping contacts",
     "suggested_group": "Suggested Group",
@@ -112,6 +120,7 @@
     "edit_error": "Error editing group",
     "add_error": "Error adding group",
     "edit_title": "Edit Group",
+    "edit_description": "Form for editing an existing contact group",
     "add_title": "Add New Group",
     "add_description": "Form for creating a new contact group",
     "group_name": "Group Name",
@@ -263,10 +272,13 @@
       "unknown": "Unknown"
     },
     "of_total": "of total",
-    "not_specified": "Not specified"
+    "not_specified": "Not specified",
+    "errors": {
+      "generic": "An error occurred"
+    }
   },
   "errors": {
-    "unknown_error": "An unknown error occurred",
+    "generic": "An error occurred",
     "invalid_user_id": "Invalid user ID",
     "user_not_found": "User not found",
     "update_user_failed": "Failed to update user: {{error}}",
@@ -401,7 +413,26 @@
     "update_success": "Custom field template updated successfully",
     "update_success_description": "Your changes have been saved.",
     "delete_success": "Custom field template deleted successfully",
-    "delete_success_description": "The custom field template has been removed."
+    "delete_success_description": "The custom field template has been removed.",
+    "templates_loaded_success": "Custom field templates loaded successfully.",
+    "error_loading_templates": "Error loading custom field templates: {{error}}",
+    "unknown_error": "Unknown error",
+    "operation_error": "An error occurred while managing custom fields",
+    "delete_error": "Error deleting custom field template",
+    "management_title": "Custom Field Management",
+    "loading_templates": "Loading custom fields...",
+    "no_templates_title": "No custom fields defined yet.",
+    "no_templates_description": "By adding custom fields, you can create standard templates for your contact information.",
+    "field_types": {
+      "text": "Text",
+      "number": "Number",
+      "date": "Date",
+      "list": "List"
+    },
+    "required": "Required",
+    "options": "Options",
+    "delete_confirm_title": "Are you sure you want to delete this custom field?",
+    "delete_confirm_description": "This action cannot be undone. This field template will be permanently deleted. (Existing data in contacts will not be deleted)"
   },
   "form_labels": {
     "first_name": "First Name",
@@ -488,8 +519,11 @@
   },
   "theme_options": {
     "light": "Light",
+    "light_description": "Use light theme for better visibility in bright environments",
     "dark": "Dark",
-    "system": "System"
+    "dark_description": "Use dark theme for reduced eye strain in low light",
+    "system": "System",
+    "system_description": "Follow your system theme preference"
   },
   "email_change_notice": {
     "message": "Email can be changed through account settings."
@@ -583,7 +617,9 @@
   },
   "contacts": {
     "add_new_contact": "Add New Contact",
-    "add_contact_description": "Add new contact information and details"
+    "add_contact_description": "Add new contact information and details",
+    "contact_deleted_success": "Contact removed from group successfully",
+    "contact_updated_success": "Contact updated successfully"
   },
   "custom_field_management": {
     "title": "Custom Field Management",
@@ -984,6 +1020,7 @@
   "settings": {
     "title": "Settings",
     "description": "Manage application settings and user preferences",
+    "choose_theme": "Choose Theme",
     "notifications": {
       "email": "Email Notifications",
       "email_desc": "Receive email notifications for important updates",

@@ -293,7 +293,7 @@ const GroupDetail = () => {
                     <div className="flex items-center gap-2">
                       <Users className="h-5 w-5" />
                       <span className="font-semibold text-foreground">
-                        {group.contacts.length} {t('groups.contacts_count')}
+                        {t('groups.contacts_count', { count: group.contacts.length })}
                       </span>
                     </div>
                     <div className="flex items-center gap-2">

@@ -113,7 +113,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
                   size="icon"
                   variant="ghost"
                   className="rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border border-white/40 dark:border-gray-700/40 flex-shrink-0"
-                  aria-label={t('common.back', 'بازگشت')}
+                  aria-label={t('common.back')}
                 >
                   <ArrowLeft
                     className={`w-5 h-5 transition-transform duration-300 ${isRTL ? 'rotate-180' : ''}`}

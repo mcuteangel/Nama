@@ -81,7 +81,7 @@ export const ContactItem = React.memo<ContactItemProps>(({
   const [isDialogClosing, setIsDialogClosing] = useState(false);
 
   const onSuccessDelete = useCallback(() => {
-    ErrorManager.notifyUser(t('contact_list.contact_deleted_success', 'Contact deleted successfully.'), 'success');
+    ErrorManager.notifyUser(t('contact_list.contact_deleted_success'), 'success');
     onContactDeleted(contact.id);
   }, [contact.id, onContactDeleted, t]);
 
@@ -96,7 +96,7 @@ export const ContactItem = React.memo<ContactItemProps>(({
     maxRetries: 3,
     retryDelay: 1000,
     showToast: true,
-    customErrorMessage: t('contact_list.error_deleting_contact', 'Error deleting contact'),
+    customErrorMessage: t('contact_list.error_deleting_contact'),
     onSuccess: onSuccessDelete,
     onError: onErrorDelete,
   });
@@ -123,7 +123,7 @@ export const ContactItem = React.memo<ContactItemProps>(({
   const displayPhoneNumber = useMemo(() => {
     return contact.phone_numbers.length > 0
       ? contact.phone_numbers[0].phone_number
-      : t('contact_list.no_phone', 'No phone number');
+      : t('contact_list.no_phone');
   }, [contact.phone_numbers, t]);
 
   const displayEmail = useMemo(() => {
@@ -327,8 +327,8 @@ export const ContactItem = React.memo<ContactItemProps>(({
               }
             }}
             onConfirm={handleDelete}
-            title={t('contact_list.confirm_delete_title', 'آیا مطمئن هستید که می‌خواهید این مخاطب را حذف کنید؟')}
-            description={t('contact_list.confirm_delete_description', 'این عمل غیرقابل برگشت است. این مخاطب برای همیشه حذف خواهد شد.')}
+            title={t('contact_list.confirm_delete_title')}
+            description={t('contact_list.confirm_delete_description')}
             isDeleting={isDeleting}
           />
         </div>

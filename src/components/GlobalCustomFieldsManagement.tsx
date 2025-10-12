@@ -53,15 +53,15 @@ export function GlobalCustomFieldsManagement() {
       required: t.required
     })));
     if (!result.fromCache) {
-      toast.success("قالب‌های فیلد سفارشی با موفقیت بارگذاری شدند.");
+      toast.success(t('custom_field_template.templates_loaded_success'));
     }
-  }, [toast]);
+  }, [toast, t]);
 
   const onErrorFetchTemplates = useCallback((err: Error) => {
     console.error("Error loading custom field templates:", err);
-    toast.error(`خطا در دریافت لیست قالب‌های فیلدهای سفارشی: ${ErrorManager.getErrorMessage(err) || "خطای ناشناخته"}`);
+    toast.error(t('custom_field_template.error_loading_templates', { error: ErrorManager.getErrorMessage(err) || t('common.unknown_error') }));
     setCustomFields([]);
-  }, [toast]);
+  }, [toast, t]);
 
   const {
     isLoading: loadingTemplates,
@@ -85,7 +85,7 @@ export function GlobalCustomFieldsManagement() {
         async () => {
           const res = await CustomFieldTemplateService.getAllCustomFieldTemplates(); // Updated service call
           if (res.error) {
-            throw new Error(res.error || "خطا در دریافت لیست قالب‌های فیلدهای سفارشی");
+            throw new Error(res.error || t('custom_field_template.error_loading_templates', { error: t('custom_field_template.unknown_error') }));
           }
           return { data: res.data, error: null };
         }
@@ -95,23 +95,20 @@ export function GlobalCustomFieldsManagement() {
       }
       return { data, error: null, fromCache };
     });
-  }, [session, isSessionLoading, executeLoadTemplates]);
+  }, [session, isSessionLoading, executeLoadTemplates, t]);
 
   const onSuccessOperation = useCallback(() => {
-    ErrorManager.notifyUser("قالب با موفقیت حذف شد", "success");
+    ErrorManager.notifyUser(t('custom_field_template.delete_success'), "success");
     invalidateCache(`custom_field_templates_${session?.user?.id}`);
     loadTemplates();
-  }, [session, loadTemplates]);
+  }, [session, loadTemplates, t]);
 
   const onErrorOperation = useCallback((error: Error) => {
     ErrorManager.logError(error, {
       component: 'GlobalCustomFieldsManagement',
       action: 'customFieldsOperation',
       metadata: {
-        operation: error.message.includes('دریافت') ? 'fetch' :
-                   error.message.includes('افزودن') ? 'add' :
-                   error.message.includes('ویرایش') ? 'edit' :
-                   error.message.includes('حذف') ? 'delete' : 'unknown'
+        operation: 'unknown' // Default to unknown since context is already logged separately
       }
     });
   }, []);
@@ -123,7 +120,7 @@ export function GlobalCustomFieldsManagement() {
     maxRetries: 3,
     retryDelay: 1000,
     showToast: true,
-    customErrorMessage: "خطایی در مدیریت فیلدهای سفارشی رخ داد",
+    customErrorMessage: t('custom_field_template.operation_error'),
     onSuccess: onSuccessOperation,
     onError: onErrorOperation,
   });
@@ -132,7 +129,7 @@ export function GlobalCustomFieldsManagement() {
     await executeOperation(async () => {
       const res = await CustomFieldTemplateService.deleteCustomFieldTemplate(id); // Updated service call
       if (res.error) {
-        throw new Error(res.error || "خطا در حذف قالب فیلد سفارشی");
+        throw new Error(res.error || t('custom_field_template.delete_error'));
       }
     });
     setIsDeleteDialogOpen(false);
@@ -170,7 +167,7 @@ export function GlobalCustomFieldsManagement() {
     <ModernCard variant="glass" className="w-full max-w-4xl rounded-xl p-6">
       <ModernCardHeader className="text-center">
         <ModernCardTitle className="text-4xl font-bold text-gray-800 dark:text-gray-100 mb-2">
-          مدیریت فیلدهای سفارشی
+          {t('custom_field_template.management_title')}
         </ModernCardTitle>
       </ModernCardHeader>
       <ModernCardContent>
@@ -179,12 +176,12 @@ export function GlobalCustomFieldsManagement() {
         </div>
 
         {loadingTemplates && customFields.length === 0 ? (
-          <LoadingMessage message="در حال بارگذاری فیلدهای سفارشی..." />
+          <LoadingMessage message={t('custom_field_template.loading_templates')} />
         ) : customFields.length === 0 ? (
           <EmptyState
             icon={ClipboardList}
-            title="هنوز فیلد سفارشی تعریف نشده است."
-            description="با افزودن فیلدهای سفارشی، می‌توانید قالب‌های استاندارد برای اطلاعات مخاطبین خود ایجاد کنید."
+            title={t('custom_field_template.no_templates_title')}
+            description={t('custom_field_template.no_templates_description')}
           />
         ) : (
           <div className="grid gap-4">
@@ -195,13 +192,13 @@ export function GlobalCustomFieldsManagement() {
                     <div className="flex items-center gap-2 mb-2">
                       <h3 className="font-semibold text-gray-800 dark:text-gray-100">{field.name}</h3>
                       <span className="px-2 py-1 bg-secondary text-secondary-foreground rounded text-xs">
-                        {field.type === 'text' ? 'متن' :
-                         field.type === 'number' ? 'عدد' :
-                         field.type === 'date' ? 'تاریخ' : 'لیست'}
+                        {field.type === 'text' ? t('custom_field_template.field_types.text') :
+                         field.type === 'number' ? t('custom_field_template.field_types.number') :
+                         field.type === 'date' ? t('custom_field_template.field_types.date') : t('custom_field_template.field_types.list')}
                       </span>
                       {field.required && (
                         <span className="px-2 py-1 bg-destructive text-destructive-foreground rounded text-xs">
-                          الزامی
+                          {t('custom_field_template.required')}
                         </span>
                       )}
                     </div>
@@ -210,7 +207,7 @@ export function GlobalCustomFieldsManagement() {
                     )}
                     {field.type === 'list' && field.options && field.options.length > 0 && (
                       <p className="text-xs text-muted-foreground">
-                        گزینه‌ها: {field.options.join(', ')}
+                        {t('custom_field_template.options')}: {field.options.join(', ')}
                       </p>
                     )}
                   </div>
@@ -255,8 +252,8 @@ export function GlobalCustomFieldsManagement() {
                         }
                       }}
                       onConfirm={() => handleDeleteField(field.id)}
-                      title="آیا از حذف این فیلد سفارشی مطمئن هستید؟"
-                      description="این عمل قابل بازگشت نیست. این قالب فیلد برای همیشه حذف خواهد شد. (داده‌های موجود در مخاطبین حذف نمی‌شوند)"
+                      title={t('custom_field_template.delete_confirm_title')}
+                      description={t('custom_field_template.delete_confirm_description')}
                       isDeleting={isOperationLoading && deletingFieldId === field.id}
                     />
                   </div>
@@ -269,8 +266,8 @@ export function GlobalCustomFieldsManagement() {
 
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <FormDialogWrapper 
-          title={t('custom_field_template.edit_title', 'Edit Custom Field Template')}
-          description={t('custom_field_template.edit_description', 'Form for editing a custom field template')}
+          title={t('custom_field_template.edit_title')}
+          description={t('custom_field_template.edit_description')}
         >
           <CustomFieldTemplateForm
             initialData={editingField || undefined}

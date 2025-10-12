@@ -98,24 +98,24 @@ const ImportContactsDialog: React.FC<ImportContactsDialogProps> = ({ onImportSuc
 
   const handleDownloadTemplate = () => {
     const headers = [
-      t('contact_form.first_name'),
-      t('contact_form.last_name'),
-      t('contact_form.gender'),
-      t('contact_form.position'),
-      t('contact_form.company'),
-      t('contact_form.street'),
-      t('contact_form.city'),
-      t('contact_form.state'),
-      t('contact_form.zip_code'),
-      t('contact_form.country'),
-      t('contact_form.notes'),
-      t('contact_form.birth_date'),
-      t('contact_form.phone_numbers'),
-      t('contact_form.email_addresses'),
-      t('contact_form.social_links'),
-      t('contact_form.group'),
-      t('contact_form.avatar_url'),
-      t('contact_form.preferred_contact_method')
+      t('form_labels.first_name'),
+      t('form_labels.last_name'),
+      t('form_labels.gender'),
+      t('form_labels.position'),
+      t('form_labels.company'),
+      t('form_labels.street'),
+      t('form_labels.city'),
+      t('form_labels.state'),
+      t('form_labels.zip_code'),
+      t('form_labels.country'),
+      t('form_labels.notes'),
+      t('form_labels.birth_date'),
+      t('form_labels.phone_numbers'),
+      t('form_labels.email_addresses'),
+      t('form_labels.social_links'),
+      t('form_labels.group'),
+      t('form_labels.avatar_url'),
+      t('form_labels.preferred_contact_method')
     ];
     const csvContent = `\uFEFF${headers.map(h => `"${h}"`).join(',')}\n`; // Add BOM for UTF-8
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
