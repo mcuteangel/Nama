@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useCallback, useEffect } from 'react';
-import { FieldPath, useFormContext } from 'react-hook-form';
+import { useFormContext } from 'react-hook-form';
 import { ModernInput } from '@/components/ui/modern-input';
 import { ModernSelect, ModernSelectContent, ModernSelectItem, ModernSelectTrigger, ModernSelectValue } from '@/components/ui/modern-select';
 import { FormField, FormLabel, FormControl } from '@/components/ui/form';
@@ -13,12 +13,10 @@ import FormDialogWrapper from '@/components/common/FormDialogWrapper';
 import { Dialog } from '@/components/ui/dialog';
 import { GlassButton } from "@/components/ui/glass-button";
 import FormCard from '@/components/ui/FormCard';
-import FormSection from '@/components/ui/FormSection';
 
 const ContactBasicInfo: React.FC = React.memo(() => {
   const { t, i18n } = useTranslation();
   const form = useFormContext<ContactFormValues>();
-  const [focusedField, setFocusedField] = useState<string | null>(null);
   const { groups, fetchGroups } = useGroups();
   const [isAddGroupDialogOpen, setIsAddGroupDialogOpen] = useState(false);
 
@@ -106,10 +104,6 @@ const ContactBasicInfo: React.FC = React.memo(() => {
   }, [form]);
 
   // Handle field blur with validation
-  const handleFieldBlur = useCallback((fieldName: FieldPath<ContactFormValues>) => {
-    setFocusedField(null);
-    form.trigger(fieldName);
-  }, [form]);
 
   return (
     <FormCard

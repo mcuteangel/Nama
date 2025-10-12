@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Clock, User, Edit3, Plus, Trash2, History, ArrowRight } from 'lucide-react';
+import { Clock, Trash2, History, User, ArrowRight } from 'lucide-react';
 import { FormCard } from '@/components/ui/FormCard';
 import { FormSection } from '@/components/ui/FormSection';
 import { ContactHistoryService, ContactHistoryEntry } from '@/services/contact-history-service';
 import { useSession } from '@/integrations/supabase/auth';
 import { useJalaliCalendar } from '@/hooks/use-jalali-calendar';
-import { cn } from '@/lib/utils';
 
 interface ContactHistoryProps {
   contactId: string;
@@ -49,19 +48,6 @@ const ContactHistory: React.FC<ContactHistoryProps> = ({ contactId }) => {
 
     fetchHistory();
   }, [contactId, session, t]);
-
-  const getActionIcon = (action: ContactHistoryEntry['action']) => {
-    switch (action) {
-      case 'created':
-        return Plus;
-      case 'updated':
-        return Edit3;
-      case 'deleted':
-        return Trash2;
-      default:
-        return Clock;
-    }
-  };
 
   const getActionLabel = (action: ContactHistoryEntry['action']) => {
     switch (action) {
@@ -123,8 +109,7 @@ const ContactHistory: React.FC<ContactHistoryProps> = ({ contactId }) => {
           </div>
         ) : (
           <>
-            {history.map((entry, index) => {
-              const ActionIcon = getActionIcon(entry.action);
+            {history.map((entry) => {
               const actionColor = getActionColor(entry.action);
 
               return (

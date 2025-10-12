@@ -16,10 +16,10 @@ export interface ModernBadgeProps
   focusRing?: boolean;
 }
 
-function ModernBadge({ 
-  className, 
-  variant, 
-  size, 
+function ModernBadge({
+  className,
+  variant,
+  size,
   effect,
   glassEffect = "none",
   gradientType = "none",
@@ -27,20 +27,20 @@ function ModernBadge({
   animation = "none",
   transition = true,
   focusRing = false,
-  ...props 
+  ...props
 }: ModernBadgeProps) {
   // Determine if we should apply glass effect
   const shouldApplyGlass = variant === "glass" || glassEffect !== "none";
   const shouldApplyNeomorphism = variant === "neomorphism";
   const shouldApplyGradient = variant === "gradient" || gradientType !== "none";
-  
+
   return (
-    <div 
+    <div
       className={cn(
-        badgeVariants({ 
-          variant, 
-          size, 
-          effect, 
+        badgeVariants({
+          variant,
+          size,
+          effect,
           glassEffect: glassEffect && ["glass", "glassAdvanced", "glassCard"].includes(glassEffect) ? glassEffect as "glass" | "glassAdvanced" | "glassCard" : "none",
           gradient: gradientType && ["primary", "ocean", "sunset", "success", "info", "fire", "royal", "mint", "purple"].includes(gradientType) ? gradientType as "primary" | "ocean" | "sunset" | "success" | "info" | "fire" | "royal" | "mint" | "purple" : "none"
         }),
@@ -53,8 +53,8 @@ function ModernBadge({
         }),
         applyAnimation(undefined, animation),
         applyHoverEffect(undefined, hoverEffect)
-      )} 
-      {...props} 
+      )}
+      {...props}
     />
   );
 }

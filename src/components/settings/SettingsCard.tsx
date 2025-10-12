@@ -8,7 +8,7 @@ interface SettingsCardProps {
   icon?: React.ReactNode;
   children: React.ReactNode;
   className?: string;
-  gradient?: 'blue' | 'green' | 'purple' | 'orange' | 'cyan' | 'pink';
+  gradient?: 'blue' | 'green' | 'purple' | 'orange' | 'cyan' | 'pink' | 'red';
 }
 
 export const SettingsCard: React.FC<SettingsCardProps> = ({
@@ -25,7 +25,8 @@ export const SettingsCard: React.FC<SettingsCardProps> = ({
     purple: 'bg-gradient-to-br from-purple-50/80 to-pink-50/80 dark:from-purple-950/30 dark:to-pink-950/30 border-purple-200/60 dark:border-purple-800/30',
     orange: 'bg-gradient-to-br from-orange-50/80 to-red-50/80 dark:from-orange-950/30 dark:to-red-950/30 border-orange-200/60 dark:border-orange-800/30',
     cyan: 'bg-gradient-to-br from-cyan-50/80 to-blue-50/80 dark:from-cyan-950/30 dark:to-blue-950/30 border-cyan-200/60 dark:border-cyan-800/30',
-    pink: 'bg-gradient-to-br from-pink-50/80 to-rose-50/80 dark:from-pink-950/30 dark:to-rose-950/30 border-pink-200/60 dark:border-pink-800/30'
+    pink: 'bg-gradient-to-br from-pink-50/80 to-rose-50/80 dark:from-pink-950/30 dark:to-rose-950/30 border-pink-200/60 dark:border-pink-800/30',
+    red: 'bg-gradient-to-br from-red-50/80 to-rose-50/80 dark:from-red-950/30 dark:to-rose-950/30 border-red-200/60 dark:border-red-800/30'
   };
 
   const iconColors = {
@@ -34,7 +35,8 @@ export const SettingsCard: React.FC<SettingsCardProps> = ({
     purple: 'text-purple-600 dark:text-purple-300 bg-white/80 dark:bg-purple-900/40 shadow-sm',
     orange: 'text-orange-600 dark:text-orange-300 bg-white/80 dark:bg-orange-900/40 shadow-sm',
     cyan: 'text-cyan-600 dark:text-cyan-300 bg-white/80 dark:bg-cyan-900/40 shadow-sm',
-    pink: 'text-pink-600 dark:text-pink-300 bg-white/80 dark:bg-pink-900/40 shadow-sm'
+    pink: 'text-pink-600 dark:text-pink-300 bg-white/80 dark:bg-pink-900/40 shadow-sm',
+    red: 'text-red-600 dark:text-red-300 bg-white/80 dark:bg-red-900/40 shadow-sm'
   };
 
   const isRTL = i18n.language === 'fa';

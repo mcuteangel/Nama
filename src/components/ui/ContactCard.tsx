@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ModernCard, ModernCardHeader, ModernCardTitle, ModernCardDescription, ModernCardContent } from '@/components/ui/modern-card';
+import { ModernCard, ModernCardHeader, ModernCardTitle, ModernCardContent } from '@/components/ui/modern-card';
 import { ModernLoader } from '@/components/ui/modern-loader';
 import { ModernTooltip, ModernTooltipContent, ModernTooltipTrigger } from '@/components/ui/modern-tooltip';
 import { LucideIcon, HelpCircle } from 'lucide-react';
@@ -29,9 +29,7 @@ export const ContactCard: React.FC<ContactCardProps> = ({
   headerClassName = '',
   contentClassName = '',
   loading = false,
-  error = null,
-  data
-}) => {
+  error = null}) => {
   // Generate simple background color based on icon color
   const getBackgroundFromColor = (color: string) => {
     const colorMap: { [key: string]: string } = {

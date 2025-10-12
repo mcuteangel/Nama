@@ -4,7 +4,6 @@ export { default as ContactPhoneNumbers } from './ContactPhoneNumbers';
 export { default as ContactEmailAddresses } from './ContactEmailAddresses';
 export { default as ContactSocialLinks } from './ContactSocialLinks';
 export { default as ContactImportantDates } from './ContactImportantDates';
-export { default as ContactOtherDetails } from './ContactOtherDetails';
 export { default as ContactCustomFields } from './ContactCustomFields';
 export { default as ContactPreviewCard } from './ContactPreviewCard';
 export { default as ContactHistory } from './ContactHistory';

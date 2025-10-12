@@ -197,7 +197,7 @@ const CarouselPrevious = React.forwardRef<
   HTMLButtonElement,
   React.ComponentProps<typeof LegacyButton>
 >(({ className, variant = "outline", size = "icon", ...props }, ref) => {
-  const { orientation, scrollPrev, canScrollPrev } = useCarousel();
+  const { scrollPrev, canScrollPrev } = useCarousel();
 
   return (
     <GlassButton
@@ -210,6 +210,8 @@ const CarouselPrevious = React.forwardRef<
         "md:left-2",
         className
       )}
+      disabled={!canScrollPrev}
+      onClick={scrollPrev}
       {...props}
     >
       <ArrowLeft className="h-4 w-4" />
@@ -223,6 +225,8 @@ const CarouselNext = React.forwardRef<
   HTMLButtonElement,
   React.ComponentProps<typeof LegacyButton>
 >(({ className, variant = "outline", size = "icon", ...props }, ref) => {
+  const { scrollNext, canScrollNext } = useCarousel();
+
   return (
     <GlassButton
       ref={ref}
@@ -234,6 +238,8 @@ const CarouselNext = React.forwardRef<
         "md:right-2",
         className
       )}
+      disabled={!canScrollNext}
+      onClick={scrollNext}
       {...props}
     >
       <ArrowRight className="h-4 w-4" />

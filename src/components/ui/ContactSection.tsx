@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { ModernCard } from '@/components/ui/modern-card';
 import { LucideIcon } from 'lucide-react';
+import { Contact } from '@/types/contact.types';
 
 interface ContactSectionProps {
   icon?: LucideIcon;
@@ -10,7 +11,7 @@ interface ContactSectionProps {
   children: React.ReactNode;
   className?: string;
   variant?: 'card' | 'simple' | 'inline';
-  data?: any; // برای اطلاعات مخاطب
+  data?: Contact; // اطلاعات مخاطب
 }
 
 export const ContactSection: React.FC<ContactSectionProps> = ({
@@ -19,9 +20,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
   description,
   children,
   className = '',
-  variant = 'card',
-  data
-}) => {
+  variant = 'card'}) => {
   if (variant === 'simple') {
     return (
       <motion.div

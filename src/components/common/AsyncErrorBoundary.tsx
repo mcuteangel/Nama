@@ -2,7 +2,7 @@ import React from 'react';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
 import { GlassButton } from "@/components/ui/glass-button";
 import { ModernCard, ModernCardContent, ModernCardDescription, ModernCardHeader, ModernCardTitle } from '@/components/ui/modern-card';
-import { AlertTriangle, RefreshCw, Database, Wifi } from 'lucide-react';
+import { RefreshCw, Database, Wifi } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { queryClient } from '@/lib/react-query-config';
 import { ErrorManager } from '@/lib/error-manager';

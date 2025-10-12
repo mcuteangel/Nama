@@ -13,12 +13,11 @@ import { useTranslation } from 'react-i18next';
 import { useJalaliCalendar } from '@/hooks/use-jalali-calendar';
 
 const ContactImportantDates: React.FC = React.memo(() => {
-  const { i18n } = useTranslation();
+  useTranslation();
   const form = useFormContext<ContactFormValues>();
   const { formatDate } = useJalaliCalendar();
 
   // Determine text direction based on language
-  const isRTL = i18n.language === 'fa' || i18n.language === 'ar';
 
   return (
     <FormCard

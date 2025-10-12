@@ -1,7 +1,6 @@
-import * as React from "react";
 import { type VariantProps } from "class-variance-authority";
 
-import { cn, applyGlobalStyles, applyAnimation } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { ModernBadge, type ModernBadgeProps } from "@/components/ui/modern-badge";
 import { badgeVariants } from "@/components/ui/badge-variants";
 

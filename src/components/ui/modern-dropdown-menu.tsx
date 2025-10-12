@@ -17,29 +17,31 @@ const ModernDropdownMenuSub = DropdownMenuPrimitive.Sub;
 
 const ModernDropdownMenuRadioGroup = DropdownMenuPrimitive.RadioGroup;
 
+export type ModernDropdownMenuSubTriggerProps = React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.SubTrigger> & {
+  inset?: boolean;
+  glassEffect?: GlassEffect;
+  gradientType?: GradientType;
+  neomorphism?: boolean;
+  hoverEffect?: HoverEffect;
+};
+
 const ModernDropdownMenuSubTrigger = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.SubTrigger>,
-  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.SubTrigger> & {
-    inset?: boolean;
-    glassEffect?: GlassEffect;
-    gradientType?: GradientType;
-    neomorphism?: boolean;
-    hoverEffect?: HoverEffect;
-  }
->(({ 
-  className, 
-  inset, 
+  ModernDropdownMenuSubTriggerProps
+>(({
+  className,
+  inset,
   glassEffect = "none",
   gradientType = "none",
   neomorphism = false,
   hoverEffect = "lift",
-  children, 
-  ...props 
+  children,
+  ...props
 }, ref) => {
   const shouldApplyGlass = glassEffect !== "none";
   const shouldApplyGradient = gradientType !== "none";
   const shouldApplyNeomorphism = neomorphism;
-  
+
   return (
     <DropdownMenuPrimitive.SubTrigger
       ref={ref}
@@ -62,26 +64,28 @@ const ModernDropdownMenuSubTrigger = React.forwardRef<
 ModernDropdownMenuSubTrigger.displayName =
   DropdownMenuPrimitive.SubTrigger.displayName;
 
+export type ModernDropdownMenuSubContentProps = React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.SubContent> & {
+  glassEffect?: GlassEffect;
+  gradientType?: GradientType;
+  neomorphism?: boolean;
+  animation?: AnimationType;
+};
+
 const ModernDropdownMenuSubContent = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.SubContent>,
-  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.SubContent> & {
-    glassEffect?: GlassEffect;
-    gradientType?: GradientType;
-    neomorphism?: boolean;
-    animation?: AnimationType;
-  }
->(({ 
-  className, 
+  ModernDropdownMenuSubContentProps
+>(({
+  className,
   glassEffect = "advanced" as GlassEffect,
   gradientType = "none",
   neomorphism = false,
   animation = "fade-in",
-  ...props 
+  ...props
 }, ref) => {
   const shouldApplyGlass = glassEffect !== "none";
   const shouldApplyGradient = gradientType !== "none";
   const shouldApplyNeomorphism = neomorphism;
-  
+
   return (
     <DropdownMenuPrimitive.SubContent
       ref={ref}
@@ -100,27 +104,29 @@ const ModernDropdownMenuSubContent = React.forwardRef<
 ModernDropdownMenuSubContent.displayName =
   DropdownMenuPrimitive.SubContent.displayName;
 
+export type ModernDropdownMenuContentProps = React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Content> & {
+  glassEffect?: GlassEffect;
+  gradientType?: GradientType;
+  neomorphism?: boolean;
+  animation?: AnimationType;
+};
+
 const ModernDropdownMenuContent = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Content> & {
-    glassEffect?: GlassEffect;
-    gradientType?: GradientType;
-    neomorphism?: boolean;
-    animation?: AnimationType;
-  }
->(({ 
-  className, 
+  ModernDropdownMenuContentProps
+>(({
+  className,
   glassEffect = "advanced" as GlassEffect,
   gradientType = "none",
   neomorphism = false,
   animation = "fade-in",
-  sideOffset = 4, 
-  ...props 
+  sideOffset = 4,
+  ...props
 }, ref) => {
   const shouldApplyGlass = glassEffect !== "none";
   const shouldApplyGradient = gradientType !== "none";
   const shouldApplyNeomorphism = neomorphism;
-  
+
   return (
     <DropdownMenuPrimitive.Portal>
       <DropdownMenuPrimitive.Content
@@ -141,28 +147,30 @@ const ModernDropdownMenuContent = React.forwardRef<
 });
 ModernDropdownMenuContent.displayName = DropdownMenuPrimitive.Content.displayName;
 
+export type ModernDropdownMenuItemProps = React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Item> & {
+  inset?: boolean;
+  glassEffect?: GlassEffect;
+  gradientType?: GradientType;
+  neomorphism?: boolean;
+  hoverEffect?: HoverEffect;
+};
+
 const ModernDropdownMenuItem = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.Item>,
-  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Item> & {
-    inset?: boolean;
-    glassEffect?: GlassEffect;
-    gradientType?: GradientType;
-    neomorphism?: boolean;
-    hoverEffect?: HoverEffect;
-  }
->(({ 
-  className, 
-  inset, 
+  ModernDropdownMenuItemProps
+>(({
+  className,
+  inset,
   glassEffect = "none",
   gradientType = "none",
   neomorphism = false,
   hoverEffect = "lift",
-  ...props 
+  ...props
 }, ref) => {
   const shouldApplyGlass = glassEffect !== "none";
   const shouldApplyGradient = gradientType !== "none";
   const shouldApplyNeomorphism = neomorphism;
-  
+
   return (
     <DropdownMenuPrimitive.Item
       ref={ref}
@@ -181,28 +189,30 @@ const ModernDropdownMenuItem = React.forwardRef<
 });
 ModernDropdownMenuItem.displayName = DropdownMenuPrimitive.Item.displayName;
 
+export type ModernDropdownMenuCheckboxItemProps = React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.CheckboxItem> & {
+  glassEffect?: GlassEffect;
+  gradientType?: GradientType;
+  neomorphism?: boolean;
+  hoverEffect?: HoverEffect;
+};
+
 const ModernDropdownMenuCheckboxItem = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.CheckboxItem>,
-  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.CheckboxItem> & {
-    glassEffect?: GlassEffect;
-    gradientType?: GradientType;
-    neomorphism?: boolean;
-    hoverEffect?: HoverEffect;
-  }
->(({ 
-  className, 
+  ModernDropdownMenuCheckboxItemProps
+>(({
+  className,
   glassEffect = "none",
   gradientType = "none",
   neomorphism = false,
   hoverEffect = "lift",
-  children, 
-  checked, 
-  ...props 
+  children,
+  checked,
+  ...props
 }, ref) => {
   const shouldApplyGlass = glassEffect !== "none";
   const shouldApplyGradient = gradientType !== "none";
   const shouldApplyNeomorphism = neomorphism;
-  
+
   return (
     <DropdownMenuPrimitive.CheckboxItem
       ref={ref}
@@ -229,27 +239,29 @@ const ModernDropdownMenuCheckboxItem = React.forwardRef<
 ModernDropdownMenuCheckboxItem.displayName =
   DropdownMenuPrimitive.CheckboxItem.displayName;
 
+export type ModernDropdownMenuRadioItemProps = React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.RadioItem> & {
+  glassEffect?: GlassEffect;
+  gradientType?: GradientType;
+  neomorphism?: boolean;
+  hoverEffect?: HoverEffect;
+};
+
 const ModernDropdownMenuRadioItem = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.RadioItem>,
-  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.RadioItem> & {
-    glassEffect?: GlassEffect;
-    gradientType?: GradientType;
-    neomorphism?: boolean;
-    hoverEffect?: HoverEffect;
-  }
->(({ 
-  className, 
+  ModernDropdownMenuRadioItemProps
+>(({
+  className,
   glassEffect = "none",
   gradientType = "none",
   neomorphism = false,
   hoverEffect = "lift",
-  children, 
-  ...props 
+  children,
+  ...props
 }, ref) => {
   const shouldApplyGlass = glassEffect !== "none";
   const shouldApplyGradient = gradientType !== "none";
   const shouldApplyNeomorphism = neomorphism;
-  
+
   return (
     <DropdownMenuPrimitive.RadioItem
       ref={ref}

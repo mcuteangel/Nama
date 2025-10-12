@@ -9,11 +9,10 @@ import { ContactFormValues } from '@/types/contact';
 import { FileText, AlertCircle, PenTool } from 'lucide-react';
 
 const ContactNotes: React.FC = React.memo(() => {
-  const { i18n } = useTranslation();
+  useTranslation();
   const form = useFormContext<ContactFormValues>();
 
   // Determine text direction based on language
-  const isRTL = i18n.language === 'fa' || i18n.language === 'ar';
 
   return (
     <FormCard

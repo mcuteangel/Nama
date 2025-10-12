@@ -70,7 +70,7 @@ const iconMap = {
 
 export interface ModernAlertProps
   extends React.HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof alertVariants> {
+    Omit<VariantProps<typeof alertVariants>, 'glassEffect'> {
   glassEffect?: GlassEffect;
   gradientType?: GradientType;
   hoverEffect?: HoverEffect;
@@ -103,15 +103,20 @@ const ModernAlert = React.forwardRef<
       ref={ref}
       role="alert"
       className={cn(
-        alertVariants({ variant, effect, glassEffect, gradient: gradientType }),
-        shouldApplyGlass && applyGlassEffect(glassEffect),
-        shouldApplyNeomorphism && applyNeomorphismEffect(),
-        shouldApplyGradient && applyGradientEffect(gradientType),
+        alertVariants({ 
+          variant, 
+          effect, 
+          glassEffect: glassEffect && ["glass", "glassAdvanced", "glassCard"].includes(glassEffect) ? glassEffect as "glass" | "glassAdvanced" | "glassCard" : "none",
+          gradient: gradientType && ["primary", "ocean", "sunset", "success", "info", "fire", "royal", "mint", "purple"].includes(gradientType) ? gradientType as "primary" | "ocean" | "sunset" | "success" | "info" | "fire" | "royal" | "mint" | "purple" : "none"
+        }),
+        shouldApplyGlass && glassEffect !== "none" && ["default", "advanced", "card", "background", "button"].includes(glassEffect) && applyGlassEffect(undefined, { variant: glassEffect }),
+        shouldApplyNeomorphism && applyNeomorphismEffect(undefined),
+        shouldApplyGradient && gradientType !== "none" && ["primary", "ocean", "sunset", "success", "info", "warning", "danger", "forest"].includes(gradientType) && applyGradientEffect(undefined, gradientType),
         applyGlobalStyles(className, {
           transition,
           focusRing
         }),
-        applyHoverEffect(hoverEffect)
+        applyHoverEffect(undefined, hoverEffect)
       )}
       {...props}
     >

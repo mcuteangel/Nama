@@ -24,12 +24,11 @@ export {
 
 export { 
   badgeVariants
-} from './badge-variants';
+} from './badge-variants-modern';
 
 export { 
   ModernBadge,
   type ModernBadgeProps,
-  badgeVariants as modernBadgeVariants
 } from './modern-badge';
 
 export * from './modern-avatar';

@@ -221,10 +221,10 @@ const GroupForm: React.FC<GroupFormProps> = ({ initialData, onSuccess, onCancel 
                   ${nameValue ? 'border-green-400' : ''}
                 `}
                 {...register('name')}
-                onFocus={(e) => {
+                onFocus={() => {
                   setFocusedField('name');
                 }}
-                onBlur={(e) => {
+                onBlur={() => {
                   setFocusedField(null);
                 }}
               />

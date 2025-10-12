@@ -1,6 +1,5 @@
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
-import { useTranslation } from 'react-i18next';
 import { ModernInput } from '@/components/ui/modern-input';
 import { FormField, FormLabel, FormControl } from '@/components/ui/form';
 import { FormCard } from '@/components/ui/FormCard';
@@ -9,11 +8,7 @@ import { ContactFormValues } from '@/types/contact';
 import { MapPin, AlertCircle, Home, Building, Globe } from 'lucide-react';
 
 const ContactAddress: React.FC = React.memo(() => {
-  const { i18n } = useTranslation();
   const form = useFormContext<ContactFormValues>();
-
-  // Determine text direction based on language
-  const isRTL = i18n.language === 'fa' || i18n.language === 'ar';
 
   return (
     <FormCard

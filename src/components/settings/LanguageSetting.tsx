@@ -9,7 +9,7 @@ import { useAppSettings } from '@/hooks/use-app-settings';
 
 const LanguageSetting: React.FC = () => {
   const { i18n, t } = useTranslation();
-  const { settings, updateSettings } = useAppSettings();
+  const { updateSettings } = useAppSettings();
 
   const languages = [
     { value: 'fa', label: t('settings.persian'), flag: '🇮🇷' },

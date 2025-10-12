@@ -5,26 +5,28 @@ import { Check } from "lucide-react";
 import { cn, applyGlassEffect, applyGradientEffect, applyNeomorphismEffect, applyHoverEffect } from "@/lib/utils";
 import { GlassEffect, GradientType, HoverEffect } from "@/types/global-style-types";
 
+export type ModernCheckboxProps = React.ComponentPropsWithoutRef<typeof CheckboxPrimitive.Root> & {
+  glassEffect?: GlassEffect;
+  gradientType?: GradientType;
+  neomorphism?: boolean;
+  hoverEffect?: HoverEffect;
+};
+
 const ModernCheckbox = React.forwardRef<
   React.ElementRef<typeof CheckboxPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof CheckboxPrimitive.Root> & {
-    glassEffect?: GlassEffect;
-    gradientType?: GradientType;
-    neomorphism?: boolean;
-    hoverEffect?: HoverEffect;
-  }
->(({ 
-  className, 
+  ModernCheckboxProps
+>(({
+  className,
   glassEffect = "none",
   gradientType = "none",
   neomorphism = false,
   hoverEffect = "lift",
-  ...props 
+  ...props
 }, ref) => {
   const shouldApplyGlass = glassEffect !== "none";
   const shouldApplyGradient = gradientType !== "none";
   const shouldApplyNeomorphism = neomorphism;
-  
+
   return (
     <CheckboxPrimitive.Root
       ref={ref}

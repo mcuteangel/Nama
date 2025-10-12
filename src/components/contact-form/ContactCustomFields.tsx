@@ -3,19 +3,18 @@ import { useFormContext } from 'react-hook-form';
 import { ModernInput } from '@/components/ui/modern-input';
 import { ModernPopover, ModernPopoverContent, ModernPopoverTrigger } from '@/components/ui/modern-popover';
 import { GlassButton } from "@/components/ui/glass-button";
-import { FormField, FormLabel, FormControl } from '@/components/ui/form';
+import { FormField, FormControl } from '@/components/ui/form';
 import { FormCard } from '@/components/ui/FormCard';
 import { FormSection } from '@/components/ui/FormSection';
 import { CalendarIcon, Plus, Settings, AlertCircle } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { JalaliCalendar } from '@/components/JalaliCalendar';
-import { cn } from '@/lib/utils';
 import { CustomFieldForm } from '@/components/custom-fields';
 import { CustomFieldTemplate } from '@/domain/schemas/custom-field-template';
 import { ContactFormValues } from '@/types/contact';
-import { useTranslation } from 'react-i18next';
 import { useJalaliCalendar } from '@/hooks/use-jalali-calendar';
 import { ControllerRenderProps } from 'react-hook-form';
+import { cn } from '../ui';
 
 interface ContactCustomFieldsProps {
   availableTemplates: CustomFieldTemplate[];
@@ -29,12 +28,8 @@ const ContactCustomFields: React.FC<ContactCustomFieldsProps> = React.memo(({
   loadingTemplates = false,
   fetchTemplates,
 }) => {
-  const { i18n } = useTranslation();
   const { control, watch } = useFormContext<ContactFormValues>();
   const { formatDate } = useJalaliCalendar();
-
-  // Determine text direction based on language
-  const isRTL = i18n.language === 'fa' || i18n.language === 'ar';
 
   // Memoize custom fields to prevent unnecessary re-renders
   const customFields = useMemo(() => {

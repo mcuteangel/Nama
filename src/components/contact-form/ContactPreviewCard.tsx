@@ -11,10 +11,9 @@ import { useGroups } from '@/hooks/use-groups';
 
 interface ContactPreviewCardProps {
   contact: ContactFormValues;
-  className?: string;
 }
 
-const ContactPreviewCard: React.FC<ContactPreviewCardProps> = ({ contact, className }) => {
+const ContactPreviewCard: React.FC<ContactPreviewCardProps> = ({ contact }) => {
   const { groups } = useGroups();
 
   // Get the first phone number and email for preview

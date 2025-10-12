@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Tag, Loader2, CheckCircle, XCircle, Plus } from 'lucide-react';
+import { Tag, Loader2, CheckCircle, XCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Tag as TagType, TagWithCount } from '@/types/tag';
 import { TagsService } from '@/services/tags-service';
@@ -19,9 +19,7 @@ export interface ContactTagsProps {
 
 const ContactTags: React.FC<ContactTagsProps> = ({
   selectedTags,
-  onTagsChange,
-  className
-}) => {
+  onTagsChange}) => {
   const { t } = useTranslation();
   const { toast } = useToast();
   const { session } = useSession();
