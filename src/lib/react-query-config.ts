@@ -1,5 +1,6 @@
 import { QueryClient, DefaultOptions, MutationCache, QueryCache } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import i18n from '@/integrations/i18n';
 
 // Types for mutation meta
 interface MutationMeta {
@@ -117,7 +118,7 @@ const mutationCache = new MutationCache({
   onSuccess: (data, _variables, _context, mutation) => {
     // Show success message for important mutations
     if (mutation.meta?.showSuccessToast) {
-      const successMessage = (mutation.meta as MutationMeta).successMessage ?? 'Operation completed successfully';
+      const successMessage = (mutation.meta as MutationMeta).successMessage ?? i18n.t('common.operation_completed_successfully');
       toast.success(successMessage, {
         duration: 3000,
       });
@@ -153,57 +154,57 @@ function getErrorMessage(error: unknown): string {
     const errorObj = error as { message: string };
     // Common Supabase error patterns
     if (errorObj.message.includes('JWT')) {
-      return 'Session expired. Please log in again.';
+      return i18n.t('common.session_expired');
     }
     if (errorObj.message.includes('permission')) {
-      return 'You do not have permission to perform this action.';
+      return i18n.t('common.permission_denied');
     }
     if (errorObj.message.includes('network')) {
-      return 'Network error. Please check your connection.';
+      return i18n.t('common.network_error');
     }
     if (errorObj.message.includes('timeout')) {
-      return 'Request timed out. Please try again.';
+      return i18n.t('common.request_timeout');
     }
     return errorObj.message;
   }
-  
+
   // Handle HTTP status codes
   if (error && typeof error === 'object' && 'status' in error) {
     const errorObj = error as { status: number };
     switch (errorObj.status) {
       case 400:
-        return 'Invalid request. Please check your input.';
+        return i18n.t('common.invalid_request');
       case 401:
-        return 'Authentication required. Please log in.';
+        return i18n.t('common.authentication_required');
       case 403:
-        return 'Access denied. You do not have permission.';
+        return i18n.t('common.access_denied');
       case 404:
-        return 'Resource not found.';
+        return i18n.t('common.resource_not_found');
       case 409:
-        return 'Conflict. The resource already exists or has been modified.';
+        return i18n.t('common.conflict_error');
       case 422:
-        return 'Validation error. Please check your input.';
+        return i18n.t('common.validation_error');
       case 429:
-        return 'Too many requests. Please wait and try again.';
+        return i18n.t('common.too_many_requests');
       case 500:
-        return 'Server error. Please try again later.';
+        return i18n.t('common.server_error');
       case 503:
-        return 'Service unavailable. Please try again later.';
+        return i18n.t('common.service_unavailable');
       default:
-        return `Request failed with status ${errorObj.status}`;
+        return i18n.t('common.request_failed_with_status', { status: errorObj.status });
     }
   }
-  
+
   // Generic network errors
   if (error && typeof error === 'object' && 'code' in error) {
     const errorObj = error as { code: string };
     if (errorObj.code === 'NETWORK_ERROR' || !navigator.onLine) {
-      return 'Network error. Please check your connection.';
+      return i18n.t('common.network_error');
     }
   }
-  
+
   // Fallback
-  return 'An unexpected error occurred. Please try again.';
+  return i18n.t('common.unexpected_error');
 }
 
 // Create the QueryClient with enhanced configuration
