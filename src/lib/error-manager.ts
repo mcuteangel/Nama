@@ -1,4 +1,4 @@
-import { toast } from "sonner";
+import React from 'react';
 import i18n from '@/integrations/i18n';
 
 type ErrorType = 'success' | 'error' | 'info' | 'warning';
@@ -215,22 +215,8 @@ export const ErrorManager = {
   },
 
   notifyUser: (message: string, type: ErrorType = 'error') => {
-    switch (type) {
-      case 'success':
-        toast.success(message);
-        break;
-      case 'error':
-        toast.error(message);
-        break;
-      case 'info':
-        toast.info(message);
-        break;
-      case 'warning':
-        toast.warning(message);
-        break;
-      default:
-        toast(message);
-    }
+    // TODO: این تابع باید در کامپوننت‌ها با استفاده از useToastHelpers استفاده شود
+    console.warn(`ErrorManager.notifyUser called with ${type} message: ${message}. Please use useToastHelpers hook in React components instead.`);
   },
 
   getErrorMessage: (error: unknown): string => {

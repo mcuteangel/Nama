@@ -1,17 +1,74 @@
-import { toast } from "sonner";
+import { ToastContext } from "@/components/ui/toast-context";
+import React from 'react';
 
-export const showSuccess = (message: string) => {
-  toast.success(message);
+export const useToastHelpers = () => {
+  const context = React.useContext(ToastContext);
+
+  const showSuccess = (message: string) => {
+    if (context) {
+      context.addToast({
+        variant: 'success',
+        title: 'موفق',
+        description: message,
+        duration: 5000
+      });
+    }
+  };
+
+  const showInfo = (message: string) => {
+    if (context) {
+      context.addToast({
+        variant: 'info',
+        title: 'اطلاع',
+        description: message,
+        duration: 5000
+      });
+    }
+  };
+
+  const showLoading = (message: string): string => {
+    if (context) {
+      const id = Math.random().toString(36).substr(2, 9);
+      context.addToast({
+        variant: 'info',
+        title: 'در حال بارگذاری',
+        description: message,
+        duration: 3000
+      });
+      return id;
+    }
+    return '';
+  };
+
+  const dismissToast = (toastId: string | number) => {
+    if (context) {
+      context.removeToast(toastId.toString());
+    }
+  };
+
+  return {
+    showSuccess,
+    showError,
+    showInfo,
+    showLoading,
+    dismissToast
+  };
 };
 
-export const showError = (message: string) => {
-  toast.error(message);
+// برای سازگاری با کدهای موجود، توابع ساده هم نگه می‌داریم اما استفاده از آن‌ها را محدود می‌کنیم
+export const showSuccess = (_message: string) => {
+  console.warn('showSuccess should be used within a React component with useToastHelpers hook');
 };
 
-export const showLoading = (message: string): string | number => { // Allow string | number as return type
-  return toast.loading(message);
+export const showError = (_message: string) => {
+  console.warn('showError should be used within a React component with useToastHelpers hook');
 };
 
-export const dismissToast = (toastId: string | number) => { // Allow string | number for dismissal
-  toast.dismiss(toastId);
+export const showLoading = (_message: string): string | number => {
+  console.warn('showLoading should be used within a React component with useToastHelpers hook');
+  return '';
+};
+
+export const dismissToast = (_toastId: string | number) => {
+  console.warn('dismissToast should be used within a React component with useToastHelpers hook');
 };

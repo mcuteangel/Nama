@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { 
   Edit, 
   Trash2, 
@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
 import { ModernCard, ModernCardContent, ModernCardHeader, ModernCardTitle } from "../ui/modern-card";
+import StandardizedDeleteDialog from "@/components/common/StandardizedDeleteDialog";
 
 type TemplateType = 'text' | 'number' | 'date' | 'list' | 'checklist';
 
@@ -36,6 +37,7 @@ const CustomFieldCard: React.FC<CustomFieldCardProps> = ({
   const { t } = useTranslation();
   const { settings } = useAppSettings();
   const isRTL = settings.language === 'fa';
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   const getTypeIcon = (type: TemplateType) => {
     const iconClass = "w-4 h-4 flex-shrink-0";
@@ -84,7 +86,12 @@ const CustomFieldCard: React.FC<CustomFieldCardProps> = ({
 
   const handleDeleteClick = (e: React.MouseEvent) => {
     e.stopPropagation();
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = () => {
     onDelete(field.id);
+    setIsDeleteDialogOpen(false);
   };
 
   return (
@@ -248,8 +255,17 @@ const CustomFieldCard: React.FC<CustomFieldCardProps> = ({
             )}
           </ModernCardContent>
         </ModernCard>
-      </motion.div>
-    );
+
+      {/* Delete Confirmation Dialog */}
+      <StandardizedDeleteDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        onConfirm={handleDeleteConfirm}
+        title={t('custom_field_template.delete_confirmation_title')}
+        description={t('custom_field_template.delete_confirmation_description', { name: field.name })}
+      />
+    </motion.div>
+  );
 };
 
 export default CustomFieldCard;

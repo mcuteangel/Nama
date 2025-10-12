@@ -22,7 +22,7 @@ import { ModernCard, ModernCardHeader, ModernCardTitle, ModernCardContent, Moder
 import { GlassButton } from "@/components/ui/glass-button";
 import { useTranslation } from 'react-i18next'; // Added import
 
-type TemplateType = 'text' | 'number' | 'date' | 'list';
+type TemplateType = 'text' | 'number' | 'date' | 'list' | 'checklist';
 
 interface CustomFieldTemplateFormProps {
   initialData?: CustomFieldTemplate;
@@ -70,7 +70,7 @@ const CustomFieldTemplateForm: React.FC<CustomFieldTemplateFormProps> = ({ initi
     defaultValues: {
       name: initialData?.name || "",
       type: initialData?.type || "text",
-      options: initialData?.type === 'list' ? (initialData.options || []) : [],
+      options: (initialData?.type === 'list' || initialData?.type === 'checklist') ? (initialData.options || []) : [],
       description: initialData?.description || "",
       required: initialData?.required || false,
     },
@@ -84,7 +84,7 @@ const CustomFieldTemplateForm: React.FC<CustomFieldTemplateFormProps> = ({ initi
       form.reset({
         name: initialData.name,
         type: initialData.type as TemplateType,
-        options: initialData.type === 'list' ? (initialData.options || []) : undefined,
+        options: (initialData.type === 'list' || initialData.type === 'checklist') ? (initialData.options || []) : undefined,
         description: initialData.description || "",
         required: initialData.required,
       });
@@ -92,32 +92,41 @@ const CustomFieldTemplateForm: React.FC<CustomFieldTemplateFormProps> = ({ initi
   }, [initialData, form]);
 
   const onSubmit = async (data: CreateCustomFieldTemplateInput) => {
-    console.log("CustomFieldTemplateForm: onSubmit triggered. Data:", data);
+    console.log("CustomFieldTemplateForm: onSubmit triggered. Raw Data:", data);
+    console.log("CustomFieldTemplateForm: Data.name:", data.name);
+    console.log("CustomFieldTemplateForm: Data.type:", data.type);
+    console.log("CustomFieldTemplateForm: Data.options:", data.options);
+    console.log("CustomFieldTemplateForm: Data.description:", data.description);
+    console.log("CustomFieldTemplateForm: Data.required:", data.required);
+
+    console.log("CustomFieldTemplateForm: Session user:", session?.user);
     if (!session?.user) {
       ErrorManager.notifyUser(t('errors.auth_loading_profile'), 'error');
       navigate('/login');
       return;
     }
 
+    // Process the data before sending
+    const processedData = {
+      name: data.name.trim(),
+      type: data.type,
+      options: (data.type === 'list' || data.type === 'checklist') ? (data.options || []).filter(Boolean) : undefined,
+      description: data.description?.trim() || "",
+      required: !!data.required,
+    };
+
+    console.log("CustomFieldTemplateForm: Processed Data:", processedData);
+
+    console.log("CustomFieldTemplateForm: About to execute async operation");
     await executeAsync(async () => {
       console.log("CustomFieldTemplateForm: Executing async Supabase operation.");
       let res;
       if (initialData) {
-        res = await CustomFieldTemplateService.updateCustomFieldTemplate(initialData.id, { // Updated service call
-          name: data.name.trim(),
-          type: data.type,
-          options: data.type === 'list' ? (data.options || []).filter(Boolean) : undefined,
-          description: data.description?.trim() || "",
-          required: !!data.required,
-        });
+        console.log("CustomFieldTemplateForm: Updating existing template");
+        res = await CustomFieldTemplateService.updateCustomFieldTemplate(initialData.id, processedData);
       } else {
-        res = await CustomFieldTemplateService.addCustomFieldTemplate({ // Updated service call
-          name: data.name.trim(),
-          type: data.type,
-          options: data.type === 'list' ? (data.options || []).filter(Boolean) : undefined,
-          description: data.description?.trim() || "",
-          required: !!data.required,
-        });
+        console.log("CustomFieldTemplateForm: Creating new template");
+        res = await CustomFieldTemplateService.addCustomFieldTemplate(processedData);
       }
 
       if (res.error) {
@@ -131,6 +140,7 @@ const CustomFieldTemplateForm: React.FC<CustomFieldTemplateFormProps> = ({ initi
 
   const addOption = () => {
     const current = form.getValues("options") || [];
+    console.log("CustomFieldTemplateForm: Adding option. Current options:", current);
     form.setValue("options", [...current, ""], { shouldDirty: true, shouldTouch: true, shouldValidate: true });
   };
 
@@ -142,6 +152,7 @@ const CustomFieldTemplateForm: React.FC<CustomFieldTemplateFormProps> = ({ initi
   const setOptionAt = (index: number, value: string) => {
     const current = [...(form.getValues("options") || [])];
     current[index] = value;
+    console.log("CustomFieldTemplateForm: Setting option at index", index, "to value:", value, "Current options:", current);
     form.setValue("options", current, { shouldDirty: true, shouldTouch: true, shouldValidate: true });
   };
 
@@ -190,11 +201,15 @@ const CustomFieldTemplateForm: React.FC<CustomFieldTemplateFormProps> = ({ initi
             <ModernSelect
               value={values.type || "text"}
               onValueChange={(value) => {
+                console.log("CustomFieldTemplateForm: Type changed to:", value);
                 form.setValue("type", value as TemplateType, { shouldValidate: true });
-                if (value !== "list") {
+                if (value !== "list" && value !== "checklist") {
+                  console.log("CustomFieldTemplateForm: Clearing options because type is not list or checklist");
                   form.setValue("options", undefined, { shouldValidate: true });
                 } else {
-                  form.setValue("options", form.getValues("options") || [""], { shouldValidate: true });
+                  const currentOptions = form.getValues("options") || [""];
+                  console.log("CustomFieldTemplateForm: Setting options for list/checklist type. Current options:", currentOptions);
+                  form.setValue("options", currentOptions, { shouldValidate: true });
                 }
               }}
               disabled={isSubmitting}
@@ -207,6 +222,7 @@ const CustomFieldTemplateForm: React.FC<CustomFieldTemplateFormProps> = ({ initi
                 <ModernSelectItem value="number">{t('contact_form.number')}</ModernSelectItem>
                 <ModernSelectItem value="date">{t('contact_form.date')}</ModernSelectItem>
                 <ModernSelectItem value="list">{t('contact_form.list')}</ModernSelectItem>
+                <ModernSelectItem value="checklist">{t('contact_form.checklist')}</ModernSelectItem>
               </ModernSelectContent>
             </ModernSelect>
             {form.formState.errors.type && (
@@ -214,7 +230,7 @@ const CustomFieldTemplateForm: React.FC<CustomFieldTemplateFormProps> = ({ initi
             )}
           </div>
 
-          {(values.type === 'list') && (
+          {(values.type === 'list' || values.type === 'checklist') && (
             <div className="flex flex-col gap-2">
               <Label className="text-gray-700 dark:text-gray-200">{t('contact_form.list_options')}</Label>
               {(values.options || []).map((option, index) => (

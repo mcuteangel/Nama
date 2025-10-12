@@ -82,7 +82,7 @@ const DebugSettings: React.FC = () => {
     toast({
       title: "Test Error Triggered",
       description: "A test error has been thrown for debugging purposes. Check the console for details.",
-      variant: "destructive",
+      variant: "error",
     });
     // Still throw the error for debugging
     throw new Error('Test error from debug panel');

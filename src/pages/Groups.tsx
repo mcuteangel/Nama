@@ -53,7 +53,7 @@ const Groups = React.memo(() => {
   }, [fetchGroups]);
 
   const handleAddGroupClick = useCallback(() => {
-    toast.info(t('notifications.navigating_to_add_group'));
+    toast.success(t('notifications.navigating_to_add_group'));
     navigate("/add-group");
   }, [navigate, t, toast]);
 

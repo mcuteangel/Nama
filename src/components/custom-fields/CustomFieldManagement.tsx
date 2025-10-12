@@ -13,14 +13,14 @@ import {
   ModernSelectTrigger
 } from "@/components/ui/modern-select";
 import { ModernTooltip, ModernTooltipContent, ModernTooltipTrigger } from "@/components/ui/modern-tooltip";
-import useAppSettings from '@/hooks/use-app-settings';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { designTokens } from '@/lib/design-tokens';
-import CustomFieldForm from "./CustomFieldForm";
 import { CustomFieldList } from "./CustomFieldList";
 import { useCustomFields } from "@/hooks/use-custom-fields";
+import { designTokens } from '@/lib/design-tokens';
+import CustomFieldForm from "./CustomFieldForm";
 import { useCustomFieldFilters, type TemplateType } from "@/hooks/use-custom-field-filters";
-import PageHeader from "@/components/ui/PageHeader";
+import PageHeader from "../ui/PageHeader";
+import useAppSettings from "@/hooks/use-app-settings";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const CustomFieldManagement: React.FC = () => {
   const { t } = useTranslation();

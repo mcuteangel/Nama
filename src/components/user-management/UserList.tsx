@@ -5,9 +5,6 @@ import { UserManagementService } from "@/services/user-management-service";
 import { useErrorHandler } from "@/hooks/use-error-handler";
 import { ErrorManager } from "@/lib/error-manager";
 import UserForm from "./UserForm";
-import { useTranslation } from "react-i18next";
-import { useSession } from "@/integrations/supabase/auth";
-import FormDialogWrapper from "../common/FormDialogWrapper";
 import LoadingMessage from "../common/LoadingMessage";
 import { fetchWithCache, invalidateCache } from "@/utils/cache-helpers";
 import EmptyState from '../common/EmptyState';
@@ -17,6 +14,10 @@ import { GlassButton } from "@/components/ui/glass-button";
 import { ModernCard } from "@/components/ui/modern-card";
 import { useDebugMode } from '@/hooks/useDebugMode';
 import { EdgeFunctionDebugger } from '@/utils/edge-function-debugger';
+import { useSession } from "@/integrations/supabase/auth";
+import { useToast } from "@/components/ui/use-toast";
+import { useTranslation } from "react-i18next";
+import { FormDialogWrapper } from "../common";
 
 interface UserProfile {
   id: string;
@@ -32,12 +33,13 @@ const UserItem = ({ user, onUserUpdated, onUserDeleted }: { user: UserProfile; o
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const { t } = useTranslation();
   const { session } = useSession();
+  const { toast } = useToast();
 
   const onSuccessDelete = useCallback(() => {
-    ErrorManager.notifyUser(t('user_management.user_deleted_success'), 'success');
+    toast.success(t('user_management.user_deleted_success'));
     invalidateCache(`user_list_${session?.user?.id}`);
     onUserDeleted();
-  }, [t, onUserDeleted, session]);
+  }, [t, onUserDeleted, session, toast]);
 
   const onErrorDelete = useCallback((err: Error) => {
     ErrorManager.logError(err, { component: 'UserList', action: 'deleteUser', userId: user.id });
@@ -135,11 +137,12 @@ const UserList: React.FC = () => {
   const [isAddUserDialogOpen, setIsAddUserDialogOpen] = useState(false);
   const { t } = useTranslation();
   const { isDebugMode } = useDebugMode();
+  const { toast } = useToast();
 
   // Debug function for Edge Function testing
   const handleDebugConnection = async () => {
     console.log('🔍 Starting debug test...');
-    ErrorManager.notifyUser(t('system_messages.connection_test_start'), 'info');
+    toast.info(t('system_messages.connection_test_start'));
     
     const result = await EdgeFunctionDebugger.testConnection();
     const directResult = await EdgeFunctionDebugger.testDirectFetch();
@@ -147,18 +150,18 @@ const UserList: React.FC = () => {
     console.log('Debug results:', { connection: result, direct: directResult });
     
     if (result.success) {
-      ErrorManager.notifyUser(t('system_messages.connection_success', { count: result.details.usersCount }), 'success');
+      toast.success(t('system_messages.connection_success', { count: result.details.usersCount }));
     } else {
-      ErrorManager.notifyUser(t('system_messages.connection_error', { error: result.details.error }), 'error');
+      toast.error(t('system_messages.connection_error', { error: result.details.error }));
       console.error('Debug details:', result.details);
     }
   };
 
   const onSuccessFetchUsers = useCallback((result: { data: UserProfile[] | null; error: string | null; fromCache: boolean }) => {
     if (result && !result.fromCache) {
-      ErrorManager.notifyUser(t('user_management.users_loaded_success'), 'success');
+      toast.success(t('user_management.users_loaded_success'));
     }
-  }, [t]);
+  }, [t, toast]);
 
   const onErrorFetchUsers = useCallback((err: Error) => {
     ErrorManager.logError(err, { component: 'UserList', action: 'fetchUsers' });
@@ -189,7 +192,7 @@ const UserList: React.FC = () => {
     
     if (session.user.user_metadata.role !== 'admin') {
       setUsers([]);
-      ErrorManager.notifyUser(t('user_management.admin_access_required'), 'error');
+      toast.error(t('user_management.admin_access_required'));
       return;
     }
 
@@ -206,7 +209,7 @@ const UserList: React.FC = () => {
       setUsers(data || []);
       return { data, error: null, fromCache };
     });
-  }, [session, isSessionLoading, executeFetchUsers, t]);
+  }, [session, isSessionLoading, executeFetchUsers, t, toast]);
 
   useEffect(() => {
     fetchUsers();

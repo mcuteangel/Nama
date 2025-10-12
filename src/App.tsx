@@ -37,18 +37,16 @@ import { SessionContextProvider } from './integrations/supabase/auth';
 import { supabase } from './integrations/supabase/client';
 import BottomNavigationBar from './components/layout/BottomNavigationBar';
 import Sidebar from './components/layout/Sidebar';
-import LoadingMessage from './components/common/LoadingMessage';
-import SuspenseWrapper from './components/common/SuspenseWrapper';
-import { Toaster } from 'sonner';
-import { ToastProvider as ModernToastProvider } from './components/ui/modern-toast';
+import { ToastProvider } from './components/ui/modern-toast';
 import { cn } from './lib/utils';
-import ProtectedRoute from './components/auth/ProtectedRoute';
-import { TooltipProvider } from './components/ui/tooltip';
-import { ThemeProvider } from 'next-themes';
-import { useTranslation } from 'react-i18next';
 import { useSession } from './integrations/supabase/auth';
+import { useTranslation } from 'react-i18next';
 import AccessibilityProvider from './components/AccessibilityProvider';
 import KeyboardNavigationHandler from './components/KeyboardNavigationHandler';
+import { TooltipProvider } from './components/ui/tooltip';
+import { ThemeProvider } from 'next-themes';
+import { ProtectedRoute } from './components/auth';
+import { SuspenseWrapper, LoadingMessage } from './components/common';
 
 function App() {
   useTranslation();
@@ -177,14 +175,7 @@ function App() {
         <SessionContextProvider supabaseClient={supabase}>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             <AccessibilityProvider>
-              <ModernToastProvider>
-                <Toaster 
-                  position="top-right" 
-                  toastOptions={{
-                    duration: 4000,
-                    className: 'text-sm',
-                  }}
-                />
+              <ToastProvider>
                 <BrowserRouter future={{
                   v7_startTransition: true,
                   v7_relativeSplatPath: true
@@ -193,7 +184,7 @@ function App() {
                     <AppLayout />
                   </TooltipProvider>
                 </BrowserRouter>
-              </ModernToastProvider>
+              </ToastProvider>
               {/* React Query DevTools has been disabled */}
             </AccessibilityProvider>
           </ThemeProvider>

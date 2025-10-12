@@ -53,7 +53,9 @@ const StandardizedDialog: React.FC<StandardizedDialogProps> = ({
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent className="glass rounded-2xl p-6 shadow-2xl border border-white/30 dark:border-gray-600/30 backdrop-blur-lg">
+      <AlertDialogContent
+        className="glass rounded-2xl p-6 shadow-2xl border border-white/30 dark:border-gray-600/30 backdrop-blur-lg"
+      >
         <AlertDialogHeader>
           <AlertDialogTitle className="text-gray-800 dark:text-gray-100 text-xl">
             {title}
@@ -63,8 +65,15 @@ const StandardizedDialog: React.FC<StandardizedDialogProps> = ({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter className="gap-3">
-          <AlertDialogCancel 
-            onClick={() => onOpenChange(false)}
+          <AlertDialogCancel
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              // Add a small delay to ensure dialog is fully closed before allowing new interactions
+              setTimeout(() => {
+                onOpenChange(false);
+              }, 10);
+            }}
             className={cn(
               "px-6 py-2 font-medium glass-advanced border border-white/20 hover:bg-white/10 dark:hover:bg-white/5 backdrop-blur-md",
               cancelClassName

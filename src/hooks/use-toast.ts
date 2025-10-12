@@ -1,15 +1,19 @@
 import * as React from "react";
+import { ToastContext, ToastState } from "@/components/ui/toast-context";
 
-import type { ToastActionElement, ToastProps } from "@/components/ui/toast";
+type ToastVariant = 'default' | 'success' | 'error' | 'warning' | 'info';
 
 const TOAST_LIMIT = 1;
 const TOAST_REMOVE_DELAY = 1000000;
 
-type ToasterToast = ToastProps & {
+type ToasterToast = {
   id: string;
   title?: React.ReactNode;
   description?: React.ReactNode;
-  action?: ToastActionElement;
+  action?: React.ReactElement;
+  variant?: ToastVariant;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 };
 
 const _actionTypes = {
@@ -134,9 +138,7 @@ function dispatch(action: Action) {
   });
 }
 
-type Toast = Omit<ToasterToast, "id">;
-
-function toast({ ...props }: Toast) {
+function toast({ ...props }: Omit<ToasterToast, "id">) {
   const id = genId();
 
   const update = (props: ToasterToast) =>
@@ -177,6 +179,23 @@ function useToast() {
       }
     };
   }, [state]);
+
+  // اضافه کردن متدهای modern toast برای سازگاری
+  const modernToastContext = React.useContext(ToastContext);
+
+  if (modernToastContext) {
+    const { addToast } = modernToastContext;
+
+    return {
+      ...state,
+      toast,
+      dismiss: (toastId?: string) => dispatch({ type: "DISMISS_TOAST", toastId }),
+      // اضافه کردن متدهای modern toast
+      addToast: (toastData: Omit<ToastState, 'id'>) => {
+        addToast(toastData);
+      }
+    };
+  }
 
   return {
     ...state,

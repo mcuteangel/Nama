@@ -47,7 +47,7 @@ export const useCustomFields = () => {
       toast({
         title: t('errors.load_custom_fields_failed'),
         description: ErrorManager.getErrorMessage(error),
-        variant: "destructive"
+        variant: "error"
       });
       setCustomFields([]);
     } finally {
@@ -79,7 +79,7 @@ export const useCustomFields = () => {
       toast({
         title: t('errors.delete_custom_field_failed'),
         description: ErrorManager.getErrorMessage(error),
-        variant: "destructive"
+        variant: "error"
       });
     } finally {
       setIsDeleting(false);

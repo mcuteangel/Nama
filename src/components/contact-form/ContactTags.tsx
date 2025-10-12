@@ -46,7 +46,7 @@ const ContactTags: React.FC<ContactTagsProps> = ({
           toast({
             title: 'خطا',
             description: 'بارگذاری تگ‌ها با مشکل مواجه شد',
-            variant: 'destructive'
+            variant: 'error'
           });
         } else {
           setAvailableTags(data || []);
@@ -68,7 +68,7 @@ const ContactTags: React.FC<ContactTagsProps> = ({
       toast({
         title: 'خطا',
         description: 'برای ایجاد تگ جدید باید وارد سیستم شوید',
-        variant: 'destructive'
+        variant: 'error'
       });
       return;
     }
@@ -84,7 +84,7 @@ const ContactTags: React.FC<ContactTagsProps> = ({
         toast({
           title: 'خطا',
           description: 'ایجاد تگ جدید با مشکل مواجه شد',
-          variant: 'destructive'
+          variant: 'error'
         });
         return;
       }
@@ -107,7 +107,7 @@ const ContactTags: React.FC<ContactTagsProps> = ({
       toast({
         title: 'خطا',
         description: 'ایجاد تگ جدید ناموفق بود',
-        variant: 'destructive'
+        variant: 'error'
       });
     }
   };

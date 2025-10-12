@@ -15,6 +15,7 @@ const AddCustomFieldTemplateDialog: React.FC<AddCustomFieldTemplateDialogProps> 
   const [isOpen, setIsOpen] = useState(false);
 
   const handleSuccess = () => {
+    console.log('AddCustomFieldTemplateDialog: handleSuccess called');
     setIsOpen(false);
     onTemplateAdded();
   };

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/integrations/supabase/auth";
 import { fetchWithCache, invalidateCache } from "@/utils/cache-helpers";
@@ -14,16 +14,16 @@ interface Group {
   contact_count?: number;
 }
 
-export const useGroups = () => {
+export const useGroups = (onSuccess?: (message: string) => void) => {
   const { session, isLoading: isSessionLoading } = useSession();
   const { t } = useTranslation();
   const [groups, setGroups] = useState<Group[]>([]);
 
   const onSuccessGroups = useCallback((result: { data: Group[] | null; error: string | null; fromCache: boolean }) => {
-    if (result && !result.fromCache) {
-      ErrorManager.notifyUser(t('groups.load_success'), 'success');
+    if (result && !result.fromCache && onSuccess) {
+      onSuccess(t('groups.load_success'));
     }
-  }, [t]);
+  }, [t, onSuccess]);
 
   const onErrorGroups = useCallback((err: unknown) => {
     ErrorManager.logError(err, { component: 'useGroups', action: 'fetchGroups' });
@@ -77,21 +77,42 @@ export const useGroups = () => {
     });
   }, [session, isSessionLoading, executeAsync, cacheKey]);
 
+  // Add a function to delete a group
+  const deleteGroup = useCallback(async (groupId: string) => {
+    if (!session?.user) return;
+
+    try {
+      const { error } = await supabase
+        .from("groups")
+        .delete()
+        .eq("id", groupId)
+        .eq("user_id", session.user.id);
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      // Refresh groups after deletion
+      invalidateCache(cacheKey);
+      await fetchGroups();
+    } catch (error) {
+      ErrorManager.logError(error, { component: 'useGroups', action: 'deleteGroup' });
+      throw error;
+    }
+  }, [session, cacheKey, fetchGroups]);
+
   // Add a function to refresh groups when needed
   const refreshGroups = useCallback(() => {
     invalidateCache(cacheKey);
     fetchGroups();
   }, [cacheKey, fetchGroups]);
 
-  useEffect(() => {
-    fetchGroups();
-  }, [fetchGroups]);
-
   // Memoize the return value to prevent unnecessary re-renders
   return useMemo(() => ({
     groups,
     loadingGroups,
     fetchGroups,
-    refreshGroups
-  }), [groups, loadingGroups, fetchGroups, refreshGroups]);
+    refreshGroups,
+    deleteGroup
+  }), [groups, loadingGroups, fetchGroups, refreshGroups, deleteGroup]);
 };

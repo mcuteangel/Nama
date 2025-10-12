@@ -1,10 +1,12 @@
-import React, { useMemo } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import { ModernGrid } from "@/components/ui/modern-grid";
 import { Users } from "lucide-react";
 import EmptyState from '../common/EmptyState';
 import GroupItem from './GroupItem';
 import GroupListItem from './GroupListItem';
 import { useTranslation } from 'react-i18next';
+import StandardizedDeleteDialog from '../common/StandardizedDeleteDialog';
+import { useGroups } from "@/hooks/use-groups";
 
 interface Group {
   id: string;
@@ -38,6 +40,36 @@ const GroupsList: React.FC<GroupsListProps> = ({
   groups
 }) => {
   const { t } = useTranslation();
+  const { deleteGroup } = useGroups();
+
+  // State for delete dialog
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [groupToDelete, setGroupToDelete] = useState<{ id: string; name: string } | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  // Handler to open delete dialog
+  const handleDeleteClick = useCallback((groupId: string, groupName: string) => {
+    setGroupToDelete({ id: groupId, name: groupName });
+    setDeleteDialogOpen(true);
+  }, []);
+
+  // Handler to confirm delete
+  const handleDeleteConfirm = useCallback(async () => {
+    if (!groupToDelete) return;
+
+    setIsDeleting(true);
+    try {
+      await deleteGroup(groupToDelete.id);
+      setDeleteDialogOpen(false);
+      setGroupToDelete(null);
+    } catch (error) {
+      console.error('Failed to delete group:', error);
+    } finally {
+      setIsDeleting(false);
+    }
+  }, [groupToDelete, deleteGroup]);
+
+  // Handler to cancel delete
 
   // Filter and sort groups based on props
   const filteredAndSortedGroups = useMemo(() => {
@@ -85,6 +117,7 @@ const GroupsList: React.FC<GroupsListProps> = ({
             <GroupListItem
               key={group.id}
               group={group}
+              onDelete={handleDeleteClick}
             />
           ))}
         </div>
@@ -102,16 +135,28 @@ const GroupsList: React.FC<GroupsListProps> = ({
           <GroupItem
             key={group.id}
             group={group}
+            onDelete={handleDeleteClick}
           />
         ))}
       </ModernGrid>
     );
-  }, [filteredAndSortedGroups, displayMode, t]);
+  }, [filteredAndSortedGroups, displayMode, t, handleDeleteClick]);
 
   return (
-    <div className="space-y-2 sm:space-y-4 w-full px-0">
-      {groupsListContent}
-    </div>
+    <>
+      <div className="space-y-2 sm:space-y-4 w-full px-0">
+        {groupsListContent}
+      </div>
+
+      <StandardizedDeleteDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onConfirm={handleDeleteConfirm}
+        title={t('groups.delete_confirmation_title')}
+        description={t('groups.delete_confirmation_description', { name: groupToDelete?.name })}
+        isDeleting={isDeleting}
+      />
+    </>
   );
 };
 

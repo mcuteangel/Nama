@@ -118,6 +118,8 @@ const AlertDialogCancel = React.forwardRef<
 ));
 AlertDialogCancel.displayName = AlertDialogPrimitive.Cancel.displayName;
 
+const AlertDialogProvider = AlertDialogPrimitive.Root; // Alias for consistency
+
 export {
   AlertDialog,
   AlertDialogPortal,
@@ -130,4 +132,5 @@ export {
   AlertDialogDescription,
   AlertDialogAction,
   AlertDialogCancel,
+  AlertDialogProvider,
 };

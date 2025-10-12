@@ -1,17 +1,6 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { GlassButton } from "@/components/ui/glass-button";
-import {
-  ModernAlertDialog,
-  ModernAlertDialogAction,
-  ModernAlertDialogCancel,
-  ModernAlertDialogContent,
-  ModernAlertDialogDescription,
-  ModernAlertDialogFooter,
-  ModernAlertDialogHeader,
-  ModernAlertDialogTitle,
-  ModernAlertDialogTrigger
-} from "@/components/ui/modern-alert-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Edit, Trash2, Phone, Mail, MapPin, Building, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -24,6 +13,7 @@ import { GestureCallbacks } from '../TouchGestureHandler.types';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Contact } from './ContactItem';
 import { designTokens } from '@/lib/design-tokens';
+import StandardizedDeleteDialog from './StandardizedDeleteDialog';
 
 interface ContactListItemProps {
   contact: Contact;
@@ -37,12 +27,13 @@ export const ContactListItem = React.memo<ContactListItemProps>(({
   contact,
   onContactDeleted,
   onContactEdited,
-  style,
   className = ""
 }) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const isMobile = useIsMobile();
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isDialogClosing, setIsDialogClosing] = useState(false);
 
   const onSuccessDelete = useCallback(() => {
     ErrorManager.notifyUser(t('contact_list.contact_deleted_success', 'Contact deleted successfully.'), 'success');
@@ -171,7 +162,9 @@ export const ContactListItem = React.memo<ContactListItemProps>(({
         boxShadow: designTokens.shadows.glass,
         padding: designTokens.spacing[4],
         transition: `all ${designTokens.transitions.duration.normal} ${designTokens.transitions.easing.easeOut}`,
-        width: '100%'
+        width: '100%',
+        pointerEvents: isDeleteDialogOpen || isDialogClosing ? 'none' : 'auto',
+        userSelect: isDeleteDialogOpen || isDialogClosing ? 'none' : 'auto'
       }}
     >
       {/* Background gradient overlay */}
@@ -321,7 +314,7 @@ export const ContactListItem = React.memo<ContactListItemProps>(({
           </div>
         </div>
 
-        <div className="flex gap-4 flex-shrink-0">
+        <div className="flex gap-4 flex-shrink-0" style={{ pointerEvents: 'auto' }}>
           <GlassButton
             variant="ghost"
             size="icon"
@@ -338,100 +331,57 @@ export const ContactListItem = React.memo<ContactListItemProps>(({
             <Edit size={24} style={{ color: designTokens.colors.primary[700] }} />
           </GlassButton>
 
-          <ModernAlertDialog>
-            <ModernAlertDialogTrigger asChild>
-              <GlassButton
-                variant="ghost"
-                size="icon"
-                className="opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110 rounded-2xl"
-                style={{
-                  background: 'rgba(239, 68, 68, 0.15)',
-                  border: `2px solid ${designTokens.colors.error[300]}`,
-                  width: '44px',
-                  height: '44px',
-                  backdropFilter: 'blur(10px)'
-                }}
-                onClick={(e) => e.stopPropagation()}
-                disabled={isDeleting}
-              >
-                {isDeleting ? (
-                  <LoadingSpinner size={24} />
-                ) : (
-                  <Trash2 size={24} style={{ color: designTokens.colors.error[700] }} />
-                )}
-              </GlassButton>
-            </ModernAlertDialogTrigger>
-            <ModernAlertDialogContent
-              className="glass rounded-3xl"
-              style={{
-                background: designTokens.colors.glass.background,
-                border: `1px solid ${designTokens.colors.glass.border}`,
-                backdropFilter: 'blur(25px)',
-                boxShadow: designTokens.shadows.glass3d,
-                padding: designTokens.spacing[8]
-              }}
-            >
-              <ModernAlertDialogHeader>
-                <ModernAlertDialogTitle
-                  style={{
-                    color: designTokens.colors.gray[800],
-                    fontSize: designTokens.typography.sizes['2xl'],
-                    fontWeight: designTokens.typography.weights.bold,
-                    fontFamily: designTokens.typography.fonts.primary
-                  }}
-                >
-                  {t('contact_list.confirm_delete_title', 'Are you sure you want to delete this contact?')}
-                </ModernAlertDialogTitle>
-                <ModernAlertDialogDescription
-                  style={{
-                    color: designTokens.colors.gray[600],
-                    fontSize: designTokens.typography.sizes.lg,
-                    marginTop: designTokens.spacing[3]
-                  }}
-                >
-                  {t('contact_list.confirm_delete_description', 'This action cannot be undone. This contact will be permanently deleted.')}
-                </ModernAlertDialogDescription>
-              </ModernAlertDialogHeader>
-              <ModernAlertDialogFooter style={{ gap: designTokens.spacing[4], marginTop: designTokens.spacing[8] }}>
-                <ModernAlertDialogCancel
-                  style={{
-                    padding: `${designTokens.spacing[3]} ${designTokens.spacing[6]}`,
-                    borderRadius: designTokens.borderRadius.xl,
-                    background: designTokens.colors.gray[200],
-                    color: designTokens.colors.gray[800],
-                    fontWeight: designTokens.typography.weights.bold,
-                    fontSize: designTokens.typography.sizes.base,
-                    border: 'none',
-                    transition: `all ${designTokens.transitions.duration.normal} ${designTokens.transitions.easing.easeOut}`
-                  }}
-                >
-                  {t('common.cancel', 'Cancel')}
-                </ModernAlertDialogCancel>
-                <ModernAlertDialogAction
-                  onClick={handleDelete}
-                  disabled={isDeleting}
-                  style={{
-                    padding: `${designTokens.spacing[3]} ${designTokens.spacing[6]}`,
-                    borderRadius: designTokens.borderRadius.xl,
-                    background: designTokens.colors.error[600],
-                    color: 'white',
-                    fontWeight: designTokens.typography.weights.bold,
-                    fontSize: designTokens.typography.sizes.base,
-                    border: 'none',
-                    transition: `all ${designTokens.transitions.duration.normal} ${designTokens.transitions.easing.easeOut}`
-                  }}
-                >
-                  {isDeleting && <LoadingSpinner size={20} className="me-3" />}
-                  {t('common.delete', 'Delete')}
-                </ModernAlertDialogAction>
-              </ModernAlertDialogFooter>
-            </ModernAlertDialogContent>
-          </ModernAlertDialog>
+          <GlassButton
+            variant="ghost"
+            size="icon"
+            className="opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110 rounded-2xl"
+            style={{
+              background: 'rgba(239, 68, 68, 0.15)',
+              border: `2px solid ${designTokens.colors.error[300]}`,
+              width: '44px',
+              height: '44px',
+              backdropFilter: 'blur(10px)'
+            }}
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              setIsDeleteDialogOpen(true);
+            }}
+            disabled={isDeleting || isDialogClosing}
+          >
+            {isDeleting ? (
+              <LoadingSpinner size={24} />
+            ) : (
+              <Trash2 size={24} style={{ color: designTokens.colors.error[700] }} />
+            )}
+          </GlassButton>
+
+          <StandardizedDeleteDialog
+            open={isDeleteDialogOpen}
+            onOpenChange={(open) => {
+              if (!open) {
+                // Set closing flag to prevent any immediate re-opening
+                setIsDialogClosing(true);
+                setIsDeleteDialogOpen(false);
+
+                // Remove the flag after a short delay
+                setTimeout(() => {
+                  setIsDialogClosing(false);
+                }, 50); // Increased delay to match dialog delay
+              } else {
+                setIsDeleteDialogOpen(true);
+                setIsDialogClosing(false);
+              }
+            }}
+            onConfirm={handleDelete}
+            title={t('contact_list.confirm_delete_title', 'آیا مطمئن هستید که می‌خواهید این مخاطب را حذف کنید؟')}
+            description={t('contact_list.confirm_delete_description', 'این عمل غیرقابل برگشت است. این مخاطب برای همیشه حذف خواهد شد.')}
+            isDeleting={isDeleting}
+          />
         </div>
       </div>
     </div>
   ), [
-    style,
     className,
     handleContactClick,
     contact?.avatar_url,
@@ -447,7 +397,10 @@ export const ContactListItem = React.memo<ContactListItemProps>(({
     handleEditClick,
     isDeleting,
     t,
-    handleDelete
+    handleDelete,
+    isDeleteDialogOpen,
+    isDialogClosing,
+    displayGender
   ]);
 
   return (

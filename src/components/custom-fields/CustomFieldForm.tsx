@@ -19,6 +19,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import useAppSettings from '@/hooks/use-app-settings';
 import { ModernCard, ModernCardContent, ModernCardFooter, ModernCardHeader, ModernCardTitle } from '@/components/ui/modern-card';
+import { useSession } from '@/integrations/supabase/auth';
 import { Label } from '@/components/ui/label';
 import { ModernInput } from '@/components/ui/modern-input';
 import { ModernTextarea } from '@/components/ui/modern-textarea';
@@ -27,6 +28,7 @@ import { GlassButton } from '@/components/ui/glass-button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import CancelButton from '@/components/common/CancelButton';
 import { Card, CardContent } from '@/components/ui/card';
+import { CustomFieldTemplateService } from '@/services/custom-field-template-service';
 
 // Types
 type TemplateType = 'text' | 'number' | 'date' | 'list' | 'checklist';
@@ -35,10 +37,12 @@ interface CustomFieldFormProps {
   onSuccess?: () => void;
   onCancel?: () => void;
   initialData?: {
+    id?: string;
     name: string;
     type: TemplateType;
     description?: string;
     options?: string[];
+    required?: boolean;
   };
 }
 
@@ -56,6 +60,7 @@ const DRAFT_KEY = 'custom_field_draft';
 const CustomFieldForm: React.FC<CustomFieldFormProps> = ({ initialData, onSuccess, onCancel }) => {
   const { t } = useTranslation();
   const { settings } = useAppSettings();
+  const { session } = useSession();
   
   // Form state
   const [formData, setFormData] = useState<FormData>(() => {
@@ -131,11 +136,16 @@ const CustomFieldForm: React.FC<CustomFieldFormProps> = ({ initialData, onSucces
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
+    console.log(`handleInputChange: ${name} changed to:`, value);
     if (!isDirty) setIsDirty(true);
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setFormData(prev => {
+      const newFormData = {
+        ...prev,
+        [name]: value
+      };
+      console.log('Updated formData:', newFormData);
+      return newFormData;
+    });
   };
 
 
@@ -218,23 +228,51 @@ const CustomFieldForm: React.FC<CustomFieldFormProps> = ({ initialData, onSucces
     setError(null);
     
     try {
+      // Check if user is authenticated
+      if (!session?.user) {
+        console.error('User not authenticated');
+        setError('auth_required');
+        return;
+      }
+
       // Prepare the data to be sent to the API
+      console.log('FormData before payload creation:', formData);
+      console.log('formData.description:', formData.description);
+      console.log('formData.description.trim():', formData.description?.trim());
+
       const payload = {
         name: formData.name.trim(),
         type: formData.type,
-        description: formData.description.trim() || undefined,
-        options: formData.type === 'list' ? formData.options?.map(opt => opt.trim()) : undefined
+        description: formData.description?.trim() || undefined,
+        options: (formData.type === 'list' || formData.type === 'checklist') ? formData.options?.filter(opt => opt.trim()).map(opt => opt.trim()) : undefined,
+        required: formData.required || false,
       };
-      
+
+      console.log('Final payload:', payload);
       console.log('Submitting form:', payload);
-      
-      // Simulate API call with a timeout
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+
+      // Call the actual service
+      let res;
+      if (initialData && initialData.id) {
+        console.log('Updating existing template');
+        res = await CustomFieldTemplateService.updateCustomFieldTemplate(initialData.id, payload);
+      } else {
+        console.log('Creating new template');
+        res = await CustomFieldTemplateService.addCustomFieldTemplate(payload);
+      }
+
+      if (res.error) {
+        console.error('Service call returned error:', res.error);
+        setError('submission_error');
+        return;
+      }
+
+      console.log('Service call successful:', res.data);
+
       // پاک کردن پیش‌نویس و فراخوانی کالبک موفقیت
       clearDraft();
       if (onSuccess) onSuccess();
-      
+
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : t('common.errors.generic');
       setError('submission_error');
@@ -249,8 +287,8 @@ const CustomFieldForm: React.FC<CustomFieldFormProps> = ({ initialData, onSucces
   // These functions are used in the form but marked as unused by the linter
   
   // Prevent unused variable warnings in development
+  // eslint-disable-next-line no-empty
   if (process.env.NODE_ENV !== 'production') {
-     
   }
 
   return (

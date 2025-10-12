@@ -3,7 +3,6 @@
 import { useState, useCallback } from "react";
 import { GlassButton } from "@/components/ui/glass-button";
 import { Dialog } from "@/components/ui/dialog";
-import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Trash2, Edit, ClipboardList } from "lucide-react";
 import { CustomFieldTemplateService } from "@/services/custom-field-template-service"; // Updated import
 import { useErrorHandler } from "@/hooks/use-error-handler";
@@ -16,11 +15,11 @@ import AddCustomFieldTemplateDialog from "./AddCustomFieldTemplateDialog";
 import { fetchWithCache, invalidateCache } from "@/utils/cache-helpers";
 import FormDialogWrapper from "./common/FormDialogWrapper";
 import LoadingMessage from "./common/LoadingMessage";
-import CancelButton from "./common/CancelButton";
 import EmptyState from './common/EmptyState';
 import LoadingSpinner from './common/LoadingSpinner';
 import { useToast } from "@/components/ui/use-toast";
 import { useTranslation } from 'react-i18next';
+import StandardizedDeleteDialog from './common/StandardizedDeleteDialog';
 
 type TemplateType = 'text' | 'number' | 'date' | 'list';
 
@@ -40,6 +39,9 @@ export function GlobalCustomFieldsManagement() {
   const [customFields, setCustomFields] = useState<TemplateViewModel[]>([]);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingField, setEditingField] = useState<CustomFieldTemplate | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [deletingFieldId, setDeletingFieldId] = useState<string | null>(null);
+  const [isDialogClosing, setIsDialogClosing] = useState(false);
 
   const onSuccessFetchTemplates = useCallback((result: { data: CustomFieldTemplate[] | null; error: string | null; fromCache: boolean }) => {
     setCustomFields(result.data!.map((t: CustomFieldTemplate) => ({
@@ -71,6 +73,7 @@ export function GlobalCustomFieldsManagement() {
   });
 
   const loadTemplates = useCallback(async () => {
+    console.log('GlobalCustomFieldsManagement: loadTemplates called');
     if (isSessionLoading || !session?.user) {
       setCustomFields([]);
       return;
@@ -132,6 +135,18 @@ export function GlobalCustomFieldsManagement() {
         throw new Error(res.error || "خطا در حذف قالب فیلد سفارشی");
       }
     });
+    setIsDeleteDialogOpen(false);
+    setDeletingFieldId(null);
+    setIsDialogClosing(false);
+    // Refresh the templates list after successful deletion
+    loadTemplates();
+  };
+
+  const handleDeleteClick = (id: string) => {
+    if (isDialogClosing) return; // Prevent opening if dialog is closing
+    setDeletingFieldId(id);
+    setIsDeleteDialogOpen(true);
+    setIsDialogClosing(false);
   };
 
   const handleEditClick = (field: CustomFieldTemplate) => {
@@ -209,33 +224,41 @@ export function GlobalCustomFieldsManagement() {
                       <Edit size={16} />
                     </GlassButton>
 
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <GlassButton variant="glass" size="sm" className="text-red-600 hover:bg-red-100 dark:text-red-400 dark:hover:bg-gray-600/50 transition-all duration-200" disabled={isOperationLoading}>
-                          {isOperationLoading ? <LoadingSpinner size={16} /> : <Trash2 size={16} />}
-                        </GlassButton>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent className="glass rounded-xl p-6">
-                        <AlertDialogHeader>
-                          <AlertDialogTitle className="text-gray-800 dark:text-gray-100">آیا از حذف این فیلد سفارشی مطمئن هستید؟</AlertDialogTitle>
-                          <AlertDialogDescription className="text-gray-600 dark:text-gray-300">
-                            این عمل قابل بازگشت نیست. این قالب فیلد برای همیشه حذف خواهد شد. (داده‌های موجود در مخاطبین حذف نمی‌شوند)
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <CancelButton onClick={() => {}} text="لغو" />
-                          <GlassButton 
-                            variant="glass"
-                            onClick={() => handleDeleteField(field.id)} 
-                            className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold" 
-                            disabled={isOperationLoading}
-                          >
-                            {isOperationLoading && <LoadingSpinner size={16} className="me-2" />}
-                            حذف
-                          </GlassButton>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
+                    <GlassButton
+                      variant="glass"
+                      size="sm"
+                      onClick={() => handleDeleteClick(field.id)}
+                      className="text-red-600 hover:bg-red-100 dark:text-red-400 dark:hover:bg-gray-600/50 transition-all duration-200"
+                      disabled={isOperationLoading || isDialogClosing}
+                    >
+                      {isOperationLoading ? <LoadingSpinner size={16} /> : <Trash2 size={16} />}
+                    </GlassButton>
+
+                    <StandardizedDeleteDialog
+                      key={`delete-${field.id}`}
+                      open={isDeleteDialogOpen && deletingFieldId === field.id}
+                      onOpenChange={(open) => {
+                        if (!open) {
+                          // Set closing flag to prevent any immediate re-opening
+                          setIsDialogClosing(true);
+                          setIsDeleteDialogOpen(false);
+                          setDeletingFieldId(null);
+
+                          // Remove the flag after a short delay
+                          setTimeout(() => {
+                            setIsDialogClosing(false);
+                          }, 50); // Increased delay to match dialog delay
+                        } else {
+                          setIsDeleteDialogOpen(true);
+                          setDeletingFieldId(field.id);
+                          setIsDialogClosing(false);
+                        }
+                      }}
+                      onConfirm={() => handleDeleteField(field.id)}
+                      title="آیا از حذف این فیلد سفارشی مطمئن هستید؟"
+                      description="این عمل قابل بازگشت نیست. این قالب فیلد برای همیشه حذف خواهد شد. (داده‌های موجود در مخاطبین حذف نمی‌شوند)"
+                      isDeleting={isOperationLoading && deletingFieldId === field.id}
+                    />
                   </div>
                 </div>
               </div>
