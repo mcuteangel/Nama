@@ -198,7 +198,7 @@ const CustomFieldCard: React.FC<CustomFieldCardProps> = ({
                 variant="outline"
                 className="text-xs font-medium px-2 py-1 bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800"
               >
-                {isRTL ? 'الزامی' : 'Required'}
+                {isRTL ? t('custom_field_template.required_badge') : t('custom_field_template.required_badge_en')}
               </Badge>
             )}
           </div>
@@ -212,8 +212,8 @@ const CustomFieldCard: React.FC<CustomFieldCardProps> = ({
                   </div>
                   <p className="text-sm font-bold text-gray-600 dark:text-gray-400">
                     {field.type === 'checklist' 
-                      ? isRTL ? 'گزینه‌های چک‌لیست' : 'Checklist Options'
-                      : isRTL ? 'گزینه‌های لیست' : 'List Options'}
+                      ? isRTL ? t('custom_field_template.checklist_options') : t('custom_field_template.checklist_options_en')
+                      : isRTL ? t('custom_field_template.list_options') : t('custom_field_template.list_options_en')}
                   </p>
                 </div>
                 <div className="space-y-2">
@@ -246,8 +246,8 @@ const CustomFieldCard: React.FC<CustomFieldCardProps> = ({
                   {field.options.length > 3 && (
                     <div className="text-xs text-gray-500 dark:text-gray-400 text-center pt-1">
                       {isRTL 
-                        ? `+${field.options.length - 3} گزینه دیگر`
-                        : `+${field.options.length - 3} more options`}
+                        ? t('custom_field_template.more_options', { count: field.options.length - 3 })
+                        : t('custom_field_template.more_options_en', { count: field.options.length - 3 })}
                     </div>
                   )}
                 </div>

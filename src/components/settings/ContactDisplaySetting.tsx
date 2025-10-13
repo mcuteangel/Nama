@@ -23,15 +23,15 @@ const ContactDisplaySetting = () => {
   const displayModes = useMemo<DisplayModeOption[]>(() => [
     {
       value: 'grid',
-      label: t('settings.display_mode_grid', 'Grid View'),
+      label: t('settings.display_mode_grid'),
       icon: <LayoutGrid className="h-4 w-4" aria-hidden="true" />,
-      description: t('settings.display_mode_grid_description', 'Display contacts in a grid layout')
+      description: t('settings.display_mode_grid_description')
     },
     {
       value: 'list',
-      label: t('settings.display_mode_list', 'List View'),
+      label: t('settings.display_mode_list'),
       icon: <List className="h-4 w-4" aria-hidden="true" />,
-      description: t('settings.display_mode_list_description', 'Display contacts in a list layout')
+      description: t('settings.display_mode_list_description')
     }
   ], [t]);
 
@@ -58,7 +58,7 @@ const ContactDisplaySetting = () => {
         "hover:shadow-lg hover:shadow-cyan-100/30 dark:hover:shadow-cyan-900/20"
       )}
       role="region"
-      aria-label={t('settings.display_settings', 'Display Settings')}
+      aria-label={t('settings.display_settings')}
     >
       <div className="space-y-3">
         <Label 
@@ -71,7 +71,7 @@ const ContactDisplaySetting = () => {
           >
             <LayoutGrid className="h-4 w-4 text-cyan-600 dark:text-cyan-400" />
           </div>
-          {t('settings.default_contact_display_mode', 'Default Contact Display')}
+          {t('settings.default_contact_display_mode')}
         </Label>
         
         <ModernSelect 
@@ -88,7 +88,7 @@ const ContactDisplaySetting = () => {
               "border border-transparent hover:border-white/10",
               "focus:ring-2 focus:ring-cyan-500/50 focus:ring-offset-2 focus:ring-offset-white/10"
             )}
-            aria-label={t('settings.select_display_mode', 'Select display mode')}
+            aria-label={t('settings.select_display_mode')}
           >
             <ModernSelectValue>
               <span className="flex items-center gap-2">
@@ -167,8 +167,7 @@ const ContactDisplaySetting = () => {
           id="display-mode-description"
         >
           {currentMode.description || t(
-            'settings.default_contact_display_mode_description',
-            'Choose how contacts are displayed by default'
+            'settings.default_contact_display_mode_description'
           )}
         </p>
       </div>

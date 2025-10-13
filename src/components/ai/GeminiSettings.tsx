@@ -306,7 +306,7 @@ const GeminiSettings: React.FC = React.memo(() => {
                t('settings.not_configured')}
             </div>
             <div className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-              وضعیت اتصال
+              {t('settings.connection_status')}
             </div>
           </div>
 

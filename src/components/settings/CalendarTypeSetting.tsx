@@ -22,8 +22,8 @@ const CalendarTypeSetting: React.FC = () => {
 
   const calendarTypes = useMemo<CalendarOption[]>(
     () => [
-      { value: 'jalali' as const, label: t('settings.jalali', 'شمسی (جلالی)'), icon: '🇮🇷' },
-      { value: 'gregorian' as const, label: t('settings.gregorian', 'میلادی'), icon: '🇬🇧' }
+      { value: 'jalali' as const, label: t('settings.jalali'), icon: '🇮🇷' },
+      { value: 'gregorian' as const, label: t('settings.gregorian'), icon: '🇬🇧' }
     ],
     [t]
   );
@@ -44,7 +44,7 @@ const CalendarTypeSetting: React.FC = () => {
           <div className="p-1.5 rounded-full bg-gray-100 dark:bg-gray-700/50">
             <Loader2 className="h-4 w-4 text-gray-400 dark:text-gray-500 animate-spin" />
           </div>
-          <span className="font-medium">{t('settings.loading', 'در حال بارگذاری...')}</span>
+          <span className="font-medium">{t('settings.loading')}</span>
         </div>
       </div>
     );
@@ -54,7 +54,7 @@ const CalendarTypeSetting: React.FC = () => {
     <div 
       className="group flex flex-col gap-3 p-4 rounded-lg bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 border border-green-200/50 dark:border-green-800/50 transition-all duration-300 hover:shadow-md"
       role="region"
-      aria-label={t('settings.calendar_type', 'نوع تقویم')}
+      aria-label={t('settings.calendar_type')}
     >
       <Label 
         htmlFor="calendar-type" 
@@ -66,7 +66,7 @@ const CalendarTypeSetting: React.FC = () => {
         >
           <Calendar className="h-4 w-4 text-green-600 dark:text-green-400" aria-hidden="true" />
         </div>
-        {t('settings.calendar_type', 'نوع تقویم')}
+        {t('settings.calendar_type')}
       </Label>
       
       <ModernSelect
@@ -82,7 +82,7 @@ const CalendarTypeSetting: React.FC = () => {
           aria-busy={isLoading}
           aria-live="polite"
         >
-          <ModernSelectValue placeholder={t('settings.calendar_type', 'نوع تقویم')}>
+          <ModernSelectValue placeholder={t('settings.calendar_type')}>
             <span className="flex items-center gap-2">
               <span className="text-lg" aria-hidden="true">{currentCalendar.icon}</span>
               <span className="font-medium">{currentCalendar.label}</span>
@@ -108,7 +108,7 @@ const CalendarTypeSetting: React.FC = () => {
       </ModernSelect>
       
       <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-        {t('settings.calendar_hint', 'تغییر نوع تقویم بر نمایش تاریخ‌ها در برنامه تأثیر می‌گذارد')}
+        {t('settings.calendar_hint')}
       </p>
     </div>
   );

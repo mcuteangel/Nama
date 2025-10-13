@@ -34,7 +34,7 @@ export const ContactDetailAddress: React.FC<ContactDetailAddressProps> = ({ cont
               <div className="flex items-center gap-2">
                 <Home size={16} className="text-slate-500" />
                 <div className="bg-slate-50/40 dark:bg-slate-800/20 backdrop-blur-sm p-3 rounded-xl shadow-md border border-slate-200/50 dark:border-slate-700/50">
-                  <span className="text-sm text-slate-600 dark:text-slate-400">{t('contact.street')}:</span>
+                  <span className="text-sm text-slate-600 dark:text-slate-400">{t('contact_detail.street_alley')}:</span>
                 </div>
               </div>
               <span className="font-medium text-slate-900 dark:text-slate-100">{contact.street}</span>
@@ -65,8 +65,8 @@ export const ContactDetailAddress: React.FC<ContactDetailAddressProps> = ({ cont
               <div className="flex items-center gap-2">
                 <MapPin size={16} className="text-slate-500" />
                 <div className="bg-slate-50/40 dark:bg-slate-800/20 backdrop-blur-sm p-3 rounded-xl shadow-md border border-slate-200/50 dark:border-slate-700/50">
-                  <span className="text-sm text-slate-600 dark:text-slate-400">{t('contact.country')}:</span>
-                </div>
+                  <span className="text-sm text-slate-600 dark:text-slate-400">{t('contact_detail.country')}:</span>
+                  </div>
               </div>
               <span className="font-medium text-slate-900 dark:text-slate-100">{contact.country}</span>
             </div>

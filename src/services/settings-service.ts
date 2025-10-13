@@ -26,7 +26,7 @@ export const SettingsService = {
         throw new Error(error.message);
       }
       return { data: data || { gemini_api_key: null, gemini_model: null }, error: null };
-    } catch (err: any) {
+    } catch (err: unknown) {
       ErrorManager.logError(err, { context: 'SettingsService.getUserSettings', userId });
       return { data: null, error: ErrorManager.getErrorMessage(err) };
     }
@@ -55,7 +55,7 @@ export const SettingsService = {
         throw new Error(error.message);
       }
       return { success: true, error: null };
-    } catch (err: any) {
+    } catch (err: unknown) {
       ErrorManager.logError(err, { context: 'SettingsService.updateUserSettings', input });
       return { success: false, error: ErrorManager.getErrorMessage(err) };
     }
@@ -97,7 +97,7 @@ export const SettingsService = {
       const responseData = await response.json();
 
       return { data: responseData.models as GeminiModel[], error: null };
-    } catch (err: any) {
+    } catch (err: unknown) {
       ErrorManager.logError(err, { context: 'SettingsService.listGeminiModels' });
       return { data: null, error: ErrorManager.getErrorMessage(err) };
     }
@@ -140,12 +140,12 @@ export const SettingsService = {
         success: responseData.success,
         message: responseData.message,
       };
-    } catch (err: any) {
+    } catch (err: unknown) {
       ErrorManager.logError(err, { context: 'SettingsService.testGeminiConnection', apiKey: '[HIDDEN]', model });
       return {
         success: false,
         message: ErrorManager.getErrorMessage(err),
-        error: err.message,
+        error: err instanceof Error ? err.message : String(err),
       };
     }
   },

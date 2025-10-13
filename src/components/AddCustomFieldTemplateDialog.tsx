@@ -40,8 +40,8 @@ const AddCustomFieldTemplateDialog: React.FC<AddCustomFieldTemplateDialogProps> 
         </GlassButton>
       </DialogTrigger>
       <FormDialogWrapper 
-        title={t('custom_field_template.add_title', 'Add Custom Field Template')}
-        description={t('custom_field_template.add_description', 'Form for creating a new custom field template')}
+        title={t('custom_field_template.add_title')}
+        description={t('custom_field_template.add_description')}
       >
         <CustomFieldTemplateForm
           onSuccess={handleSuccess}

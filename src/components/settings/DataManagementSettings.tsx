@@ -167,7 +167,7 @@ const DataManagementSettings: React.FC<DataManagementSettingsProps> = ({ onImpor
                         onChange={(e) => setExportSettings(prev => ({ ...prev, includeGroups: e.target.checked }))}
                         className="rounded"
                       />
-                      شامل گروه‌ها
+                      {t('common.include_groups')}
                     </label>
                     <label className="flex items-center gap-2">
                       <input
@@ -176,7 +176,7 @@ const DataManagementSettings: React.FC<DataManagementSettingsProps> = ({ onImpor
                         onChange={(e) => setExportSettings(prev => ({ ...prev, includeCustomFields: e.target.checked }))}
                         className="rounded"
                       />
-                      شامل فیلدهای سفارشی
+                      {t('common.include_custom_fields')}
                     </label>
                   </div>
                   <ModernSelect
@@ -184,12 +184,12 @@ const DataManagementSettings: React.FC<DataManagementSettingsProps> = ({ onImpor
                     onValueChange={(value) => setExportSettings(prev => ({ ...prev, format: value }))}
                   >
                     <ModernSelectTrigger className="w-full text-sm">
-                      <ModernSelectValue placeholder="فرمت فایل" />
+                      <ModernSelectValue placeholder={t('common.file_format')} />
                     </ModernSelectTrigger>
                     <ModernSelectContent>
-                      <ModernSelectItem value="csv">CSV</ModernSelectItem>
-                      <ModernSelectItem value="xlsx">Excel</ModernSelectItem>
-                      <ModernSelectItem value="json">JSON</ModernSelectItem>
+                      <ModernSelectItem value="csv">{t('common.csv_format')}</ModernSelectItem>
+                      <ModernSelectItem value="xlsx">{t('common.excel_format')}</ModernSelectItem>
+                      <ModernSelectItem value="json">{t('common.json_format')}</ModernSelectItem>
                     </ModernSelectContent>
                   </ModernSelect>
                 </div>
@@ -210,26 +210,26 @@ const DataManagementSettings: React.FC<DataManagementSettingsProps> = ({ onImpor
         {/* Export History */}
         {exportHistory.length > 0 && (
           <SettingsCard
-            title={t('settings.export_history', 'تاریخچه صادرات')}
-            description={t('settings.recent_exports', 'فایل‌های اخیر صادر شده')}
+            title={t('settings.export_history')}
+            description={t('settings.recent_exports')}
             icon={<History size={16} />}
             gradient="purple"
           >
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium">
-                  {t('settings.total_exports', 'کل فایل‌های صادر شده: {{count}}', { count: exportHistory.length })}
+                  {t('settings.total_exports', { count: exportHistory.length })}
                 </span>
                 <GlassButton
                   variant="outline"
                   size="sm"
                   onClick={clearExportHistory}
                   className="group relative overflow-hidden rounded-2xl font-medium text-xs transition-all duration-300 hover:scale-105 active:scale-95 shadow-2xl hover:shadow-3xl bg-gradient-to-r from-red-50 to-pink-50 dark:from-red-900/20 dark:to-pink-900/20 border-2 border-red-200/50 dark:border-red-700/50 hover:border-red-300 dark:hover:border-red-600 text-red-700 dark:text-red-300 hover:text-red-800 dark:hover:text-red-200 backdrop-blur-sm before:absolute before:inset-0 before:bg-gradient-to-r before:from-white/20 before:to-transparent before:opacity-0 hover:before:opacity-100 before:transition-opacity before:duration-300"
-                  aria-label={t('settings.clear_history', 'پاک کردن تاریخچه صادرات')}
+                  aria-label={t('settings.clear_history')}
                 >
                   <div className="relative z-10 flex items-center gap-1">
                     <Trash2 size={12} />
-                    پاک کردن تاریخچه صادرات
+                    {t('settings.clear_history')}
                   </div>
                 </GlassButton>
               </div>
@@ -260,8 +260,8 @@ const DataManagementSettings: React.FC<DataManagementSettingsProps> = ({ onImpor
                     <div className="flex items-center gap-2">
                       <span className={`text-xs ${item.status === 'success' ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
                         {item.status === 'success'
-                          ? (item.recordCount > 0 ? `${item.recordCount} مخاطب` : t('settings.successful_export', 'موفق'))
-                          : t('settings.failed_export', 'ناموفق')}
+                          ? (item.recordCount > 0 ? `${item.recordCount} ${t('common.contact')}` : t('settings.successful_export'))
+                          : t('settings.failed_export')}
                       </span>
                       <GlassButton
                         variant="outline"
@@ -291,7 +291,7 @@ const DataManagementSettings: React.FC<DataManagementSettingsProps> = ({ onImpor
               </div>
               <div className="text-sm font-medium text-emerald-600 dark:text-emerald-300 flex items-center justify-center gap-1">
                 <CheckCircle2 size={14} className="text-emerald-500" />
-                صادرات موفق
+                {t('common.successful_exports')}
               </div>
             </div>
           </div>
@@ -304,7 +304,7 @@ const DataManagementSettings: React.FC<DataManagementSettingsProps> = ({ onImpor
               </div>
               <div className="text-sm font-medium text-red-600 dark:text-red-300 flex items-center justify-center gap-1">
                 <AlertCircle size={14} className="text-red-500" />
-                صادرات ناموفق
+                {t('settings.failed_exports')}
               </div>
             </div>
           </div>
@@ -317,7 +317,7 @@ const DataManagementSettings: React.FC<DataManagementSettingsProps> = ({ onImpor
               </div>
               <div className="text-sm font-medium text-blue-600 dark:text-blue-300 flex items-center justify-center gap-1">
                 <Database size={14} className="text-blue-500" />
-                کل عملیات
+                {t('settings.total_exports')}
               </div>
             </div>
           </div>
@@ -330,7 +330,7 @@ const DataManagementSettings: React.FC<DataManagementSettingsProps> = ({ onImpor
               </div>
               <div className="text-sm font-medium text-purple-600 dark:text-purple-300 flex items-center justify-center gap-1">
                 <TrendingUp size={14} className="text-purple-500" />
-                میانگین مخاطبین
+                {t('settings.average_contacts')}
               </div>
             </div>
           </div>

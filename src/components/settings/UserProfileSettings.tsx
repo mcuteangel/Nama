@@ -101,7 +101,7 @@ const UserProfileSettings: React.FC = () => {
       >
         <SettingsCard
           title={t('common.auth_required')}
-          description="برای مشاهده پروفایل باید وارد حساب کاربری خود شوید"
+          description={t('common.auth_required_description')}
           icon={<User size={16} />}
           gradient="red"
         >
@@ -111,7 +111,7 @@ const UserProfileSettings: React.FC = () => {
           >
             <Link to="/login" className="flex items-center justify-center gap-2">
               <User size={14} />
-              ورود به حساب
+              {t('common.login_button')}
             </Link>
           </GlassButton>
         </SettingsCard>
@@ -142,11 +142,11 @@ const UserProfileSettings: React.FC = () => {
               </div>
               <div className="flex-1">
                 <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
-                  {session.user.user_metadata?.full_name || 'کاربر'}
+                  {session.user.user_metadata?.full_name || t('common.user')}
                 </h3>
                 <p className="text-sm text-gray-600 dark:text-gray-300">{session.user.email}</p>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                  عضو از {formatDate(stats.memberSince)}
+                  {t('common.member_since')} {formatDate(stats.memberSince)}
                 </p>
               </div>
             </div>
@@ -159,7 +159,7 @@ const UserProfileSettings: React.FC = () => {
               >
                 <Link to="/profile" className="flex items-center justify-center gap-2">
                   <Edit3 size={14} />
-                  ویرایش پروفایل
+                  {t('common.edit_profile')}
                 </Link>
               </GlassButton>
             </div>
@@ -180,7 +180,7 @@ const UserProfileSettings: React.FC = () => {
             >
               <div className="relative z-10 flex items-center justify-center gap-2">
                 <LogOut size={14} />
-                خروج از حساب
+                {t('common.logout')}
               </div>
             </GlassButton>
           </div>
@@ -190,24 +190,24 @@ const UserProfileSettings: React.FC = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl border border-blue-200/50 dark:border-blue-700/50">
             <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{stats.totalContacts}</div>
-            <div className="text-sm text-blue-600 dark:text-blue-300">مخاطب</div>
+            <div className="text-sm text-blue-600 dark:text-blue-300">{t('common.contact')}</div>
           </div>
 
           <div className="text-center p-4 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl border border-green-200/50 dark:border-green-700/50">
             <div className="text-2xl font-bold text-green-600 dark:text-green-400">{stats.successfulExports}</div>
-            <div className="text-sm text-green-600 dark:text-green-300">صادرات موفق</div>
+            <div className="text-sm text-green-600 dark:text-green-300">{t('common.successful_exports')}</div>
           </div>
 
           <div className="text-center p-4 bg-gradient-to-br from-purple-50 to-violet-50 dark:from-purple-900/20 dark:to-violet-900/20 rounded-xl border border-purple-200/50 dark:border-purple-700/50">
             <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">{stats.totalGroups}</div>
-            <div className="text-sm text-purple-600 dark:text-purple-300">گروه</div>
+            <div className="text-sm text-purple-600 dark:text-purple-300">{t('common.group')}</div>
           </div>
 
           <div className="text-center p-4 bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-900/20 dark:to-amber-900/20 rounded-xl border border-orange-200/50 dark:border-orange-700/50">
             <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">
               {Math.floor((new Date().getTime() - stats.memberSince.getTime()) / (1000 * 60 * 60 * 24))}
             </div>
-            <div className="text-sm text-orange-600 dark:text-orange-300">روز عضویت</div>
+            <div className="text-sm text-orange-600 dark:text-orange-300">{t('common.membership_days')}</div>
           </div>
         </div>
       </div>
