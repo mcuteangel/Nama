@@ -7,12 +7,13 @@ import {
   syncGroupAssignment,
   syncCustomFields,
 } from '@/services/contact-crud/helpers'; // Import helper functions
+import i18n from '@/integrations/i18n';
 
 export const ContactCrudService = {
   async addContact(values: ContactFormValues): Promise<{ data: { id: string } | null; error: string | null }> {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
-      return { data: null, error: 'کاربر احراز هویت نشده است.' };
+      return { data: null, error: i18n.t('auth.user_not_authenticated') };
     }
 
     try {
@@ -63,14 +64,14 @@ export const ContactCrudService = {
       return { data: { id: currentContactId }, error: null };
     } catch (error: unknown) {
       console.error("ContactCrudService.addContact: Caught an error during add process:", error);
-      return { data: null, error: error instanceof Error ? error.message : "Unknown error" };
+      return { data: null, error: error instanceof Error ? error.message : i18n.t('errors.unknown_error') };
     }
   },
 
   async updateContact(contactId: string, values: ContactFormValues): Promise<{ success: boolean; error: string | null }> {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
-      return { success: false, error: 'کاربر احراز هویت نشده است.' };
+      return { success: false, error: i18n.t('auth.user_not_authenticated') };
     }
 
     try {
@@ -108,14 +109,14 @@ export const ContactCrudService = {
       return { success: true, error: null };
     } catch (error: unknown) {
       console.error("ContactCrudService.updateContact: Caught an error during update process:", error);
-      return { success: false, error: error instanceof Error ? error.message : "Unknown error" };
+      return { success: false, error: error instanceof Error ? error.message : i18n.t('errors.unknown_error') };
     }
   },
 
   async deleteContact(contactId: string): Promise<{ success: boolean; error: string | null }> {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
-      return { success: false, error: 'کاربر احراز هویت نشده است.' };
+      return { success: false, error: i18n.t('auth.user_not_authenticated') };
     }
 
     try {
@@ -129,7 +130,7 @@ export const ContactCrudService = {
       return { success: true, error: null };
     } catch (error: unknown) {
       console.error("ContactCrudService.deleteContact: Caught an error during delete process:", error);
-      return { success: false, error: error instanceof Error ? error.message : "Unknown error" };
+      return { success: false, error: error instanceof Error ? error.message : i18n.t('errors.unknown_error') };
     }
   },
 };

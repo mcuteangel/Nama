@@ -57,13 +57,13 @@ const ContactAvatarUpload: React.FC<ContactAvatarUploadProps> = React.memo(({
 
     // Validate file type
     if (!file.type.startsWith('image/')) {
-      alert(t('errors.invalid_image_type', 'Please upload an image file'));
+      alert(t('errors.invalid_image_type'));
       return;
     }
 
     // Validate file size (2MB)
     if (file.size > 2 * 1024 * 1024) {
-      alert(t('errors.image_too_large', 'Image must be less than 2MB'));
+      alert(t('errors.image_too_large'));
       return;
     }
 
@@ -131,7 +131,7 @@ const ContactAvatarUpload: React.FC<ContactAvatarUploadProps> = React.memo(({
         role="button"
         tabIndex={0}
         onKeyDown={(e) => e.key === 'Enter' && !disabled && handleClick()}
-        aria-label={t('upload_avatar', 'Upload profile picture')}
+        aria-label={t('labels.upload_avatar')}
       >
         <input
           type="file"
@@ -163,7 +163,7 @@ const ContactAvatarUpload: React.FC<ContactAvatarUploadProps> = React.memo(({
                 currentSize.removeBtn
               )}
               onClick={handleRemove}
-              aria-label={t('remove_photo', 'حذف عکس')}
+              aria-label={t('labels.remove_photo')}
             >
               <X className="h-4 w-4" />
             </Button>
@@ -177,7 +177,7 @@ const ContactAvatarUpload: React.FC<ContactAvatarUploadProps> = React.memo(({
               </div>
             </div>
             <span className="text-sm text-gray-600">
-              انتخاب تصویر پروفایل
+              {t('labels.select_image_file')}
             </span>
           </div>
         )}

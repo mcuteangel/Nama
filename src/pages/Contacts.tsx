@@ -356,7 +356,7 @@ const Contacts = React.memo(() => {
                         </GlassButton>
                       </ModernTooltipTrigger>
                       <ModernTooltipContent>
-                        <p>نمایش کارتی</p>
+                        <p>{t('common.display_modes.grid')}</p>
                       </ModernTooltipContent>
                     </ModernTooltip>
 
@@ -378,7 +378,7 @@ const Contacts = React.memo(() => {
                         </GlassButton>
                       </ModernTooltipTrigger>
                       <ModernTooltipContent>
-                        <p>نمایش لیستی</p>
+                        <p>{t('common.display_modes.list')}</p>
                       </ModernTooltipContent>
                     </ModernTooltip>
                   </div>

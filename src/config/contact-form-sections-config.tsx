@@ -56,7 +56,7 @@ export const useContactFormSections = (): ContactFormSectionsConfig => {
   ): FormSection[] => [
     {
       id: 'avatar',
-      title: t('accessibility.avatar_section', 'Avatar Section'),
+      title: t('accessibility.avatar_section'),
       component: (
         <Suspense fallback={<SectionLoader />}>
           <ContactAvatarUpload
@@ -71,7 +71,7 @@ export const useContactFormSections = (): ContactFormSectionsConfig => {
     },
     {
       id: 'basic-info',
-      title: t('accessibility.basic_info_section', 'Basic Information Section'),
+      title: t('accessibility.basic_info_section'),
       component: (
         <Suspense fallback={<SectionLoader />}>
           <ContactBasicInfo />
@@ -80,7 +80,7 @@ export const useContactFormSections = (): ContactFormSectionsConfig => {
     },
     {
       id: 'contact-info',
-      title: t('accessibility.contact_info_section', 'Contact Information Section'),
+      title: t('accessibility.contact_info_section'),
       component: (
         <Suspense fallback={<SectionLoader />}>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -92,7 +92,7 @@ export const useContactFormSections = (): ContactFormSectionsConfig => {
     },
     {
       id: 'social-dates',
-      title: t('accessibility.social_dates_section', 'Social Links and Important Dates Section'),
+      title: t('accessibility.social_dates_section'),
       component: (
         <Suspense fallback={<SectionLoader />}>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -104,7 +104,7 @@ export const useContactFormSections = (): ContactFormSectionsConfig => {
     },
     {
       id: 'address-notes',
-      title: t('accessibility.address_notes_section', 'Address and Notes Section'),
+      title: t('accessibility.address_notes_section'),
       component: (
         <Suspense fallback={<SectionLoader />}>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -116,7 +116,7 @@ export const useContactFormSections = (): ContactFormSectionsConfig => {
     },
     {
       id: 'fields-tags',
-      title: t('accessibility.fields_tags_section', 'Custom Fields and Tags Section'),
+      title: t('accessibility.fields_tags_section'),
       component: (
         <Suspense fallback={<SectionLoader />}>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -145,7 +145,7 @@ export const useContactFormSections = (): ContactFormSectionsConfig => {
     },
     {
       id: 'preview-history',
-      title: t('accessibility.preview_history_section', 'Preview and History Section'),
+      title: t('accessibility.preview_history_section'),
       component: (
         <Suspense fallback={<SectionLoader />}>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -157,7 +157,7 @@ export const useContactFormSections = (): ContactFormSectionsConfig => {
     },
     {
       id: 'actions',
-      title: t('accessibility.form_actions_section', 'Form Actions Section'),
+      title: t('accessibility.form_actions_section'),
       component: (
         <Suspense fallback={<SectionLoader />}>
           <ContactFormActions

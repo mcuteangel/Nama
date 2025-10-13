@@ -40,7 +40,7 @@ export const ContactDetailBasicInfo: React.FC<ContactDetailBasicInfoProps> = ({
           <div className="flex-1 space-y-2">
             <div className="flex items-center gap-2">
               <User size={16} className="text-slate-500" />
-              <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{t('contact.first_name')}</span>
+              <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{t('form_labels.first_name')}</span>
             </div>
             <div className="text-base font-semibold text-slate-900 dark:text-slate-100 bg-slate-50/40 dark:bg-slate-800/20 backdrop-blur-sm p-3 rounded-xl shadow-md">
               {contact.first_name}
@@ -50,7 +50,7 @@ export const ContactDetailBasicInfo: React.FC<ContactDetailBasicInfoProps> = ({
           <div className="flex-1 space-y-2">
             <div className="flex items-center gap-2">
               <Users size={16} className="text-slate-500" />
-              <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{t('contact.last_name')}</span>
+              <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{t('form_labels.last_name')}</span>
             </div>
             <div className="text-base font-semibold text-slate-900 dark:text-slate-100 bg-slate-50/40 dark:bg-slate-800/20 backdrop-blur-sm p-3 rounded-xl shadow-md">
               {contact.last_name}
@@ -61,7 +61,7 @@ export const ContactDetailBasicInfo: React.FC<ContactDetailBasicInfoProps> = ({
         {/* گروه مخاطب - اگر وجود داشته باشه */}
         {assignedGroup && (
           <div className="space-y-2">
-            <span className="text-sm font-medium text-slate-700 dark:text-slate-300">گروه</span>
+            <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{t('form_labels.group')}</span>
             <div
               className="flex items-center gap-2 p-3 rounded-xl shadow-md w-fit"
               style={{
@@ -81,13 +81,13 @@ export const ContactDetailBasicInfo: React.FC<ContactDetailBasicInfoProps> = ({
         {/* اطلاعات شغلی - در یک ردیف اگر هر دو وجود داشته باشن */}
         {(contact.position || contact.company) && (
           <div className="space-y-3">
-            <span className="text-sm font-medium text-slate-700 dark:text-slate-300">اطلاعات شغلی</span>
+            <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{t('form_labels.job_info')}</span>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {contact.position && (
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
                     <Briefcase size={16} className="text-slate-500" />
-                    <span className="text-sm text-slate-600 dark:text-slate-400">{t('contact.position')}</span>
+                    <span className="text-sm text-slate-600 dark:text-slate-400">{t('form_labels.position')}</span>
                   </div>
                   <div className="text-sm font-medium text-slate-900 dark:text-slate-100 bg-slate-50/40 dark:bg-slate-800/20 backdrop-blur-sm p-3 rounded-xl shadow-md">
                     {contact.position}
@@ -99,7 +99,7 @@ export const ContactDetailBasicInfo: React.FC<ContactDetailBasicInfoProps> = ({
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
                     <Building size={16} className="text-slate-500" />
-                    <span className="text-sm text-slate-600 dark:text-slate-400">{t('contact.company')}</span>
+                    <span className="text-sm text-slate-600 dark:text-slate-400">{t('form_labels.company')}</span>
                   </div>
                   <div className="text-sm font-medium text-slate-900 dark:text-slate-100 bg-slate-50/40 dark:bg-slate-800/20 backdrop-blur-sm p-3 rounded-xl shadow-md">
                     {contact.company}
@@ -112,12 +112,12 @@ export const ContactDetailBasicInfo: React.FC<ContactDetailBasicInfoProps> = ({
 
         {/* اطلاعات شخصی - جنسیت و روش تماس ترجیحی */}
         <div className="space-y-3">
-          <span className="text-sm font-medium text-slate-700 dark:text-slate-300">اطلاعات شخصی</span>
+          <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{t('form_labels.personal_info')}</span>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <Heart size={16} className="text-slate-500" />
-                <span className="text-sm text-slate-600 dark:text-slate-400">{t('contact.gender')}</span>
+                <span className="text-sm text-slate-600 dark:text-slate-400">{t('form_labels.gender')}</span>
               </div>
               <div className="text-sm font-medium text-slate-900 dark:text-slate-100 bg-slate-50/40 dark:bg-slate-800/20 backdrop-blur-sm p-3 rounded-xl shadow-md">
                 {getGenderLabel(contact.gender, t)}
@@ -128,7 +128,7 @@ export const ContactDetailBasicInfo: React.FC<ContactDetailBasicInfoProps> = ({
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
                   <Star size={16} className="text-slate-500" />
-                  <span className="text-sm text-slate-600 dark:text-slate-400">{t('contact.preferred_contact_method')}</span>
+                  <span className="text-sm text-slate-600 dark:text-slate-400">{t('form_labels.preferred_contact_method')}</span>
                 </div>
                 <div className="text-sm font-medium text-slate-900 dark:text-slate-100 bg-slate-50/40 dark:bg-slate-800/20 backdrop-blur-sm p-3 rounded-xl shadow-md">
                   {getPreferredContactMethodLabel(contact.preferred_contact_method, t)}

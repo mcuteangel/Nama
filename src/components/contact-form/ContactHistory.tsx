@@ -35,7 +35,7 @@ const ContactHistory: React.FC<ContactHistoryProps> = ({ contactId }) => {
           // Update user_email with actual session user email
           const updatedData = data.map(entry => ({
             ...entry,
-            user_email: session.user?.email || 'کاربر ناشناس'
+            user_email: session.user?.email || t('contact_history.anonymous_user')
           }));
           setHistory(updatedData);
         }
@@ -52,11 +52,11 @@ const ContactHistory: React.FC<ContactHistoryProps> = ({ contactId }) => {
   const getActionLabel = (action: ContactHistoryEntry['action']) => {
     switch (action) {
       case 'created':
-        return 'ایجاد شد';
+        return t('contact_history.actions.created');
       case 'updated':
-        return 'ویرایش شد';
+        return t('contact_history.actions.updated');
       case 'deleted':
-        return 'حذف شد';
+        return t('contact_history.actions.deleted');
       default:
         return action;
     }
@@ -86,8 +86,8 @@ const ContactHistory: React.FC<ContactHistoryProps> = ({ contactId }) => {
 
   return (
     <FormCard
-      title="تاریخچه تغییرات"
-      description="تمام تغییرات اعمال شده روی این مخاطب را مشاهده کنید"
+      title={t('contact_history.title')}
+      description={t('contact_history.description')}
       icon={History}
       iconColor="#8b5cf6"
     >
@@ -95,17 +95,17 @@ const ContactHistory: React.FC<ContactHistoryProps> = ({ contactId }) => {
         {loading ? (
           <div className="text-center py-8 text-slate-500 dark:text-slate-400">
             <Clock size={24} className="mx-auto mb-2 opacity-50 animate-pulse" />
-            <p className="text-sm">در حال بارگذاری تاریخچه...</p>
+            <p className="text-sm">{t('contact_history.loading')}</p>
           </div>
         ) : error ? (
           <div className="text-center py-8 text-slate-500 dark:text-slate-400">
             <Trash2 size={24} className="mx-auto mb-2 opacity-50" />
-            <p className="text-sm">بارگذاری تاریخچه با خطا مواجه شد</p>
+            <p className="text-sm">{t('contact_history.error_loading')}</p>
           </div>
         ) : history.length === 0 ? (
           <div className="text-center py-8 text-slate-500 dark:text-slate-400">
             <History size={24} className="mx-auto mb-2 opacity-50" />
-            <p className="text-sm">هنوز هیچ تغییری ثبت نشده است</p>
+            <p className="text-sm">{t('contact_history.no_changes')}</p>
           </div>
         ) : (
           <>
@@ -143,7 +143,7 @@ const ContactHistory: React.FC<ContactHistoryProps> = ({ contactId }) => {
                   {/* Field changes */}
                   <div className="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-3 border border-slate-200 dark:border-slate-700">
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="text-sm font-bold text-slate-700 dark:text-slate-300">فیلد:</span>
+                      <span className="text-sm font-bold text-slate-700 dark:text-slate-300">{t('contact_history.field_label')}:</span>
                       <span className="text-sm font-medium text-slate-900 dark:text-white bg-white/50 dark:bg-slate-600/50 px-2 py-1 rounded-xl">
                         {entry.field_name}
                       </span>
@@ -153,9 +153,9 @@ const ContactHistory: React.FC<ContactHistoryProps> = ({ contactId }) => {
                       <div className="flex items-start gap-2">
                         <ArrowRight size={14} className="text-green-500 mt-0.5 flex-shrink-0" />
                         <div className="flex-1">
-                          <span className="text-xs font-bold text-slate-700 dark:text-slate-300">مقدار جدید:</span>
+                          <span className="text-xs font-bold text-slate-700 dark:text-slate-300">{t('contact_history.new_value_label')}:</span>
                           <p className="text-sm text-slate-900 dark:text-white mt-1 bg-green-50 dark:bg-green-900/20 p-2 rounded-xl border border-green-200 dark:border-green-800/30 break-words">
-                            {entry.new_value || 'خالی'}
+                            {entry.new_value || t('contact_history.empty_value')}
                           </p>
                         </div>
                       </div>
@@ -164,7 +164,7 @@ const ContactHistory: React.FC<ContactHistoryProps> = ({ contactId }) => {
                         <div className="flex items-start gap-2">
                           <ArrowRight size={14} className="text-red-500 mt-0.5 flex-shrink-0 rotate-180" />
                           <div className="flex-1">
-                            <span className="text-xs font-bold text-slate-700 dark:text-slate-300">مقدار قبلی:</span>
+                            <span className="text-xs font-bold text-slate-700 dark:text-slate-300">{t('contact_history.old_value_label')}:</span>
                             <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 bg-red-50 dark:bg-red-900/20 p-2 rounded-xl border border-red-200 dark:border-red-800/30 line-through break-words">
                               {entry.old_value}
                             </p>

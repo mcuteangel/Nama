@@ -17,14 +17,14 @@ export const useContactFormAccessibility = (contactId?: string): ContactFormAcce
   // Set up ARIA labels for form
   useEffect(() => {
     const formTitle = contactId
-      ? t('accessibility.edit_contact_form', 'Edit Contact Form')
-      : t('accessibility.add_contact_form', 'Add Contact Form');
+      ? t('accessibility.edit_contact_form')
+      : t('accessibility.add_contact_form');
 
     setAriaLabel('contact-form', formTitle);
     setAriaLabel('contact-form-description',
       contactId
-        ? t('accessibility.edit_contact_description', 'Edit contact information and details')
-        : t('accessibility.add_contact_description', 'Add new contact information and details')
+        ? t('accessibility.edit_contact_description')
+        : t('accessibility.add_contact_description')
     );
   }, [contactId, t, setAriaLabel]);
 

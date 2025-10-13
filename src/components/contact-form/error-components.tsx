@@ -1,6 +1,7 @@
 import React from 'react';
 import { AlertCircle } from 'lucide-react';
 import { GlassButton } from '@/components/ui/glass-button';
+import { useTranslation } from 'react-i18next';
 
 interface FormErrorDisplayProps {
   error: boolean;
@@ -17,6 +18,8 @@ export const FormErrorDisplay: React.FC<FormErrorDisplayProps> = ({
   onRetry,
   isSubmitting = false
 }) => {
+  const { t } = useTranslation();
+
   if (!error) return null;
 
   return (
@@ -26,7 +29,7 @@ export const FormErrorDisplay: React.FC<FormErrorDisplayProps> = ({
           <AlertCircle size={20} className="text-red-600 dark:text-red-400" />
         </div>
         <div>
-          <h3 className="text-lg font-semibold text-red-800 dark:text-red-200">خطا در ذخیره</h3>
+          <h3 className="text-lg font-semibold text-red-800 dark:text-red-200">{t('form_errors.save_error_title')}</h3>
           <p className="text-red-700 dark:text-red-300 text-sm">{errorMessage}</p>
         </div>
       </div>
@@ -38,9 +41,9 @@ export const FormErrorDisplay: React.FC<FormErrorDisplayProps> = ({
           disabled={isSubmitting}
           className="text-red-700 dark:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/30 px-3 py-2 rounded-lg border border-red-200 dark:border-red-800 text-sm"
           aria-describedby="form-error-message"
-          aria-label="تلاش مجدد برای ذخیره فرم"
+          aria-label={t('form_errors.retry_save_label')}
         >
-          تلاش مجدد ({retryCount} از ۳)
+          {t('form_errors.retry_attempt', { retryCount, maxRetries: 3 })}
         </GlassButton>
       )}
     </div>
@@ -54,8 +57,10 @@ interface ProgressIndicatorProps {
 
 export const ProgressIndicator: React.FC<ProgressIndicatorProps> = ({
   isSubmitting,
-  message = "در حال ذخیره..."
+  message
 }) => {
+  const { t } = useTranslation();
+
   if (!isSubmitting) return null;
 
   return (
@@ -65,8 +70,8 @@ export const ProgressIndicator: React.FC<ProgressIndicatorProps> = ({
           <div className="h-4 w-4 animate-spin rounded-full border-2 border-blue-600 dark:border-blue-400 border-t-transparent"></div>
         </div>
         <div>
-          <h3 className="text-lg font-semibold text-blue-800 dark:text-blue-200">{message}</h3>
-          <p className="text-blue-700 dark:text-blue-300 text-sm">لطفاً صبر کنید</p>
+          <h3 className="text-lg font-semibold text-blue-800 dark:text-blue-200">{message || t('form_messages.saving_default')}</h3>
+          <p className="text-blue-700 dark:text-blue-300 text-sm">{t('form_messages.please_wait')}</p>
         </div>
       </div>
     </div>

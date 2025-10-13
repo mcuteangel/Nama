@@ -4,6 +4,8 @@ import i18n from '@/integrations/i18n';
 type ErrorType = 'success' | 'error' | 'info' | 'warning';
 
 // Error pattern constants for message matching
+// NOTE: These patterns are in English because they match against error messages from external systems (Supabase, etc.)
+// The actual display translations are handled in getErrorMessage function
 const ERROR_PATTERNS = {
   EDGE_FUNCTION_REQUEST: 'Failed to send a request to the Edge Function',
   SESSION_ERROR: 'Session error',
@@ -214,9 +216,36 @@ export const ErrorManager = {
     }
   },
 
-  notifyUser: (message: string, type: ErrorType = 'error') => {
-    // TODO: این تابع باید در کامپوننت‌ها با استفاده از useToastHelpers استفاده شود
-    console.warn(`ErrorManager.notifyUser called with ${type} message: ${message}. Please use useToastHelpers hook in React components instead.`);
+  notifyUser: (message: string, type: ErrorType = 'error', toastHelpers?: {
+    showSuccess: (message: string) => void;
+    showError: (message: string) => void;
+    showInfo: (message: string) => void;
+    showLoading: (message: string) => string;
+  }) => {
+    if (toastHelpers) {
+      // Use provided toast helpers
+      switch (type) {
+        case 'success':
+          toastHelpers.showSuccess(message);
+          break;
+        case 'error':
+          toastHelpers.showError(message);
+          break;
+        case 'info':
+          toastHelpers.showInfo(message);
+          break;
+        case 'warning':
+          toastHelpers.showInfo(message); // Use info for warnings since we don't have a warning type
+          break;
+      }
+    } else {
+      // Fallback: return toast configuration for caller to handle
+      return {
+        type,
+        message,
+        timestamp: new Date().toISOString()
+      };
+    }
   },
 
   getErrorMessage: (error: unknown): string => {

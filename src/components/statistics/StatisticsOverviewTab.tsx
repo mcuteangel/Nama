@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { ChartContainer, ChartTooltip } from "@/components/ui/chart";
 import { PieChart, Pie, Cell, BarChart, Bar, CartesianGrid, XAxis, YAxis, Legend } from "recharts";
 import { Users, MessageCircle } from "lucide-react";
+import { useTranslation } from 'react-i18next';
 
 interface StatisticsOverviewTabProps {
   genderChartData: Array<{ name: string; value: number }>;
@@ -22,6 +23,8 @@ const StatisticsOverviewTab: React.FC<StatisticsOverviewTabProps> = ({
   isLoading = false,
   error = null,
 }) => {
+  const { t } = useTranslation();
+
   if (isLoading) {
     return (
       <div className="grid gap-6 md:grid-cols-2">
@@ -53,7 +56,7 @@ const StatisticsOverviewTab: React.FC<StatisticsOverviewTabProps> = ({
         <Card className="relative overflow-hidden bg-gradient-to-br from-red-50/50 via-white/80 to-red-50/30 backdrop-blur-sm border-0 shadow-xl rounded-2xl">
           <CardContent className="flex items-center justify-center h-[300px] p-4">
             <div className="text-center text-slate-500">
-              <p className="text-sm font-medium">خطا در بارگذاری آمار جنسیت</p>
+              <p className="text-sm font-medium">{t('contact_list.error_loading_gender_statistics')}</p>
               <p className="text-xs mt-1">{error}</p>
             </div>
           </CardContent>
@@ -61,8 +64,8 @@ const StatisticsOverviewTab: React.FC<StatisticsOverviewTabProps> = ({
         <Card className="relative overflow-hidden bg-gradient-to-br from-red-50/50 via-white/80 to-red-50/30 backdrop-blur-sm border-0 shadow-xl rounded-2xl">
           <CardContent className="flex items-center justify-center h-[300px] p-4">
             <div className="text-center text-slate-500">
-              <p className="text-sm font-medium">خطا در بارگذاری روش‌های ارتباط</p>
-              <p className="text-xs mt-1">داده‌ای برای نمایش وجود ندارد</p>
+              <p className="text-sm font-medium">{t('contact_list.error_loading_contact_methods')}</p>
+              <p className="text-xs mt-1">{t('contact_list.no_data_available')}</p>
             </div>
           </CardContent>
         </Card>
@@ -89,17 +92,17 @@ const StatisticsOverviewTab: React.FC<StatisticsOverviewTabProps> = ({
             </div>
             <div>
               <CardTitle className="text-xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
-                توزیع جنسیت
+                {t('statistics.gender_distribution')}
               </CardTitle>
               <CardDescription className="text-sm text-slate-500 leading-relaxed">
-                توزیع مخاطبین بر اساس جنسیت ثبت شده
+                {t('statistics.gender_distribution_description')}
               </CardDescription>
             </div>
           </div>
         </CardHeader>
 
         <CardContent className="relative p-4">
-          <ChartContainer config={{ count: { label: "تعداد", color: "hsl(var(--chart-1))" } }} className="h-[240px] w-full">
+          <ChartContainer config={{ count: { label: t('statistics.count'), color: "hsl(var(--chart-1))" } }} className="h-[240px] w-full">
             <PieChart>
               <Pie
                 data={genderChartData}
@@ -124,11 +127,11 @@ const StatisticsOverviewTab: React.FC<StatisticsOverviewTabProps> = ({
                         <p className="font-semibold text-slate-800 text-center mb-2">{data.name}</p>
                         <div className="space-y-2">
                           <div className="flex justify-between items-center">
-                            <span className="text-sm text-slate-600">تعداد:</span>
+                            <span className="text-sm text-slate-600">{t('statistics.tooltip.count')}</span>
                             <span className="font-bold text-slate-800 text-lg">{data.value}</span>
                           </div>
                           <div className="flex justify-between items-center">
-                            <span className="text-sm text-slate-600">درصد:</span>
+                            <span className="text-sm text-slate-600">{t('statistics.tooltip.percentage')}</span>
                             <span className="font-bold text-slate-800 text-lg">{((data.value / genderChartData.reduce((a, b) => a + b.value, 0)) * 100).toFixed(1)}%</span>
                           </div>
                         </div>
@@ -166,17 +169,17 @@ const StatisticsOverviewTab: React.FC<StatisticsOverviewTabProps> = ({
             </div>
             <div>
               <CardTitle className="text-xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
-                روش‌های ارتباط ترجیحی
+                {t('statistics.contact_methods_title')}
               </CardTitle>
               <CardDescription className="text-sm text-slate-500 leading-relaxed">
-                توزیع مخاطبین بر اساس روش ارتباط مورد علاقه
+                {t('statistics.contact_methods_description')}
               </CardDescription>
             </div>
           </div>
         </CardHeader>
 
         <CardContent className="relative p-4">
-          <ChartContainer config={{ value: { label: "تعداد", color: "hsl(var(--chart-2))" } }} className="h-[240px] w-full">
+          <ChartContainer config={{ value: { label: t('statistics.count'), color: "hsl(var(--chart-2))" } }} className="h-[240px] w-full">
             <BarChart data={contactMethodChartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" className="opacity-20" />
               <XAxis
@@ -195,11 +198,11 @@ const StatisticsOverviewTab: React.FC<StatisticsOverviewTabProps> = ({
                         <p className="font-semibold text-slate-800 text-center mb-2">{data.name}</p>
                         <div className="space-y-2">
                           <div className="flex justify-between items-center">
-                            <span className="text-sm text-slate-600">تعداد:</span>
+                            <span className="text-sm text-slate-600">{t('statistics.tooltip.count')}</span>
                             <span className="font-bold text-slate-800 text-lg">{data.value}</span>
                           </div>
                           <div className="flex justify-between items-center">
-                            <span className="text-sm text-slate-600">درصد:</span>
+                            <span className="text-sm text-slate-600">{t('statistics.tooltip.percentage')}</span>
                             <span className="font-bold text-slate-800 text-lg">{((data.value / contactMethodChartData.reduce((a, b) => a + b.value, 0)) * 100).toFixed(1)}%</span>
                           </div>
                         </div>

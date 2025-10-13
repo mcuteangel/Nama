@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import i18n from 'i18next';
 
 export interface ContactHistoryEntry {
   id: string;
@@ -35,7 +36,7 @@ export const ContactHistoryService = {
       if (error) throw error;
 
       if (!data) {
-        return { data: null, error: 'Contact not found' };
+        return { data: null, error: i18n.t('contact_history.contact_not_found') };
       }
 
       // Simulate history entries based on contact data
@@ -49,7 +50,7 @@ export const ContactHistoryService = {
           old_value: null,
           new_value: `${data.first_name} ${data.last_name}`,
           timestamp: data.created_at,
-          user_email: 'کاربر فعلی' // We'll use a placeholder since we don't have access to user email in this context
+          user_email: i18n.t('contact_history.current_user') // We'll use a placeholder since we don't have access to user email in this context
         }
       ];
 
@@ -62,9 +63,9 @@ export const ContactHistoryService = {
           action: 'updated',
           field_name: 'contact',
           old_value: null,
-          new_value: 'Contact information updated',
+          new_value: i18n.t('contact_history.contact_info_updated'),
           timestamp: data.updated_at,
-          user_email: 'کاربر فعلی'
+          user_email: i18n.t('contact_history.current_user')
         });
       }
 

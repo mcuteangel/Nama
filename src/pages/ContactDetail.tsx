@@ -204,7 +204,7 @@ const ContactDetail = () => {
           <PageHeader
             title={`${contact.first_name} ${contact.last_name}`}
             description={contact.position && contact.company ?
-              `${contact.position} در ${contact.company}` :
+              `${contact.position} ${t('contact_detail.position_in_company')} ${contact.company}` :
               contact.position || contact.company || t('contact_detail.contact_details')
             }
             showBackButton={true}

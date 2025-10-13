@@ -12,6 +12,7 @@ import { ExtractedContactInfo } from "@/hooks/use-contact-extractor";
 import { AISuggestionsService } from "@/services/ai-suggestions-service";
 import { useSession } from "@/integrations/supabase/auth";
 import { ContactFormValues } from "@/types/contact";
+import { t } from "i18next";
 
 interface PhoneNumber {
   id: string;
@@ -147,7 +148,7 @@ const EditContact = () => {
         setInitialContactData(mappedData);
         lastFetchedContactDataRef.current = mappedData;
         if (!result.fromCache) {
-          showSuccess("اطلاعات مخاطب با موفقیت بارگذاری شد.");
+          showSuccess(t('shortcuts.contact_loaded'));
         }
       } else {
         console.log("EditContact: Fetched data is identical to current state, skipping setInitialContactData.");
@@ -183,13 +184,13 @@ const EditContact = () => {
         if (suggestionId && currentSession?.user) {
           currentExecuteUpdateSuggestionStatus(async () => {
             const { success, error } = await AISuggestionsService.updateSuggestionStatus(suggestionId, 'edited');
-            if (!success) throw new Error(error || 'Failed to update AI suggestion status to edited.');
+            if (!success) throw new Error(error || t('errors.failed_update_ai_suggestion_status'));
           });
         }
       }
 
     } else {
-      showError("مخاطب برای ویرایش یافت نشد.");
+      showError(t('errors.contact_not_found_for_edit'));
       currentNavigate("/");
     }
   }, []); // Empty dependency array for onSuccessFetchContact
@@ -197,7 +198,8 @@ const EditContact = () => {
   const onErrorFetchContact = useCallback((err: Error) => {
     const currentNavigate = navigateRef.current;
     console.error("Error fetching contact details for edit:", err);
-    showError(`خطا در بارگذاری اطلاعات مخاطب: ${ErrorManager.getErrorMessage(err) || "خطای ناشناخته"}`);
+    const errorMessage = ErrorManager.getErrorMessage(err) || t('errors.unknown_error');
+    showError(`${t('errors.error_loading_contact_details')}: ${errorMessage}`);
     currentNavigate("/");
   }, []); // Empty dependency array for onErrorFetchContact
 
@@ -213,7 +215,7 @@ const EditContact = () => {
   useEffect(() => {
     const fetchDetails = async () => {
       if (!id) {
-        showError("شناسه مخاطب برای ویرایش یافت نشد.");
+        showError(t('errors.contact_id_not_found'));
         navigateRef.current("/");
         return;
       }
@@ -234,7 +236,7 @@ const EditContact = () => {
             if (data) {
               return { data: data as ContactDetailType, error: null };
             }
-            return { data: null, error: "مخاطب برای ویرایش یافت نشد." };
+            return { data: null, error: t('errors.contact_not_found_for_edit') };
           }
         );
 
@@ -250,15 +252,15 @@ const EditContact = () => {
 
   if (loading) {
     return (
-      <LoadingMessage message="در حال بارگذاری اطلاعات مخاطب..." />
+      <LoadingMessage message={t('loading.contact_details')} />
     );
   }
 
   if (!initialContactData) {
     return (
       <div className="flex flex-col items-center justify-center h-full w-full p-4">
-        <p className="text-gray-700 dark:text-gray-300">مخاطب برای ویرایش یافت نشد.</p>
-        <CancelButton text="بازگشت به لیست مخاطبین" />
+        <p className="text-gray-700 dark:text-gray-300">{t('errors.contact_not_found_for_edit')}</p>
+        <CancelButton text={t('actions.back_to_contacts_list')} />
       </div>
     );
   }

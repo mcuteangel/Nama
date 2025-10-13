@@ -1,14 +1,27 @@
 import { ToastContext } from "@/components/ui/toast-context";
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 export const useToastHelpers = () => {
   const context = React.useContext(ToastContext);
+  const { t } = useTranslation();
 
   const showSuccess = (message: string) => {
     if (context) {
       context.addToast({
         variant: 'success',
-        title: 'موفق',
+        title: t('toast.success_title'),
+        description: message,
+        duration: 5000
+      });
+    }
+  };
+
+  const showError = (message: string) => {
+    if (context) {
+      context.addToast({
+        variant: 'error',
+        title: t('toast.error_title'),
         description: message,
         duration: 5000
       });
@@ -19,7 +32,7 @@ export const useToastHelpers = () => {
     if (context) {
       context.addToast({
         variant: 'info',
-        title: 'اطلاع',
+        title: t('toast.info_title'),
         description: message,
         duration: 5000
       });
@@ -31,7 +44,7 @@ export const useToastHelpers = () => {
       const id = Math.random().toString(36).substr(2, 9);
       context.addToast({
         variant: 'info',
-        title: 'در حال بارگذاری',
+        title: t('toast.loading_title'),
         description: message,
         duration: 3000
       });
