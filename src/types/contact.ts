@@ -1,40 +1,41 @@
 import * as z from "zod";
+import { validation } from "@/utils/validation";
 
 export const contactFormSchema = z.object({
-  firstName: z.string().min(1, { message: "نام الزامی است." }),
-  lastName: z.string().min(1, { message: "نام خانوادگی الزامی است." }),
+  firstName: z.string().min(1, validation.required('firstName')),
+  lastName: z.string().min(1, validation.required('lastName')),
   phoneNumbers: z.array(z.object({
     id: z.string().optional(),
-    phone_type: z.string().min(1, { message: "نوع شماره الزامی است." }),
+    phone_type: z.string().min(1, validation.required('phoneType')),
     // Preprocess phone_number to remove non-digit characters before validation
     phone_number: z.string()
-      .transform((val) => val.replace(/[-\s./]/g, '')) // Remove hyphens, spaces, dots, slashes
-      .refine((val) => /^(0|\+98)?\d{10}$|^\d{7,11}$/.test(val), { message: "شماره تلفن معتبر نیست (مثال: 09123456789 یا 02188888888)." }),
+      .transform((val) => val?.replace(/[-\s./]/g, '') || '')
+      .refine((val) => /^(0|\+98)?\d{10}$|^\d{7,11}$/.test(val), validation.phone),
     extension: z.string().optional().nullable(),
   })).optional(),
   emailAddresses: z.array(z.object({
     id: z.string().optional(),
-    email_type: z.string().min(1, { message: "نوع ایمیل الزامی است." }),
-    email_address: z.string().email({ message: "آدرس ایمیل معتبر نیست." }),
+    email_type: z.string().min(1, validation.required('emailType')),
+    email_address: z.string().email(validation.email),
   })).optional(),
   socialLinks: z.array(z.object({
     id: z.string().optional(),
-    type: z.string().min(1, { message: "نوع شبکه اجتماعی الزامی است." }),
-    url: z.string().url({ message: "آدرس URL معتبر نیست." }),
+    type: z.string().min(1, validation.required('socialType')),
+    url: z.string().url(validation.url),
   })).optional(),
-  gender: z.enum(["male", "female", "not_specified"], { message: "جنسیت معتبر نیست." }).default("not_specified"),
+  gender: z.enum(["male", "female", "not_specified"], validation.gender).default("not_specified"),
   position: z.string().optional(),
   company: z.string().optional(),
-  street: z.string().optional().nullable(), // New: Detailed address field
-  city: z.string().optional().nullable(),    // New: Detailed address field
-  state: z.string().optional().nullable(),   // New: Detailed address field
-  zipCode: z.string().optional().nullable(), // New: Detailed address field
-  country: z.string().optional().nullable(), // New: Detailed address field
+  street: z.string().optional().nullable(),
+  city: z.string().optional().nullable(),
+  state: z.string().optional().nullable(),
+  zipCode: z.string().optional().nullable(),
+  country: z.string().optional().nullable(),
   notes: z.string().optional().nullable(),
   groupId: z.string().optional().nullable(),
   birthday: z.string().optional().nullable(),
-  avatarUrl: z.string().url({ message: "آدرس URL تصویر معتبر نیست." }).optional().nullable(), // New: Avatar URL
-  preferredContactMethod: z.enum(['email', 'phone', 'sms', 'any'], { message: "روش ارتباط ترجیحی معتبر نیست." }).optional().nullable(), // New: Preferred contact method
+  avatarUrl: z.string().url(validation.url).optional().nullable(),
+  preferredContactMethod: z.enum(['email', 'phone', 'sms', 'any'], validation.preferredContactMethod).optional().nullable(),
   customFields: z.array(z.object({
     template_id: z.string(),
     value: z.string(),

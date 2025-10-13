@@ -924,6 +924,8 @@
     "edit_custom_field_template_error": "خطا در به‌روزرسانی قالب فیلد سفارشی",
     "merge_contacts_error": "خطا در ادغام مخاطبین",
     "failed_to_fetch_contact_details": "خطا در دریافت جزئیات کامل مخاطب برای ادغام",
+    "database_fetch_error": "خطا در دریافت اطلاعات از پایگاه داده",
+    "unknown_contacts_fetch_error": "خطای ناشناخته در دریافت مخاطبین",
     "failed_parse_gender_preferences": "خطا در پردازش ترجیحات جنسیتی ذخیره شده",
     "failed_clear_learned_names": "خطا در پاک کردن نام‌های یادگرفته شده فارسی",
     "failed_load_persian_names_suggestion": "خطا در بارگیری نام‌های فارسی برای پیشنهاد جنسیت",
@@ -934,6 +936,8 @@
     "failed_load_persian_names_with_status": "خطا در بارگیری نام‌های فارسی. وضعیت: {{status}}",
     "failed_to_fetch_ai_suggestion": "خطا در دریافت پیشنهادات هوش مصنوعی",
     "failed_update_ai_suggestion_status": "خطا در به‌روزرسانی وضعیت پیشنهاد هوش مصنوعی به وضعیت ویرایش شده",
+    "csv_empty_or_header_only": "فایل CSV خالی است یا فقط شامل سربرگ است",
+    "csv_row_mismatch": "ردیف به دلیل عدم تطابق تعداد ستون‌ها نادیده گرفته شد: {{row}}",
     "error_loading_contact_details": "خطا در بارگذاری اطلاعات مخاطب",
     "unknown_error": "خطای ناشناخته",
     "contact_id_not_found": "شناسه مخاطب برای ویرایش یافت نشد",
@@ -1103,6 +1107,21 @@
       "list": "لیست"
     },
     "required": "الزامی",
+    "validation": {
+      "required": "{{field}} الزامی است.",
+      "email": "آدرس ایمیل معتبر نیست.",
+      "url": "آدرس URL معتبر نیست.",
+      "phone": "شماره تلفن معتبر نیست (مثال: 09123456789 یا 02188888888).",
+      "gender": "جنسیت معتبر نیست.",
+      "preferredContactMethod": "روش ارتباط ترجیحی معتبر نیست."
+    },
+    "fields": {
+      "firstName": "نام",
+      "lastName": "نام خانوادگی",
+      "phoneType": "نوع شماره",
+      "emailType": "نوع ایمیل",
+      "socialType": "نوع شبکه اجتماعی"
+    },
     "options": "گزینه‌ها",
     "delete_confirm_title": "آیا از حذف این فیلد سفارشی مطمئن هستید؟",
     "delete_confirm_description": "این عمل قابل بازگشت نیست. این قالب فیلد برای همیشه حذف خواهد شد. (داده‌های موجود در مخاطبین حذف نمی‌شوند)",

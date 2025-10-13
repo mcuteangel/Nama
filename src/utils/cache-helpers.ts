@@ -1,3 +1,5 @@
+import i18n from "@/integrations/i18n";
+
 const CACHE_EXPIRATION_TIME = 10 * 60 * 1000; // Increase to 10 minutes from 5 minutes
 
 interface CacheEntry<T> {
@@ -97,6 +99,10 @@ export async function fetchWithCache<T>(
   } catch (err: unknown) {
     // 5. Handle errors: return stale data if available, otherwise null
     console.error(`Error fetching data for ${cacheKey}:`, err);
-    return { data: initialData, error: err instanceof Error ? err.message : "Unknown error", fromCache: false };
+    return { 
+      data: initialData, 
+      error: err instanceof Error ? err.message : i18n.t('errors.unknown_error'), 
+      fromCache: false 
+    };
   }
 }

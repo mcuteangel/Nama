@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { ContactFormValues } from '@/types/contact';
 import { Phone, Mail, Building, MapPin, Calendar, Users, Tag, Sparkles, Heart, Briefcase } from 'lucide-react';
 import { FormCard } from '@/components/ui/FormCard';
@@ -15,6 +16,7 @@ interface ContactPreviewCardProps {
 
 const ContactPreviewCard: React.FC<ContactPreviewCardProps> = ({ contact }) => {
   const { groups } = useGroups();
+  const { t } = useTranslation();
 
   // Get the first phone number and email for preview
   const primaryPhone = contact.phoneNumbers?.[0];
@@ -36,8 +38,8 @@ const ContactPreviewCard: React.FC<ContactPreviewCardProps> = ({ contact }) => {
 
   return (
     <FormCard
-      title="پیش نمایش مخاطب"
-      description="اطلاعات مخاطب را قبل از ذخیره مشاهده کنید"
+      title={t('contact_form.preview_title')}
+      description={t('contact_form.preview_description')}
       icon={Sparkles}
       iconColor="#3b82f6"
     >

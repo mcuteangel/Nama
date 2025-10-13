@@ -1,9 +1,10 @@
 import { supabase } from '@/integrations/supabase/client';
-import { ErrorManager } from '@/lib/error-manager';
+import { invalidateCache } from '@/utils/cache-helpers';
+import i18n from '@/integrations/i18n';
 import { ContactCrudService } from './contact-crud-service'; // Updated import
 import { CustomFieldTemplateService } from './custom-field-template-service'; // Updated import
 import { ContactFormValues } from '@/types/contact';
-import { invalidateCache } from '@/utils/cache-helpers';
+import { ErrorManager } from '@/lib/error-manager';
 
 interface ParsedContactRow {
   firstName: string;
@@ -32,7 +33,7 @@ export const DataImportService = {
     try {
       const lines = csvContent.split('\n').filter(line => line.trim() !== '');
       if (lines.length < 2) {
-        return { success: false, importedCount: 0, error: 'فایل CSV خالی است یا فقط شامل سربرگ است.' };
+        return { success: false, importedCount: 0, error: i18n.t('errors.csv_empty_or_header_only') };
       }
 
       const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
@@ -46,7 +47,7 @@ export const DataImportService = {
         const values = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(v => v.trim().replace(/^"|"$/g, '')); // Split by comma, ignore commas inside double quotes
 
         if (values.length !== headers.length) {
-          console.warn(`Skipping row due to mismatch in column count: ${row}`);
+          console.warn(i18n.t('errors.csv_row_mismatch', { row }));
           continue;
         }
 

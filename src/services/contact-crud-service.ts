@@ -13,7 +13,7 @@ export const ContactCrudService = {
   async addContact(values: ContactFormValues): Promise<{ data: { id: string } | null; error: string | null }> {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
-      return { data: null, error: i18n.t('auth.user_not_authenticated') };
+      return { data: null, error: i18n.t('errors.auth_required') };
     }
 
     try {
@@ -71,7 +71,7 @@ export const ContactCrudService = {
   async updateContact(contactId: string, values: ContactFormValues): Promise<{ success: boolean; error: string | null }> {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
-      return { success: false, error: i18n.t('auth.user_not_authenticated') };
+      return { success: false, error: i18n.t('errors.auth_required') };
     }
 
     try {
@@ -116,7 +116,7 @@ export const ContactCrudService = {
   async deleteContact(contactId: string): Promise<{ success: boolean; error: string | null }> {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
-      return { success: false, error: i18n.t('auth.user_not_authenticated') };
+      return { success: false, error: i18n.t('errors.auth_required') };
     }
 
     try {

@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { ContactListResponse } from "@/types/contact.types";
+import i18n from "@/integrations/i18n";
 
 export const fetchContacts = async (
   userId: string,
@@ -74,7 +75,7 @@ export const fetchContacts = async (
 
     if (error) {
       console.error('Database error:', error);
-      return { data: null, error: 'خطا در دریافت اطلاعات از پایگاه داده' };
+      return { data: null, error: i18n.t('errors.database_fetch_error') };
     }
 
     return { data, error: null };
@@ -82,7 +83,7 @@ export const fetchContacts = async (
     console.error('Error in fetchContacts:', error);
     return { 
       data: null, 
-      error: error instanceof Error ? error.message : 'خطای ناشناخته در دریافت مخاطبین' 
+      error: error instanceof Error ? error.message : i18n.t('errors.unknown_contacts_fetch_error')
     };
   }
 };
