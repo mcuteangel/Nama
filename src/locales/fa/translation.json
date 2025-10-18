@@ -1,5 +1,46 @@
 {
+  "social_link_types": {
+    "linkedin": "لینکدین",
+    "twitter": "توییتر",
+    "instagram": "اینستاگرام",
+    "telegram": "تلگرام",
+    "website": "وب‌سایت",
+    "facebook": "فیسبوک",
+    "youtube": "یوتیوب",
+    "github": "گیت‌هاب",
+    "other": "سایر"
+  },
+  "email_types": {
+    "personal": "شخصی",
+    "work": "کاری",
+    "other": "سایر"
+  },
+  "email_label": "ایمیل",
   "contact_form": {
+    "notes": {
+      "title": "یادداشت‌ها",
+      "description": "اطلاعات اضافی و یادداشت‌های مربوط به مخاطب را وارد کنید",
+      "label": "یادداشت‌ها",
+      "placeholder": "یادداشت‌های خود را اینجا بنویسید..."
+    },
+    "important_dates": {
+      "title": "تاریخ‌های مهم",
+      "description": "تاریخ تولد و سایر مناسبت‌های مهم را وارد کنید",
+      "birthday_label": "تاریخ تولد",
+      "select_birthday_placeholder": "تاریخ تولد را انتخاب کنید"
+    },
+    "social_links": {
+      "title": "شبکه‌های اجتماعی",
+      "description": "لینک‌های شبکه‌های اجتماعی مخاطب را اضافه کنید",
+      "item_label": "شبکه اجتماعی",
+      "delete_button_aria_label": "حذف شبکه اجتماعی",
+      "type_label": "نوع شبکه",
+      "type_placeholder": "نوع شبکه اجتماعی را انتخاب کنید",
+      "url_label": "آدرس لینک",
+      "url_placeholder": "https://example.com",
+      "empty_state_message": "شبکه‌ای اضافه نشده",
+      "add_button": "افزودن شبکه اجتماعی"
+    },
     "edit_contact": "ویرایش مخاطب",
     "add_new_contact": "افزودن مخاطب جدید",
     "edit_contact_description": "اطلاعات مخاطب را ویرایش کنید",
@@ -8,6 +49,25 @@
     "preview_description": "پیش‌نمایش اطلاعات مخاطب قبل از ذخیره‌سازی",
     "group": "گروه",
     "select_group": "انتخاب گروه",
+    "email_addresses": {
+      "title": "آدرس ایمیل‌ها",
+      "description": "آدرس ایمیل‌های مخاطب را اضافه کنید",
+      "no_emails_added": "ایمیلی اضافه نشده",
+      "add_email_button": "افزودن ایمیل"
+    },
+    "phone_numbers": {
+      "title": "شماره تلفن‌ها",
+      "description": "شماره تلفن‌های مخاطب را اضافه کنید",
+      "phone_number_label": "شماره تلفن",
+      "phone_number_placeholder": "مثال: ۰۹۱۲۳۴۵۶۷۸۹",
+      "extension_label": "داخلی (اختیاری)",
+      "extension_placeholder": "۱۲۳",
+      "phone_type_label": "نوع تلفن",
+      "delete_button_aria_label": "حذف شماره تلفن",
+      "select_phone_type_placeholder": "نوع تلفن را انتخاب کنید",
+      "add_phone_button": "افزودن شماره تلفن",
+      "no_phone_numbers": "شماره‌ای اضافه نشده"
+    },
     "no_group": "بدون گروه",
     "add_new_group": "افزودن گروه جدید",
     "preparing_group_form": "در حال آماده‌سازی فرم گروه...",
@@ -38,8 +98,6 @@
     "email": "ایمیل",
     "phone": "تلفن",
     "sms": "پیامک",
-    "notes": "یادداشت‌ها",
-    "notes_placeholder": "یادداشت‌های اضافی",
     "field_name": "نام فیلد",
     "field_name_placeholder": "مثال: تاریخ تولد",
     "field_type": "نوع فیلد",
@@ -207,6 +265,7 @@
     "fid_tip": "نکته بهینه‌سازی FID",
     "fid_suggestion": " زمان اجرای JavaScript را کاهش دهید و از تقسیم کد استفاده کنید"
   },
+  "character_count": "{{count}} کاراکتر",
   "common": {
     "loading_page": "در حال بارگذاری صفحه...",
     "created_on": "تاریخ ایجاد",
@@ -878,6 +937,21 @@
   "errors": {
     "generic": "خطایی رخ داد",
     "unknown_error_occurred": "یک خطای ناشناخته رخ داد",
+    "network_offline": "عدم اتصال به اینترنت",
+    "network_offline_desc": "لطفاً اتصال اینترنت خود را بررسی کرده و دوباره تلاش کنید.",
+    "network_error": "خطای شبکه",
+    "network_error_desc": "اتصال به سرور برقرار نشد. لطفاً دوباره تلاش کنید.",
+    "timeout_error": "اتمام زمان درخواست",
+    "timeout_error_desc": "زمان درخواست به پایان رسید. لطفاً دوباره تلاش کنید.",
+    "data_error": "خطای بارگذاری داده",
+    "data_error_desc": "در بارگذاری داده‌ها خطا رخ داد. لطفاً دوباره تلاش کنید.",
+    "offline_mode": "شما در حال حاضر آفلاین هستید",
+    "retry_attempt": "تلاش مجدد: {{count}}",
+    "retry_operation": "تلاش مجدد برای انجام عملیات ناموفق",
+    "retrying": "در حال تلاش مجدد...",
+    "try_again": "تلاش مجدد",
+    "reload_page": "بارگذاری مجدد صفحه",
+    "technical_details": "جزئیات فنی",
     "auth_required": "برای انجام این عملیات باید وارد سیستم شوید.",
     "invalid_user_id": "شناسه کاربر نامعتبر است",
     "user_not_found": "کاربر مورد نظر یافت نشد",
@@ -1145,13 +1219,35 @@
     "list_options_en": "List Options",
     "checklist_options_en": "Checklist Options"
   },
+  "form_actions": {
+    "update_contact": "بروزرسانی مخاطب",
+    "save_contact": "ذخیره مخاطب",
+    "cancel": "انصراف"
+  },
+  "address": {
+    "title": "آدرس",
+    "description": "اطلاعات آدرس مخاطب را وارد کنید",
+    "fields": {
+      "street": "خیابان",
+      "street_placeholder": "مثال: خیابان ولیعصر، پلاک ۱۲۳",
+      "city": "شهر",
+      "city_placeholder": "مثال: تهران",
+      "postal_code": "کد پستی",
+      "postal_code_placeholder": "مثال: 1234567890",
+      "state": "استان",
+      "state_placeholder": "مثال: تهران",
+      "country": "کشور",
+      "country_placeholder": "مثال: ایران"
+    }
+  },
   "form_labels": {
     "first_name": "نام",
     "last_name": "نام خانوادگی",
     "gender": "جنسیت",
     "email_type": "نوع ایمیل",
-    "notes": "یادداشت‌ها",
-    "birth_date": "تاریخ تولد",
+    "select_email_type_placeholder": "نوع ایمیل را انتخاب کنید",
+    "email_placeholder": "مثال: example@email.com",
+    "field_name": "نام فیلد",
     "phone_numbers": "شماره‌های تماس",
     "email_addresses": "آدرس‌های ایمیل",
     "social_links": "شبکه‌های اجتماعی",
@@ -1234,6 +1330,7 @@
     }
   },
   "accessibility": {
+    "delete_email": "حذف آدرس ایمیل",
     "edit_contact_form": "فرم ویرایش مخاطب",
     "add_contact_form": "فرم افزودن مخاطب",
     "edit_contact_description": "ویرایش اطلاعات و جزئیات مخاطب",

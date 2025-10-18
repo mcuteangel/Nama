@@ -37,11 +37,13 @@ const ContactFormActions: React.FC<ContactFormActionsProps> = React.memo(({ isSu
     return () => window.removeEventListener('scroll', handleScroll);
   }, [isMobile]);
 
+  const { t } = useTranslation();
+  
   // Memoize button labels to prevent unnecessary re-renders
   const buttonLabels = useMemo(() => ({
-    submit: contactId ? 'بروزرسانی مخاطب' : 'ذخیره مخاطب',
-    cancel: 'انصراف'
-  }), [contactId]);
+    submit: contactId ? t('form_actions.update_contact') : t('form_actions.save_contact'),
+    cancel: t('form_actions.cancel')
+  }), [contactId, t]);
 
   return (
     <>

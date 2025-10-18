@@ -9,15 +9,15 @@ import { ContactFormValues } from '@/types/contact';
 import { FileText, AlertCircle, PenTool } from 'lucide-react';
 
 const ContactNotes: React.FC = React.memo(() => {
-  useTranslation();
+  const { t } = useTranslation();
   const form = useFormContext<ContactFormValues>();
 
   // Determine text direction based on language
 
   return (
     <FormCard
-      title="یادداشت‌ها"
-      description="اطلاعات اضافی و یادداشت‌های مربوط به مخاطب را وارد کنید"
+      title={t('contact_form.notes.title')}
+      description={t('contact_form.notes.description')}
       icon={FileText}
       iconColor="#22c55e"
     >
@@ -37,12 +37,12 @@ const ContactNotes: React.FC = React.memo(() => {
                     <PenTool size={10} className="text-primary-600 dark:text-primary-400" />
                   </div>
                   <FormLabel className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                    یادداشت‌ها
+                    {t('contact_form.notes.label')}
                   </FormLabel>
                 </div>
                 <FormControl>
                   <ModernTextarea
-                    placeholder="یادداشت‌های خود را درباره این مخاطب اینجا بنویسید..."
+                    placeholder={t('contact_form.notes.placeholder')}
                     variant="glass"
                     className={`w-full px-3 py-2 text-sm rounded-lg border-2 bg-white/80 dark:bg-gray-700/80 backdrop-blur-md transition-all duration-300 ease-out focus:ring-4 focus:ring-green-500/30 focus:border-green-400 hover:bg-white/95 dark:hover:bg-gray-600/95 hover:shadow-xl hover:shadow-green-500/20 min-h-[120px] resize-none ${fieldState.error ? 'border-red-300 focus:border-red-500' : 'border-slate-200 dark:border-slate-600'}`}
                     {...field}
@@ -51,7 +51,7 @@ const ContactNotes: React.FC = React.memo(() => {
                 </FormControl>
                 {field.value && (
                   <div className="text-xs text-slate-500 dark:text-slate-400 text-left">
-                    {field.value.length} کاراکتر
+                    {t('character_count', { count: field.value.length })}
                   </div>
                 )}
                 {fieldState.error && (

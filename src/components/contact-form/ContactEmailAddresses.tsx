@@ -22,11 +22,13 @@ const ContactEmailAddresses: React.FC = React.memo(() => {
   const isRTL = i18n.language === 'fa' || i18n.language === 'ar';
 
   // Memoize email type options to prevent unnecessary re-renders
+  const { t } = useTranslation();
+  
   const emailTypeOptions = useMemo(() => [
-    { value: "personal", label: "شخصی", icon: User },
-    { value: "work", label: "کاری", icon: Briefcase },
-    { value: "other", label: "سایر", icon: MoreHorizontal },
-  ], []);
+    { value: "personal", label: t('email_types.personal'), icon: User },
+    { value: "work", label: t('email_types.work'), icon: Briefcase },
+    { value: "other", label: t('email_types.other'), icon: MoreHorizontal },
+  ], [t]);
 
   const handleAddEmail = () => {
     append({ email_type: "personal", email_address: "" });
@@ -34,8 +36,8 @@ const ContactEmailAddresses: React.FC = React.memo(() => {
 
   return (
     <FormCard
-      title="آدرس ایمیل‌ها"
-      description="آدرس ایمیل‌های مخاطب را اضافه کنید"
+      title={t('contact_form.email_addresses.title')}
+      description={t('contact_form.email_addresses.description')}
       icon={Mail}
       iconColor="#8b5cf6"
     >
@@ -55,7 +57,7 @@ const ContactEmailAddresses: React.FC = React.memo(() => {
                     <Mail size={10} className="text-primary-600 dark:text-primary-400" />
                   </div>
                   <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                    ایمیل {index + 1}
+                    {t('email_label')} {index + 1}
                   </span>
                 </div>
 
@@ -66,7 +68,7 @@ const ContactEmailAddresses: React.FC = React.memo(() => {
                   size="icon"
                   onClick={() => remove(index)}
                   className="text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 h-6 w-6 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-200"
-                  aria-label="حذف آدرس ایمیل"
+                  aria-label={t('accessibility.delete_email')}
                 >
                   <X size={12} />
                 </GlassButton>
@@ -81,7 +83,7 @@ const ContactEmailAddresses: React.FC = React.memo(() => {
                     render={({ field, fieldState }) => (
                       <div className="space-y-1">
                         <FormLabel className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                          نوع ایمیل
+                          {t('form_labels.email_type')}
                         </FormLabel>
                         <FormControl>
                           <ModernSelect onValueChange={field.onChange} value={field.value} dir={isRTL ? 'rtl' : 'ltr'}>
@@ -90,7 +92,7 @@ const ContactEmailAddresses: React.FC = React.memo(() => {
                               dir={isRTL ? 'rtl' : 'ltr'}
                               variant="glass"
                             >
-                              <ModernSelectValue placeholder="نوع ایمیل را انتخاب کنید" />
+                              <ModernSelectValue placeholder={t('form_labels.select_email_type_placeholder')} />
                             </ModernSelectTrigger>
                             <ModernSelectContent dir={isRTL ? 'rtl' : 'ltr'} variant="glass">
                               {emailTypeOptions.map(option => (
@@ -123,12 +125,12 @@ const ContactEmailAddresses: React.FC = React.memo(() => {
                     render={({ field, fieldState }) => (
                       <div className="space-y-1">
                         <FormLabel className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                          آدرس ایمیل
+                          {t('form_labels.email_address')}
                         </FormLabel>
                         <FormControl>
                           <ModernInput
                             type="email"
-                            placeholder="مثال: example@email.com"
+                            placeholder={t('form_labels.email_placeholder')}
                             className={`w-full ${fieldState.error ? 'border-red-300 focus:border-red-500' : ''}`}
                             variant="glass"
                             {...field}
@@ -153,7 +155,7 @@ const ContactEmailAddresses: React.FC = React.memo(() => {
         {fields.length === 0 && (
           <div className="text-center py-2 text-slate-500 dark:text-slate-400">
             <Mail size={18} className="mx-auto mb-1 opacity-50" />
-            <p className="text-xs">ایمیلی اضافه نشده</p>
+            <p className="text-xs">{t('contact_form.email_addresses.no_emails_added')}</p>
           </div>
         )}
 
@@ -167,7 +169,7 @@ const ContactEmailAddresses: React.FC = React.memo(() => {
             className="bg-primary-500/10 hover:bg-primary-500/20 text-primary-700 dark:text-primary-300 px-3 py-1.5 rounded-xl border border-primary-200 dark:border-primary-800 transition-all duration-200"
           >
             <Plus size={14} className="ml-2" />
-            افزودن ایمیل
+            {t('contact_form.email_addresses.add_email_button')}
           </GlassButton>
         </div>
       </div>

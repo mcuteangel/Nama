@@ -19,10 +19,12 @@ const ContactImportantDates: React.FC = React.memo(() => {
 
   // Determine text direction based on language
 
+  const { t } = useTranslation();
+
   return (
     <FormCard
-      title="تاریخ‌های مهم"
-      description="تاریخ تولد و سایر مناسبت‌های مهم را وارد کنید"
+      title={t('contact_form.important_dates.title')}
+      description={t('contact_form.important_dates.description')}
       icon={Cake}
       iconColor="#ec4899"
     >
@@ -38,7 +40,7 @@ const ContactImportantDates: React.FC = React.memo(() => {
             render={({ field, fieldState }) => (
               <div className="space-y-2">
                 <FormLabel className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                  تاریخ تولد
+                  {t('contact_form.important_dates.birthday_label')}
                 </FormLabel>
                 <FormControl>
                   <ModernPopover>
@@ -57,7 +59,9 @@ const ContactImportantDates: React.FC = React.memo(() => {
                               {formatDate(new Date(field.value))}
                             </span>
                           ) : (
-                            <span className="text-slate-500 dark:text-slate-400">تاریخ تولد را انتخاب کنید</span>
+                            <span className="text-slate-500 dark:text-slate-400">
+                              {t('contact_form.important_dates.select_birthday_placeholder')}
+                            </span>
                           )}
                         </span>
                       </GlassButton>

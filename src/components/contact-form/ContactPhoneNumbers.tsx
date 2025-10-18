@@ -11,7 +11,7 @@ import { ContactFormValues } from '@/types/contact';
 import { useTranslation } from 'react-i18next';
 
 const ContactPhoneNumbers: React.FC = React.memo(() => {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const form = useFormContext<ContactFormValues>();
   const { fields, append, remove } = useFieldArray({
     control: form.control,
@@ -30,11 +30,11 @@ const ContactPhoneNumbers: React.FC = React.memo(() => {
 
   // Memoize phone type options to prevent unnecessary re-renders
   const phoneTypeOptions = useMemo(() => [
-    { value: "mobile", label: "موبایل", icon: Smartphone },
-    { value: "home", label: "خانه", icon: Home },
-    { value: "work", label: "کار", icon: Briefcase },
-    { value: "other", label: "سایر", icon: MoreHorizontal },
-  ], []);
+    { value: "mobile", label: t('phone_type.mobile'), icon: Smartphone },
+    { value: "home", label: t('phone_type.home'), icon: Home },
+    { value: "work", label: t('phone_type.work'), icon: Briefcase },
+    { value: "other", label: t('phone_type.other'), icon: MoreHorizontal },
+  ], [t]);
 
   const handleAddPhoneNumber = () => {
     append({ phone_type: "mobile", phone_number: "", extension: null });
@@ -48,8 +48,8 @@ const ContactPhoneNumbers: React.FC = React.memo(() => {
 
   return (
     <FormCard
-      title="شماره تلفن‌ها"
-      description="شماره تلفن‌های مخاطب را اضافه کنید"
+      title={t('contact_form.phone_numbers.title')}
+      description={t('contact_form.phone_numbers.description')}
       icon={Phone}
       iconColor="#f97316"
     >
@@ -69,7 +69,7 @@ const ContactPhoneNumbers: React.FC = React.memo(() => {
                     <Phone size={10} className="text-primary-600 dark:text-primary-400" />
                   </div>
                   <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                    شماره تلفن {index + 1}
+                    {t('contact_form.phone_numbers.phone_number_label')} {index + 1}
                   </span>
                 </div>
 
@@ -81,7 +81,7 @@ const ContactPhoneNumbers: React.FC = React.memo(() => {
                     size="icon"
                     onClick={() => handleRemovePhoneNumber(index)}
                     className="text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 h-6 w-6 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-200"
-                    aria-label="حذف شماره تلفن"
+                    aria-label={t('contact_form.phone_numbers.delete_button_aria_label')}
                   >
                     <X size={12} />
                   </GlassButton>
@@ -97,7 +97,7 @@ const ContactPhoneNumbers: React.FC = React.memo(() => {
                     render={({ field, fieldState }) => (
                       <div className="space-y-1">
                         <FormLabel className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                          نوع تلفن
+                          {t('contact_form.phone_numbers.phone_type_label')}
                         </FormLabel>
                         <FormControl>
                           <ModernSelect onValueChange={field.onChange} value={field.value} dir={isRTL ? 'rtl' : 'ltr'}>
@@ -106,7 +106,7 @@ const ContactPhoneNumbers: React.FC = React.memo(() => {
                               dir={isRTL ? 'rtl' : 'ltr'}
                               variant="glass"
                             >
-                              <ModernSelectValue placeholder="نوع تلفن را انتخاب کنید" />
+                              <ModernSelectValue placeholder={t('contact_form.phone_numbers.select_phone_type_placeholder')} />
                             </ModernSelectTrigger>
                             <ModernSelectContent dir={isRTL ? 'rtl' : 'ltr'} variant="glass">
                               {phoneTypeOptions.map(option => (
@@ -139,11 +139,11 @@ const ContactPhoneNumbers: React.FC = React.memo(() => {
                     render={({ field, fieldState }) => (
                       <div className="space-y-1">
                         <FormLabel className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                          شماره تلفن
+                          {t('contact_form.phone_numbers.phone_number_label')}
                         </FormLabel>
                         <FormControl>
                           <ModernInput
-                            placeholder="مثال: ۰۹۱۲۳۴۵۶۷۸۹"
+                            placeholder={t('contact_form.phone_numbers.phone_number_placeholder')}
                             className={`w-full ${fieldState.error ? 'border-red-300 focus:border-red-500' : ''}`}
                             variant="glass"
                             {...field}
@@ -168,11 +168,11 @@ const ContactPhoneNumbers: React.FC = React.memo(() => {
                     render={({ field, fieldState }) => (
                       <div className="space-y-1">
                         <FormLabel className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                          داخلی (اختیاری)
+                          {t('contact_form.phone_numbers.extension_label')}
                         </FormLabel>
                         <FormControl>
                           <ModernInput
-                            placeholder="۱۲۳"
+                            placeholder={t('contact_form.phone_numbers.extension_placeholder')}
                             className={`w-full ${fieldState.error ? 'border-red-300 focus:border-red-500' : ''}`}
                             variant="glass"
                             {...field}
@@ -204,14 +204,14 @@ const ContactPhoneNumbers: React.FC = React.memo(() => {
             className="bg-primary-500/10 hover:bg-primary-500/20 text-primary-700 dark:text-primary-300 px-3 py-1.5 rounded-xl border border-primary-200 dark:border-primary-800 transition-all duration-200"
           >
             <Plus size={14} className="ml-2" />
-            افزودن شماره تلفن
+            {t('contact_form.phone_numbers.add_phone_button')}
           </GlassButton>
         </div>
 
         {fields.length === 0 && (
           <div className="text-center py-2 text-slate-500 dark:text-slate-400">
             <Phone size={18} className="mx-auto mb-1 opacity-50" />
-            <p className="text-xs">شماره‌ای اضافه نشده</p>
+            <p className="text-xs">{t('contact_form.phone_numbers.no_phone_numbers')}</p>
           </div>
         )}
       </div>

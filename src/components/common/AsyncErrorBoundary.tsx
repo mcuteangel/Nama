@@ -90,8 +90,8 @@ function AsyncErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
       return {
         type: 'network',
         icon: Wifi,
-        title: t('error.network_offline', 'No Internet Connection'),
-        description: t('error.network_offline_desc', 'Please check your internet connection and try again.')
+        title: t('errors.network_offline'),
+        description: t('errors.network_offline_desc')
       };
     }
     
@@ -99,8 +99,8 @@ function AsyncErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
       return {
         type: 'network',
         icon: Wifi,
-        title: t('error.network_error', 'Network Error'),
-        description: t('error.network_error_desc', 'Unable to connect to the server. Please try again.')
+        title: t('errors.network_error'),
+        description: t('errors.network_error_desc')
       };
     }
     
@@ -108,16 +108,16 @@ function AsyncErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
       return {
         type: 'timeout',
         icon: RefreshCw,
-        title: t('error.timeout_error', 'Request Timeout'),
-        description: t('error.timeout_error_desc', 'The request took too long to complete. Please try again.')
+        title: t('errors.timeout_error'),
+        description: t('errors.timeout_error_desc')
       };
     }
     
     return {
       type: 'data',
       icon: Database,
-      title: t('error.data_error', 'Data Loading Error'),
-      description: t('error.data_error_desc', 'Failed to load data. Please try again.')
+      title: t('errors.data_error'),
+      description: t('errors.data_error_desc')
     };
   }, [error.message, isOnline, t]);
 
@@ -143,7 +143,7 @@ function AsyncErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
             <div className="flex items-center justify-center p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">
               <Wifi className="w-4 h-4 text-red-600 dark:text-red-400 mr-2" />
               <span className="text-sm text-red-600 dark:text-red-400">
-                {t('error.offline_mode', 'You are currently offline')}
+                {t('errors.offline_mode')}
               </span>
             </div>
           )}
@@ -151,7 +151,7 @@ function AsyncErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
           {/* Retry information */}
           {retryCount > 0 && (
             <div className="text-center text-sm text-gray-500 dark:text-gray-400">
-              {t('error.retry_attempt', 'Retry attempt: {{count}}', { count: retryCount })}
+              {t('errors.retry_attempt', { count: retryCount })}
             </div>
           )}
           
@@ -161,10 +161,10 @@ function AsyncErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
               onClick={handleRetry} 
               disabled={isRetrying}
               className="w-full"
-              aria-label={t('error.retry_operation', 'Retry the failed operation')}
+              aria-label={t('errors.retry_operation')}
             >
               <RefreshCw className={`w-4 h-4 mr-2 ${isRetrying ? 'animate-spin' : ''}`} />
-              {isRetrying ? t('error.retrying', 'Retrying...') : t('error.try_again', 'Try Again')}
+              {isRetrying ? t('errors.retrying') : t('errors.try_again')}
             </GlassButton>
             
             {retryCount >= 3 && (
@@ -173,7 +173,7 @@ function AsyncErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
                 onClick={() => window.location.reload()}
                 className="w-full"
               >
-                {t('error.reload_page', 'Reload Page')}
+                {t('errors.reload_page')}
               </GlassButton>
             )}
           </div>
@@ -182,7 +182,7 @@ function AsyncErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
           {process.env.NODE_ENV === 'development' && (
             <details className="mt-4">
               <summary className="cursor-pointer text-sm text-gray-500 dark:text-gray-400">
-                {t('error.technical_details', 'Technical Details')}
+                {t('errors.technical_details')}
               </summary>
               <pre className="mt-2 p-3 bg-gray-100 dark:bg-gray-800 rounded text-xs overflow-auto max-h-32">
                 {error.message}

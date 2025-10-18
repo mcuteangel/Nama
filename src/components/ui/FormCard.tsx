@@ -4,6 +4,7 @@ import { ModernCard, ModernCardHeader, ModernCardTitle, ModernCardContent } from
 import { ModernLoader } from '@/components/ui/modern-loader';
 import { ModernTooltip, ModernTooltipContent, ModernTooltipTrigger } from '@/components/ui/modern-tooltip';
 import { LucideIcon, HelpCircle } from 'lucide-react';
+import { t } from 'i18next';
 
 interface FormCardProps {
   title: string;
@@ -113,7 +114,9 @@ export const FormCard: React.FC<FormCardProps> = ({
         {loading ? (
           <div className="flex items-center justify-center py-8">
             <ModernLoader variant="spinner" size="sm" />
-            <span className="mr-3 text-sm text-slate-600 dark:text-slate-400">در حال بارگذاری...</span>
+            <span className="mr-3 text-sm text-slate-600 dark:text-slate-400">
+              {t('common.loading')}
+            </span>
           </div>
         ) : error ? (
           <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
