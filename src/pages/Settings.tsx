@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from 'react-i18next';
-import { Settings as SettingsIcon, Palette, Sparkles, TestTube, UserCircle, Database, Code } from "lucide-react";
+import { Settings as SettingsIcon, Palette, Sparkles, UserCircle, Database, Code } from "lucide-react";
 import { cn } from '@/lib/utils';
 import PageHeader from "@/components/ui/PageHeader";
 import { ModernCard, ModernCardContent } from "@/components/ui/modern-card";
