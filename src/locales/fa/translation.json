@@ -1,10 +1,22 @@
 {
   "contact_form": {
+    "edit_contact": "ویرایش مخاطب",
+    "add_new_contact": "افزودن مخاطب جدید",
+    "edit_contact_description": "اطلاعات مخاطب را ویرایش کنید",
+    "add_contact_description": "اطلاعات مخاطب جدید را وارد کنید",
+    "preview_title": "پیش‌نمایش مخاطب",
+    "preview_description": "پیش‌نمایش اطلاعات مخاطب قبل از ذخیره‌سازی",
     "group": "گروه",
     "select_group": "انتخاب گروه",
     "no_group": "بدون گروه",
     "add_new_group": "افزودن گروه جدید",
     "preparing_group_form": "در حال آماده‌سازی فرم گروه...",
+    "values": {
+      "no_group_selected": "بدون گروه انتخاب شده",
+      "add_new_group": "افزودن گروه جدید"
+    },
+    "add_group_title": "افزودن گروه",
+    "add_group_description": "فرم افزودن گروه مخاطبین جدید",
     "company": "شرکت",
     "company_placeholder": "مثال: شرکت X",
     "position": "سمت/تخصص",
@@ -610,10 +622,11 @@
     "users_loaded_success": "کاربران با موفقیت بارگذاری شدند."
   },
   "ai_suggestions": {
-    "ungendered_contacts": "مخاطبین بدون جنسیت",
-    "male_suggestions": "مرد",
-    "female_suggestions": "زن",
+    "ungendered_contacts": "مخاطبین فاقد جنسیت",
+    "male_suggestions": "پیشنهادات مردانه",
+    "female_suggestions": "پیشنهادات زنانه",
     "no_gender_suggestions_found_local": "هیچ پیشنهاد جنسیتی برای مخاطبین محلی یافت نشد",
+    "update_status_failed": "به‌روزرسانی وضعیت پیشنهاد هوش مصنوعی به {{status}} با شکست مواجه شد.",
     "gender_reasoning_name_analysis": "نام '{{name}}' معمولاً برای جنسیت {{gender}} استفاده می‌شود",
     "learned_names_description": "تعداد نام‌هایی که هوش مصنوعی یاد گرفته است",
     "clear_learning_button": "پاک کردن داده‌های یادگیری",
@@ -814,6 +827,7 @@
   ],
   "gender": {
     "male": "مرد",
+    "male_value": "male",
     "female": "زن",
     "not_specified": "نامشخص"
   },
@@ -863,6 +877,7 @@
   },
   "errors": {
     "generic": "خطایی رخ داد",
+    "unknown_error_occurred": "یک خطای ناشناخته رخ داد",
     "auth_required": "برای انجام این عملیات باید وارد سیستم شوید.",
     "invalid_user_id": "شناسه کاربر نامعتبر است",
     "user_not_found": "کاربر مورد نظر یافت نشد",
@@ -971,12 +986,6 @@
       "updated": "ویرایش شد",
       "deleted": "حذف شد"
     }
-  },
-  "toast": {
-    "success_title": "موفق",
-    "error_title": "خطا",
-    "info_title": "اطلاع",
-    "loading_title": "در حال بارگذاری"
   },
   "contact_list": {
     "contact_deleted_success": "مخاطب با موفقیت حذف شد.",
@@ -1171,11 +1180,15 @@
     "bio": "بیوگرافی",
     "birthday": "تولد"
   },
+  "basic_info": "اطلاعات پایه",
   "form_placeholders": {
     "enter_name": "نام خود را وارد کنید",
     "enter_last_name": "نام خانوادگی خود را وارد کنید",
-    "select_gender": "انتخاب جنسیت",
-    "select_type": "انتخاب نوع",
+    "select_gender": "جنسیت را انتخاب کنید",
+    "select_type": "نوع را انتخاب کنید",
+    "position_example": "مثال: مهندس نرم‌افزار",
+    "company_example": "مثال: شرکت فناوری اطلاعات",
+    "select_group": "انتخاب گروه",
     "email_example": "مثال: example@domain.com",
     "select_birth_date": "تاریخ را انتخاب کنید",
     "phone_example": "مثال: 09123456789",
@@ -1211,17 +1224,32 @@
     "no_groups_found": "هیچ گروهی یافت نشد.",
     "add_first_group": "برای شروع، یک گروه جدید اضافه کنید."
   },
+  "toast": {
+    "must_use_in_provider": "هوک useToast باید درون یک ToastProvider استفاده شود",
+    "titles": {
+      "success": "موفقیت‌آمیز",
+      "error": "خطا",
+      "warning": "هشدار",
+      "info": "اطلاعات"
+    }
+  },
   "accessibility": {
     "edit_contact_form": "فرم ویرایش مخاطب",
     "add_contact_form": "فرم افزودن مخاطب",
     "edit_contact_description": "ویرایش اطلاعات و جزئیات مخاطب",
-    "add_contact_description": "افزودن اطلاعات و جزئیات مخاطب جدید",
-    "avatar_section": "تصویر پروفایل",
+    "form_cancelled": "فرم لغو شد",
+    "form_submitted": "فرم با موفقیت ارسال شد",
+    "form_validation_failed": "اعتبارسنجی فرم ناموفق بود. لطفاً خطاها را بررسی کنید.",
+    "saving_changes": "در حال ذخیره تغییرات...",
+    "contact_form_title_edit": "ویرایش مخاطب",
+    "contact_form_title_add": "افزودن مخاطب",
+    "contact_form_description": "فرم را پر کنید تا اطلاعات تماس را مدیریت کنید",
     "basic_info_section": "اطلاعات پایه",
     "contact_info_section": "اطلاعات تماس",
     "social_dates_section": "شبکه‌های اجتماعی و تاریخ‌های مهم",
     "address_notes_section": "آدرس و یادداشت‌ها",
     "fields_tags_section": "فیلدها و برچسب‌های سفارشی",
+    "avatar_section": "تصویر پروفایل",
     "preview_history_section": "پیش‌نمایش و تاریخچه",
     "form_actions_section": "عملیات فرم",
     "updating_contact": "در حال به‌روزرسانی مخاطب...",
@@ -1242,7 +1270,6 @@
     "success": "موفقیت",
     "skip_to_content": "رفتن به محتوای اصلی",
     "skip_to_navigation": "رفتن به ناوبری",
-    "form_cancelled": "فرم لغو شد",
     "retry_save": "تلاش مجدد برای ذخیره",
     "remove_email_address": "حذف آدرس ایمیل",
     "remove_phone_number": "حذف شماره تلفن",

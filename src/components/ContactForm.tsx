@@ -77,13 +77,13 @@ const ContactForm: React.FC<ContactFormProps> = React.memo(({ initialData, conta
       await formLogic.onSubmit(data);
     } catch (error) {
       console.error('Error submitting form:', error);
-      formState.setFormError(error instanceof Error ? error.message : 'An unknown error occurred');
+      formState.setFormError(error instanceof Error ? error.message : t('errors.unknown_error_occurred'));
     }
   };
 
   // Handle cancel action
   const handleCancel = useCallback(() => {
-    accessibility.announce(t('accessibility.form_cancelled', 'Form cancelled'), 'polite');
+    accessibility.announce(t('accessibility.form_cancelled'), 'polite');
     navigate(-1);
   }, [navigate, accessibility, t]);
 
@@ -116,8 +116,8 @@ const ContactForm: React.FC<ContactFormProps> = React.memo(({ initialData, conta
     <div className="space-y-8">
       {/* Page Header */}
       <PageHeader
-        title={contactId ? 'ویرایش مخاطب' : 'افزودن مخاطب جدید'}
-        description={contactId ? 'اطلاعات مخاطب را ویرایش کنید' : 'اطلاعات مخاطب جدید را وارد کنید'}
+        title={contactId ? t('contact_form.edit_contact') : t('contact_form.add_new_contact')}
+        description={contactId ? t('contact_form.edit_contact_description') : t('contact_form.add_contact_description')}
         showBackButton={true}
       >
         {/* Additional header content can be added here if needed */}
@@ -156,10 +156,10 @@ const ContactForm: React.FC<ContactFormProps> = React.memo(({ initialData, conta
               {/* Hidden form title and description for screen readers */}
               <div className="sr-only">
                 <h2 id="contact-form-title">
-                  {accessibility.getAriaLabel('contact-form', contactId ? 'Edit Contact' : 'Add Contact')}
+                  {accessibility.getAriaLabel('contact-form', contactId ? t('accessibility.contact_form_title_edit') : t('accessibility.contact_form_title_add'))}
                 </h2>
                 <p id="contact-form-description">
-                  {accessibility.getAriaLabel('contact-form-description', 'Fill out the form to manage contact information')}
+                  {accessibility.getAriaLabel('contact-form-description', t('accessibility.contact_form_description'))}
                 </p>
               </div>
 
@@ -172,8 +172,8 @@ const ContactForm: React.FC<ContactFormProps> = React.memo(({ initialData, conta
                 {formLogic.isSubmitting && (
                   <span>
                     {contactId
-                      ? t('accessibility.updating_contact', 'Updating contact...')
-                      : t('accessibility.creating_contact', 'Creating contact...')
+                      ? t('accessibility.updating_contact')
+                      : t('accessibility.creating_contact')
                     }
                   </span>
                 )}
@@ -181,7 +181,7 @@ const ContactForm: React.FC<ContactFormProps> = React.memo(({ initialData, conta
 
               <fieldset disabled={formLogic.isSubmitting} className="space-y-4">
                 <legend className="sr-only">
-                  {t('accessibility.contact_information', 'Contact Information')}
+                  {t('accessibility.contact_information')}
                 </legend>
 
                 {/* Render sections with collapsible organization */}

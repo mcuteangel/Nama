@@ -76,7 +76,7 @@ const ContactPreviewCard: React.FC<ContactPreviewCardProps> = ({ contact }) => {
 
             <div className="flex-1 text-center sm:text-left">
               <h2 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white mb-1">
-                {fullName || 'مخاطب بدون نام'}
+                {fullName || t('contact_form.unnamed_contact')}
               </h2>
 
               {contact.position && (
@@ -86,7 +86,7 @@ const ContactPreviewCard: React.FC<ContactPreviewCardProps> = ({ contact }) => {
                   </div>
                   <p className="text-sm sm:text-base text-slate-700 dark:text-slate-300 font-medium">
                     {contact.position}
-                    {contact.company && ` در ${contact.company}`}
+                    {contact.company && ` ${t('common.at')} ${contact.company}`}
                   </p>
                 </div>
               )}
@@ -119,13 +119,13 @@ const ContactPreviewCard: React.FC<ContactPreviewCardProps> = ({ contact }) => {
                   <Phone size={10} className="text-primary-600 dark:text-primary-400" />
                 </div>
                 <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                  شماره تلفن
+                  {t('contact_form.phone_number')}
                 </span>
               </div>
               <div className="space-y-1">
                 <p className="text-base font-bold text-slate-900 dark:text-white">
                   {primaryPhone.phone_number}
-                  {primaryPhone.extension && ` (داخلی: ${primaryPhone.extension})`}
+                  {primaryPhone.extension && ` (${t('contact_form.extension', { extension: primaryPhone.extension })})`}
                 </p>
                 <p className="text-xs text-slate-500 dark:text-slate-400 capitalize">
                   {primaryPhone.phone_type}
@@ -146,7 +146,7 @@ const ContactPreviewCard: React.FC<ContactPreviewCardProps> = ({ contact }) => {
                   <Mail size={10} className="text-primary-600 dark:text-primary-400" />
                 </div>
                 <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                  آدرس ایمیل
+                  {t('contact_form.email_address')}
                 </span>
               </div>
               <div className="space-y-1">
@@ -172,7 +172,7 @@ const ContactPreviewCard: React.FC<ContactPreviewCardProps> = ({ contact }) => {
                   <MapPin size={10} className="text-primary-600 dark:text-primary-400" />
                 </div>
                 <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                  آدرس
+                  {t('contact_form.address')}
                 </span>
               </div>
               <p className="text-sm font-bold text-slate-900 dark:text-white">
@@ -195,7 +195,7 @@ const ContactPreviewCard: React.FC<ContactPreviewCardProps> = ({ contact }) => {
                   <Calendar size={10} className="text-primary-600 dark:text-primary-400" />
                 </div>
                 <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                  تاریخ تولد
+                  {t('contact_form.birthday')}
                 </span>
               </div>
               <p className="text-sm font-bold text-slate-900 dark:text-white">
@@ -216,7 +216,7 @@ const ContactPreviewCard: React.FC<ContactPreviewCardProps> = ({ contact }) => {
                   <Users size={10} className="text-primary-600 dark:text-primary-400" />
                 </div>
                 <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                  گروه
+                  {t('contact_form.group')}
                 </span>
               </div>
               <div className="flex items-center gap-2">
@@ -246,7 +246,7 @@ const ContactPreviewCard: React.FC<ContactPreviewCardProps> = ({ contact }) => {
                 <Tag size={10} className="text-primary-600 dark:text-primary-400" />
               </div>
               <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                تگ‌ها
+                {t('contact_form.tags')}
               </span>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -281,7 +281,7 @@ const ContactPreviewCard: React.FC<ContactPreviewCardProps> = ({ contact }) => {
                 <Heart size={10} className="text-primary-600 dark:text-primary-400" />
               </div>
               <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                جنسیت
+                {t('contact_form.gender')}
               </span>
             </div>
             <Badge
@@ -293,7 +293,7 @@ const ContactPreviewCard: React.FC<ContactPreviewCardProps> = ({ contact }) => {
                   : "bg-gradient-to-r from-pink-500 to-rose-500 text-white"
               )}
             >
-              {contact.gender === 'male' ? 'آقا' : 'خانم'}
+              {contact.gender === 'male' ? t('contact_form.male') : t('contact_form.female')}
             </Badge>
           </FormSection>
         )}

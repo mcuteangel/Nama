@@ -42,9 +42,9 @@ const ContactBasicInfo: React.FC = React.memo(() => {
 
   // Memoize gender options to prevent unnecessary re-renders
   const genderOptions = useMemo(() => [
-    { value: "male", label: t('gender.male') },
-    { value: "female", label: t('gender.female') },
-    { value: "not_specified", label: t('gender.not_specified') },
+    { value: "male" as const, label: t('gender.male') },
+    { value: "female" as const, label: t('gender.female') },
+    { value: "not_specified" as const, label: t('gender.not_specified') },
   ], [t]);
 
   // Memoize group options for search select
@@ -53,12 +53,12 @@ const ContactBasicInfo: React.FC = React.memo(() => {
     const safeGroups = Array.isArray(groups) ? groups : [];
 
     const options: { value: string; label: string }[] = [
-      { value: "no-group-selected", label: t('contact_form.no_group') },
+      { value: t('contact_form.values.no_group_selected'), label: t('contact_form.no_group') },
       ...safeGroups.map((group) => ({
         value: group.id,
         label: group.name,
       })),
-      { value: "__ADD_NEW_GROUP__", label: t('contact_form.add_new_group') },
+      { value: t('contact_form.values.add_new_group'), label: t('contact_form.add_new_group') },
     ];
 
     return options;
@@ -73,13 +73,13 @@ const ContactBasicInfo: React.FC = React.memo(() => {
   }, [fetchGroups, form]);
 
   const handleGroupSelection = useCallback(async (value: string) => {
-    if (value === "__ADD_NEW_GROUP__") {
+    if (value === t('contact_form.values.add_new_group')) {
       await fetchColorsWhenNeeded();
       setIsAddGroupDialogOpen(true);
     } else {
-      form.setValue('groupId', value === "no-group-selected" ? null : value, { shouldDirty: true, shouldValidate: true });
+      form.setValue('groupId', value === t('contact_form.values.no_group_selected') ? null : value, { shouldDirty: true, shouldValidate: true });
     }
-  }, [form, fetchColorsWhenNeeded]);
+  }, [form, fetchColorsWhenNeeded, t]);
 
   // Specialized handler for gender field to ensure proper typing
   const handleGenderChange = useCallback((value: "male" | "female" | "not_specified") => {
@@ -107,7 +107,7 @@ const ContactBasicInfo: React.FC = React.memo(() => {
 
   return (
     <FormCard
-      title="اطلاعات پایه"
+      title={t('basic_info')}
       icon={User}
       iconColor="#3b82f6"
       className="space-y-6"
@@ -122,12 +122,12 @@ const ContactBasicInfo: React.FC = React.memo(() => {
               <div className="space-y-2">
                 <FormLabel className="flex items-center gap-2">
                   <User size={16} />
-                  نام
+                  {t('form_labels.first_name')}
                   <span className="text-red-500">*</span>
                 </FormLabel>
                 <FormControl>
                   <ModernInput
-                    placeholder="مثال: محمد"
+                    placeholder={t('form_placeholders.enter_name')}
                     variant="glass"
                     {...field}
                     value={field.value || ''}
@@ -148,12 +148,12 @@ const ContactBasicInfo: React.FC = React.memo(() => {
               <div className="space-y-2">
                 <FormLabel className="flex items-center gap-2">
                   <User2 size={16} />
-                  نام خانوادگی
+                  {t('form_labels.last_name')}
                   <span className="text-red-500">*</span>
                 </FormLabel>
                 <FormControl>
                   <ModernInput
-                    placeholder="مثال: احمدی"
+                    placeholder={t('form_placeholders.enter_last_name')}
                     variant="glass"
                     {...field}
                     value={field.value || ''}
@@ -174,11 +174,11 @@ const ContactBasicInfo: React.FC = React.memo(() => {
               <div className="space-y-2">
                 <FormLabel className="flex items-center gap-2">
                   <Briefcase size={16} />
-                  سمت شغلی
+                  {t('form_labels.position')}
                 </FormLabel>
                 <FormControl>
                   <ModernInput
-                    placeholder="مثال: مدیر فروش"
+                    placeholder={t('form_placeholders.position_example')}
                     variant="glass"
                     {...field}
                     value={field.value || ''}
@@ -199,11 +199,11 @@ const ContactBasicInfo: React.FC = React.memo(() => {
               <div className="space-y-2">
                 <FormLabel className="flex items-center gap-2">
                   <Building2 size={16} />
-                  شرکت
+                  {t('form_labels.company')}
                 </FormLabel>
                 <FormControl>
                   <ModernInput
-                    placeholder="مثال: شرکت فناوری اطلاعات"
+                    placeholder={t('form_placeholders.company_example')}
                     variant="glass"
                     {...field}
                     value={field.value || ''}
@@ -224,7 +224,7 @@ const ContactBasicInfo: React.FC = React.memo(() => {
               <div className="space-y-2">
                 <FormLabel className="flex items-center gap-2">
                   <UserCheck size={16} />
-                  جنسیت
+                  {t('form_labels.gender')}
                 </FormLabel>
                 <FormControl>
                   <ModernSelect
@@ -233,7 +233,7 @@ const ContactBasicInfo: React.FC = React.memo(() => {
                     dir={isRTL ? 'rtl' : 'ltr'}
                   >
                     <ModernSelectTrigger variant="glass">
-                      <ModernSelectValue placeholder="جنسیت را انتخاب کنید" />
+                      <ModernSelectValue placeholder={t('form_placeholders.select_gender')} />
                     </ModernSelectTrigger>
                     <ModernSelectContent variant="glass">
                       {genderOptions.map(option => (
@@ -258,16 +258,16 @@ const ContactBasicInfo: React.FC = React.memo(() => {
               <div className="space-y-2">
                 <FormLabel className="flex items-center gap-2">
                   <Users size={16} />
-                  گروه
+                  {t('form_labels.group')}
                 </FormLabel>
                 <FormControl>
                   <ModernSelect
-                    value={field.value === null ? "no-group-selected" : field.value}
+                    value={field.value === null ? t('contact_form.values.no_group_selected') : field.value}
                     onValueChange={handleGroupSelection}
                     dir={isRTL ? 'rtl' : 'ltr'}
                   >
                     <ModernSelectTrigger variant="glass">
-                      <ModernSelectValue placeholder="گروه را انتخاب کنید" />
+                      <ModernSelectValue placeholder={t('form_placeholders.select_group')} />
                     </ModernSelectTrigger>
                     <ModernSelectContent variant="glass">
                       {groupOptions.map(option => (
@@ -290,8 +290,8 @@ const ContactBasicInfo: React.FC = React.memo(() => {
       {/* Dialog for adding new group */}
       <Dialog open={isAddGroupDialogOpen} onOpenChange={setIsAddGroupDialogOpen}>
         <FormDialogWrapper
-          title={t('contact_form.add_group_title', 'Add Group')}
-          description={t('contact_form.add_group_description', 'Form for adding a new contact group')}
+          title={t('contact_form.add_group_title')}
+          description={t('contact_form.add_group_description')}
         >
           {isFetchingColors ? (
             <div className="flex items-center justify-center p-6">

@@ -1,10 +1,20 @@
 {
   "contact_form": {
+    "edit_contact": "Edit Contact",
+    "add_new_contact": "Add New Contact",
+    "edit_contact_description": "Edit contact information",
+    "add_contact_description": "Enter new contact information",
     "group": "Group",
     "select_group": "Select Group",
     "no_group": "No Group",
     "add_new_group": "Add New Group",
     "preparing_group_form": "Preparing group form...",
+    "values": {
+      "no_group_selected": "No Group Selected",
+      "add_new_group": "Add New Group"
+    },
+    "add_group_title": "Add Group",
+    "add_group_description": "Form for adding a new contact group",
     "company": "Company",
     "company_placeholder": "e.g., Company X",
     "position": "Position/Expertise",
@@ -267,9 +277,17 @@
     "export_data": "Export Data",
     "gender": {
       "male": "Male",
+      "male_value": "male",
       "female": "Female",
-      "other": "Other",
-      "unknown": "Unknown"
+      "female_value": "female",
+      "not_specified": "Not Specified",
+      "not_specified_value": "not_specified"
+    },
+    "contact_form": {
+      "values": {
+        "no_group_selected": "no-group-selected",
+        "add_new_group": "__ADD_NEW_GROUP__"
+      }
     },
     "of_total": "of total",
     "not_specified": "Not specified",
@@ -279,6 +297,7 @@
   },
   "errors": {
     "generic": "An error occurred",
+    "unknown_error": "An unknown error occurred",
     "invalid_user_id": "Invalid user ID",
     "user_not_found": "User not found",
     "update_user_failed": "Failed to update user: {{error}}",
@@ -455,11 +474,15 @@
     "bio": "Bio",
     "birthday": "Birthday"
   },
+  "basic_info": "Basic Information",
   "form_placeholders": {
     "enter_name": "Enter your name",
     "enter_last_name": "Enter your last name",
     "select_gender": "Select gender",
     "select_type": "Select type",
+    "position_example": "e.g., Software Engineer",
+    "company_example": "e.g., Tech Company Inc.",
+    "select_group": "Select a group",
     "email_example": "Example: example@domain.com",
     "select_birth_date": "Select birth date",
     "phone_example": "Example: 09123456789",
@@ -493,12 +516,26 @@
     "add_first_contact": "Add your first contact to get started.",
     "no_custom_field_templates": "No custom field templates defined."
   },
+  "toast": {
+    "must_use_in_provider": "useToast must be used within a ToastProvider",
+    "titles": {
+      "success": "Success",
+      "error": "Error",
+      "warning": "Warning",
+      "info": "Information"
+    }
+  },
   "accessibility": {
-    "edit_contact_form": "Edit Contact Form",
-    "add_contact_form": "Add Contact Form",
+    "edit_contact_form": "Edit contact form",
+    "add_contact_form": "Add contact form",
     "edit_contact_description": "Edit contact information and details",
-    "add_contact_description": "Add new contact information and details",
-    "updating_contact": "Updating contact...",
+    "form_cancelled": "Form cancelled",
+    "form_submitted": "Form submitted successfully",
+    "form_validation_failed": "Form validation failed. Please check the errors.",
+    "saving_changes": "Saving changes...",
+    "contact_form_title_edit": "Edit Contact",
+    "contact_form_title_add": "Add Contact",
+    "contact_form_description": "Fill out the form to manage contact information",
     "creating_contact": "Creating contact...",
     "form_error": "Form error: {{message}}",
     "contact_information": "Contact Information",
@@ -828,6 +865,10 @@
     "performance": "Performance",
     "contact_information": "Contact Information",
     "contact_details": "Contact Details",
+    "timestamps": "Timestamps",
+    "edit": "Edit",
+    "basic_info": "Basic Information",
+    "gender": "Gender",
     "birthday": "Birthday",
     "days_until_birthday": "Days Until Birthday"
   },
@@ -911,6 +952,7 @@
     "male_suggestions": "Male Suggestions",
     "female_suggestions": "Female Suggestions",
     "no_gender_suggestions_found_local": "No gender suggestions found for local contacts",
+    "update_status_failed": "Failed to update AI suggestion status to {{status}}.",
     "gender_suggestions_generated_local": "Gender suggestions generated successfully",
     "error_generating_gender_suggestions_local": "Error generating gender suggestions",
     "gender_reasoning_name_analysis": "The name '{{name}}' is typically used for {{gender}} gender",

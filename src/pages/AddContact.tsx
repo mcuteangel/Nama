@@ -13,7 +13,7 @@ const AddContact = () => {
   const [prefillData, setPrefillData] = useState<ContactFormValues | undefined>(undefined);
   const [formLoaded, setFormLoaded] = useState(false);
   const { session } = useSession();
-  useTranslation();
+  const { t } = useTranslation();
 
   const { executeAsync: executeUpdateSuggestionStatus } = useErrorHandler(null, {
     showToast: false,
@@ -72,14 +72,14 @@ const AddContact = () => {
       if (suggestionId && session?.user) {
         executeUpdateSuggestionStatus(async () => {
           const { success, error } = await AISuggestionsService.updateSuggestionStatus(suggestionId, 'edited');
-          if (!success) throw new Error(error || 'Failed to update AI suggestion status to edited.');
+          if (!success) throw new Error(error || t('ai_suggestions.update_status_failed', { status: 'edited' }));
         });
       }
     }
     
     // Mark form as loaded after initial data processing
     setFormLoaded(true);
-  }, [processInitialData, session, executeUpdateSuggestionStatus]);
+  }, [processInitialData, session, executeUpdateSuggestionStatus, t]);
 
   return (
     <div className="flex flex-col items-center p-4 md:p-6 h-full w-full fade-in-up">

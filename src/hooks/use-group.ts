@@ -1,13 +1,38 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useErrorHandler } from './use-error-handler';
+// Define interfaces for group contacts
+interface GroupContactPhone {
+  id: string;
+  phone_number: string;
+  phone_type?: string;
+  extension?: string;
+}
+
+interface GroupContactEmail {
+  id: string;
+  email_address: string;
+  email_type?: string;
+}
+
+interface GroupContact {
+  id: string;
+  first_name: string | null;
+  last_name: string | null;
+  avatar_url: string | null;
+  phone_numbers: GroupContactPhone[];
+  email_addresses?: GroupContactEmail[];
+}
+
 // Define a simplified contact interface for preview purposes
 interface ContactPreview {
   id: string;
   first_name: string;
   last_name: string;
-  avatar_url?: string;
+  avatar_url?: string | null;
   email?: string;
+  phone_number?: string;
+  phone_numbers?: GroupContactPhone[];
   name?: string; // For backward compatibility
 }
 
@@ -83,13 +108,14 @@ export const useGroup = (groupId: string | undefined) => {
 
       const formattedData = {
         ...groupData,
-        contacts: contactsData.map((contact: any) => ({
+        contacts: (contactsData as GroupContact[]).map((contact) => ({
           id: contact.id,
           first_name: contact.first_name || '',
           last_name: contact.last_name || '',
           avatar_url: contact.avatar_url || null,
           phone_number: contact.phone_numbers?.[0]?.phone_number || '',
-          phone_numbers: contact.phone_numbers || []
+          phone_numbers: contact.phone_numbers || [],
+          email: contact.email_addresses?.[0]?.email_address || undefined
         } as ContactPreview)),
       };
 

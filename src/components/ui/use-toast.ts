@@ -1,18 +1,18 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { ToastContext, ToastState } from './toast-context';
 
 type ToastVariant = 'default' | 'success' | 'error' | 'warning' | 'info';
 
-
-
 /**
- * useToast - Hook برای استفاده از Toast
+ * useToast - Hook for using Toast notifications with i18n support
  */
 export function useToast() {
+  const { t } = useTranslation();
   const context = React.useContext(ToastContext);
   
   if (!context) {
-    throw new Error('useToast must be used within a ToastProvider');
+    throw new Error(t('toast.must_use_in_provider'));
   }
 
   const { addToast } = context;
@@ -21,7 +21,7 @@ export function useToast() {
     success: (message: string, options?: Partial<Omit<ToastState, 'id' | 'variant'>>) => {
       addToast({
         variant: 'success' as ToastVariant,
-        title: 'موفق',
+        title: t('toast.titles.success'),
         description: message,
         ...options
       });
@@ -29,7 +29,7 @@ export function useToast() {
     error: (message: string, options?: Partial<Omit<ToastState, 'id' | 'variant'>>) => {
       addToast({
         variant: 'error' as ToastVariant,
-        title: 'خطا',
+        title: t('toast.titles.error'),
         description: message,
         ...options
       });
@@ -37,7 +37,7 @@ export function useToast() {
     warning: (message: string, options?: Partial<Omit<ToastState, 'id' | 'variant'>>) => {
       addToast({
         variant: 'warning' as ToastVariant,
-        title: 'هشدار',
+        title: t('toast.titles.warning'),
         description: message,
         ...options
       });
@@ -45,7 +45,7 @@ export function useToast() {
     info: (message: string, options?: Partial<Omit<ToastState, 'id' | 'variant'>>) => {
       addToast({
         variant: 'info' as ToastVariant,
-        title: 'اطلاع',
+        title: t('toast.titles.info'),
         description: message,
         ...options
       });
