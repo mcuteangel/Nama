@@ -115,7 +115,7 @@ const LoadingMessage: React.FC<LoadingMessageProps> = ({
               transition={{ delay: 0.5 }}
             >
               <Sparkles size={14} className="animate-pulse" />
-              <span>{t('common.please_wait', 'لطفاً صبر کنید...')}</span>
+              <span>{t('common.loading.please_wait')}</span>
             </motion.div>
           )}
         </motion.div>

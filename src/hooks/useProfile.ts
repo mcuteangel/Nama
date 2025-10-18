@@ -95,14 +95,22 @@ export const useProfile = (): UseProfileReturn => {
     retryCount.current = 0;
   }, []);
 
+  // Store fetchProfile in a ref to avoid circular dependency
+  const fetchProfileRef = useRef(fetchProfile);
+  
+  // Update the ref when fetchProfile changes
+  useEffect(() => {
+    fetchProfileRef.current = fetchProfile;
+  }, [fetchProfile]);
+
   const retryOperation = useCallback(async () => {
     if (retryCount.current < maxRetries) {
       retryCount.current += 1;
-      await fetchProfile(true);
+      await fetchProfileRef.current(true);
     } else {
       showError(t('errors.max_retries_exceeded'));
     }
-  }, [t]); // Removed fetchProfile from dependencies to break circular dependency
+  }, [t]);
 
   const updateProfile = useCallback(async (data: Partial<ProfileData>) => {
     if (!session?.user) {

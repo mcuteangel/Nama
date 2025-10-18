@@ -121,7 +121,7 @@ const UserProfileImageUpload: React.FC<UserProfileImageUploadProps> = ({
                   {t('users.drop_profile_image')}
                 </p>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  {t('users.supported_formats')}: JPG, PNG, WebP
+                  {t('users.supported_formats')}
                 </p>
               </div>
             </div>

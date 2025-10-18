@@ -76,16 +76,16 @@ function ErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
   const { announce } = useSafeAccessibility();
 
   React.useEffect(() => {
-    announce(t('error.boundary_triggered', 'An error occurred and has been caught'), 'assertive');
+    announce(t('error.boundary_triggered'), 'assertive');
   }, [announce, t]);
 
   const handleRetry = () => {
-    announce(t('error.retrying', 'Retrying...'), 'polite');
+    announce(t('error.retrying'), 'polite');
     resetErrorBoundary();
   };
 
   const handleGoHome = () => {
-    announce(t('error.navigating_home', 'Navigating to home'), 'polite');
+    announce(t('error.navigating_home'), 'polite');
     if (hasRouter && navigate) {
       navigate('/');
     } else {
@@ -96,7 +96,7 @@ function ErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
   };
 
   const handleReload = () => {
-    announce(t('error.reloading_page', 'Reloading page'), 'polite');
+    announce(t('error.reloading_page'), 'polite');
     window.location.reload();
   };
 
@@ -108,9 +108,11 @@ function ErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
       timestamp: new Date().toISOString(),
     };
 
-    const mailtoUrl = `mailto:support@example.com?subject=Error%20Report&body=${encodeURIComponent(
-      `Error Details:\n\n${JSON.stringify(errorReport, null, 2)}`
-    )}`;
+    const emailSubject = t('error.report_email_subject');
+    const emailBody = t('error.report_email_body', { 
+      errorDetails: JSON.stringify(errorReport, null, 2) 
+    });
+    const mailtoUrl = `mailto:${t('error.support_email')}?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
 
     window.location.href = mailtoUrl;
   };
@@ -123,10 +125,10 @@ function ErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
             <AlertTriangle className="w-8 h-8 text-red-600 dark:text-red-400" />
           </div>
           <ModernCardTitle className="text-xl text-red-600 dark:text-red-400">
-            {t('error.something_went_wrong', 'Something went wrong')}
+            {t('error.something_went_wrong')}
           </ModernCardTitle>
           <ModernCardDescription className="text-base">
-            {t('error.unexpected_error_occurred', 'An unexpected error occurred. Don\'t worry, we\'ve been notified.')}
+            {t('error.unexpected_error_occurred')}
           </ModernCardDescription>
         </ModernCardHeader>
         <ModernCardContent className="space-y-6">
@@ -134,18 +136,18 @@ function ErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
           {process.env.NODE_ENV === 'development' && (
             <details className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4">
               <summary className="cursor-pointer font-medium text-sm text-gray-700 dark:text-gray-300 mb-2">
-                {t('error.technical_details', 'Technical Details')}
+                {t('error.technical_details')}
               </summary>
               <div className="mt-2 space-y-2 text-xs">
                 <div>
-                  <strong>{t('error.message', 'Message')}:</strong>
+                  <strong>{t('error.message')}:</strong>
                   <pre className="mt-1 p-2 bg-red-50 dark:bg-red-900/10 rounded text-red-800 dark:text-red-200 whitespace-pre-wrap">
                     {error.message}
                   </pre>
                 </div>
                 {error.stack && (
                   <div>
-                    <strong>{t('error.stack_trace', 'Stack Trace')}:</strong>
+                    <strong>{t('error.stack_trace')}:</strong>
                     <pre className="mt-1 p-2 bg-gray-50 dark:bg-gray-900 rounded text-gray-700 dark:text-gray-300 whitespace-pre-wrap text-xs overflow-auto max-h-40">
                       {error.stack}
                     </pre>
@@ -160,10 +162,10 @@ function ErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
             <GlassButton 
               onClick={handleRetry} 
               className="flex-1"
-              aria-label={t('error.retry_operation', 'Retry the operation that failed')}
+              aria-label={t('error.retry_operation')}
             >
               <RefreshCw className="w-4 h-4 mr-2" />
-              {t('error.try_again', 'Try Again')}
+              {t('error.try_again')}
             </GlassButton>
             
             {hasRouter && (
@@ -171,10 +173,10 @@ function ErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
                 variant="outline" 
                 onClick={handleGoHome}
                 className="flex-1"
-                aria-label={t('error.go_home', 'Go to home page')}
+                aria-label={t('error.go_home')}
               >
                 <Home className="w-4 h-4 mr-2" />
-                {t('error.go_home', 'Go Home')}
+                {t('error.go_home')}
               </GlassButton>
             )}
           </div>
@@ -184,26 +186,26 @@ function ErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
               variant="outline" 
               onClick={handleReload}
               className="flex-1"
-              aria-label={t('error.reload_page', 'Reload the entire page')}
+              aria-label={t('error.reload_page')}
             >
               <RefreshCw className="w-4 h-4 mr-2" />
-              {t('error.reload_page', 'Reload Page')}
+              {t('error.reload_page')}
             </GlassButton>
             
             <GlassButton 
               variant="ghost" 
               onClick={handleReportError}
               className="flex-1"
-              aria-label={t('error.report_error', 'Report this error to support')}
+              aria-label={t('error.report_error')}
             >
               <Mail className="w-4 h-4 mr-2" />
-              {t('error.report_error', 'Report Error')}
+              {t('error.report_error')}
             </GlassButton>
           </div>
 
           {/* Help Text */}
           <div className="text-center text-sm text-gray-500 dark:text-gray-400">
-            <p>{t('error.help_text', 'If the problem persists, please contact support.')}</p>
+            <p>{t('error.help_text')}</p>
           </div>
         </ModernCardContent>
       </ModernCard>
@@ -217,13 +219,13 @@ function AsyncErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
   const { announce } = useSafeAccessibility();
 
   React.useEffect(() => {
-    announce(t('error.async_error_occurred', 'A data loading error occurred'), 'assertive');
+    announce(t('error.async_error_occurred'), 'assertive');
   }, [announce, t]);
 
   const handleRetry = () => {
     // Clear React Query cache to force refetch
     queryClient.clear();
-    announce(t('error.clearing_cache_retrying', 'Clearing cache and retrying'), 'polite');
+    announce(t('error.clearing_cache_retrying'), 'polite');
     resetErrorBoundary();
   };
 
@@ -238,16 +240,16 @@ function AsyncErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
         <AlertTriangle className="w-6 h-6 text-orange-600 dark:text-orange-400" />
       </div>
       <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
-        {t('error.data_loading_failed', 'Failed to load data')}
+        {t('error.data_loading_failed')}
       </h3>
       <p className="text-gray-600 dark:text-gray-400 mb-4 max-w-md">
-        {t('error.network_or_server_error', 'There was a problem loading the data. This could be due to a network or server issue.')}
+        {t('error.network_or_server_error')}
       </p>
       
       {/* Error Details */}
       <details className="mb-4 w-full max-w-md">
         <summary className="cursor-pointer text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">
-          {t('error.technical_details', 'Technical Details')}
+          {t('error.technical_details')}
         </summary>
         <div className="mt-2 p-3 bg-gray-100 dark:bg-gray-800 rounded text-left overflow-auto max-h-40">
           <pre className="text-xs text-gray-800 dark:text-gray-200 whitespace-pre-wrap">
@@ -264,7 +266,7 @@ function AsyncErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
             onClick={copyErrorToClipboard}
             className="mt-2 text-xs text-blue-600 dark:text-blue-400 hover:underline"
           >
-            {t('error.copy_to_clipboard', 'Copy to clipboard')}
+            {t('error.copy_to_clipboard')}
           </button>
         </div>
       </details>
@@ -272,7 +274,7 @@ function AsyncErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
       <div className="space-y-2">
         <GlassButton onClick={handleRetry}>
           <RefreshCw className="w-4 h-4 mr-2" />
-          {t('error.try_again', 'Try Again')}
+          {t('error.try_again')}
         </GlassButton>
       </div>
     </div>
@@ -285,7 +287,7 @@ function FormErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
   const { announce } = useSafeAccessibility();
 
   React.useEffect(() => {
-    announce(t('error.form_error_occurred', 'A form error occurred'), 'assertive');
+    announce(t('error.form_error_occurred'), 'assertive');
   }, [announce, t]);
 
   return (
@@ -294,10 +296,10 @@ function FormErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
         <AlertTriangle className="w-5 h-5 text-red-600 dark:text-red-400 mt-0.5 mr-3 flex-shrink-0" />
         <div className="flex-1">
           <h4 className="text-sm font-medium text-red-800 dark:text-red-200 mb-1">
-            {t('error.form_submission_failed', 'Form submission failed')}
+            {t('error.form_submission_failed')}
           </h4>
           <p className="text-sm text-red-700 dark:text-red-300 mb-3">
-            {error.message || t('error.form_validation_error', 'There was a problem with your form submission.')}
+            {error.message || t('error.form_validation_error')}
           </p>
           <GlassButton
             size="sm"
@@ -306,7 +308,7 @@ function FormErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
             className="border-red-300 text-red-700 hover:bg-red-100 dark:border-red-600 dark:text-red-300 dark:hover:bg-red-900/20"
           >
             <RefreshCw className="w-3 h-3 mr-1" />
-            {t('error.reset_form', 'Reset Form')}
+            {t('error.reset_form')}
           </GlassButton>
         </div>
       </div>

@@ -125,7 +125,7 @@ const AddGroupDialog: React.FC<AddGroupDialogProps> = ({ onGroupAdded, open, onO
               <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-400 rounded-full animate-ping"></div>
             </div>
             <DialogTitle className="text-2xl font-bold text-gray-800 dark:text-white mb-4">
-              {t('groups.login_required_title', 'ورود لازم است')}
+              {t('groups.login_required_title')}
             </DialogTitle>
             <p className="text-gray-600 dark:text-gray-300 mb-6">
               {t('groups.login_required')}
@@ -184,7 +184,7 @@ const AddGroupDialog: React.FC<AddGroupDialogProps> = ({ onGroupAdded, open, onO
                 </DialogTitle>
                 <p className="text-lg text-gray-600 dark:text-gray-300 flex items-center justify-center gap-2">
                   <Sparkles size={18} className="text-yellow-500" />
-                  <span>{t('groups.create_new_group_desc', 'یک گروه جدید بسازید')}</span>
+                  <span>{t('groups.create_new_group_desc')}</span>
                 </p>
               </div>
             </div>
@@ -194,21 +194,21 @@ const AddGroupDialog: React.FC<AddGroupDialogProps> = ({ onGroupAdded, open, onO
               <div className="bg-gradient-to-br from-blue-500/10 to-blue-600/10 dark:from-blue-500/20 dark:to-blue-600/20 rounded-2xl p-4 border border-blue-200/30 dark:border-blue-800/30 backdrop-blur-sm text-center">
                 <Palette size={20} className="text-blue-500 mx-auto mb-2" />
                 <div className="text-sm font-medium text-blue-600 dark:text-blue-400">
-                  {t('groups.color_picker', 'انتخاب رنگ')}
+                  {t('groups.color_picker')}
                 </div>
               </div>
 
               <div className="bg-gradient-to-br from-green-500/10 to-green-600/10 dark:from-green-500/20 dark:to-green-600/20 rounded-2xl p-4 border border-green-200/30 dark:border-green-800/30 backdrop-blur-sm text-center">
                 <Zap size={20} className="text-green-500 mx-auto mb-2" />
                 <div className="text-sm font-medium text-green-600 dark:text-green-400">
-                  {t('groups.smart_suggestions', 'پیشنهاد هوشمند')}
+                  {t('groups.smart_suggestions')}
                 </div>
               </div>
 
               <div className="bg-gradient-to-br from-purple-500/10 to-purple-600/10 dark:from-purple-500/20 dark:to-purple-600/20 rounded-2xl p-4 border border-purple-200/30 dark:border-purple-800/30 backdrop-blur-sm text-center">
                 <Users size={20} className="text-purple-500 mx-auto mb-2" />
                 <div className="text-sm font-medium text-purple-600 dark:text-purple-400">
-                  {t('groups.organize_contacts', 'سازماندهی مخاطبین')}
+                  {t('groups.organize_contacts')}
                 </div>
               </div>
             </div>
@@ -225,7 +225,7 @@ const AddGroupDialog: React.FC<AddGroupDialogProps> = ({ onGroupAdded, open, onO
                   </div>
                   <LoadingMessage message={t('system_messages.preparing_group_form')} />
                   <p className="text-sm text-gray-600 dark:text-gray-300">
-                    {t('groups.preparing_colors', 'در حال آماده‌سازی رنگ‌های منحصر به فرد...')}
+                    {t('groups.preparing_colors')}
                   </p>
                 </div>
               </ModernCard>
@@ -237,7 +237,7 @@ const AddGroupDialog: React.FC<AddGroupDialogProps> = ({ onGroupAdded, open, onO
                   </div>
                   <div>
                     <h3 className="text-lg font-bold text-red-600 dark:text-red-400 mb-2">
-                      {t('errors.color_load_failed', 'خطا در بارگذاری رنگ‌ها')}
+                      {t('errors.color_load_failed')}
                     </h3>
                     <p className="text-red-500 dark:text-red-300 text-sm">
                       {fetchColorsError.message}
@@ -261,7 +261,7 @@ const AddGroupDialog: React.FC<AddGroupDialogProps> = ({ onGroupAdded, open, onO
                     </div>
                     <div className="flex-1">
                       <p className="text-sm font-medium text-green-700 dark:text-green-300">
-                        {t('groups.success_preview', 'پس از ایجاد گروه، به طور خودکار به لیست گروه‌ها اضافه خواهد شد')}
+                        {t('groups.success_preview')}
                       </p>
                     </div>
                   </div>

@@ -246,7 +246,7 @@ const ContactPreviewCard: React.FC<ContactPreviewCardProps> = ({ contact }) => {
                 <Tag size={10} className="text-primary-600 dark:text-primary-400" />
               </div>
               <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                {t('contact_form.tags')}
+                {t('contact_form.tag')}
               </span>
             </div>
             <div className="flex flex-wrap gap-2">

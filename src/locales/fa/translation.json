@@ -16,11 +16,17 @@
     "other": "سایر"
   },
   "email_label": "ایمیل",
+  "labels": {
+    "upload_avatar": "آپلود عکس پروفایل",
+    "remove_photo": "حذف عکس",
+    "select_image_file": "انتخاب فایل تصویر"
+  },
   "success": {
     "title": "موفقیت"
   },
   "contact_form": {
     "gender": "جنسیت",
+    "tag": "تگ‌ها",
     "male": "مرد",
     "female": "زن",
     "birthday": "تاریخ تولد",
@@ -177,6 +183,8 @@
     "feature_secure_storage": "ذخیره‌سازی ابری امن"
   },
   "contact": {
+    "single": "مخاطب",
+    "plural": "مخاطبین",
     "no_phone": "بدون شماره",
     "delete_success": "مخاطب با موفقیت حذف شد.",
     "delete_error": "خطا در حذف مخاطب",
@@ -196,12 +204,19 @@
     "title": "مدیریت گروه‌ها",
     "description": "ایجاد، ویرایش و حذف گروه‌های مخاطبین",
     "add_new": "افزودن گروه جدید",
+    "add_group": "افزودن گروه",
     "all_groups": "همه گروه‌ها",
     "existing_groups": "گروه‌های موجود",
     "not_found": "گروه مورد نظر یافت نشد",
     "not_found_description": "گروهی که به دنبال آن هستید وجود ندارد یا حذف شده است.",
     "group_description": "مدیریت مخاطبین گروه",
     "groups_list_description": "لیست تمام گروه‌های شما",
+    "login_required_title": "ورود الزامی است",
+    "login_required": "برای ایجاد گروه جدید باید وارد حساب کاربری خود شوید.",
+    "create_new_group_desc": "یک گروه جدید بسازید",
+    "color_picker": "انتخاب رنگ",
+    "smart_suggestions": "پیشنهاد هوشمند",
+    "organize_contacts": "سازماندهی مخاطبین",
     "group_contacts": "مخاطبین گروه",
     "contacts_in_group_count": "{{count}} مخاطب در این گروه",
     "no_contacts_in_group": "هنوز مخاطبی در این گروه وجود ندارد",
@@ -211,6 +226,7 @@
     "empty_description": "برای سازماندهی مخاطبین خود، یک گروه جدید اضافه کنید.",
     "loading": "در حال بارگذاری گروه‌ها...",
     "load_success": "گروه‌ها با موفقیت بارگذاری شدند.",
+    "preparing_colors": "در حال آماده‌سازی رنگ‌های منحصر به فرد...",
     "load_error": "خطا در بارگذاری گروه‌ها",
     "delete_auth_required": "برای حذف گروه باید وارد شوید.",
     "deleting_group": "در حال حذف گروه...",
@@ -237,12 +253,20 @@
     "group_name": "نام گروه",
     "group_name_placeholder": "نام گروه را وارد کنید",
     "group_color": "رنگ گروه",
+    "group_image": "تصویر گروه",
+    "upload_group_image": "آپلود تصویر گروه",
+    "delete_group_image": "حذف تصویر گروه",
+    "drop_image_here": "تصویر را اینجا رها کنید",
+    "image_uploaded": "تصویر با موفقیت آپلود شد",
+    "no_image_uploaded": "هنوز تصویری آپلود نشده است",
     "editing": "در حال ویرایش...",
-    "adding": "در حال افزودن..."
+    "adding": "در حال افزودن...",
+    "success_preview": "گروه با موفقیت ذخیره شد. تغییرات اعمال شد."
   },
   "bundle_monitor": {
     "title": "مانیتور حجم بسته",
     "description": "مانیتورینگ بلادرنگ حجم بسته و معیارهای عملکرد",
+    "of_total": "از کل",
     "status_good": "بهینه",
     "status_warning": "نیاز به توجه",
     "export": "خروجی گزارش",
@@ -258,20 +282,18 @@
     "eager": "فوری",
     "modules": "ماژول",
     "gzipped": "فشرده شده",
-    "of_total": "از کل",
     "insights": "بینش‌های عملکرد",
     "size_warning": "حجم بسته از آستانه توصیه شده فراتر رفته",
     "size_recommendation": "تقسیم کد یا حذف وابستگی‌های غیرضروری را در نظر بگیرید",
     "compression_tip": "فشرده‌سازی قابل بهبود است",
     "compression_recommendation": "فعال کردن فشرده‌سازی Brotli یا بهینه‌سازی دارایی‌ها را در نظر بگیرید",
     "performance_good": "عملکرد عالی!",
-    "performance_message": "بسته شما بهینه شده و تمام آستانه‌های عملکرد را رعایت می‌کد"
+    "performance_message": "بسته شما بهینه شده و تمام آستانه‌های عملکرد را رعایت می‌کند"
   },
   "performance": {
     "title": "داشبورد عملکرد",
     "description": "مانیتورینگ بلادرنگ Web Vitals و معیارهای عملکرد",
     "cls": "CLS",
-    "cls_description": "تغییرات ناگهانی در چیدمان صفحه",
     "fcp": "FCP",
     "inp": "INP",
     "inp_description": "زمان پاسخ به تعاملات کاربر",
@@ -280,30 +302,31 @@
     "error": "خطا",
     "score": "امتیاز",
     "refresh": "بروزرسانی",
-    "excellent": "عالی",
-    "good": "خوب",
-    "needs_improvement": "نیاز به بهبود",
-    "poor": "ضعیف",
     "export": "خروجی",
     "overall_health": "سلامت کلی عملکرد",
-    "insights": "بینش‌های عملکردی",
     "insights_description": "نکات و توصیه‌های بهینه‌سازی",
     "last_updated": "آخرین بروزرسانی",
+    "poor": "ضعیف",
+    "good": "خوب",
+    "excellent": "عالی",
     "measuring": "در حال اندازه‌گیری...",
+    "needs_improvement": "نیاز به بهبود",
     "unknown": "نامشخص",
     "threshold": "آستانه خوب",
+    "insights": "بینش‌های عملکرد",
     "excellent_performance": "عملکرد عالی!",
     "excellent_message": "برنامه شما تمام استانداردهای عملکرد را رعایت می‌کند",
     "critical_issues": "مشکلات حیاتی عملکرد شناسایی شد",
     "critical_message": "برخی معیارها در محدوده ضعیف هستند و نیاز به توجه فوری دارند",
     "room_for_improvement": "جای بهبود وجود دارد",
     "improvement_message": "برخی معیارها برای تجربه کاربری بهتر قابل بهینه‌سازی هستند",
+    "cls_description": "ثبات بصری در طول بارگذاری صفحه",
     "fcp_description": "زمان تا نمایش اولین محتوا",
     "fid_description": "پاسخگویی به اولین تعامل کاربر",
     "lcp_description": "زمان بارگذاری بزرگترین عنصر محتوا",
     "ttfb_description": "زمان پاسخ سرور",
     "lcp_tip": "نکته بهینه‌سازی LCP",
-    "lcp_suggestion": "بهینه‌سازی تصاویر، فونت‌ها و بارگذاری منابع حیاتی را در نظر بگیرید",
+    "lcp_suggestion": " بهینه‌سازی تصاویر، فونت‌ها و بارگذاری منابع حیاتی را در نظر بگیرید",
     "cls_tip": "نکته بهینه‌سازی CLS",
     "cls_suggestion": "اطمینان حاصل کنید تصاویر و تبلیغات ابعاد تعریف شده دارند",
     "inp_tip": "نکته بهینه‌سازی INP",
@@ -379,10 +402,33 @@
     "title": "اقدامات دیباگ",
     "description": "ابزارهای سریع دیباگ و تست"
   },
+  "loading": {
+    "contact_details": "در حال بارگذاری جزئیات مخاطب..."
+  },
   "common": {
     "all_types": "همه انواع",
     "at": "در",
     "not_available": "ناموجود",
+    "not_specified": "نامشخص",
+    "fields": "فیلدها",
+    "no_data_found": "داده‌ای یافت نشد",
+    "no_data_description": "متأسفانه هیچ داده‌ای برای نمایش وجود ندارد.",
+    "percentage": "درصد",
+    "of_total": "از کل",
+    "loading": {
+      "title": "در حال بارگذاری...",
+      "please_wait": "لطفاً صبر کنید",
+      "contact_details": "در حال بارگذاری جزئیات مخاطب..."
+    },
+    "count": "تعداد",
+    "export_csv": "خروجی به CSV",
+    "contact_form": {
+      "values": {
+        "no_group_selected": "بدون گروه انتخاب شده"
+      },
+      "add_new_group": "افزودن گروه جدید"
+    },
+    "category": "دسته‌بندی",
     "unknown": "ناشناخته",
     "mbps": "مگابیت بر ثانیه",
     "mb": "مگابایت",
@@ -442,6 +488,7 @@
     "creating": "در حال ایجاد...",
     "save": "ذخیره",
     "create": "ایجاد",
+    "apply": "اعمال",
     "cancel": "لغو",
     "update_contact": "به‌روزرسانی مخاطب",
     "save_contact": "ذخیره مخاطب",
@@ -465,11 +512,7 @@
     "service_unavailable": "سرویس در دسترس نیست. لطفاً بعداً دوباره تلاش کنید.",
     "request_failed_with_status": "درخواست با وضعیت {{status}} شکست خورد",
     "unexpected_error": "خطای غیرمنتظره‌ای رخ داده است. لطفاً دوباره تلاش کنید.",
-    "loading": {
-      "title": "در حال بارگذاری...",
-      "please_wait": "لطفاً صبر کنید",
-      "contact_details": "در حال بارگذاری اطلاعات مخاطب..."
-    },
+    
     "reload_page": "بارگذاری مجدد صفحه",
     "contacts": "مخاطبین",
     "delete": "حذف",
@@ -514,7 +557,9 @@
       "list": "نمایش لیستی"
     },
     "errors": {
+      "session_expired": "نشست شما منقضی شده است. لطفاً دوباره وارد شوید.",
       "generic": "خطایی رخ داد",
+      "color_load_failed": "خطا در بارگذاری رنگ‌ها",
       "auth_required": "برای انجام این عملیات باید وارد سیستم شوید.",
       "no_active_session": "هیچ نشست فعالی یافت نشد. کاربر باید وارد سیستم شده باشد.",
       "no_active_session_list_gemini": "هیچ نشست فعالی یافت نشد. کاربر باید وارد سیستم شده باشد تا مدل‌های Gemini را لیست کند.",
@@ -544,11 +589,12 @@
     "export_data": "خروجی داده",
     "gender": {
       "male": "مرد",
+      "male_value": "مذکر",
       "female": "زن",
+      "female_value": "مونث",
       "other": "دیگر",
       "unknown": "نامشخص"
     },
-    "not_specified": "نامشخص",
     "contact_method": {
       "email": "ایمیل",
       "phone": "تلفن",
@@ -571,6 +617,10 @@
     "bearer_token": "حامل"
   },
   "settings": {
+    "calendar": {
+      "solar": "شمسی",
+      "gregorian": "میلادی"
+    },
     "tabs": {
       "profile": "پروفایل",
       "appearance": "نمایش",
@@ -591,10 +641,8 @@
     "theme_description": "انتخاب تم روشن، تاریک یا تنظیم خودکار بر اساس سیستم",
     "calendar_type": "نوع تقویم",
     "calendar_hint": "تغییر نوع تقویم بر روی نمایش تاریخ‌ها در سراسر برنامه تأثیر می‌گذارد.",
-    "calendar": {
-      "solar": "شمسی",
-      "gregorian": "میلادی"
-    },
+    "jalali": "شمسی",
+    "gregorian": "میلادی",
     "language": "زبان",
     "persian": "فارسی",
     "english": "انگلیسی",
@@ -603,6 +651,7 @@
     "ai_settings_description": "پیکربندی قابلیت‌های هوش مصنوعی و مدل‌های زبانی",
     "gemini_api_key": "کلید API Gemini",
     "enter_gemini_api_key": "کلید API Gemini خود را وارد کنید",
+    "api_key_placeholder": "کلید API خود را اینجا وارد کنید",
     "gemini_api_key_description": "برای استفاده از قابلیت‌های هوش مصنوعی، کلید API Gemini خود را وارد کنید. این کلید به صورت امن ذخیره می‌شود.",
     "gemini_model": "مدل Gemini",
     "select_gemini_model": "مدل Gemini را انتخاب کنید",
@@ -771,6 +820,7 @@
   },
   "user_management": {
     "title": "مدیریت کاربران",
+    "profile_image": "تصویر پروفایل",
     "description": "مدیریت کاربران و دسترسی‌ها",
     "edit_user_title": "ویرایش کاربر",
     "sort": {
@@ -819,6 +869,11 @@
     "ungendered_contacts": "مخاطبین فاقد جنسیت",
     "male_suggestions": "پیشنهادات مردانه",
     "female_suggestions": "پیشنهادات زنانه",
+    "general_group_keywords": {
+      "general": "عمومی",
+      "other": "متفرقه",
+      "miscellaneous": "سایر"
+    },
     "no_gender_suggestions_found_local": "هیچ پیشنهاد جنسیتی برای مخاطبین محلی یافت نشد",
     "update_status_failed": "به‌روزرسانی وضعیت پیشنهاد هوش مصنوعی به {{status}} با شکست مواجه شد.",
     "gender_reasoning_name_analysis": "نام '{{name}}' معمولاً برای جنسیت {{gender}} استفاده می‌شود",
@@ -977,7 +1032,8 @@
     "loading_smart_management_data": "در حال بارگذاری داده‌های مدیریت هوشمند...",
     "loading_duplicate_management_data": "در حال بارگذاری داده‌های مدیریت تکراری...",
     "gender_suggestion_title": "پیشنهاد جنسیت",
-    "gender_suggestion_description_local": "پیشنهاد جنسیت برای مخاطبین با جنسیت نامشخص بر اساس منطق داخلی ساده. این سیستم از انتخاب‌های شما یاد می‌گیرد.",
+    "gender_suggestion_description": "پیش‌بینی جنسیت مبتنی بر هوش مصنوعی بر اساس نام مخاطبین",
+    "gender_suggestion_description_local": "پیش‌بینی جنسیت مبتنی بر هوش مصنوعی بر اساس نام مخاطبین (نسخه محلی)",
     "ai_powered_footer": "قدرت گرفته از هوش مصنوعی پیشرفته",
     "ready_to_start": "آماده شروع هستیم!",
     "enter_text_to_start": "متن خود را وارد کنید تا هوش مصنوعی شروع به کار کند",
@@ -1010,8 +1066,9 @@
   "notifications": {
     "export_started": "در حال صادر کردن اطلاعات...",
     "export_success": "اطلاعات با موفقیت صادر شد",
-    "export_error": "خطا در صادر کردن اطلاعات. لطفاً دوباره تلاش کنید.",
-    "navigating_to_add_contact": "در حال انتقال به صفحه افزودن مخاطب..."
+    "export_error": "خطا در صادر کردن اطلاعات. لطفاً دوباره تلاس کنید.",
+    "navigating_to_add_contact": "در حال انتقال به صفحه افزودن مخاطب...",
+    "navigating_to_add_group": "در حال انتقال به صفحه افزودن گروه..."
   },
   "common_company_terms": [
     "شرکت",
@@ -1046,20 +1103,34 @@
     "other": "سایر"
   },
   "error": {
+    "support_email": "support@example.com",
+    "report_email_subject": "گزارش خطا",
+    "report_email_body": "جزئیات خطا:\n\n{{errorDetails}}",
     "boundary_triggered": "خطایی رخ داده و شناسایی شده است",
     "retrying": "در حال تلاش مجدد...",
+    "clearing_cache_retrying": "در حال پاک‌سازی حافظه موقت و تلاش مجدد...",
     "navigating_home": "انتقال به صفحه اصلی",
     "reloading_page": "بارگذاری مجدد صفحه",
     "something_went_wrong": "مشکلی پیش آمده است",
     "unexpected_error_occurred": "خطای غیرمنتظره‌ای رخ داده است. نگران نباشید، ما از آن مطلع شده‌ایم.",
+    "async_error_occurred": "خطا در بارگذاری اطلاعات رخ داد. لطفاً دوباره تلاش کنید.",
+    "data_loading_failed": "بارگذاری داده‌ها ناموفق بود",
+    "network_or_server_error": "مشکلی در بارگذاری داده‌ها وجود دارد. این ممکن است به دلیل مشکل شبکه یا سرور باشد.",
+    "form_error_occurred": "خطایی در فرم رخ داد",
+    "form_submission_failed": "ثبت فرم ناموفق بود",
+    "form_validation_error": "مشکلی در ثبت فرم شما وجود دارد.",
+    "color_load_failed": "خطا در بارگذاری رنگ‌ها",
+    "reset_form": "بازنشانی فرم",
     "technical_details": "جزئیات فنی",
     "message": "پیام",
     "stack_trace": "ردیابی پشته",
+    "copy_to_clipboard": "کپی به حافظه موقت",
     "retry_operation": "تلاش مجدد برای عملیات ناموفق",
     "try_again": "تلاش مجدد",
     "go_home": "برو به خانه",
     "reload_page": "بارگذاری مجدد صفحه",
-    "report_error": "گزارش خطا"
+    "report_error": "گزارش خطا",
+    "help_text": "در صورت بروز مشکل، لطفاً با پشتیبانی تماس بگیرید."
   },
   "duplicate_reasons": {
     "same_name_and_contact": "نام و نام خانوادگی یکسان به همراه ایمیل یا تلفن مشابه",
@@ -1076,6 +1147,9 @@
     "queue_error": "خطا در افزودن درخواست به صف استخراج اطلاعات"
   },
   "errors": {
+    "max_retries_exceeded": "حداکثر تعداد تلاش‌ها به پایان رسید. لطفاً دوباره امتحان کنید.",
+    "color_load_failed": "خطا در بارگذاری رنگ‌ها",
+    "invalid_phone_format": "فرمت شماره تلفن نامعتبر است. لطفاً شماره را به درستی وارد کنید.",
     "invalid_image_url": "آدرس تصویر نامعتبر است",
     "delete_auth_required": "برای حذف فایل باید وارد حساب کاربری خود شوید",
     "upload_auth_required": "برای آپلود فایل باید وارد حساب کاربری خود شوید",
@@ -1109,13 +1183,11 @@
     "help_text": "اگر مشکل ادامه داشت، لطفاً با پشتیبانی تماس بگیرید.",
     "async_error_occurred": "خطایی در بارگذاری داده‌ها رخ داد",
     "clearing_cache_retrying": "در حال پاک کردن حافظه نهان و تلاش مجدد",
-    "data_loading_failed": "بارگذاری داده‌ها ناموفق بود",
     "network_or_server_error": "مشکلی در بارگذاری داده‌ها وجود دارد. این ممکن است به دلیل مشکل شبکه یا سرور باشد.",
     "form_error_occurred": "خطایی در فرم رخ داد",
     "invalid_image_type": "لطفاً یک فایل تصویری معتبر آپلود کنید.",
     "image_too_large": "حجم تصویر باید کمتر از 2 مگابایت باشد.",
     "form_submission_failed": "ثبت فرم ناموفق بود",
-    "form_validation_error": "مشکلی در ثبت فرم شما وجود دارد.",
     "loading_group_colors": "خطا در بارگذاری رنگ‌ههای گروه‌های موجود",
     "field_required": "{{field}} الزامی است",
     "upload_avatar_auth": "برای آپلود تصویر پروفایل باید وارد سیستم شوید",
@@ -1131,6 +1203,8 @@
     "edit_template_error": "خطایی در ویرایش قالب رخ داد",
     "auth_loading_profile": "برای بارگذاری پروفایل باید وارد سیستم شوید",
     "profile_info_error": "خطا در دریافت اطلاعات پروفایل",
+    "profile_load_error": "خطا در بارگذاری پروفایل: {{message}}",
+    "profile_load_retry": "خطا در بارگذاری پروفایل (تلاش {{retryCount}} از {{maxRetries}}): {{message}}",
     "update_profile_auth": "برای به‌روزرسانی پروفایل باید وارد سیستم شوید",
     "save_profile_error": "خطا در ذخیره پروفایل",
     "invalid_email": "ایمیل نامعتبر",
@@ -1146,7 +1220,6 @@
       "unauthenticated_user": "کاربر احراز هویت نشده است.",
       "user_not_authenticated": "کاربر احراز هویت نشده است"
     },
-    "profile_load_retry": "خطا در بارگذاری پروفایل (تلاش {{retryCount}} از {{maxRetries}}): {{message}}",
     "update_profile_error": "خطایی در به‌روزرسانی پروفایل رخ داد",
     "unknown": "خطای ناشناخته",
     "loading_ungrouped_contacts": "خطا در بارگذاری مخاطبین بدون گروه",
@@ -1273,6 +1346,7 @@
   },
   "actions": {
     "create": "ایجاد",
+    "close": "بستن",
     "add_new_group": "افزودن گروه جدید",
     "add_group": "افزودن گروه",
     "back_to_contacts": "بازگشت به مخاطبین",
@@ -1410,6 +1484,29 @@
     "save_contact": "ذخیره مخاطب",
     "cancel": "انصراف"
   },
+  "users": {
+    "title": "کاربران",
+    "profile_image": "تصویر پروفایل",
+    "current_user": "کاربر فعلی",
+    "update_profile_image": "بروزرسانی تصویر پروفایل",
+    "upload_profile_image": "آپلود تصویر پروفایل",
+    "delete_profile_image": "حذف تصویر پروفایل",
+    "drop_profile_image": "تصویر را اینجا رها کنید",
+    "supported_formats": "فرمت‌های پشتیبانی شده",
+    "profile_image_description": "تصویر جدید را انتخاب کنید یا آن را در اینجا رها کنید",
+    "description": "اطلاعات آدرس مخاطب را وارد کنید",
+    "fields": {
+      "street": "خیابان",
+      "street_placeholder": "مثال: خیابان ولیعصر، پلاک ۱۲۳",
+      "city": "شهر",
+      "city_placeholder": "مثال: تهران",
+      "postal_code": "کد پستی",
+      "postal_code_placeholder": "مثال: 1234567890",
+      "state": "استان",
+      "state_placeholder": "مثال: تهران",
+      "country": "کشور"
+    }
+  },
   "address": {
     "title": "آدرس",
     "description": "اطلاعات آدرس مخاطب را وارد کنید",
@@ -1430,6 +1527,9 @@
     "first_name": "نام",
     "last_name": "نام خانوادگی",
     "gender": "جنسیت",
+    "email_type": "نوع ایمیل",
+    "email_placeholder": "آدرس ایمیل را وارد کنید",
+    "select_email_type_placeholder": "نوع ایمیل را انتخاب کنید",
     "position": "سمت/تخصص",
     "company": "شرکت",
     "street": "خیابان/کوچه",
@@ -1506,6 +1606,10 @@
   },
   "toast": {
     "must_use_in_provider": "هوک useToast باید درون یک ToastProvider استفاده شود",
+    "success_title": "موفقیت‌آمیز",
+    "error_title": "خطا",
+    "info_title": "اطلاعات",
+    "loading_title": "در حال انجام...",
     "titles": {
       "success": "موفقیت‌آمیز",
       "error": "خطا",
@@ -1516,8 +1620,9 @@
   "accessibility": {
     "delete_email": "حذف آدرس ایمیل",
     "edit_contact_form": "فرم ویرایش مخاطب",
-    "add_contact_form": "فرم افزودن مخاطب",
-    "edit_contact_description": "ویرایش اطلاعات و جزئیات مخاطب",
+    "add_contact_form": "فرم افزودن مخاطب جدید",
+    "edit_contact_description": "فرم ویرایش اطلاعات مخاطب. لطفاً تغییرات مورد نظر را اعمال کنید.",
+    "add_contact_description": "فرم افزودن مخاطب جدید. لطفاً اطلاعات مخاطب را وارد کنید.",
     "form_cancelled": "فرم لغو شد",
     "form_submitted": "فرم با موفقیت ارسال شد",
     "form_validation_failed": "اعتبارسنجی فرم ناموفق بود. لطفاً خطاها را بررسی کنید.",
@@ -1627,6 +1732,44 @@
   "custom_field_management": {
     "title": "مدیریت فیلدهای سفارشی",
     "description": "مدیریت و سازماندهی فیلدهای سفارشی مخاطبین",
+    "empty_state": {
+      "title": "هنوز فیلد سفارشی وجود ندارد!",
+      "description": "با ایجاد فیلدهای سفارشی، اطلاعات بیشتری از مخاطبین خود جمع‌آوری کنید و داده‌های ساخت‌یافته‌تری داشته باشید.",
+      "create_first_field": "اولین فیلد سفارشی خود را بسازید",
+      "getting_started": "ایده‌هایی برای شروع:",
+      "suggestions": {
+        "company": {
+          "title": "شرکت",
+          "description": "نام شرکت مخاطب"
+        },
+        "position": {
+          "title": "سمت",
+          "description": "عنوان شغلی یا تخصص"
+        },
+        "city": {
+          "title": "شهر",
+          "description": "محل زندگی یا کار"
+        },
+        "birthday": {
+          "title": "تاریخ تولد",
+          "description": "برای یادآوری تولد"
+        },
+        "priority": {
+          "title": "اولویت",
+          "description": "سطح اهمیت مخاطب"
+        },
+        "secondary_phone": {
+          "title": "تلفن دوم",
+          "description": "شماره تلفن اضافی"
+        }
+      }
+    },
+    "loading": {
+      "title": "در حال بارگذاری فیلدهای سفارشی...",
+      "please_wait": "لطفاً کمی صبر کنید"
+    },
+    "custom_fields": "فیلدهای سفارشی",
+    "manage_fields": "مدیریت فیلدهای سفارشی شما",
     "field_name": "نام فیلد",
     "field_name_placeholder": "مثال: تاریخ تولد",
     "list_options": "گزینه‌های لیست",
@@ -1636,31 +1779,15 @@
     "errors": {
       "name_required": "نام فیلد الزامی است"
     },
-    "filter_description": "فیلتر و جستجو در فیلدهای سفارشی",
-    "custom_fields": "فیلدهای سفارشی",
-    "manage_fields": "مدیریت و سازماندهی فیلدهای سفارشی شما",
     "add_field": "افزودن فیلد سفارشی",
-    "no_fields": "هنوز فیلد سفارشی وجود ندارد!",
-    "no_fields_description": "با ایجاد فیلدهای سفارشی، اطلاعات بیشتری از مخاطبین خود جمع‌آوری کنید و داده‌های ساخت‌یافته‌تری داشته باشید.",
-    "create_first_field": "اولین فیلد سفارشی خود را بسازید",
-    "search_placeholder": "جستجو در فیلدها...",
     "filter_by_type": "فیلتر بر اساس نوع فیلد",
-    "all_types": "همه انواع",
     "filter_all": "همه انواع",
-    "search_term": "عبارت جستجو",
-    "active_filters": "فیلترهای فعال",
-    "search": "جستجو",
-    "type": "نوع",
     "field_type": "نوع فیلد",
-    "empty_title": "هیچ فیلد سفارشی یافت نشد",
-    "empty_description": "قالب‌های فیلد سفارشی ایجاد کنید تا داده‌های ساخت‌یافته به مخاطبین خود اضافه کنید.",
     "add_first_field": "افزودن اولین فیلد",
-    "delete_confirm_title": "حذف قالب فیلد سفارشی؟",
-    "delete_confirm_description": "این عمل قابل بازگشت نیست. این قالب به طور دائم حذف خواهد شد. (داده‌های موجود در مخاطبین تحت تأثیر قرار نمی‌گیرند)",
+
     "types": {
       "text": "متن",
       "number": "عدد",
-      "date": "تاریخ",
       "list": "لیست"
     }
   },
@@ -1683,9 +1810,30 @@
     "title": "داشبورد آماری",
     "page_title": "آمار و گزارش‌ها",
     "page_description": "تحلیل جامع اطلاعات مخاطبین شما",
+    "details_tab": {
+      "groups_error": "خطا در بارگذاری اطلاعات گروه‌ها",
+      "upcoming_birthdays_title": "تولدهای پیش‌رو",
+      "upcoming_birthdays_description": "تولدهای پیش‌رو در ۳۰ روز آینده",
+      "no_birthdays_title": "تولد پیش‌رویی وجود ندارد",
+      "no_birthdays_description": "در ۳۰ روز آینده تولدی ثبت نشده است",
+      "days_remaining": "روز دیگر",
+      "coming_soon": "به زودی...",
+      "top_groups_title": "گروه‌های برتر",
+      "top_groups_description": "گروه‌های شما بر اساس تعداد مخاطبین"
+    },
     "description": "تحلیل‌ها و بینش‌های جامع درباره مخاطبین شما",
+    "error_loading_upcoming_birthdays": "خطا در بارگذاری تولدهای پیش‌رو",
+    "error_loading_birthdays_stats": "خطا در بارگذاری آمار تولدها",
+    "no_birthdays_stats_data": "اطلاعاتی برای نمایش وجود ندارد",
     "gender_distribution": "توزیع جنسیت",
     "gender_distribution_description": "توزیع مخاطبین بر اساس جنسیت ثبت شده",
+    "timeline_tab": {
+      "title": "روند زمانی",
+      "description": "روند تغییرات تعداد مخاطبین در طول زمان",
+      "count_label": "تعداد مخاطبین",
+      "count_with_colon": "تعداد:",
+      "error_loading": "خطا در بارگذاری خط زمانی"
+    },
     "contact_methods_title": "روش‌های ارتباط ترجیحی",
     "contact_methods_description": "توزیع مخاطبین بر اساس روش ارتباط مورد علاقه",
     "tooltip": {
@@ -1828,8 +1976,9 @@
     "error_boundary": {
       "title": "خطا در بارگذاری آمار",
       "description": "متاسفانه در بارگذاری داده‌های آماری مشکلی پیش آمده است.",
-      "retry": "تلاش مجدد",
-      "go_home": "صفحه اصلی",
+      "report_error": "گزارش خطا",
+      "help_text": "در صورت بروز مشکل، لطفاً با پشتیبانی تماس بگیرید.",
+      "go_home": "برو به صفحه اصلی",
       "reload_page": "بارگذاری مجدد",
       "technical_details": "جزئیات فنی",
       "message": "پیام خطا",
@@ -2184,8 +2333,5 @@
     "general": "عمومی",
     "other": "متفرقه",
     "miscellaneous": "سایر"
-  },
-  "loading": {
-    "contact_details": "در حال بارگذاری اطلاعات مخاطب..."
   }
 }

@@ -37,7 +37,7 @@ export const CustomFieldList: React.FC<CustomFieldListProps> = ({
   onDelete,
   onAddNew
 }) => {
-  const { t } = useTranslation(['common', 'custom_field_management']);
+  const { t } = useTranslation();
 
   // Loading state with enhanced design
   if (isLoading && fields.length === 0) {
@@ -53,10 +53,10 @@ export const CustomFieldList: React.FC<CustomFieldListProps> = ({
         </div>
         <div className="text-center space-y-2">
           <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-            در حال بارگذاری فیلدهای سفارشی...
+            {t('custom_field_management.loading.title')}
           </h3>
           <p className="text-gray-600 dark:text-gray-400">
-            لطفاً کمی صبر کنید
+            {t('custom_field_management.loading.please_wait')}
           </p>
         </div>
         <LoadingSpinner size={40} className="text-blue-600" />
@@ -78,8 +78,8 @@ export const CustomFieldList: React.FC<CustomFieldListProps> = ({
         <ModernCardContent className="relative p-8">
           <EmptyState
             icon={ClipboardList}
-            title="هنوز فیلد سفارشی‌ای ایجاد نشده!"
-            description="با ایجاد فیلدهای سفارشی، اطلاعات بیشتری از مخاطبین خود جمع‌آوری کنید و داده‌های ساخت‌یافته‌تری داشته باشید."
+            title={t('custom_field_management.empty_state.title')}
+            description={t('custom_field_management.empty_state.description')}
           >
             <div className="flex flex-col sm:flex-row gap-4 mt-6">
               <GlassButton
@@ -88,25 +88,55 @@ export const CustomFieldList: React.FC<CustomFieldListProps> = ({
                 className="flex items-center gap-3 px-6 py-4 text-lg font-semibold bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105"
               >
                 <Plus size={24} />
-                ایجاد اولین فیلد سفارشی
+                {t('custom_field_management.empty_state.create_first_field')}
                 <Sparkles className="w-5 h-5 animate-pulse" />
               </GlassButton>
 
               <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                 <Lightbulb className="w-4 h-4 text-yellow-500" />
-                <span>ایده‌هایی برای شروع:</span>
+                <span>{t('custom_field_management.empty_state.getting_started')}</span>
               </div>
             </div>
 
             {/* Suggestions */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-8">
               {[
-                { icon: <Building2 className="w-6 h-6" />, title: "شرکت", desc: "نام شرکت مخاطب" },
-                { icon: <Target className="w-6 h-6" />, title: "سمت", desc: "عنوان شغلی یا تخصص" },
-                { icon: <MapPin className="w-6 h-6" />, title: "شهر", desc: "محل زندگی یا کار" },
-                { icon: <Cake className="w-6 h-6" />, title: "تاریخ تولد", desc: "برای یادآوری تولد" },
-                { icon: <Star className="w-6 h-6" />, title: "اولویت", desc: "سطح اهمیت مخاطب" },
-                { icon: <Phone className="w-6 h-6" />, title: "تلفن دوم", desc: "شماره تلفن اضافی" }
+                { 
+                  icon: <Building2 className="w-6 h-6" />, 
+                  key: 'company',
+                  title: t('custom_field_management.empty_state.suggestions.company.title'), 
+                  desc: t('custom_field_management.empty_state.suggestions.company.description') 
+                },
+                { 
+                  icon: <Target className="w-6 h-6" />, 
+                  key: 'position',
+                  title: t('custom_field_management.empty_state.suggestions.position.title'), 
+                  desc: t('custom_field_management.empty_state.suggestions.position.description') 
+                },
+                { 
+                  icon: <MapPin className="w-6 h-6" />, 
+                  key: 'city',
+                  title: t('custom_field_management.empty_state.suggestions.city.title'), 
+                  desc: t('custom_field_management.empty_state.suggestions.city.description') 
+                },
+                { 
+                  icon: <Cake className="w-6 h-6" />, 
+                  key: 'birthday',
+                  title: t('custom_field_management.empty_state.suggestions.birthday.title'), 
+                  desc: t('custom_field_management.empty_state.suggestions.birthday.description') 
+                },
+                { 
+                  icon: <Star className="w-6 h-6" />, 
+                  key: 'priority',
+                  title: t('custom_field_management.empty_state.suggestions.priority.title'), 
+                  desc: t('custom_field_management.empty_state.suggestions.priority.description') 
+                },
+                { 
+                  icon: <Phone className="w-6 h-6" />, 
+                  key: 'secondary_phone',
+                  title: t('custom_field_management.empty_state.suggestions.secondary_phone.title'), 
+                  desc: t('custom_field_management.empty_state.suggestions.secondary_phone.description') 
+                }
               ].map((suggestion, index) => (
                 <div
                   key={index}

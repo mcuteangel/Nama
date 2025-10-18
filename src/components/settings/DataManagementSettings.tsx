@@ -260,7 +260,9 @@ const DataManagementSettings: React.FC<DataManagementSettingsProps> = ({ onImpor
                     <div className="flex items-center gap-2">
                       <span className={`text-xs ${item.status === 'success' ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
                         {item.status === 'success'
-                          ? (item.recordCount > 0 ? `${item.recordCount} ${t('common.contact')}` : t('settings.successful_export'))
+                          ? (item.recordCount > 0 
+                              ? `${item.recordCount} ${item.recordCount === 1 ? t('contact.single') : t('contact.plural')}` 
+                              : t('settings.successful_export'))
                           : t('settings.failed_export')}
                       </span>
                       <GlassButton
