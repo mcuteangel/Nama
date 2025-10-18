@@ -4,7 +4,7 @@ import { Clock, Trash2, History, User, ArrowRight } from 'lucide-react';
 import { FormCard } from '@/components/ui/FormCard';
 import { FormSection } from '@/components/ui/FormSection';
 import { ContactHistoryService, ContactHistoryEntry } from '@/services/contact-history-service';
-import { useSession } from '@/integrations/supabase/auth';
+import { useSession } from '@/integrations/supabase/useAuth';
 import { useJalaliCalendar } from '@/hooks/use-jalali-calendar';
 
 interface ContactHistoryProps {

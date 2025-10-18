@@ -7,6 +7,7 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button as LegacyButton } from "@/components/ui/button";
 import { GlassButton } from "@/components/ui/glass-button";
+import { useTranslation } from "react-i18next";
 
 type CarouselApi = UseEmblaCarouselType[1];
 type UseCarouselParameters = Parameters<typeof useEmblaCarousel>;
@@ -32,10 +33,11 @@ type CarouselContextProps = {
 const CarouselContext = React.createContext<CarouselContextProps | null>(null);
 
 function useCarousel() {
+  const { t } = useTranslation();
   const context = React.useContext(CarouselContext);
 
   if (!context) {
-    throw new Error("useCarousel must be used within a <Carousel />");
+    throw new Error(t('carousel.hook_usage_error'));
   }
 
   return context;
@@ -119,6 +121,8 @@ const Carousel = React.forwardRef<
       };
     }, [api, onSelect]);
 
+    const { t } = useTranslation();
+
     return (
       <CarouselContext.Provider
         value={{
@@ -138,7 +142,7 @@ const Carousel = React.forwardRef<
           onKeyDownCapture={handleKeyDown}
           className={cn("relative", className)}
           role="region"
-          aria-roledescription="carousel"
+          aria-roledescription={t('carousel.carousel_role_description')}
           {...props}
         >
           {children}
@@ -177,11 +181,13 @@ const CarouselItem = React.forwardRef<
 >(({ className, ...props }, ref) => {
   const { orientation } = useCarousel();
 
+  const { t } = useTranslation();
+
   return (
     <div
       ref={ref}
       role="group"
-      aria-roledescription="slide"
+      aria-roledescription={t('carousel.slide_role_description')}
       className={cn(
         "min-w-0 shrink-0 grow-0 basis-full",
         orientation === "horizontal" ? "pl-4" : "pt-4",
@@ -197,6 +203,7 @@ const CarouselPrevious = React.forwardRef<
   HTMLButtonElement,
   React.ComponentProps<typeof LegacyButton>
 >(({ className, variant = "outline", size = "icon", ...props }, ref) => {
+  const { t } = useTranslation();
   const { scrollPrev, canScrollPrev } = useCarousel();
 
   return (
@@ -215,7 +222,7 @@ const CarouselPrevious = React.forwardRef<
       {...props}
     >
       <ArrowLeft className="h-4 w-4" />
-      <span className="sr-only">Previous slide</span>
+      <span className="sr-only">{t('carousel.previous_slide')}</span>
     </GlassButton>
   );
 });
@@ -225,6 +232,7 @@ const CarouselNext = React.forwardRef<
   HTMLButtonElement,
   React.ComponentProps<typeof LegacyButton>
 >(({ className, variant = "outline", size = "icon", ...props }, ref) => {
+  const { t } = useTranslation();
   const { scrollNext, canScrollNext } = useCarousel();
 
   return (
@@ -243,7 +251,7 @@ const CarouselNext = React.forwardRef<
       {...props}
     >
       <ArrowRight className="h-4 w-4" />
-      <span className="sr-only">Next slide</span>
+      <span className="sr-only">{t('carousel.next_slide')}</span>
     </GlassButton>
   );
 });

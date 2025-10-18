@@ -1,27 +1,15 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useErrorHandler } from './use-error-handler';
-// Define interfaces for group contacts
-interface GroupContactPhone {
-  id: string;
-  phone_number: string;
-  phone_type?: string;
-  extension?: string;
-}
-
-interface GroupContactEmail {
-  id: string;
-  email_address: string;
-  email_type?: string;
-}
+import { PhoneNumber, EmailAddress } from '@/types/contact.types';
 
 interface GroupContact {
   id: string;
   first_name: string | null;
   last_name: string | null;
   avatar_url: string | null;
-  phone_numbers: GroupContactPhone[];
-  email_addresses?: GroupContactEmail[];
+  phone_numbers: PhoneNumber[];
+  email_addresses?: EmailAddress[];
 }
 
 // Define a simplified contact interface for preview purposes
@@ -32,7 +20,7 @@ interface ContactPreview {
   avatar_url?: string | null;
   email?: string;
   phone_number?: string;
-  phone_numbers?: GroupContactPhone[];
+  phone_numbers?: PhoneNumber[];
   name?: string; // For backward compatibility
 }
 

@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
-import { useFormContext } from 'react-hook-form';
+import { useFormContext, ControllerRenderProps } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { ModernInput } from '@/components/ui/modern-input';
 import { ModernPopover, ModernPopoverContent, ModernPopoverTrigger } from '@/components/ui/modern-popover';
 import { GlassButton } from "@/components/ui/glass-button";
@@ -13,7 +14,6 @@ import { CustomFieldForm } from '@/components/custom-fields';
 import { CustomFieldTemplate } from '@/domain/schemas/custom-field-template';
 import { ContactFormValues } from '@/types/contact';
 import { useJalaliCalendar } from '@/hooks/use-jalali-calendar';
-import { ControllerRenderProps } from 'react-hook-form';
 import { cn } from '../ui';
 
 interface ContactCustomFieldsProps {
@@ -29,6 +29,7 @@ const ContactCustomFields: React.FC<ContactCustomFieldsProps> = React.memo(({
   fetchTemplates,
 }) => {
   const { control, watch } = useFormContext<ContactFormValues>();
+  const { t } = useTranslation();
   const { formatDate } = useJalaliCalendar();
 
   // Memoize custom fields to prevent unnecessary re-renders
@@ -65,8 +66,8 @@ const ContactCustomFields: React.FC<ContactCustomFieldsProps> = React.memo(({
 
   return (
     <FormCard
-      title="فیلدهای سفارشی"
-      description="فیلدهای اضافی برای اطلاعات مخاطب"
+      title={t('contact_form.custom_fields.title')}
+      description={t('contact_form.custom_fields.description')}
       icon={Settings}
       iconColor="#ec4899"
     >
@@ -74,12 +75,12 @@ const ContactCustomFields: React.FC<ContactCustomFieldsProps> = React.memo(({
         {loadingTemplates ? (
           <div className="text-center py-8 text-slate-500 dark:text-slate-400">
             <Settings size={24} className="mx-auto mb-2 opacity-50" />
-            <p className="text-sm">در حال بارگذاری فیلدهای سفارشی...</p>
+            <p className="text-sm">{t('contact_form.custom_fields.loading')}</p>
           </div>
         ) : availableTemplates.length === 0 ? (
           <div className="text-center py-8 text-slate-500 dark:text-slate-400">
             <Settings size={24} className="mx-auto mb-2 opacity-50" />
-            <p className="text-sm mb-4">هنوز هیچ فیلد سفارشی ایجاد نشده است</p>
+            <p className="text-sm mb-4">{t('contact_form.custom_fields.no_fields')}</p>
 
             <Dialog>
               <DialogTrigger asChild>
@@ -89,12 +90,12 @@ const ContactCustomFields: React.FC<ContactCustomFieldsProps> = React.memo(({
                   className="bg-primary-500/10 hover:bg-primary-500/20 text-primary-700 dark:text-primary-300 px-3 py-1.5 rounded-xl border border-primary-200 dark:border-primary-800 transition-all duration-200"
                 >
                   <Plus size={14} className="ml-2" />
-                  ایجاد فیلد جدید
+                  {t('contact_form.custom_fields.create_new')}
                 </GlassButton>
               </DialogTrigger>
               <DialogContent className="w-full p-0 border-none bg-transparent shadow-none max-h-[80vh] overflow-y-auto">
                 <DialogHeader className="sr-only">
-                  <DialogTitle>ایجاد فیلد سفارشی جدید</DialogTitle>
+                  <DialogTitle>{t('contact_form.custom_fields.dialog_title')}</DialogTitle>
                 </DialogHeader>
                 <CustomFieldForm onSuccess={fetchTemplates} onCancel={() => {}} />
               </DialogContent>
@@ -136,7 +137,7 @@ const ContactCustomFields: React.FC<ContactCustomFieldsProps> = React.memo(({
                           <FormControl>
                             {template.type === 'text' ? (
                               <ModernInput
-                                placeholder={template.description || `مقدار ${template.name} را وارد کنید`}
+                                placeholder={template.description || t('contact_form.custom_fields.input_placeholder', { fieldName: template.name })}
                                 variant="glass"
                                 className={`w-full px-3 py-2 text-sm rounded-lg border-2 bg-white/80 dark:bg-gray-700/80 backdrop-blur-md transition-all duration-300 ease-out focus:ring-4 focus:ring-pink-500/30 focus:border-pink-400 hover:bg-white/95 dark:hover:bg-gray-600/95 hover:shadow-xl hover:shadow-pink-500/20 ${fieldState.error ? 'border-red-300 focus:border-red-500' : 'border-slate-200 dark:border-slate-600'}`}
                                 {...field}
@@ -145,7 +146,7 @@ const ContactCustomFields: React.FC<ContactCustomFieldsProps> = React.memo(({
                             ) : template.type === 'number' ? (
                               <ModernInput
                                 type="number"
-                                placeholder={template.description || `مقدار ${template.name} را وارد کنید`}
+                                placeholder={template.description || t('contact_form.custom_fields.input_placeholder', { fieldName: template.name })}
                                 variant="glass"
                                 className={`w-full px-3 py-2 text-sm rounded-lg border-2 bg-white/80 dark:bg-gray-700/80 backdrop-blur-md transition-all duration-300 ease-out focus:ring-4 focus:ring-pink-500/30 focus:border-pink-400 hover:bg-white/95 dark:hover:bg-gray-600/95 hover:shadow-xl hover:shadow-pink-500/20 ${fieldState.error ? 'border-red-300 focus:border-red-500' : 'border-slate-200 dark:border-slate-600'}`}
                                 {...field}
@@ -165,7 +166,7 @@ const ContactCustomFields: React.FC<ContactCustomFieldsProps> = React.memo(({
                                   >
                                     <span className="flex items-center gap-2">
                                       <CalendarIcon className="h-4 w-4" />
-                                      {field.value && typeof field.value === 'string' ? formatDate(new Date(field.value)) : <span>تاریخ را انتخاب کنید</span>}
+                                      {field.value && typeof field.value === 'string' ? formatDate(new Date(field.value)) : <span>{t('contact_form.custom_fields.select_date')}</span>}
                                     </span>
                                   </GlassButton>
                                 </ModernPopoverTrigger>
@@ -179,7 +180,7 @@ const ContactCustomFields: React.FC<ContactCustomFieldsProps> = React.memo(({
                               </ModernPopover>
                             ) : template.type === 'list' ? (
                               <div className="text-center py-4 text-slate-500 dark:text-slate-400 text-sm">
-                                انتخاب از لیست (در حال توسعه)
+                                {t('contact_form.custom_fields.list_under_development')}
                               </div>
                             ) : template.type === 'checklist' ? (
                               <div className="space-y-2 p-3 rounded-lg border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-800/50">
@@ -209,7 +210,7 @@ const ContactCustomFields: React.FC<ContactCustomFieldsProps> = React.memo(({
                             ) : (
                               <ModernInput
                                 disabled
-                                placeholder="نوع فیلد نامشخص"
+                                placeholder={t('contact_form.custom_fields.unknown_field_type')}
                                 variant="glass"
                                 className="w-full px-3 py-2 text-sm rounded-lg border-2 bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-600"
                               />
@@ -239,12 +240,12 @@ const ContactCustomFields: React.FC<ContactCustomFieldsProps> = React.memo(({
                     className="bg-primary-500/10 hover:bg-primary-500/20 text-primary-700 dark:text-primary-300 px-3 py-1.5 rounded-xl border border-primary-200 dark:border-primary-800 transition-all duration-200"
                   >
                     <Plus size={14} className="ml-2" />
-                    ایجاد فیلد سفارشی جدید
+                    {t('contact_form.custom_fields.create_new')}
                   </GlassButton>
                 </DialogTrigger>
                 <DialogContent className="w-full p-0 border-none bg-transparent shadow-none max-h-[80vh] overflow-y-auto">
                   <DialogHeader className="sr-only">
-                    <DialogTitle>ایجاد فیلد سفارشی جدید</DialogTitle>
+                    <DialogTitle>{t('contact_form.custom_fields.dialog_title')}</DialogTitle>
                   </DialogHeader>
                   <CustomFieldForm onSuccess={fetchTemplates} onCancel={() => {}} />
                 </DialogContent>

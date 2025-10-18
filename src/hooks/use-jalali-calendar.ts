@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import moment from 'moment-jalaali';
 import { enUS } from 'date-fns/locale';
 import { format as formatFns } from 'date-fns'; // Renamed to avoid conflict with local format function
@@ -15,7 +16,7 @@ export interface CalendarOptions {
 
 export interface CalendarHookReturn {
   calendarType: CalendarType;
-  currentLocale: any;
+  currentLocale: 'fa' | 'en';
   setCalendarType: (type: CalendarType) => void;
   formatDate: (date: Date | undefined, formatString?: string) => string;
   formatDateWithDay: (date: Date | undefined) => string;
@@ -31,6 +32,8 @@ export function useJalaliCalendar(options: CalendarOptions = {}): CalendarHookRe
     type = 'jalali', 
     format: formatString = 'jYYYY/jMM/jDD' 
   } = options;
+
+  const { t } = useTranslation();
 
   const [calendarType, setCalendarTypeState] = useState<CalendarType>(() => {
     if (typeof window !== 'undefined') {
@@ -76,8 +79,8 @@ export function useJalaliCalendar(options: CalendarOptions = {}): CalendarHookRe
   }, [calendarType]);
 
   const getCalendarLabel = useCallback(() => {
-    return calendarType === 'jalali' ? 'شمسی' : 'میلادی';
-  }, [calendarType]);
+    return calendarType === 'jalali' ? t('settings.calendar.solar') : t('settings.calendar.gregorian');
+  }, [calendarType, t]);
 
   const convertToJalali = useCallback((date: Date) => {
     return moment(date);

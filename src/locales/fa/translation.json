@@ -16,7 +16,45 @@
     "other": "سایر"
   },
   "email_label": "ایمیل",
+  "success": {
+    "title": "موفقیت"
+  },
   "contact_form": {
+    "gender": "جنسیت",
+    "male": "مرد",
+    "female": "زن",
+    "birthday": "تاریخ تولد",
+    "email_address": "آدرس ایمیل",
+    "phone_number": "شماره تماس",
+    "extension": "داخلی",
+    "unnamed_contact": "مخاطب بدون نام",
+    "tags": {
+      "load_error": "بارگذاری تگ‌ها با مشکل مواجه شد",
+      "load_failed": "بارگذاری تگ‌ها ناموفق بود",
+      "login_required": "برای ایجاد تگ جدید باید وارد سیستم شوید",
+      "create_failed": "ایجاد تگ جدید با مشکل مواجه شد",
+      "create_success": "تگ جدید با موفقیت ایجاد شد",
+      "creation_failed": "ایجاد تگ جدید ناموفق بود",
+      "loading": "در حال بارگذاری تگ‌ها...",
+      "title": "تگ‌ها",
+      "description": "تگ‌های مرتبط با مخاطب را انتخاب یا ایجاد کنید",
+      "selected_tags": "تگ‌های انتخاب شده",
+      "add_new_tag": "افزودن تگ جدید",
+      "enter_tag_name": "نام تگ جدید را وارد کنید...",
+      "create_new_tag": "ایجاد تگ جدید"
+    },
+    "custom_fields": {
+      "title": "فیلدهای سفارشی",
+      "description": "فیلدهای اضافی برای اطلاعات مخاطب",
+      "loading": "در حال بارگذاری فیلدهای سفارشی...",
+      "no_fields": "هنوز هیچ فیلد سفارشی ایجاد نشده است",
+      "create_new": "ایجاد فیلد جدید",
+      "dialog_title": "ایجاد فیلد سفارشی جدید",
+      "input_placeholder": "مقدار {{fieldName}} را وارد کنید",
+      "select_date": "تاریخ را انتخاب کنید",
+      "list_under_development": "انتخاب از لیست",
+      "unknown_field_type": "نوع فیلد نامشخص"
+    },
     "notes": {
       "title": "یادداشت‌ها",
       "description": "اطلاعات اضافی و یادداشت‌های مربوط به مخاطب را وارد کنید",
@@ -121,8 +159,6 @@
     "required_field": "فیلد الزامی",
     "editing": "در حال ویرایش...",
     "adding": "در حال افزودن...",
-    "gender": "جنسیت",
-    "birth_date": "تاریخ تولد",
     "avatar_url": "آدرس تصویر پروفایل"
   },
   "home": {
@@ -229,44 +265,129 @@
     "compression_tip": "فشرده‌سازی قابل بهبود است",
     "compression_recommendation": "فعال کردن فشرده‌سازی Brotli یا بهینه‌سازی دارایی‌ها را در نظر بگیرید",
     "performance_good": "عملکرد عالی!",
-    "performance_message": "بسته شما بهینه شده و تمام آستانه‌های عملکرد را رعایت می‌کند"
+    "performance_message": "بسته شما بهینه شده و تمام آستانه‌های عملکرد را رعایت می‌کد"
   },
   "performance": {
     "title": "داشبورد عملکرد",
     "description": "مانیتورینگ بلادرنگ Web Vitals و معیارهای عملکرد",
+    "cls": "CLS",
+    "cls_description": "تغییرات ناگهانی در چیدمان صفحه",
+    "fcp": "FCP",
+    "inp": "INP",
+    "inp_description": "زمان پاسخ به تعاملات کاربر",
+    "lcp": "LCP",
+    "ttfb": "TTFB",
+    "error": "خطا",
     "score": "امتیاز",
     "refresh": "بروزرسانی",
+    "excellent": "عالی",
+    "good": "خوب",
+    "needs_improvement": "نیاز به بهبود",
+    "poor": "ضعیف",
     "export": "خروجی",
     "overall_health": "سلامت کلی عملکرد",
+    "insights": "بینش‌های عملکردی",
+    "insights_description": "نکات و توصیه‌های بهینه‌سازی",
     "last_updated": "آخرین بروزرسانی",
-    "poor": "ضعیف",
-    "good": "خوب",
-    "excellent": "عالی",
     "measuring": "در حال اندازه‌گیری...",
-    "needs_improvement": "نیاز به بهبود",
     "unknown": "نامشخص",
     "threshold": "آستانه خوب",
-    "insights": "بینش‌های عملکرد",
     "excellent_performance": "عملکرد عالی!",
     "excellent_message": "برنامه شما تمام استانداردهای عملکرد را رعایت می‌کند",
     "critical_issues": "مشکلات حیاتی عملکرد شناسایی شد",
     "critical_message": "برخی معیارها در محدوده ضعیف هستند و نیاز به توجه فوری دارند",
     "room_for_improvement": "جای بهبود وجود دارد",
     "improvement_message": "برخی معیارها برای تجربه کاربری بهتر قابل بهینه‌سازی هستند",
-    "cls_description": "ثبات بصری در طول بارگذاری صفحه",
     "fcp_description": "زمان تا نمایش اولین محتوا",
     "fid_description": "پاسخگویی به اولین تعامل کاربر",
     "lcp_description": "زمان بارگذاری بزرگترین عنصر محتوا",
     "ttfb_description": "زمان پاسخ سرور",
     "lcp_tip": "نکته بهینه‌سازی LCP",
-    "lcp_suggestion": " بهینه‌سازی تصاویر، فونت‌ها و بارگذاری منابع حیاتی را در نظر بگیرید",
+    "lcp_suggestion": "بهینه‌سازی تصاویر، فونت‌ها و بارگذاری منابع حیاتی را در نظر بگیرید",
     "cls_tip": "نکته بهینه‌سازی CLS",
-    "cls_suggestion": " اطمینان حاصل کنید تصاویر و تبلیغات ابعاد تعریف شده دارند",
+    "cls_suggestion": "اطمینان حاصل کنید تصاویر و تبلیغات ابعاد تعریف شده دارند",
+    "inp_tip": "نکته بهینه‌سازی INP",
+    "inp_suggestion": " اطمینان حاصل کنید تصاویر و تبلیغات ابعاد تعریف شده دارند",
     "fid_tip": "نکته بهینه‌سازی FID",
     "fid_suggestion": " زمان اجرای JavaScript را کاهش دهید و از تقسیم کد استفاده کنید"
   },
   "character_count": "{{count}} کاراکتر",
+  "debug": {
+    "status": {
+      "online": "آنلاین",
+      "offline": "آفلاین"
+    },
+    "actions": {
+      "refresh_system_info": {
+        "title": "بروزرسانی اطلاعات سیستم",
+        "description": "به‌روزرسانی اطلاعات فنی سیستم"
+      },
+      "clear_storage": {
+        "title": "پاک‌سازی حافظه",
+        "description": "پاک‌سازی حافظه‌ی محلی و نشست"
+      },
+      "test_error": {
+        "title": "خطای آزمایشی ایجاد کن",
+        "description": "ایجاد یک خطای آزمایشی برای دیباگ"
+      }
+    },
+    "test_error": {
+      "title": "خطای آزمایشی فعال شد",
+      "description": "یک خطای آزمایشی برای اهداف دیباگ ایجاد شد. برای جزئیات بیشتر کنسول را بررسی کنید.",
+      "message": "خطای آزمایشی از پنل دیباگ"
+    },
+    "developer_mode": {
+      "title": "فعال‌سازی حالت توسعه‌دهنده",
+      "description": "قابلیت‌های دیباگ و ابزارهای توسعه را فعال کنید",
+      "button": "فعال‌سازی حالت دیباگ"
+    },
+    "system_info": {
+      "title": "اطلاعات سیستم",
+      "description": "جزئیات فنی مرورگر و سیستم شما",
+      "browser": "مرورگر:",
+      "platform": "پلتفرم:",
+      "language": "زبان:",
+      "screen": "صفحه‌نمایش:",
+      "online": "وضعیت اتصال:",
+      "memory": "حافظه:",
+      "connection": "اتصال:",
+      "local_storage": "حافظه محلی:",
+      "session_storage": "حافظه نشست:",
+    "timezone": "منطقه زمانی:"
+    }
+  },
+  "developer_mode": {
+    "title": "حالت توسعه‌دهنده",
+    "description": "ویژگی‌های دیباگ فعال شد",
+    "development_description": "در حال اجرا در محیط توسعه",
+    "active": "حالت دیباگ فعال",
+    "inactive": "حالت دیباگ غیرفعال",
+    "dev_badge": "توسعه",
+    "enable": "فعال کردن",
+    "disable": "غیرفعال کردن"
+  },
+  "performance_dashboard": {
+    "title": "داشبورد عملکرد",
+    "description": "نظارت بر معیارهای عملکردی و Web Vitals به صورت زنده",
+    "visible": "داشبورد قابل مشاهده است",
+    "hidden": "داشبورد پنهان است",
+    "show": "نمایش",
+    "hide": "مخفی کردن",
+    "error_metrics": "خطا در دریافت معیارهای عملکردی"
+  },
+  "debug_actions": {
+    "title": "اقدامات دیباگ",
+    "description": "ابزارهای سریع دیباگ و تست"
+  },
   "common": {
+    "all_types": "همه انواع",
+    "at": "در",
+    "not_available": "ناموجود",
+    "unknown": "ناشناخته",
+    "mbps": "مگابیت بر ثانیه",
+    "mb": "مگابایت",
+    "confirm_clear_storage": "آیا از پاک کردن تمام اطلاعات ذخیره شده محلی اطمینان دارید؟ این کار شما را از سیستم خارج خواهد کرد.",
+    "clear_storage": "پاک کردن حافظه محلی",
     "loading_page": "در حال بارگذاری صفحه...",
     "created_on": "تاریخ ایجاد",
     "field": "فیلد",
@@ -287,6 +408,7 @@
     "discard": "حذف",
     "expand": "مشاهده جزئیات",
     "collapse": "بستن",
+    "more": "بیشتر",
     "clear_search": "پاک کردن جستجو",
     "not_found": "یافت نشد",
     "no_results_for": "نتیجه‌ای برای",
@@ -459,8 +581,10 @@
     "theme_description": "انتخاب تم روشن، تاریک یا تنظیم خودکار بر اساس سیستم",
     "calendar_type": "نوع تقویم",
     "calendar_hint": "تغییر نوع تقویم بر روی نمایش تاریخ‌ها در سراسر برنامه تأثیر می‌گذارد.",
-    "jalali": "شمسی",
-    "gregorian": "میلادی",
+    "calendar": {
+      "solar": "شمسی",
+      "gregorian": "میلادی"
+    },
     "language": "زبان",
     "persian": "فارسی",
     "english": "انگلیسی",
@@ -518,8 +642,8 @@
     "debug_mode_description": "نمایش ابزارهای تشخیص عیب در کامپوننت‌ها",
     "accessibility": "دسترس‌پذیری",
     "accessibility_description": "فعال‌سازی قابلیت‌های دسترس‌پذیری مانند پشتیبانی از صفحه‌خوان و ناوبری با صفحه‌کلید",
-    "component_testing": "تست کامپوننت‌ها",
-    "component_testing_description": "ابزارهای تست و نمایش کامپوننت‌های رابط کاربری",
+    "component_testing": "تنظیمات توسعه‌دهنده",
+    "component_testing_description": "تنظیمات پیشرفته برای توسعه‌دهندگان و دیباگ برنامه",
     "rtl_components_test": "تست کامپوننت‌های RTL",
     "rtl_components_test_description": "تست کامپوننت‌های رابط کاربری در چیدمان راست به چپ",
     "test_success": "اتصال با موفقیت تست شد",
@@ -637,7 +761,8 @@
   },
   "user_management": {
     "title": "مدیریت کاربران",
-    "description": "افزودن، ویرایش و حذف کاربران",
+    "description": "مدیریت کاربران و دسترسی‌ها",
+    "edit_user_title": "ویرایش کاربر",
     "sort": {
       "newest": "جدیدترین",
       "oldest": "قدیمی‌ترین",
@@ -934,6 +1059,12 @@
     "email": "ایمیل",
     "phone": "شماره تلفن"
   },
+  "contact_extraction": {
+    "extraction_queued": "درخواست استخراج اطلاعات با موفقیت به صف اضافه شد.",
+    "invalid_edge_response": "پاسخ نامعتبر از تابع Edge.",
+    "extraction_failed": "خطا در استخراج اطلاعات",
+    "queue_error": "خطا در افزودن درخواست به صف استخراج اطلاعات"
+  },
   "errors": {
     "generic": "خطایی رخ داد",
     "unknown_error_occurred": "یک خطای ناشناخته رخ داد",
@@ -997,6 +1128,8 @@
     "unknown_field_type": "نوع فیلد نامشخص",
     "group_load_failed": "خطا در بارگذاری گروه",
     "auth": {
+      "please_sign_in": "برای استخراج اطلاعات باید وارد شوید.",
+      "unauthenticated_user": "کاربر احراز هویت نشده است.",
       "user_not_authenticated": "کاربر احراز هویت نشده است"
     },
     "profile_load_retry": "خطا در بارگذاری پروفایل (تلاش {{retryCount}} از {{maxRetries}}): {{message}}",
@@ -1032,10 +1165,43 @@
     "contact_id_not_found": "شناسه مخاطب برای ویرایش یافت نشد",
     "generic_error": "خطای عمومی رخ داده است"
   },
+  "tag_input": {
+    "label": "تگ‌ها",
+    "placeholder": "تایپ کنید و اینتر بزنید...",
+    "add_tag": "افزودن تگ",
+    "no_tags": "تگی وجود ندارد",
+    "select_color": "انتخاب رنگ"
+  },
+  "carousel": {
+    "hook_usage_error": "useCarousel باید درون کامپوننت <Carousel> استفاده شود",
+    "carousel_role_description": "اسلایدر",
+    "slide_role_description": "اسلاید",
+    "previous_slide": "اسلاید قبلی",
+    "next_slide": "اسلاید بعدی"
+  },
+  "dialog": {
+    "close": "بستن"
+  },
+  "form": {
+    "hook_usage_error": "useModernFormField باید درون کامپوننت <ModernFormField> استفاده شود"
+  },
   "form_errors": {
     "save_error_title": "خطا در ذخیره",
     "retry_save_label": "تلاش مجدد برای ذخیره فرم",
     "retry_attempt": "تلاش مجدد ({{retryCount}} از {{maxRetries}})"
+  },
+  "pagination": {
+    "navigation": "ناوبری صفحه‌بندی",
+    "previous": "قبلی",
+    "next": "بعدی",
+    "page": "صفحه",
+    "of": "از",
+    "go_to_page": "برو به صفحه",
+    "go_to_first": "برو به اولین صفحه",
+    "go_to_last": "برو به آخرین صفحه",
+    "go_to_previous": "برو به صفحه قبل",
+    "go_to_next": "برو به صفحه بعد",
+    "more_pages": "صفحات بیشتر"
   },
   "form_messages": {
     "please_wait": "لطفاً صبر کنید",
@@ -1158,6 +1324,10 @@
     "clear_draft": "حذف پیش‌نویس",
     "confirm_clear_draft": "آیا از حذف پیش‌نویس فعلی اطمینان دارید؟",
     "text_placeholder": "مقدار را وارد کنید...",
+    "tag_input": {
+      "placeholder": "تگ جدید اضافه کنید...",
+      "label": "تگ‌ها"
+    },
     "number_placeholder": "عدد وارد کنید...",
     "select_placeholder": "انتخاب کنید...",
     "optional_label": "(اختیاری)",
@@ -1441,6 +1611,8 @@
     "company_placeholder": "نام شرکت..."
   },
   "custom_field_management": {
+    "title": "مدیریت فیلدهای سفارشی",
+    "description": "مدیریت و سازماندهی فیلدهای سفارشی مخاطبین",
     "field_name": "نام فیلد",
     "field_name_placeholder": "مثال: تاریخ تولد",
     "list_options": "گزینه‌های لیست",

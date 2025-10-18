@@ -1,14 +1,8 @@
 import * as React from "react";
 import * as LabelPrimitive from "@radix-ui/react-label";
 import { Slot } from "@radix-ui/react-slot";
-import {
-  Controller,
-  ControllerProps,
-  FieldPath,
-  FieldValues,
-  FormProvider,
-  useFormContext,
-} from "react-hook-form";
+import { Controller, ControllerProps, FieldPath, FieldValues, FormProvider, useFormContext } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 
 import { cn, applyGlassEffect, applyGradientEffect, applyNeomorphismEffect } from "@/lib/utils";
 import { GlassEffect, GradientType } from "@/types/global-style-types";
@@ -47,8 +41,10 @@ const useModernFormField = () => {
 
   const fieldState = getFieldState(fieldContext.name, formState);
 
+  const { t } = useTranslation();
+  
   if (!fieldContext) {
-    throw new Error("useModernFormField should be used within <ModernFormField>");
+    throw new Error(t('form.hook_usage_error'));
   }
 
   const { id } = itemContext;

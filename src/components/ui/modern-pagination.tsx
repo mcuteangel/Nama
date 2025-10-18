@@ -1,17 +1,21 @@
 import * as React from "react";
 import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { cn, applyGlassEffect, applyGradientEffect, applyNeomorphismEffect, applyHoverEffect } from "@/lib/utils";
 import { GlassEffect, GradientType, HoverEffect } from "@/types/global-style-types";
 
-const ModernPagination = ({ className, ...props }: React.ComponentProps<"nav">) => (
-  <nav
-    role="navigation"
-    aria-label="pagination"
-    className={cn("mx-auto flex w-full justify-center", className)}
-    {...props}
-  />
-);
+const ModernPagination = ({ className, ...props }: React.ComponentProps<"nav">) => {
+  const { t } = useTranslation();
+  return (
+    <nav
+      role="navigation"
+      aria-label={t('pagination.navigation')}
+      className={cn("mx-auto flex w-full justify-center", className)}
+      {...props}
+    />
+  );
+};
 ModernPagination.displayName = "ModernPagination";
 
 const ModernPaginationContent = React.forwardRef<
@@ -93,13 +97,14 @@ const ModernPaginationPrevious = ({
   hoverEffect = "lift",
   ...props
 }: React.ComponentProps<typeof ModernPaginationLink>) => {
+  const { t } = useTranslation();
   const shouldApplyGlass = glassEffect !== "none";
   const shouldApplyGradient = gradientType !== "none";
   const shouldApplyNeomorphism = neomorphism;
   
   return (
     <ModernPaginationLink
-      aria-label="Go to previous page"
+      aria-label={t('pagination.go_to_previous')}
       className={cn(
         "gap-1 pl-2.5",
         shouldApplyGlass && applyGlassEffect(undefined, { variant: glassEffect }),
@@ -111,7 +116,7 @@ const ModernPaginationPrevious = ({
       {...props}
     >
       <ChevronLeft className="h-4 w-4" />
-      <span>Previous</span>
+      <span>{t('pagination.previous')}</span>
     </ModernPaginationLink>
   );
 };
@@ -125,13 +130,14 @@ const ModernPaginationNext = ({
   hoverEffect = "lift",
   ...props
 }: React.ComponentProps<typeof ModernPaginationLink>) => {
+  const { t } = useTranslation();
   const shouldApplyGlass = glassEffect !== "none";
   const shouldApplyGradient = gradientType !== "none";
   const shouldApplyNeomorphism = neomorphism;
   
   return (
     <ModernPaginationLink
-      aria-label="Go to next page"
+      aria-label={t('pagination.go_to_next')}
       className={cn(
         "gap-1 pr-2.5",
         shouldApplyGlass && applyGlassEffect(undefined, { variant: glassEffect }),
@@ -142,7 +148,7 @@ const ModernPaginationNext = ({
       )}
       {...props}
     >
-      <span>Next</span>
+      <span>{t('pagination.next')}</span>
       <ChevronRight className="h-4 w-4" />
     </ModernPaginationLink>
   );
@@ -160,6 +166,7 @@ const ModernPaginationEllipsis = ({
   gradientType?: GradientType;
   neomorphism?: boolean;
 }) => {
+  const { t } = useTranslation();
   const shouldApplyGlass = glassEffect !== "none";
   const shouldApplyGradient = gradientType !== "none";
   const shouldApplyNeomorphism = neomorphism;
@@ -177,7 +184,7 @@ const ModernPaginationEllipsis = ({
       {...props}
     >
       <MoreHorizontal className="h-4 w-4" />
-      <span className="sr-only">More pages</span>
+      <span className="sr-only">{t('pagination.more_pages')}</span>
     </span>
   );
 };

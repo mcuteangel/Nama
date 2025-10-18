@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import { PhoneNumberFormData, EmailAddressFormData, SocialLinkFormData } from '@/types/contact';
 import { ErrorManager } from '@/lib/error-manager';
 import { useSession } from '@/integrations/supabase/auth'; // Import useSession to get the access token
+import { useTranslation } from 'react-i18next';
 
 // Define ExtractedContactInfo here as it's the core output of the AI
 export interface ExtractedContactInfo {
@@ -16,6 +17,7 @@ export interface ExtractedContactInfo {
 }
 
 export function useContactExtractor() {
+  const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { session } = useSession(); // Get the current session
@@ -25,9 +27,9 @@ export function useContactExtractor() {
     setError(null);
 
     if (!session?.access_token) {
-      ErrorManager.notifyUser('برای استخراج اطلاعات باید وارد شوید.', 'error');
+      ErrorManager.notifyUser(t('errors.auth.please_sign_in'), 'error');
       setIsLoading(false);
-      return { success: false, error: 'کاربر احراز هویت نشده است.' };
+      return { success: false, error: t('errors.auth.unauthenticated_user') };
     }
 
     try {
@@ -58,21 +60,21 @@ export function useContactExtractor() {
       const responseData = await response.json();
 
       if (responseData.message) {
-        ErrorManager.notifyUser('درخواست استخراج اطلاعات با موفقیت به صف اضافه شد.', 'success');
+        ErrorManager.notifyUser(t('contact_extraction.extraction_queued'), 'success');
         return { success: true, error: null, suggestionId: responseData.ai_suggestion_id };
       } else {
-        throw new Error('پاسخ نامعتبر از تابع Edge.');
+        throw new Error(t('contact_extraction.invalid_edge_response'));
       }
     } catch (err: unknown) {
       console.error("Error during contact info extraction enqueue:", err);
-      const errorMessage = err instanceof Error ? err.message : 'خطا در افزودن درخواست به صف استخراج اطلاعات.';
+      const errorMessage = err instanceof Error ? err.message : t('contact_extraction.queue_error');
       setError(errorMessage);
       ErrorManager.notifyUser(errorMessage, 'error');
       return { success: false, error: errorMessage };
     } finally {
       setIsLoading(false);
     }
-  }, [session]);
+  }, [session, t]);
 
   return { enqueueContactExtraction, isLoading, error };
 }

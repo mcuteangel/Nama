@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { X, AlertCircle, Plus } from 'lucide-react';
 import { Tag as TagType, TAG_COLOR_VARIANTS } from '@/types/tag';
 import { cn } from '@/lib/utils';
@@ -19,6 +20,7 @@ export const Tag: React.FC<TagProps> = ({
   size = 'md',
   className
 }) => {
+  const { t } = useTranslation();
   const sizeClasses = {
     sm: 'px-2 py-1 text-xs',
     md: 'px-3 py-1.5 text-sm',
@@ -56,7 +58,7 @@ export const Tag: React.FC<TagProps> = ({
             onRemove(tag.id);
           }}
           className="flex items-center justify-center rounded-full hover:bg-black/10 transition-colors p-0.5 ml-1"
-          aria-label={`حذف تگ ${tag.name}`}
+          aria-label={`${t('common.delete')} ${tag.name}`}
         >
           <X size={iconSizes[size]} className="text-current" />
         </button>
@@ -82,6 +84,7 @@ export const TagList: React.FC<TagListProps> = ({
   maxDisplay = 3,
   className
 }) => {
+  const { t } = useTranslation();
   const displayTags = tags.slice(0, maxDisplay);
   const remainingCount = tags.length - maxDisplay;
 
@@ -99,7 +102,7 @@ export const TagList: React.FC<TagListProps> = ({
 
       {remainingCount > 0 && (
         <span className="text-sm text-muted-foreground px-2 py-1">
-          +{remainingCount} بیشتر
+          +{remainingCount} {t('common.more')}
         </span>
       )}
     </div>
@@ -123,12 +126,15 @@ export const TagInput: React.FC<TagInputProps> = ({
   onAdd,
   onRemove,
   availableColors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'],
-  placeholder = 'تگ جدید اضافه کنید...',
+  placeholder: placeholderProp,
   className,
   error,
-  label = 'تگ‌ها',
+  label: labelProp,
   required = false
 }) => {
+  const { t } = useTranslation();
+  const placeholder = placeholderProp || t('tag_input.placeholder');
+  const label = labelProp || t('tag_input.label');
   const [inputValue, setInputValue] = React.useState('');
   const [selectedColor, setSelectedColor] = React.useState(availableColors[0]);
   const [, setIsOpen] = React.useState(false);
@@ -196,7 +202,7 @@ export const TagInput: React.FC<TagInputProps> = ({
               className="bg-slate-100/80 hover:bg-slate-200/90 dark:bg-slate-700/80 dark:hover:bg-slate-600/90 text-slate-700 dark:text-slate-300 border border-slate-200/60 dark:border-slate-600/60 rounded-xl px-3 py-1.5 transition-all duration-200 hover:scale-105 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
               <Plus size={14} className="ml-2" />
-              اضافه
+              {t('common.add')}
             </GlassButton>
           </div>
 
@@ -214,7 +220,7 @@ export const TagInput: React.FC<TagInputProps> = ({
                     : 'border-slate-300/60 dark:border-slate-600/60 hover:border-slate-400 dark:hover:border-slate-500 hover:shadow-lg'
                 )}
                 style={{ backgroundColor: color }}
-                aria-label={`انتخاب رنگ ${color}`}
+                aria-label={`${t('tag_input.select_color')} ${color}`}
               />
             ))}
           </div>

@@ -31,7 +31,7 @@ const ContactTags: React.FC<ContactTagsProps> = ({
   useEffect(() => {
     const loadTags = async () => {
       if (!session?.user?.id) {
-        setError('کاربر احراز هویت نشده');
+        setError(t('errors.auth.user_not_authenticated'));
         return;
       }
 
@@ -44,15 +44,15 @@ const ContactTags: React.FC<ContactTagsProps> = ({
         if (error) {
           setError(error);
           toast({
-            title: 'خطا',
-            description: 'بارگذاری تگ‌ها با مشکل مواجه شد',
+            title: t('errors.generic'),
+            description: t('contact_form.tags.load_error'),
             variant: 'error'
           });
         } else {
           setAvailableTags(data || []);
         }
       } catch (err) {
-        setError('بارگذاری تگ‌ها ناموفق بود');
+        setError(t('contact_form.tags.load_failed'));
         console.error('Error loading tags:', err);
       } finally {
         setLoading(false);
@@ -66,8 +66,8 @@ const ContactTags: React.FC<ContactTagsProps> = ({
   const handleAddTag = async (tagName: string, color: string) => {
     if (!session?.user?.id) {
       toast({
-        title: 'خطا',
-        description: 'برای ایجاد تگ جدید باید وارد سیستم شوید',
+        title: t('errors.generic'),
+        description: t('contact_form.tags.login_required'),
         variant: 'error'
       });
       return;
@@ -82,8 +82,8 @@ const ContactTags: React.FC<ContactTagsProps> = ({
 
       if (error) {
         toast({
-          title: 'خطا',
-          description: 'ایجاد تگ جدید با مشکل مواجه شد',
+          title: t('errors.generic'),
+          description: t('contact_form.tags.create_failed'),
           variant: 'error'
         });
         return;
@@ -98,15 +98,15 @@ const ContactTags: React.FC<ContactTagsProps> = ({
         onTagsChange(updatedTags);
 
         toast({
-          title: 'موفقیت',
-          description: 'تگ جدید با موفقیت ایجاد شد'
+          title: t('success.title'),
+          description: t('contact_form.tags.create_success')
         });
       }
     } catch (err) {
       console.error('Error creating tag:', err);
       toast({
-        title: 'خطا',
-        description: 'ایجاد تگ جدید ناموفق بود',
+        title: t('errors.generic'),
+        description: t('contact_form.tags.creation_failed'),
         variant: 'error'
       });
     }
@@ -128,8 +128,8 @@ const ContactTags: React.FC<ContactTagsProps> = ({
 
   return (
     <FormCard
-      title="تگ‌ها"
-      description="تگ‌های مرتبط با مخاطب را انتخاب یا ایجاد کنید"
+      title={t('contact_form.tags.title')}
+      description={t('contact_form.tags.description')}
       icon={Tag}
       iconColor="#8b5cf6"
     >
@@ -137,12 +137,12 @@ const ContactTags: React.FC<ContactTagsProps> = ({
         {loading ? (
           <div className="text-center py-8 text-slate-500 dark:text-slate-400">
             <Loader2 size={24} className="mx-auto mb-2 opacity-50 animate-spin" />
-            <p className="text-sm">در حال بارگذاری تگ‌ها...</p>
+            <p className="text-sm">{t('contact_form.tags.loading')}</p>
           </div>
         ) : error ? (
           <div className="text-center py-8 text-slate-500 dark:text-slate-400">
             <XCircle size={24} className="mx-auto mb-2 opacity-50" />
-            <p className="text-sm">بارگذاری تگ‌ها با خطا مواجه شد</p>
+            <p className="text-sm">{t('contact_form.tags.load_error')}</p>
           </div>
         ) : (
           <>
@@ -158,7 +158,7 @@ const ContactTags: React.FC<ContactTagsProps> = ({
                     <CheckCircle size={10} className="text-primary-600 dark:text-primary-400" />
                   </div>
                   <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                    تگ‌های انتخاب شده
+                    {t('contact_form.tags.selected_tags')}
                   </span>
                 </div>
                 <TagList
@@ -180,8 +180,8 @@ const ContactTags: React.FC<ContactTagsProps> = ({
               <TagInput
                 tags={[]}
                 onAdd={handleAddTag}
-                placeholder="نام تگ جدید را وارد کنید..."
-                label="ایجاد تگ جدید"
+                placeholder={t('contact_form.tags.enter_tag_name')}
+                label={t('contact_form.tags.create_new_tag')}
               />
             </FormSection>
 
@@ -197,7 +197,7 @@ const ContactTags: React.FC<ContactTagsProps> = ({
                     <Tag size={10} className="text-primary-600 dark:text-primary-400" />
                   </div>
                   <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                    تگ‌های موجود
+                    {t('contact_form.tags.add_new_tag')}
                   </span>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">

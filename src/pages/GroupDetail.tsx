@@ -16,11 +16,22 @@ import { designTokens } from '@/lib/design-tokens';
 import { GlassButton, GradientButton } from '@/components/ui/glass-button';
 import { useToast } from '@/components/ui/use-toast';
 import PageHeader from '@/components/ui/PageHeader';
-import { ContactData } from '@/types/group.types';
 import { useState } from 'react';
 
+// Define a simplified contact interface for preview purposes (matching use-group.ts)
+interface ContactPreview {
+  id: string;
+  first_name: string;
+  last_name: string;
+  avatar_url?: string | null;
+  email?: string;
+  phone_number?: string;
+  phone_numbers?: PhoneNumber[];
+  name?: string; // For backward compatibility
+}
+
 // Define a function to map our contact data to the Contact type expected by ContactItem
-const mapToContact = (contact: ContactData): Contact => {
+const mapToContact = (contact: ContactPreview): Contact => {
   // Extract phone numbers if they exist in the contact data
   let phoneNumbers: PhoneNumber[] = [];
 

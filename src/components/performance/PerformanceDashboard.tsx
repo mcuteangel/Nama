@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   RefreshCw,
   Download,
@@ -49,7 +49,7 @@ const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({ className }
   const [error, setError] = useState<string | null>(null);
 
   // Function to get Web Vitals metrics
-  const getWebVitals = () => {
+  const getWebVitals = useCallback(() => {
     setIsLoading(true);
     setError(null);
 
@@ -77,14 +77,14 @@ const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({ className }
         setLastUpdated(new Date());
       }, 2000);
     } catch (err) {
-      setError('Failed to collect performance metrics');
+      setError(t('performance_dashboard.error_metrics'));
       setIsLoading(false);
     }
-  };
+  }, [t]);
 
   useEffect(() => {
     getWebVitals();
-  }, []);
+  }, [getWebVitals]);
 
   const refreshMetrics = () => {
     getWebVitals();
@@ -155,8 +155,8 @@ const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({ className }
 
   return (
     <SettingsSection
-      title={t('performance.title', 'Performance Dashboard')}
-      description={t('performance.description', 'Real-time Web Vitals and performance metrics monitoring')}
+      title={t('performance.title')}
+      description={t('performance.description')}
       icon={<Activity size={20} />}
       variant="glass"
       className={className}
@@ -172,7 +172,7 @@ const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({ className }
           className="flex items-center gap-2 font-medium"
         >
           <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
-          {t('performance.refresh', 'Refresh')}
+          {t('performance.refresh')}
         </GlassButton>
         <GlassButton
           onClick={exportData}
@@ -182,14 +182,14 @@ const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({ className }
           className="flex items-center gap-2 font-medium"
         >
           <Download className="h-4 w-4" />
-          {t('performance.export', 'Export')}
+          {t('performance.export')}
         </GlassButton>
       </div>
 
       {/* Error Display */}
       {error && (
         <SettingsCard
-          title={t('performance.error', 'Error')}
+          title={t('performance.error')}
           description={error}
           icon={<AlertTriangle size={16} />}
           gradient="orange"
@@ -203,8 +203,8 @@ const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({ className }
 
       {/* Overall Score */}
       <SettingsCard
-        title={t('performance.overall_health', 'Overall Performance Health')}
-        description={`${t('performance.last_updated', 'Last updated')}: ${formatTime(lastUpdated)}`}
+        title={t('performance.overall_health')}
+        description={`${t('performance.last_updated')}: ${formatTime(lastUpdated)}`}
         icon={<BarChart3 size={16} />}
         gradient={statusColor as 'blue' | 'green' | 'orange' | 'purple' | 'pink' | 'cyan'}
         className="mb-4"
@@ -212,7 +212,7 @@ const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({ className }
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <span className="text-sm font-medium">
-              {t('performance.score', 'Score')}: {overallScore}/100
+              {t('performance.score')}: {overallScore}/100
             </span>
             <span className={`px-2 py-1 rounded-full text-xs font-medium ${
               status === 'excellent' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' :
@@ -220,9 +220,7 @@ const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({ className }
               status === 'needs_improvement' ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300' :
               'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300'
             }`}>
-              {t(`performance.${status}`, status === 'excellent' ? 'Excellent' :
-                status === 'good' ? 'Good' :
-                status === 'needs_improvement' ? 'Needs Improvement' : 'Poor')}
+              {t(`performance.${status}`)}
             </span>
           </div>
           <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
@@ -242,8 +240,8 @@ const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({ className }
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
         {/* CLS Metric */}
         <SettingsCard
-          title="CLS"
-          description={t('performance.cls_description', 'Visual stability')}
+          title={t('performance.cls')}
+          description={t('performance.cls_description')}
           icon={<Layout size={16} />}
           gradient="purple"
         >
@@ -270,8 +268,8 @@ const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({ className }
 
         {/* FCP Metric */}
         <SettingsCard
-          title="FCP"
-          description={t('performance.fcp_description', 'First content paint')}
+          title={t('performance.fcp')}
+          description={t('performance.fcp_description')}
           icon={<Zap size={16} />}
           gradient="blue"
         >
@@ -298,8 +296,8 @@ const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({ className }
 
         {/* INP Metric */}
         <SettingsCard
-          title="INP"
-          description={t('performance.inp_description', 'Interaction to Next Paint')}
+          title={t('performance.inp')}
+          description={t('performance.inp_description')}
           icon={<MousePointer size={16} />}
           gradient="green"
         >
@@ -326,8 +324,8 @@ const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({ className }
 
         {/* LCP Metric */}
         <SettingsCard
-          title="LCP"
-          description={t('performance.lcp_description', 'Largest content paint')}
+          title={t('performance.lcp')}
+          description={t('performance.lcp_description')}
           icon={<Image size={16} />}
           gradient="orange"
         >
@@ -354,8 +352,8 @@ const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({ className }
 
         {/* TTFB Metric */}
         <SettingsCard
-          title="TTFB"
-          description={t('performance.ttfb_description', 'Time to first byte')}
+          title={t('performance.ttfb')}
+          description={t('performance.ttfb_description')}
           icon={<Wifi size={16} />}
           gradient="cyan"
         >
@@ -383,8 +381,8 @@ const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({ className }
 
       {/* Performance Insights */}
       <SettingsCard
-        title={t('performance.insights', 'Performance Insights')}
-        description={t('performance.insights_description', 'Optimization tips and recommendations')}
+        title={t('performance.insights')}
+        description={t('performance.insights_description')}
         icon={<Lightbulb size={16} />}
         gradient="purple"
       >
@@ -394,11 +392,11 @@ const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({ className }
               <div className="flex items-center gap-2 mb-1">
                 <CheckCircle className="h-4 w-4 text-green-600" />
                 <span className="font-medium text-green-700 dark:text-green-300">
-                  {t('performance.excellent_performance', 'Excellent Performance!')}
+                  {t('performance.excellent_performance')}
                 </span>
               </div>
               <p className="text-sm text-green-600 dark:text-green-400">
-                {t('performance.excellent_message', 'Your application meets all performance standards')}
+                {t('performance.excellent_message')}
               </p>
             </div>
           )}
@@ -408,11 +406,11 @@ const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({ className }
               <div className="flex items-center gap-2 mb-1">
                 <AlertTriangle className="h-4 w-4 text-red-600" />
                 <span className="font-medium text-red-700 dark:text-red-300">
-                  {t('performance.critical_issues', 'Critical Performance Issues Detected')}
+                  {t('performance.critical_issues')}
                 </span>
               </div>
               <p className="text-sm text-red-600 dark:text-red-400">
-                {t('performance.critical_message', 'Some metrics are in the poor range and need immediate attention')}
+                {t('performance.critical_message')}
               </p>
             </div>
           )}
@@ -422,11 +420,11 @@ const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({ className }
               <div className="flex items-center gap-2 mb-1">
                 <TrendingUp className="h-4 w-4 text-orange-600" />
                 <span className="font-medium text-orange-700 dark:text-orange-300">
-                  {t('performance.room_for_improvement', 'Room for Improvement')}
+                  {t('performance.room_for_improvement')}
                 </span>
               </div>
               <p className="text-sm text-orange-600 dark:text-orange-400">
-                {t('performance.improvement_message', 'Some metrics can be optimized for better user experience')}
+                {t('performance.improvement_message')}
               </p>
             </div>
           )}
@@ -436,11 +434,11 @@ const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({ className }
               <div className="flex items-center gap-2 mb-1">
                 <Zap className="h-4 w-4 text-blue-600" />
                 <span className="font-medium text-blue-700 dark:text-blue-300">
-                  {t('performance.lcp_tip', 'LCP Optimization')}
+                  {t('performance.lcp_tip')}
                 </span>
               </div>
               <p className="text-sm text-blue-600 dark:text-blue-400">
-                {t('performance.lcp_suggestion', 'Consider optimizing images, fonts, and critical resource loading')}
+                {t('performance.lcp_suggestion')}
               </p>
             </div>
 
@@ -448,11 +446,11 @@ const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({ className }
               <div className="flex items-center gap-2 mb-1">
                 <Layout className="h-4 w-4 text-purple-600" />
                 <span className="font-medium text-purple-700 dark:text-purple-300">
-                  {t('performance.cls_tip', 'CLS Optimization')}
+                  {t('performance.cls_tip')}
                 </span>
               </div>
               <p className="text-sm text-purple-600 dark:text-purple-400">
-                {t('performance.cls_suggestion', 'Ensure images and ads have defined dimensions')}
+                {t('performance.cls_suggestion')}
               </p>
             </div>
 
@@ -460,11 +458,11 @@ const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({ className }
               <div className="flex items-center gap-2 mb-1">
                 <MousePointer className="h-4 w-4 text-green-600" />
                 <span className="font-medium text-green-700 dark:text-green-300">
-                  {t('performance.inp_tip', 'INP Optimization')}
+                  {t('performance.inp_tip')}
                 </span>
               </div>
               <p className="text-sm text-green-600 dark:text-green-400">
-                {t('performance.inp_suggestion', 'Reduce JavaScript execution time and use code splitting')}
+                {t('performance.inp_suggestion')}
               </p>
             </div>
           </div>

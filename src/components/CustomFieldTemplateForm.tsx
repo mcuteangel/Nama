@@ -14,7 +14,7 @@ import {
   type CreateCustomFieldTemplateInput,
   type CustomFieldTemplate,
 } from '@/domain/schemas/custom-field-template';
-import { useSession } from '@/integrations/supabase/auth';
+import { useSession } from '@/integrations/supabase/useAuth';
 import { useNavigate } from 'react-router-dom';
 import CancelButton from './common/CancelButton';
 import LoadingSpinner from './common/LoadingSpinner';
