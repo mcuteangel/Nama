@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from 'react-i18next';
-import { Settings as SettingsIcon, Palette, Sparkles, TestTube, UserCircle, Database } from "lucide-react";
+import { Settings as SettingsIcon, Palette, Sparkles, TestTube, UserCircle, Database, Code } from "lucide-react";
 import { cn } from '@/lib/utils';
 import PageHeader from "@/components/ui/PageHeader";
 import { ModernCard, ModernCardContent } from "@/components/ui/modern-card";
@@ -22,7 +22,7 @@ const Settings = () => {
   const settingsTabs = [
     {
       id: 'profile',
-      title: 'پروفایل',
+      title: t('settings.tabs.profile'),
       icon: <UserCircle size={14} />,
       component: <UserProfileSettings />,
       color: 'blue',
@@ -32,7 +32,7 @@ const Settings = () => {
     },
     {
       id: 'appearance',
-      title: 'نمایش',
+      title: t('settings.tabs.appearance'),
       icon: <Palette size={14} />,
       component: <AppearanceSettings />,
       color: 'purple',
@@ -42,7 +42,7 @@ const Settings = () => {
     },
     {
       id: 'data',
-      title: 'مدیریت داده',
+      title: t('settings.tabs.data'),
       icon: <Database size={14} />,
       component: <DataManagementSettings onImportSuccess={handleImportSuccess} />,
       color: 'green',
@@ -52,7 +52,7 @@ const Settings = () => {
     },
     {
       id: 'ai',
-      title: 'هوش مصنوعی',
+      title: t('settings.tabs.ai'),
       icon: <Sparkles size={14} />,
       component: <AISettings />,
       color: 'orange',
@@ -62,8 +62,8 @@ const Settings = () => {
     },
     {
       id: 'developer',
-      title: 'توسعه‌دهنده',
-      icon: <TestTube size={14} />,
+      title: t('settings.tabs.developer'),
+      icon: <Code size={14} />,
       component: <DeveloperSettings />,
       color: 'red',
       gradient: 'from-red-500 to-red-600',
@@ -99,7 +99,7 @@ const Settings = () => {
                     <div className="flex items-center gap-4 mb-4">
                       <SettingsIcon size={20} className="text-blue-600 dark:text-blue-400" />
                       <h2 className="text-base font-semibold text-slate-800 dark:text-slate-100">
-                        انتخاب بخش تنظیمات
+                        {t('settings.section_chooser')}
                       </h2>
                     </div>
 
@@ -196,14 +196,14 @@ const Settings = () => {
                       {currentTab?.title}
                     </h3>
                     <p className="text-sm text-slate-600 dark:text-slate-300">
-                      تنظیمات و گزینه‌های مربوط به این بخش
+                      {t('settings.section_description')}
                     </p>
                   </div>
                   <div className={cn(
                     "px-3 py-1 rounded-full text-xs font-medium",
                     `bg-${currentTab?.color}-100 dark:bg-${currentTab?.color}-900/30 text-${currentTab?.color}-700 dark:text-${currentTab?.color}-300`
                   )}>
-                    فعال
+                    {t('settings.active_status')}
                   </div>
                 </div>
 

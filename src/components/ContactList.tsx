@@ -51,7 +51,7 @@ const ContactList: React.FC<ContactListProps> = ({
       setContacts(result.data);
     }
     if (result && !result.fromCache) {
-      ErrorManager.notifyUser(t('contact_list.contacts_loaded_success', 'Contacts loaded successfully.'), 'success');
+      ErrorManager.notifyUser(t('contact_list.contacts_loaded_success'), 'success');
     }
   }, [t]);
 
@@ -66,7 +66,7 @@ const ContactList: React.FC<ContactListProps> = ({
     maxRetries: 3,
     retryDelay: 1000,
     showToast: false,
-    customErrorMessage: t('contact_list.error_loading_contacts', 'Error loading contacts'),
+    customErrorMessage: t('contact_list.error_loading_contacts' ),
     onSuccess: onSuccessContacts,
     onError: onErrorContacts,
   });

@@ -290,12 +290,13 @@
       }
     },
     "of_total": "of total",
-    "not_specified": "Not specified",
-    "errors": {
-      "generic": "An error occurred"
-    }
+    "not_specified": "Not specified"
   },
   "errors": {
+    "invalid_image_url": "Invalid image URL",
+    "delete_auth_required": "You must be logged in to delete files",
+    "upload_auth_required": "You must be logged in to upload files",
+    "select_image_file": "Please select a valid image file",
     "generic": "An error occurred",
     "unknown_error": "An unknown error occurred",
     "invalid_user_id": "Invalid user ID",
@@ -309,7 +310,6 @@
     "field_required": "{{field}} is required",
     "generic_error": "An error occurred",
     "upload_avatar_auth": "You must be logged in to upload profile picture",
-    "select_image_file": "Please select an image file",
     "file_size_limit": "File size should not exceed 5 MB",
     "no_fields_to_update": "No fields specified for update",
     "public_url_error": "Error getting public URL of image",
@@ -1059,7 +1059,21 @@
     "authorization": "Authorization",
     "bearer_token": "Bearer"
   },
+  "contact_list": {
+    "contacts_loaded_success": "Contacts loaded successfully",
+    "error_loading_contacts": "Error loading contacts"
+  },
   "settings": {
+    "tabs": {
+      "profile": "Profile",
+      "appearance": "Appearance",
+      "data": "Data Management",
+      "ai": "AI",
+      "developer": "Developer"
+    },
+    "section_chooser": "Select Settings Section",
+    "section_description": "Settings and options related to this section",
+    "active_status": "Active",
     "title": "Settings",
     "description": "Manage application settings and user preferences",
     "choose_theme": "Choose Theme",
