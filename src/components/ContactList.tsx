@@ -163,14 +163,14 @@ const ContactList: React.FC<ContactListProps> = ({
 
   if (isLoading || isSessionLoading) {
     return (
-      <div className="flex justify-center items-center p-8">
+      <div className="loading-container">
         <ModernLoader variant="spinner" size="lg" />
       </div>
     );
   }
 
   return (
-    <div className="space-y-2 sm:space-y-4 w-full px-0">
+    <div className="contact-list-container">
       {contactListContent}
     </div>
   );
