@@ -1,17 +1,17 @@
-# Nama-1 - AI-Powered Smart Contact Management System
+# Nama - AI-Powered Smart Contact Management System
+
+[![CI](https://github.com/mcuteangel/Nama/actions/workflows/ci.yml/badge.svg)](https://github.com/mcuteangel/Nama/actions/workflows/ci.yml)
+[![Coverage Status](https://coveralls.io/repos/github/mcuteangel/Nama/badge.svg?branch=main)](https://coveralls.io/github/mcuteangel/Nama?branch=main)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## 🌐 Available Versions
 
 - 🇺🇸 [English README](README.md) - English version
 - 🇮🇷 [فارسی README](README-fa.md) - Persian version
 
-[![Build Status](https://github.com/mcuteangel/Nama/workflows/CI/badge.svg)](https://github.com/mcuteangel/Nama/actions)
-[![Coverage Status](https://coveralls.io/repos/github/mcuteangel/Nama/badge.svg?branch=main)](https://coveralls.io/github/mcuteangel/Nama?branch=main)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-
 ## 📱 Overview
 
-Nama-1 is a modern and intelligent contact management application that revolutionizes how you organize and interact with your personal and professional networks through the power of artificial intelligence. Built with React, TypeScript, and Supabase, this application provides intelligent contact organization, AI-powered data extraction, and real-time cross-platform accessibility.
+Nama is a modern and intelligent contact management application that revolutionizes how you organize and interact with your personal and professional networks through the power of artificial intelligence. Built with React, TypeScript, and Supabase, this application provides intelligent contact organization, AI-powered data extraction, and real-time cross-platform accessibility.
 
 ### ✨ Key Features
 
@@ -71,7 +71,7 @@ Nama-1 is a modern and intelligent contact management application that revolutio
 
    ```bash
    git clone https://github.com/mcuteangel/Nama.git
-   cd nama-1
+   cd nama
    ```
 
 2. **Install dependencies**
@@ -302,7 +302,7 @@ cypress/
 
 ## 🤝 Contributing
 
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+We welcome contributions! Please see our development workflow below for details.
 
 ### Development Workflow
 
@@ -329,9 +329,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🆘 Support
 
-- 📧 Email: <support@nama-app.com>
-- 💬 Discord: [Join our community](https://discord.gg/nama-app)
-- 📚 Documentation: [docs.nama-app.com](https://docs.nama-app.com)
 - 🐛 Issues: [GitHub Issues](https://github.com/mcuteangel/Nama/issues)
 
 ## 🙏 Acknowledgments

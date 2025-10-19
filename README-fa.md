@@ -1,17 +1,17 @@
-# نما-۱ - سیستم مدیریت مخاطبین هوشمند با قدرت هوش مصنوعی
+# نما - سیستم مدیریت مخاطبین هوشمند با قدرت هوش مصنوعی
+
+[![CI](https://github.com/mcuteangel/Nama/actions/workflows/ci.yml/badge.svg)](https://github.com/mcuteangel/Nama/actions/workflows/ci.yml)
+[![Coverage Status](https://coveralls.io/repos/github/mcuteangel/Nama/badge.svg?branch=main)](https://coveralls.io/github/mcuteangel/Nama?branch=main)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## 🌐 نسخه‌های موجود
 
 - 🇺🇸 [English README](README.md) - نسخه انگلیسی
 - 🇮🇷 [فارسی README](README-fa.md) - نسخه فارسی
 
-[![Build Status](https://github.com/mcuteangel/Nama/workflows/CI/badge.svg)](https://github.com/mcuteangel/Nama/actions)
-[![Coverage Status](https://coveralls.io/repos/github/mcuteangel/Nama/badge.svg?branch=main)](https://coveralls.io/github/mcuteangel/Nama?branch=main)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-
 ## 📱 نمای کلی
 
-نما-۱ یک اپلیکیشن مدرن و هوشمند برای مدیریت مخاطبین است که با قدرت هوش مصنوعی، نحوه سازماندهی و تعامل شما با شبکه‌های شخصی و حرفه‌ای‌تان را متحول می‌کند. این اپلیکیشن با React، TypeScript و Supabase ساخته شده و سازماندهی هوشمند مخاطبین، استخراج داده‌های مبتنی بر هوش مصنوعی و دسترسی بی‌درنگ چندپلتفرمه را ارائه می‌دهد.
+نما یک اپلیکیشن مدرن و هوشمند برای مدیریت مخاطبین است که با قدرت هوش مصنوعی، نحوه سازماندهی و تعامل شما با شبکه‌های شخصی و حرفه‌ای‌تان را متحول می‌کند. این اپلیکیشن با React، TypeScript و Supabase ساخته شده و سازماندهی هوشمند مخاطبین، استخراج داده‌های مبتنی بر هوش مصنوعی و دسترسی بی‌درنگ چندپلتفرمه را ارائه می‌دهد.
 
 ### ✨ ویژگی‌های کلیدی
 
@@ -71,7 +71,7 @@
 
    ```bash
    git clone https://github.com/mcuteangel/Nama.git
-   cd nama-1
+   cd nama
    ```
 
 2. **نصب وابستگی‌ها**
@@ -302,7 +302,7 @@ cypress/
 
 ## 🤝 مشارکت
 
-ما از مشارکت استقبال می‌کنیم! لطفاً [راهنمای مشارکت](CONTRIBUTING.md) ما را برای جزئیات ببینید.
+ما از مشارکت استقبال می‌کنیم! لطفاً گردش کار توسعه زیر را برای جزئیات ببینید.
 
 ### گردش کار توسعه
 
@@ -329,9 +329,6 @@ cypress/
 
 ## 🆘 پشتیبانی
 
-- 📧 ایمیل: <support@nama-app.com>
-- 💬 Discord: [به جامعه ما بپیوندید](https://discord.gg/nama-app)
-- 📚 مستندات: [docs.nama-app.com](https://docs.nama-app.com)
 - 🐛 مسائل: [GitHub Issues](https://github.com/mcuteangel/Nama/issues)
 
 ## 🙏 تقدیر و تشکر
