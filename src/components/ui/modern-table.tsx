@@ -6,21 +6,18 @@ import { GlassEffect, GradientType, HoverEffect } from "@/types/global-style-typ
 // Helper function to safely cast string to GlassEffect type (excluding "none")
 const toGlassEffectVariant = (value: string): "default" | "advanced" | "card" | "background" | "button" => {
   const validValues: ("default" | "advanced" | "card" | "background" | "button")[] = ["default", "advanced", "card", "background", "button"];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return validValues.includes(value as any) ? (value as any) : "default";
 };
 
 // Helper function to safely cast string to GradientType (excluding "none")
 const toGradientTypeValue = (value: string): "primary" | "ocean" | "sunset" | "success" | "info" | "warning" | "danger" | "forest" => {
   const validValues: ("primary" | "ocean" | "sunset" | "success" | "info" | "warning" | "danger" | "forest")[] = ["primary", "ocean", "sunset", "success", "info", "warning", "danger", "forest"];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return validValues.includes(value as any) ? (value as any) : "primary";
 };
 
 // Helper function to safely cast string to HoverEffect type
 const toHoverEffectValue = (value: string): "lift" | "glow" | "scale" | "none" => {
   const validValues: ("lift" | "glow" | "scale" | "none")[] = ["lift", "glow", "scale", "none"];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return validValues.includes(value as any) ? (value as any) : "lift";
 };
 

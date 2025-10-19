@@ -3,6 +3,7 @@ import { ModernPopover, ModernPopoverContent, ModernPopoverTrigger } from '@/com
 import { GlassButton } from "@/components/ui/glass-button";
 import { cn } from '@/lib/utils';
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const colors = [
   '#EF4444', // red-500
   '#F97316', // orange-500

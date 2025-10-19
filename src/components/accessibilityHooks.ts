@@ -40,7 +40,6 @@ export const useKeyboardShortcut = (key: string, callback: () => void, deps: Rea
   useEffect(() => {
     registerShortcut(key, callback);
     return () => unregisterShortcut(key);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key, registerShortcut, unregisterShortcut, ...deps]);
 };
 

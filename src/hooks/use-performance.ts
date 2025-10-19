@@ -33,7 +33,6 @@ export function useExpensiveComputation<T>(
   computationFn: () => T,
   deps: unknown[]
 ): T {
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   return useMemo(() => computationFn(), [computationFn, ...deps]);
 }
 
@@ -44,7 +43,6 @@ export function useStableCallback<T extends (...args: unknown[]) => unknown>(
   callback: T,
   deps: unknown[]
 ): T {
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   return useCallback((...args: Parameters<T>) => callback(...args), deps) as T;
 }
 
