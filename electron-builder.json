@@ -11,7 +11,8 @@
   ],
   "win": {
     "icon": "public/logo.ico",
-    "target": "nsis"
+    "target": "portable",
+    "verifyUpdateCodeSignature": false
   },
   "mac": {
     "icon": "public/logo.icns"

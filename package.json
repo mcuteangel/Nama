@@ -1,6 +1,7 @@
 {
   "name": "nama",
   "version": "1.0.0",
+  "main": "main.js",
   "type": "module",
   "homepage": "https://github.com/mcuteangel/Nama",
   "repository": {
