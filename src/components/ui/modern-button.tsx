@@ -200,4 +200,5 @@ const ModernButtonIcon = React.forwardRef<HTMLButtonElement, ButtonIconProps>(
 )
 ModernButtonIcon.displayName = "ModernButtonIcon"
 
+// eslint-disable-next-line react-refresh/only-export-components
 export { ModernButton, ModernButtonGroup, ModernButtonIcon, buttonVariants }
