@@ -9,6 +9,8 @@ on:
 jobs:
   build-web:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
     - uses: actions/checkout@v4
@@ -49,6 +51,8 @@ jobs:
   build-desktop:
     runs-on: windows-latest
     needs: build-web
+    permissions:
+      contents: write
 
     steps:
     - uses: actions/checkout@v4
@@ -96,24 +100,14 @@ jobs:
 
     - name: Create Release (optional, only on push to main)
       if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-      uses: actions/create-release@v1
+      uses: softprops/action-gh-release@v2
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         tag_name: v${{ github.run_number }}
-        release_name: Release v${{ github.run_number }}
+        name: Release v${{ github.run_number }}
         body: |
           Automated release for desktop app.
         draft: false
         prerelease: false
-
-    - name: Upload Release Asset
-      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./dist-electron/Nama App-1.0.0-setup.exe  # نام فایل exe رو چک کن و تنظیم کن
-        asset_name: Nama-Desktop-Windows.exe
-        asset_content_type: application/octet-stream
+        files: ./dist-electron/**/*

@@ -11,8 +11,11 @@
   ],
   "win": {
     "icon": "public/logo.ico",
-    "target": "portable",
-    "verifyUpdateCodeSignature": false
+    "target": "dir",
+    "verifyUpdateCodeSignature": false,
+    "forceCodeSigning": false,
+    "asar": false,
+    "compression": "store"
   },
   "mac": {
     "icon": "public/logo.icns"
