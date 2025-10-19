@@ -54,6 +54,6 @@ describe('CustomFieldForm', () => {
         <CustomFieldForm />
       </MemoryRouter>
     );
-    expect(screen.getByText('custom_field_template.add_title')).toBeInTheDocument();
+    expect(screen.getByText('custom_fields.add_title')).toBeInTheDocument();
   });
 });

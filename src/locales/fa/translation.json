@@ -51,6 +51,7 @@
     },
     "custom_fields": {
       "title": "فیلدهای سفارشی",
+      "add_title": "افزودن فیلد سفارشی",
       "description": "فیلدهای اضافی برای اطلاعات مخاطب",
       "loading": "در حال بارگذاری فیلدهای سفارشی...",
       "no_fields": "هنوز هیچ فیلد سفارشی ایجاد نشده است",
@@ -266,29 +267,65 @@
   "bundle_monitor": {
     "title": "مانیتور حجم بسته",
     "description": "مانیتورینگ بلادرنگ حجم بسته و معیارهای عملکرد",
+    "no_data": "داده‌ای موجود نیست",
+    "percentage_of_total": "% از کل",
+    "gzipped": "(فشرده)",
+    "units": {
+      "bytes": "بایت",
+      "kilobytes": "کیلوبایت",
+      "megabytes": "مگابایت",
+      "gigabytes": "گیگابایت"
+    },
+    "export": {
+      "filename": "گزارش-حجم-بسته"
+    },
     "of_total": "از کل",
-    "status_good": "بهینه",
+    "status": {
+      "optimal": "بهینه",
+      "good": "خوب",
+      "needs_optimization": "نیاز به بهینه‌سازی"
+    },
+    "metrics": {
+      "total_size": "حجم کل",
+      "compression": "نسبت فشرده‌سازی",
+      "load_time": "زمان بارگذاری",
+      "gzip_size": "حجم فشرده",
+      "bundle_size": "حجم بسته",
+      "performance": "عملکرد",
+      "assets": "دارایی‌ها"
+    },
     "status_warning": "نیاز به توجه",
-    "export": "خروجی گزارش",
-    "total_size": "حجم کل",
     "threshold": "آستانه",
-    "compression": "فشرده‌سازی",
-    "gzip_size": "فشرده شده",
-    "load_time": "زمان بارگذاری",
     "target": "هدف",
     "chunks_analysis": "تحلیل قطعات",
-    "chunks_description": "تفکیک دقیق قطعات بسته و تاثیر آن‌ها",
-    "lazy": "تنبل",
-    "eager": "فوری",
+    "chunks": {
+      "title": "قطعات بسته",
+      "description": "تفکیک دقیق قطعات بسته و تاثیر آن‌ها"
+    },
+    "loading": {
+      "eager": "فوری",
+      "lazy": "تنبل"
+    },
     "modules": "ماژول",
-    "gzipped": "فشرده شده",
-    "insights": "بینش‌های عملکرد",
+    "insights": {
+      "title": "بینش‌های عملکرد",
+      "description": "توصیه‌ها و بینش‌های بهبود عملکرد بسته",
+      "excellent": "عملکرد عالی! حجم بسته و زمان‌های بارگذاری در محدوده بهینه قرار دارند.",
+      "title_alt": "بینش‌های عملکردی"
+    },
     "size_warning": "حجم بسته از آستانه توصیه شده فراتر رفته",
     "size_recommendation": "تقسیم کد یا حذف وابستگی‌های غیرضروری را در نظر بگیرید",
     "compression_tip": "فشرده‌سازی قابل بهبود است",
     "compression_recommendation": "فعال کردن فشرده‌سازی Brotli یا بهینه‌سازی دارایی‌ها را در نظر بگیرید",
+    "compression_good": "فشرده‌سازی عالی!",
+    "compression_good_message": "نسبت فشرده‌سازی شما در محدوده بهینه قرار دارد.",
     "performance_good": "عملکرد عالی!",
-    "performance_message": "بسته شما بهینه شده و تمام آستانه‌های عملکرد را رعایت می‌کند"
+    "performance_message": "بسته شما بهینه شده و تمام آستانه‌های عملکرد را رعایت می‌کند",
+    "export_button": "دریافت گزارش",
+    "within_threshold": "در محدوده مجاز",
+    "above_threshold": "بالاتر از حد مجاز",
+    "lazy_loading_title": "بارگذاری تنبل (Lazy Loading)",
+    "lazy_loading_message": "برای بهبود عملکرد، استفاده از بارگذاری تنبل برای ماژول‌های غیرضروری را در نظر بگیرید."
   },
   "performance": {
     "title": "داشبورد عملکرد",
@@ -410,6 +447,8 @@
     "at": "در",
     "not_available": "ناموجود",
     "not_specified": "نامشخص",
+    "na": "نامعلوم",
+    "percentage_symbol": "٪",
     "fields": "فیلدها",
     "no_data_found": "داده‌ای یافت نشد",
     "no_data_description": "متأسفانه هیچ داده‌ای برای نمایش وجود ندارد.",

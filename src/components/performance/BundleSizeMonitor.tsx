@@ -1,9 +1,7 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { GlassButton } from "@/components/ui/glass-button";
 import { ModernCard, ModernCardContent, ModernCardDescription, ModernCardHeader, ModernCardTitle } from '@/components/ui/modern-card';
-import { Separator } from '@/components/ui/separator';
 import { 
   BarChart3, 
   Download, 
@@ -16,12 +14,15 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
+type LoadingType = 'eager' | 'lazy';
+
 interface BundleMetrics {
   totalSize: number;
   gzipSize: number;
-  chunks: ChunkInfo[];
+  gzippedSize?: number; // Made optional with ?
   loadTime: number;
-  timestamp: Date;
+  timestamp?: Date;
+  chunks: (ChunkInfo | ChunkInfoSimple)[];
 }
 
 interface ChunkInfo {
@@ -30,6 +31,13 @@ interface ChunkInfo {
   gzipSize: number;
   modules: string[];
   isLazy: boolean;
+}
+
+// Simplified chunk interface from the other component
+interface ChunkInfoSimple {
+  name: string;
+  size: number;
+  loading?: LoadingType; // Made optional with ?
 }
 
 interface PerformanceThresholds {
@@ -44,11 +52,56 @@ const DEFAULT_THRESHOLDS: PerformanceThresholds = {
   loadTime: 3000,         // 3 seconds
 };
 
-export const BundleSizeMonitor: React.FC = React.memo(() => {
+export const BundleSizeMonitor = React.memo(() => {
   const { t } = useTranslation();
   const [metrics, setMetrics] = useState<BundleMetrics | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [thresholds] = useState<PerformanceThresholds>(DEFAULT_THRESHOLDS);
+  
+  // Simulate loading metrics (from the simpler component)
+  useEffect(() => {
+    if (metrics) return;
+    
+    const timer = setTimeout(() => {
+      setMetrics({
+        totalSize: 420000, // 420 KB
+        gzipSize: 130000,  // 130 KB
+        gzippedSize: 130000, // For backward compatibility
+        loadTime: 2500,    // 2.5 seconds
+        timestamp: new Date(),
+        chunks: [
+          { name: 'main', size: 250000, gzipSize: 80000, modules: ['main'], isLazy: false },
+          { name: 'vendor', size: 120000, gzipSize: 40000, modules: ['vendor'], isLazy: false },
+          { name: 'contacts', size: 50000, gzipSize: 10000, modules: ['contacts'], isLazy: true }
+        ]
+      });
+      setIsLoading(false);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [metrics]);
+  
+  // Format bytes helper (from the simpler component)
+  const formatBytes = useCallback((bytes: number): string => {
+    if (bytes === 0) return `0 ${t('bundle_monitor.units.bytes')}`;
+    const k = 1024;
+    const sizes = [
+      t('bundle_monitor.units.bytes'),
+      t('bundle_monitor.units.kilobytes'),
+      t('bundle_monitor.units.megabytes'),
+      t('bundle_monitor.units.gigabytes')
+    ];
+    const i = Math.min(
+      Math.floor(Math.log(bytes) / Math.log(k)),
+      sizes.length - 1
+    );
+    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`;
+  }, [t]);
+  
+  // Format time helper (from the simpler component)
+  const formatTime = useCallback((ms: number): string => {
+    return `${ms}ms`;
+  }, []);
 
   // Simulate bundle metrics collection (in real implementation, this would come from build data)
   useEffect(() => {
@@ -96,13 +149,61 @@ export const BundleSizeMonitor: React.FC = React.memo(() => {
     collectMetrics();
   }, []);
 
-  const formatBytes = (bytes: number): string => {
-    if (bytes === 0) return '0 B';
-    const k = 1024;
-    const sizes = ['B', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`;
-  };
+  const compressionRatio = useMemo(() => {
+    if (!metrics || metrics.totalSize === 0) return 0;
+    const gzipSize = metrics.gzipSize || metrics.gzippedSize || 0;
+    return ((metrics.totalSize - gzipSize) / metrics.totalSize) * 100;
+  }, [metrics]);
+
+  const exportReport = useCallback(() => {
+    if (!metrics) return;
+    
+    const report = {
+      timestamp: metrics.timestamp?.toISOString() || new Date().toISOString(),
+      totalSize: metrics.totalSize,
+      gzipSize: metrics.gzipSize || metrics.gzippedSize,
+      compressionRatio: compressionRatio,
+      loadTime: metrics.loadTime,
+      chunks: metrics.chunks.map(chunk => {
+        // For ChunkInfoSimple, we'll determine laziness from the loading prop
+        const isChunkInfo = 'isLazy' in chunk;
+        const isLazy = isChunkInfo ? chunk.isLazy : chunk.loading === 'lazy';
+        const loading = isChunkInfo ? (chunk.isLazy ? 'lazy' : 'eager') : chunk.loading;
+        
+        return {
+          name: chunk.name,
+          size: chunk.size,
+          gzipSize: isChunkInfo ? chunk.gzipSize : undefined,
+          modules: isChunkInfo ? chunk.modules : [],
+          isLazy,
+          loading
+        };
+      }),
+    };
+
+    const blob = new Blob([JSON.stringify({
+      ...report,
+      totalSize: formatBytes(report.totalSize),
+      gzipSize: formatBytes(report.gzipSize || 0),
+      compressionRatio: `${compressionRatio.toFixed(1)}${t('common.percentage_symbol')}`,
+      loadTime: formatTime(report.loadTime),
+      chunks: report.chunks.map(chunk => ({
+        ...chunk,
+        size: formatBytes(chunk.size),
+        gzipSize: chunk.gzipSize !== undefined ? formatBytes(chunk.gzipSize) : t('common.na'),
+        modules: Array.isArray(chunk.modules) ? chunk.modules.length : t('common.na')
+      }))
+    }, null, 2)], { type: 'application/json' });
+    
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${t('bundle_monitor.export.filename', 'bundle-report')}-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }, [metrics, compressionRatio, formatBytes, formatTime]);
 
   const getBundleStatus = useMemo(() => {
     if (!metrics) return { status: 'unknown', color: 'gray', icon: Package };
@@ -117,46 +218,20 @@ export const BundleSizeMonitor: React.FC = React.memo(() => {
     return { status: 'good', color: 'green', icon: CheckCircle };
   }, [metrics, thresholds]);
 
-  const getChunkStatus = (chunk: ChunkInfo) => {
+  const getChunkStatus = (chunk: ChunkInfo | ChunkInfoSimple) => {
+    // For ChunkInfoSimple, we don't have size thresholds, so always return good
+    if (!('isLazy' in chunk)) {
+      return { status: 'good', color: 'green' };
+    }
+    
+    // For ChunkInfo, apply size thresholds
     if (chunk.size > thresholds.chunkSize) {
       return { status: 'warning', color: 'orange' };
     }
     return { status: 'good', color: 'green' };
   };
 
-  const compressionRatio = useMemo(() => {
-    if (!metrics || metrics.totalSize === 0) return 0;
-    return ((metrics.totalSize - metrics.gzipSize) / metrics.totalSize) * 100;
-  }, [metrics]);
-
-  const exportReport = () => {
-    if (!metrics) return;
-    
-    const report = {
-      timestamp: metrics.timestamp.toISOString(),
-      totalSize: formatBytes(metrics.totalSize),
-      gzipSize: formatBytes(metrics.gzipSize),
-      compressionRatio: `${compressionRatio.toFixed(1)}%`,
-      loadTime: `${metrics.loadTime}ms`,
-      chunks: metrics.chunks.map(chunk => ({
-        name: chunk.name,
-        size: formatBytes(chunk.size),
-        gzipSize: formatBytes(chunk.gzipSize),
-        modules: chunk.modules.length,
-        isLazy: chunk.isLazy,
-      })),
-    };
-
-    const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `bundle-report-${Date.now()}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  };
+  // Render chunk item based on type
 
   if (isLoading) {
     return (
@@ -164,14 +239,14 @@ export const BundleSizeMonitor: React.FC = React.memo(() => {
         <ModernCardHeader>
           <ModernCardTitle className="flex items-center gap-2">
             <Package className="h-5 w-5" />
-            {t('bundle_monitor.title', 'Bundle Size Monitor')}
+            {t('bundle_monitor.title')}
           </ModernCardTitle>
         </ModernCardHeader>
         <ModernCardContent>
           <div className="space-y-4">
-            <div className="h-4 bg-gray-200 rounded animate-pulse" />
-            <div className="h-4 bg-gray-200 rounded animate-pulse w-3/4" />
-            <div className="h-4 bg-gray-200 rounded animate-pulse w-1/2" />
+            <div className="h-4 bg-muted/50 rounded animate-pulse" />
+            <div className="h-4 bg-muted/50 rounded animate-pulse w-3/4" />
+            <div className="h-4 bg-muted/50 rounded animate-pulse w-1/2" />
           </div>
         </ModernCardContent>
       </ModernCard>
@@ -179,10 +254,20 @@ export const BundleSizeMonitor: React.FC = React.memo(() => {
   }
 
   if (!metrics) {
-    return null;
+    return (
+      <ModernCard variant="glass" className="w-full rounded-xl p-6">
+        <ModernCardHeader>
+          <ModernCardTitle>{t('bundle_monitor.title')}</ModernCardTitle>
+          <ModernCardDescription>
+            {t('bundle_monitor.description')}
+          </ModernCardDescription>
+        </ModernCardHeader>
+        <ModernCardContent className="text-center text-muted-foreground">
+          {t('bundle_monitor.no_data')}
+        </ModernCardContent>
+      </ModernCard>
+    );
   }
-
-  const StatusIcon = getBundleStatus.icon;
 
   return (
     <div className="space-y-6">
@@ -192,69 +277,83 @@ export const BundleSizeMonitor: React.FC = React.memo(() => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Package className="h-5 w-5" />
-              <ModernCardTitle>{t('bundle_monitor.title', 'Bundle Size Monitor')}</ModernCardTitle>
+              <ModernCardTitle>{t('bundle_monitor.title')}</ModernCardTitle>
             </div>
             <div className="flex items-center gap-2">
-              <Badge variant={getBundleStatus.color === 'green' ? 'default' : 'destructive'}>
-                <StatusIcon className="h-3 w-3 mr-1" />
-                {getBundleStatus.status === 'good' 
-                  ? t('bundle_monitor.status_good', 'Optimal') 
-                  : t('bundle_monitor.status_warning', 'Needs Attention')
-                }
-              </Badge>
-              <GlassButton variant="outline" size="sm" onClick={exportReport}>
-                <Download className="h-4 w-4 mr-2" />
-                {t('bundle_monitor.export', 'Export Report')}
-              </GlassButton>
+              {getBundleStatus.icon && <getBundleStatus.icon className={`h-5 w-5 ${getBundleStatus.color}-500`} />}
+              <span className={`text-sm font-medium px-2.5 py-0.5 rounded-full ${
+                getBundleStatus.status === 'optimal' ? 'bg-green-100 text-green-800' :
+                getBundleStatus.status === 'good' ? 'bg-yellow-100 text-yellow-800' :
+                'bg-red-100 text-red-800'
+              }`}>
+                {getBundleStatus.status === 'optimal' ? t('bundle_monitor.status.optimal') :
+                 getBundleStatus.status === 'good' ? t('bundle_monitor.status.good') :
+                 t('bundle_monitor.status.needs_optimization')}
+              </span>
             </div>
           </div>
           <ModernCardDescription>
-            {t('bundle_monitor.description', 'Real-time monitoring of bundle size and performance metrics')}
+            {t('bundle_monitor.description')}
           </ModernCardDescription>
         </ModernCardHeader>
-        <ModernCardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Bundle Size */}
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <Package className="h-4 w-4 text-blue-500" />
-                <span className="font-medium">{t('bundle_monitor.total_size', 'Total Size')}</span>
+        
+        <ModernCardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Total Size */}
+            <div className="bg-background/50 p-4 rounded-lg">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium text-muted-foreground">
+                  {t('bundle_monitor.metrics.total_size')}
+                </span>
+                <Package className="h-4 w-4 text-muted-foreground" />
               </div>
-              <div className="text-2xl font-bold">{formatBytes(metrics.totalSize)}</div>
-              <Progress 
-                value={(metrics.totalSize / thresholds.bundleSize) * 100} 
-                className="h-2"
-              />
-              <div className="text-sm text-gray-500">
-                {t('bundle_monitor.threshold', 'Threshold')}: {formatBytes(thresholds.bundleSize)}
+              <div className="text-2xl font-bold">
+                {formatBytes(metrics.totalSize)}
+              </div>
+              <div className="text-xs text-muted-foreground mt-1">
+                {t('bundle_monitor.gzipped')}: {formatBytes(metrics.gzipSize || metrics.gzippedSize || 0)}
               </div>
             </div>
 
             {/* Compression */}
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <Zap className="h-4 w-4 text-green-500" />
-                <span className="font-medium">{t('bundle_monitor.compression', 'Compression')}</span>
+            <div className="bg-background/50 p-4 rounded-lg">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium text-muted-foreground">
+                  {t('bundle_monitor.metrics.compression')}
+                </span>
+                <Zap className="h-4 w-4 text-muted-foreground" />
               </div>
-              <div className="text-2xl font-bold">{compressionRatio.toFixed(1)}%</div>
-              <div className="text-sm text-gray-500">
-                {t('bundle_monitor.gzip_size', 'Gzipped')}: {formatBytes(metrics.gzipSize)}
+              <div className="text-2xl font-bold">
+                {`${compressionRatio.toFixed(1)}${t('common.percentage_symbol')}`}
+              </div>
+              <div className="mt-1">
+                <Progress value={Math.min(compressionRatio, 100)} className="h-2" />
               </div>
             </div>
 
             {/* Load Time */}
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <Clock className="h-4 w-4 text-purple-500" />
-                <span className="font-medium">{t('bundle_monitor.load_time', 'Load Time')}</span>
+            <div className="bg-background/50 p-4 rounded-lg">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium text-muted-foreground">
+                  {t('bundle_monitor.metrics.load_time')}
+                </span>
+                <Clock className="h-4 w-4 text-muted-foreground" />
               </div>
-              <div className="text-2xl font-bold">{metrics.loadTime}ms</div>
-              <Progress 
-                value={(metrics.loadTime / thresholds.loadTime) * 100} 
-                className="h-2"
-              />
-              <div className="text-sm text-gray-500">
-                {t('bundle_monitor.target', 'Target')}: &lt; {thresholds.loadTime}ms
+              <div className="text-2xl font-bold">
+                {formatTime(metrics.loadTime)}
+              </div>
+              <div className="text-xs text-muted-foreground mt-1">
+                {metrics.loadTime < thresholds.loadTime ? (
+                  <span className="text-green-500 flex items-center gap-1">
+                    <CheckCircle className="h-3 w-3" />
+                    {t('bundle_monitor.within_threshold')}
+                  </span>
+                ) : (
+                  <span className="text-amber-500 flex items-center gap-1">
+                    <AlertTriangle className="h-3 w-3" />
+                    {t('bundle_monitor.above_threshold')}
+                  </span>
+                )}
               </div>
             </div>
           </div>
@@ -266,42 +365,80 @@ export const BundleSizeMonitor: React.FC = React.memo(() => {
         <ModernCardHeader>
           <ModernCardTitle className="flex items-center gap-2">
             <BarChart3 className="h-5 w-5" />
-            {t('bundle_monitor.chunks_analysis', 'Chunks Analysis')}
+            {t('bundle_monitor.chunks.title')}
           </ModernCardTitle>
           <ModernCardDescription>
-            {t('bundle_monitor.chunks_description', 'Detailed breakdown of bundle chunks and their impact')}
+            {t('bundle_monitor.chunks.description')}
           </ModernCardDescription>
         </ModernCardHeader>
+        
         <ModernCardContent>
-          <div className="space-y-4">
+          <div className="space-y-3">
             {metrics.chunks.map((chunk, index) => {
-              const chunkStatus = getChunkStatus(chunk);
+              if ('loading' in chunk) {
+                // Handle simplified chunk format
+                return (
+                  <div key={index} className="p-3 bg-background/50 rounded-lg">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium">{chunk.name}</span>
+                        <Badge variant={chunk.loading === 'lazy' ? 'outline' : 'default'} className="text-xs">
+                          {chunk.loading === 'lazy' 
+                            ? t('bundle_monitor.loading.lazy') 
+                            : t('bundle_monitor.loading.eager')}
+                        </Badge>
+                      </div>
+                      <div className="text-sm">
+                        <span className="font-medium">{formatBytes(chunk.size)}</span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              }
+              
+              // Handle detailed chunk format
+              const status = getChunkStatus(chunk);
+              const isLazy = 'isLazy' in chunk ? chunk.isLazy : chunk.loading === 'lazy';
+              const gzipSize = 'gzipSize' in chunk ? chunk.gzipSize : undefined;
+              const modules = 'modules' in chunk ? chunk.modules : [];
+              
               return (
-                <div key={chunk.name} className="space-y-2">
-                  <div className="flex items-center justify-between">
+                <div key={index} className="p-3 bg-background/50 rounded-lg">
+                  <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
-                      <Badge variant={chunk.isLazy ? 'secondary' : 'default'} className="text-xs">
-                        {chunk.isLazy ? t('bundle_monitor.lazy', 'Lazy') : t('bundle_monitor.eager', 'Eager')}
-                      </Badge>
                       <span className="font-medium">{chunk.name}</span>
-                      <span className="text-sm text-gray-500">
-                        ({chunk.modules.length} {t('bundle_monitor.modules', 'modules')})
-                      </span>
+                      {isLazy && (
+                        <Badge variant="outline" className="text-xs">
+                          {t('bundle_monitor.loading.lazy')}
+                        </Badge>
+                      )}
                     </div>
-                    <div className="flex items-center gap-4">
-                      <span className="text-sm font-mono">{formatBytes(chunk.size)}</span>
-                      <div className={`w-2 h-2 rounded-full bg-${chunkStatus.color}-500`} />
+                    <div className="flex items-center gap-3">
+                      <div className="text-sm">
+                        <span className="font-medium">{formatBytes(chunk.size)}</span>
+                        {gzipSize !== undefined && (
+                          <span className="text-muted-foreground text-xs ml-2">
+                            ({formatBytes(gzipSize)} {t('bundle_monitor.gzipped')})
+                          </span>
+                        )}
+                      </div>
+                      <div className={`h-2 w-2 rounded-full ${
+                        status.status === 'good' ? 'bg-green-500' : 
+                        status.status === 'warning' ? 'bg-amber-500' : 'bg-red-500'
+                      }`} />
                     </div>
                   </div>
-                  <Progress 
-                    value={(chunk.size / metrics.totalSize) * 100} 
-                    className="h-1"
-                  />
-                  <div className="text-xs text-gray-500 flex justify-between">
-                    <span>{t('bundle_monitor.gzipped', 'Gzipped')}: {formatBytes(chunk.gzipSize)}</span>
-                    <span>{((chunk.size / metrics.totalSize) * 100).toFixed(1)}% {t('bundle_monitor.of_total', 'of total')}</span>
+                  
+                  <div className="mt-2">
+                    <div className="flex justify-between text-xs text-muted-foreground mb-1">
+                      <span>{t('bundle_monitor.modules')}: {modules.length}</span>
+                      <span>{t('bundle_monitor.percentage_of_total', { value: Math.round((chunk.size / metrics.totalSize) * 100) })}</span>
+                    </div>
+                    <Progress 
+                      value={(chunk.size / metrics.totalSize) * 100} 
+                      className="h-2"
+                    />
                   </div>
-                  {index < metrics.chunks.length - 1 && <Separator className="mt-4" />}
                 </div>
               );
             })}
@@ -314,55 +451,101 @@ export const BundleSizeMonitor: React.FC = React.memo(() => {
         <ModernCardHeader>
           <ModernCardTitle className="flex items-center gap-2">
             <TrendingUp className="h-5 w-5" />
-            {t('bundle_monitor.insights', 'Performance Insights')}
+            {t('bundle_monitor.insights.title')}
           </ModernCardTitle>
+          <ModernCardDescription>
+            {t('bundle_monitor.insights.description')}
+          </ModernCardDescription>
         </ModernCardHeader>
-        <ModernCardContent>
-          <div className="space-y-3">
-            {metrics.totalSize > thresholds.bundleSize && (
-              <div className="flex items-start gap-2 p-3 bg-orange-50 border border-orange-200 rounded-lg">
-                <AlertTriangle className="h-4 w-4 text-orange-500 mt-0.5" />
+        
+        <ModernCardContent className="space-y-4">
+          {metrics.totalSize > thresholds.bundleSize ? (
+            <div className="p-4 bg-amber-50 dark:bg-amber-900/20 rounded-lg">
+              <div className="flex items-start gap-3">
+                <AlertTriangle className="h-5 w-5 text-amber-500 mt-0.5 flex-shrink-0" />
                 <div>
-                  <div className="font-medium text-orange-800">
-                    {t('bundle_monitor.size_warning', 'Bundle size exceeds recommended threshold')}
-                  </div>
-                  <div className="text-sm text-orange-600">
-                    {t('bundle_monitor.size_recommendation', 'Consider code splitting or removing unused dependencies')}
-                  </div>
+                  <h4 className="font-medium text-amber-800 dark:text-amber-200">
+                    {t('bundle_monitor.size_warning')}
+                  </h4>
+                  <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">
+                    {t('bundle_monitor.size_recommendation')}
+                  </p>
                 </div>
               </div>
-            )}
-            
-            {compressionRatio < 60 && (
-              <div className="flex items-start gap-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                <Zap className="h-4 w-4 text-blue-500 mt-0.5" />
+            </div>
+          ) : (
+            <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
+              <div className="flex items-start gap-3">
+                <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
                 <div>
-                  <div className="font-medium text-blue-800">
-                    {t('bundle_monitor.compression_tip', 'Compression could be improved')}
-                  </div>
-                  <div className="text-sm text-blue-600">
-                    {t('bundle_monitor.compression_recommendation', 'Consider enabling Brotli compression or optimizing assets')}
-                  </div>
+                  <h4 className="font-medium text-green-800 dark:text-green-200">
+                    {t('bundle_monitor.performance_good')}
+                  </h4>
+                  <p className="text-sm text-green-700 dark:text-green-300 mt-1">
+                    {t('bundle_monitor.performance_message')}
+                  </p>
                 </div>
               </div>
-            )}
-            
-            {getBundleStatus.status === 'good' && (
-              <div className="flex items-start gap-2 p-3 bg-green-50 border border-green-200 rounded-lg">
-                <CheckCircle className="h-4 w-4 text-green-500 mt-0.5" />
+            </div>
+          )}
+          
+          {compressionRatio < 60 ? (
+            <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+              <div className="flex items-start gap-3">
+                <Zap className="h-5 w-5 text-purple-500 mt-0.5 flex-shrink-0" />
                 <div>
-                  <div className="font-medium text-green-800">
-                    {t('bundle_monitor.performance_good', 'Excellent performance!')}
-                  </div>
-                  <div className="text-sm text-green-600">
-                    {t('bundle_monitor.performance_message', 'Your bundle is optimized and meets all performance thresholds')}
-                  </div>
+                  <h4 className="font-medium text-purple-800 dark:text-purple-200">
+                    {t('bundle_monitor.compression_tip')}
+                  </h4>
+                  <p className="text-sm text-purple-700 dark:text-purple-300 mt-1">
+                    {t('bundle_monitor.compression_recommendation')}
+                  </p>
                 </div>
               </div>
-            )}
+            </div>
+          ) : (
+            <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
+              <div className="flex items-start gap-3">
+                <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
+                <div>
+                  <h4 className="font-medium text-green-800 dark:text-green-200">
+                    {t('bundle_monitor.compression_good')}
+                  </h4>
+                  <p className="text-sm text-green-700 dark:text-green-300 mt-1">
+                    {t('bundle_monitor.compression_good_message')}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+          
+          {!metrics.chunks.some(chunk => 'isLazy' in chunk ? chunk.isLazy : chunk.loading === 'lazy') && metrics.chunks.length > 1 && (
+            <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+              <div className="flex items-start gap-3">
+                <Package className="h-5 w-5 text-blue-500 mt-0.5 flex-shrink-0" />
+                <div>
+                  <h4 className="font-medium text-blue-800 dark:text-blue-200">
+                    {t('bundle_monitor.lazy_loading_title')}
+                  </h4>
+                  <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
+                    {t('bundle_monitor.lazy_loading_message')}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+          
+          <div className="mt-4 flex justify-end">
+            <button
+              onClick={exportReport}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+            >
+              <Download className="h-4 w-4" />
+              {t('bundle_monitor.export_button')}
+            </button>
           </div>
         </ModernCardContent>
-      </ModernCard>
+      </ModernCard>;
     </div>
   );
 });
