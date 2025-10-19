@@ -1,81 +1,90 @@
-# نما-۱ - سیستم مدیریت مخاطبین هوشمند با قدرت هوش مصنوعی
+# Nama-1 - AI-Powered Smart Contact Management System
 
-[![وضعیت ساخت](https://github.com/mcuteangel/Nama/workflows/CI/badge.svg)](https://github.com/mcuteangel/Nama/actions)
-[![وضعیت پوشش](https://coveralls.io/repos/github/mcuteangel/Nama/badge.svg?branch=main)](https://coveralls.io/github/mcuteangel/Nama?branch=main)
-[![مجوز: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+## 🌐 Available Versions
 
-## 📱 نمای کلی
+- 🇺🇸 [English README](README.md) - English version
+- 🇮🇷 [فارسی README](README-fa.md) - Persian version
 
-نما-۱ یک اپلیکیشن مدرن و هوشمند برای مدیریت مخاطبین است که با قدرت هوش مصنوعی، نحوه سازماندهی و تعامل شما با شبکه‌های شخصی و حرفه‌ای‌تان را متحول می‌کند. این اپلیکیشن با React، TypeScript و Supabase ساخته شده و سازماندهی هوشمند مخاطبین، استخراج داده‌های مبتنی بر هوش مصنوعی و دسترسی بی‌درنگ چندپلتفرمه را ارائه می‌دهد.
+[![Build Status](https://github.com/mcuteangel/Nama/workflows/CI/badge.svg)](https://github.com/mcuteangel/Nama/actions)
+[![Coverage Status](https://coveralls.io/repos/github/mcuteangel/Nama/badge.svg?branch=main)](https://coveralls.io/github/mcuteangel/Nama?branch=main)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-### ✨ ویژگی‌های کلیدی
+## 📱 Overview
 
-- 🤖 **استخراج هوشمند مخاطبین**: استخراج خودکار اطلاعات ساختاریافته مخاطبین از متن‌های غیرساختاریافته با استفاده از هوش مصنوعی تولیدی گوگل (Gemini)
-- 📱 **چندپلتفرمه**: پشتیبانی از وب و موبایل از طریق Capacitor
-- 🌐 **بین‌المللی‌سازی**: پشتیبانی کامل از زبان‌های انگلیسی و فارسی با طراحی راست به چپ
-- 🎨 **رابط کاربری مدرن**: ساخته شده با shadcn/ui، Radix UI و Tailwind CSS
-- 🔐 **احراز هویت امن**: Supabase Auth با امنیت سطح ردیف (RLS)
-- 📊 **تجزیه و تحلیل و آمار**: بینش‌ها و روندهای جامع مخاطبین
-- 🎯 **فیلدهای سفارشی**: سازماندهی انعطاف‌پذیر مخاطبین با فیلدهای تعریف‌شده توسط کاربر
-- 👥 **مدیریت گروه**: سازماندهی مخاطبین در گروه‌های قابل سفارشی‌سازی
-- 🌙 **تم تیره/روشن**: تشخیص خودکار تم با امکان تغییر دستی
-- ♿ **دسترسی‌پذیری**: سازگار با WCAG 2.1 AA با ناوبری صفحه‌کلید
+Nama-1 is a modern and intelligent contact management application that revolutionizes how you organize and interact with your personal and professional networks through the power of artificial intelligence. Built with React, TypeScript, and Supabase, this application provides intelligent contact organization, AI-powered data extraction, and real-time cross-platform accessibility.
 
-## 🏗️ پشته فناوری
+### ✨ Key Features
 
-### بخش جلویی (Frontend)
+- 🤖 **Smart Contact Extraction**: Automatically extract structured contact information from unstructured text using Google's Generative AI (Gemini)
+- 📱 **Cross-Platform**: Web and mobile support through Capacitor
+- 🌐 **Internationalization**: Full support for English and Persian languages with RTL design
+- 🎨 **Modern UI**: Built with shadcn/ui, Radix UI, and Tailwind CSS
+- 🔐 **Secure Authentication**: Supabase Auth with Row Level Security (RLS)
+- 📊 **Analytics & Insights**: Comprehensive contact insights and trends
+- 🎯 **Custom Fields**: Flexible contact organization with user-defined fields
+- 👥 **Group Management**: Organize contacts into customizable groups
+- 👤 **Advanced User Management**: Modular user management system with enhanced features
+- 🏗️ **Domain Architecture**: Structured domain models and business logic
+- 📊 **Data Management**: Centralized data and configuration management
+- 🔧 **Constants Configuration**: Centralized application constants and settings
+- 🌙 **Dark/Light Theme**: Auto theme detection with manual toggle
+- ♿ **Accessibility**: WCAG 2.1 AA compliant with keyboard navigation
 
-- **فریمورک**: React 18.3.1 با TypeScript 5.5.3
-- **ابزار ساخت**: Vite 6.3.4 با کامپایلر SWC
-- **کامپوننت‌های رابط کاربری**: shadcn/ui + Radix UI primitives
-- **استایل‌دهی**: Tailwind CSS 3.4.11
-- **مدیریت وضعیت**: TanStack React Query 5.56.2
-- **فرم‌ها**: React Hook Form 7.53.0 + Zod 3.23.8
-- **مسیریابی**: React Router DOM 6.26.2
-- **موبایل**: Capacitor 7.4.2
+## 🏗️ Technology Stack
 
-### بخش عقبی (Backend)
+### Frontend
 
-- **BaaS**: Supabase (PostgreSQL + Auth + Edge Functions)
-- **هوش مصنوعی**: Google Generative AI 0.24.1
-- **احراز هویت**: Supabase Auth با RLS
-- **پایگاه داده**: PostgreSQL با امنیت سطح ردیف
+- **Framework**: React 18.3.1 with TypeScript 5.5.3
+- **Build Tool**: Vite 6.3.4 with SWC compiler
+- **UI Components**: shadcn/ui + Radix UI primitives
+- **Styling**: Tailwind CSS 3.4.11
+- **State Management**: TanStack React Query 5.56.2
+- **Forms**: React Hook Form 7.53.0 + Zod 3.23.8
+- **Routing**: React Router DOM 6.26.2
+- **Mobile**: Capacitor 7.4.2
 
-### توسعه
+### Backend
 
-- **تست**: Vitest + Testing Library + Cypress
-- **بررسی کد**: ESLint 9.9.0 + TypeScript ESLint
-- **عملکرد**: تجزیه و تحلیل بسته + نظارت بر عملکرد
-- **دسترسی‌پذیری**: تست axe-core
+- **BaaS**: Supabase 2.55.0 (PostgreSQL + Auth + Edge Functions)
+- **AI**: Google Generative AI 0.24.1
+- **Authentication**: Supabase Auth with RLS
+- **Database**: PostgreSQL with Row Level Security
 
-## 🚀 شروع سریع
+### Development
 
-### پیش‌نیازها
+- **Testing**: Vitest 3.2.4 + Testing Library + Cypress
+- **Linting**: ESLint 9.9.0 + TypeScript ESLint
+- **Performance**: Bundle analysis + performance monitoring
+- **Accessibility**: axe-core testing
 
-- Node.js 18+ (توصیه شده: 20+)
-- pnpm (توصیه شده) یا npm
+## 🚀 Quick Start
+
+### Prerequisites
+
+- Node.js 18+ (recommended: 20+)
+- pnpm (recommended) or npm
 - Git
 
-### نصب
+### Installation
 
-1. **کلون کردن مخزن**
+1. **Clone the repository**
 
    ```bash
    git clone https://github.com/mcuteangel/Nama.git
    cd nama-1
    ```
 
-2. **نصب وابستگی‌ها**
+2. **Install dependencies**
 
    ```bash
    pnpm install
-   # یا
+   # or
    npm install
    ```
 
-3. **تنظیم محیط**
+3. **Set up environment**
 
-   فایل `.env.local` را در دایرکتوری اصلی ایجاد کنید:
+   Create `.env.local` file in the root directory:
 
    ```env
    VITE_SUPABASE_URL=your_supabase_project_url
@@ -83,42 +92,42 @@
    VITE_GEMINI_API_KEY=your_google_ai_api_key
    ```
 
-4. **تنظیم پایگاه داده**
+4. **Set up database**
 
-   اجرای migrations مربوط به Supabase:
+   Run Supabase migrations:
 
    ```bash
    npx supabase migration up
    ```
 
-5. **شروع سرور توسعه**
+5. **Start development server**
 
    ```bash
    pnpm dev
-   # یا
+   # or
    npm run dev
    ```
 
-   اپلیکیشن در آدرس `http://localhost:8000` در دسترس خواهد بود
+   The application will be available at `http://localhost:8000`
 
-## 📱 توسعه موبایل
+## 📱 Mobile Development
 
 ### Android
 
-1. **نصب Android Studio** و تنظیم Android SDK
-2. **ساخت اپ وب**:
+1. **Install Android Studio** and set up Android SDK
+2. **Build the web app**:
 
    ```bash
    pnpm build
    ```
 
-3. **اضافه کردن پلتفرم Android**:
+3. **Add Android platform**:
 
    ```bash
    npx cap add android
    ```
 
-4. **همگام‌سازی و باز کردن در Android Studio**:
+4. **Sync and open in Android Studio**:
 
    ```bash
    npx cap sync android
@@ -127,212 +136,222 @@
 
 ### iOS
 
-1. **نصب Xcode** (فقط macOS)
-2. **ساخت اپ وب**:
+1. **Install Xcode** (macOS only)
+2. **Build the web app**:
 
    ```bash
    pnpm build
    ```
 
-3. **اضافه کردن پلتفرم iOS**:
+3. **Add iOS platform**:
 
    ```bash
    npx cap add ios
    ```
 
-4. **همگام‌سازی و باز کردن در Xcode**:
+4. **Sync and open in Xcode**:
 
    ```bash
    npx cap sync ios
    npx cap open ios
    ```
 
-## 🧪 تست
+## 🧪 Testing
 
-### تست‌های واحد
+### Unit Tests
 
 ```bash
-# اجرای تست‌های واحد
+# Run unit tests
 pnpm test
 
-# اجرای تست‌ها در حالت watch
+# Run tests in watch mode
 pnpm test:watch
 
-# اجرای تست‌ها با پوشش
+# Run tests with coverage
 pnpm test:coverage
 ```
 
-### تست‌های یکپارچگی
+### Integration Tests
 
 ```bash
-# اجرای تست‌های یکپارچگی
+# Run integration tests
 pnpm test:integration
 ```
 
-### تست‌های End-to-End
+### End-to-End Tests
 
 ```bash
-# نصب Cypress (در صورت عدم نصب)
+# Install Cypress (if not installed)
 pnpm add -D cypress
 
-# باز کردن Cypress Test Runner
+# Open Cypress Test Runner
 npx cypress open
 
-# اجرای تست‌های E2E در حالت headless
+# Run E2E tests in headless mode
 npx cypress run
 ```
 
-### تست‌های دسترسی‌پذیری
+### Accessibility Tests
 
 ```bash
-# اجرای تست‌های دسترسی‌پذیری
+# Run accessibility tests
 pnpm test:a11y
 ```
 
-## 🏁 ساخت و استقرار
+## 🏁 Build and Deployment
 
-### ساخت تولید
+### Production Build
 
 ```bash
-# ساخت برای تولید
+# Build for production
 pnpm build
 
-# پیش‌نمایش ساخت تولید
+# Preview production build
 pnpm preview
 ```
 
-### تجزیه و تحلیل بسته
+### Bundle Analysis
 
 ```bash
-# تجزیه و تحلیل اندازه بسته
+# Analyze bundle size
 pnpm analyze
 
-# تولید گزارش بسته
+# Generate bundle report
 pnpm analyze:bundle
 ```
 
-### نظارت بر عملکرد
+### Performance Monitoring
 
 ```bash
-# اجرای تست‌های عملکرد
+# Run performance tests
 pnpm test:performance
 
-# نظارت بر اندازه بسته
+# Monitor bundle size
 pnpm test:bundle
 ```
 
-## 🔧 پیکربندی
+## 🔧 Configuration
 
-### متغیرهای محیط
+### Environment Variables
 
-| متغیر | توضیح | ضروری |
-|-------|-------|-------|
-| `VITE_SUPABASE_URL` | URL پروژه Supabase | ✅ |
-| `VITE_SUPABASE_ANON_KEY` | کلید ناشناس Supabase | ✅ |
-| `VITE_GEMINI_API_KEY` | کلید API هوش مصنوعی گوگل | ✅ |
-| `VITE_ENVIRONMENT` | محیط (development/production) | ❌ |
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `VITE_SUPABASE_URL` | Supabase project URL | ✅ |
+| `VITE_SUPABASE_ANON_KEY` | Supabase anonymous key | ✅ |
+| `VITE_GEMINI_API_KEY` | Google AI API key | ✅ |
+| `VITE_ENVIRONMENT` | Environment (development/production) | ❌ |
 
-### تنظیم Supabase
+### Supabase Setup
 
-1. ایجاد پروژه جدید Supabase
-2. اجرای migrations ارائه شده در `supabase/migrations/`
-3. تنظیم Edge Functions در `supabase/functions/`
-4. پیکربندی خط‌مشی‌های RLS برای امنیت
+1. Create a new Supabase project
+2. Run the provided migrations in `supabase/migrations/`
+3. Set up Edge Functions in `supabase/functions/`
+4. Configure RLS policies for security
 
-### پیکربندی هوش مصنوعی
+### AI Configuration
 
-1. دریافت کلید API هوش مصنوعی گوگل از [Google AI Studio](https://aistudio.google.com/)
-2. اضافه کردن کلید به متغیرهای محیط
-3. پیکربندی تنظیمات هوش مصنوعی در صفحه تنظیمات اپ
+1. Get your Google AI API key from [Google AI Studio](https://aistudio.google.com/)
+2. Add the key to your environment variables
+3. Configure AI settings in the app settings page
 
-## 📚 معماری
+## 📚 Architecture
 
-### ساختار پروژه
+### Project Structure
 
 ```
 src/
-├── components/          # کامپوننت‌های قابل استفاده مجدد رابط کاربری
-│   ├── ui/             # کامپوننت‌های shadcn/ui
-│   ├── contact-form/   # کامپوننت‌های فرم مخاطبین
-│   └── __tests__/      # تست‌های کامپوننت
-├── hooks/              # هوک‌های سفارشی React
-├── pages/              # کامپوننت‌های صفحه
-├── services/           # سرویس‌های API
-├── types/              # تعاریف نوع TypeScript
-├── utils/              # توابع کمکی
-├── integrations/       # یکپارچگی‌های شخص ثالث
-└── lib/                # پیکربندی و کمک‌کننده‌ها
+├── components/          # Reusable UI components
+│   ├── ui/             # shadcn/ui components
+│   ├── contact-form/   # Contact form components
+│   ├── common/         # Common components
+│   ├── auth/           # Authentication components
+│   ├── ai/             # AI-related components
+│   └── __tests__/      # Component tests
+├── features/           # Feature-based modules
+│   ├── user-management/ # User management feature
+│   └── contact-management/ # Contact management feature
+├── hooks/              # Custom React hooks
+├── pages/              # Page components
+├── services/           # API services
+├── types/              # TypeScript type definitions
+├── utils/              # Utility functions
+├── integrations/       # Third-party integrations
+├── lib/                # Configuration and helpers
+├── constants/          # Application constants
+├── data/               # Static data and configurations
+├── domain/             # Domain models and business logic
+└── locales/            # Internationalization files
 
 supabase/
 ├── functions/          # Edge Functions
-└── migrations/         # Migration های پایگاه داده
+└── migrations/         # Database migrations
 
 cypress/
-├── e2e/               # تست‌های End-to-end
-├── fixtures/          # داده‌های تست
-└── support/           # ابزارهای تست
+├── e2e/               # End-to-end tests
+├── fixtures/          # Test data
+└── support/           # Test utilities
 ```
 
-### الگوهای معماری کلیدی
+### Key Architecture Patterns
 
-- **معماری مبتنی بر کامپوننت**: کامپوننت‌های مدولار و قابل استفاده مجدد رابط کاربری
-- **الگوی لایه سرویس**: جداسازی منطق تجاری از ارائه
-- **مدیریت وضعیت مبتنی بر هوک**: هوک‌های سفارشی برای کپسوله‌سازی منطق
-- **بارگذاری تنبل**: بهینه‌سازی عملکرد با تقسیم کد
-- **مرزهای خطا**: مدیریت خطا و بازیابی شایسته
+- **Component-Based Architecture**: Modular and reusable UI components
+- **Service Layer Pattern**: Separation of business logic from presentation
+- **Hook-Based State Management**: Custom hooks for state encapsulation
+- **Lazy Loading**: Performance optimization with code splitting
+- **Error Boundaries**: Graceful error handling and recovery
 
-## 🤝 مشارکت
+## 🤝 Contributing
 
-ما از مشارکت استقبال می‌کنیم! لطفاً [راهنمای مشارکت](CONTRIBUTING.md) ما را برای جزئیات ببینید.
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
 
-### گردش کار توسعه
+### Development Workflow
 
-1. Fork کردن مخزن
-2. ایجاد شاخه ویژگی (`git checkout -b feature/amazing-feature`)
-3. انجام تغییرات
-4. اضافه کردن تست برای تغییرات
-5. اجرای مجموعه تست (`pnpm test`)
-6. Commit کردن تغییرات (`git commit -m 'Add amazing feature'`)
-7. Push کردن به شاخه (`git push origin feature/amazing-feature`)
-8. باز کردن Pull Request
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Make your changes
+4. Add tests for your changes
+5. Run the test suite (`pnpm test`)
+6. Commit your changes (`git commit -m 'Add amazing feature'`)
+7. Push to the branch (`git push origin feature/amazing-feature`)
+8. Open a Pull Request
 
-### سبک کد
+### Code Style
 
-- پیروی از الگوهای موجود TypeScript و React
-- استفاده از نام‌های معنادار برای کامپوننت‌ها و متغیرها
-- نوشتن تست برای ویژگی‌های جدید
-- پیروی از بهترین شیوه‌های دسترسی‌پذیری
-- اطمینان از پشتیبانی بین‌المللی‌سازی
+- Follow existing TypeScript and React patterns
+- Use meaningful names for components and variables
+- Write tests for new features
+- Follow accessibility best practices
+- Ensure internationalization support
 
-## 📄 مجوز
+## 📄 License
 
-این پروژه تحت مجوز MIT منتشر شده است - فایل [LICENSE](LICENSE) را برای جزئیات ببینید.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🆘 پشتیبانی
+## 🆘 Support
 
-- 📧 ایمیل: <support@nama-app.com>
-- 💬 Discord: [به جامعه ما بپیوندید](https://discord.gg/nama-app)
-- 📚 مستندات: [docs.nama-app.com](https://docs.nama-app.com)
-- 🐛 مسائل: [GitHub Issues](https://github.com/mcuteangel/Nama/issues)
+- 📧 Email: <support@nama-app.com>
+- 💬 Discord: [Join our community](https://discord.gg/nama-app)
+- 📚 Documentation: [docs.nama-app.com](https://docs.nama-app.com)
+- 🐛 Issues: [GitHub Issues](https://github.com/mcuteangel/Nama/issues)
 
-## 🙏 تقدیر و تشکر
+## 🙏 Acknowledgments
 
-- [Supabase](https://supabase.com/) برای پلتفرم فوق‌العاده BaaS
-- [Google AI](https://ai.google.dev/) برای قابلیت‌های هوش مصنوعی تولیدی
-- [shadcn/ui](https://ui.shadcn.com/) برای کامپوننت‌های زیبای رابط کاربری
-- [Radix UI](https://www.radix-ui.com/) برای primitives قابل دسترس
-- [Tailwind CSS](https://tailwindcss.com/) برای استایل‌دهی utility-first
+- [Supabase](https://supabase.com/) for the amazing BaaS platform
+- [Google AI](https://ai.google.dev/) for generative AI capabilities
+- [shadcn/ui](https://ui.shadcn.com/) for beautiful UI components
+- [Radix UI](https://www.radix-ui.com/) for accessible primitives
+- [Tailwind CSS](https://tailwindcss.com/) for utility-first styling
 
-## 📈 نقشه راه
+## 📈 Roadmap
 
-- [ ] ویژگی‌های همکاری بلادرنگ
-- [ ] بینش‌های پیشرفته مخاطبین مبتنی بر هوش مصنوعی
-- [ ] یکپارچگی با سیستم‌های CRM محبوب
-- [ ] استخراج مخاطبین از صدا
-- [ ] بهبود واردات/صادرات گروهی
-- [ ] جستجو و فیلترینگ پیشرفته
-- [ ] اشتراک‌گذاری و همکاری در مخاطبین
+- [ ] Real-time collaboration features
+- [ ] Advanced AI-powered contact insights
+- [ ] Integration with popular CRM systems
+- [ ] Voice-based contact extraction
+- [ ] Enhanced bulk import/export
+- [ ] Advanced search and filtering
+- [ ] Contact sharing and collaboration
 
 ---
 
-**ساخته شده با ❤️ توسط تیم نما-۱**
+**Built with ❤️ by the Nama Team**
