@@ -1,5 +1,8 @@
 // cypress/support/commands.ts
 /// <reference types="cypress" />
+/// <reference types="cypress-axe" />
+
+export {};
 
 declare global {
   namespace Cypress {
@@ -8,31 +11,25 @@ declare global {
        * Custom command to login with test credentials
        * @example cy.login('user@example.com', 'password123')
        */
-      login(email: string, password: string): Chainable<void>;
+      login(email: string, password: string): void;
       
       /**
        * Custom command to create a test contact
        * @example cy.createContact({ firstName: 'John', lastName: 'Doe' })
        */
-      createContact(contactData: Partial<Contact>): Chainable<void>;
+      createContact(contactData: Partial<Contact>): void;
       
       /**
        * Custom command to wait for the app to be ready
        * @example cy.waitForApp()
        */
-      waitForApp(): Chainable<void>;
-      
-      /**
-       * Custom command to check accessibility
-       * @example cy.checkA11y()
-       */
-      checkA11y(): Chainable<void>;
+      waitForApp(): void;
       
       /**
        * Custom command to switch language
        * @example cy.switchLanguage('fa')
        */
-      switchLanguage(language: 'en' | 'fa'): Chainable<void>;
+      switchLanguage(language: 'en' | 'fa'): void;
     }
   }
 }
@@ -51,7 +48,7 @@ Cypress.Commands.add('login', (email: string, password: string) => {
   cy.get('[data-testid="email-input"]').type(email);
   cy.get('[data-testid="password-input"]').type(password);
   cy.get('[data-testid="login-button"]').click();
-  cy.wait('@login');
+  cy.wait('@login' as any);
   cy.url().should('not.include', '/login');
   cy.get('[data-testid="user-menu"]').should('be.visible');
 });
@@ -83,7 +80,7 @@ Cypress.Commands.add('createContact', (contactData: Partial<Contact>) => {
   }
   
   cy.get('[data-testid="save-contact-button"]').click();
-  cy.wait('@createContact');
+  cy.wait('@createContact' as any);
 });
 
 // Wait for app to be ready
