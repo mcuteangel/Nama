@@ -1,0 +1,22 @@
+{
+  "appId": "com.yourapp.nama",
+  "productName": "Nama App",
+  "directories": {
+    "output": "dist-electron"
+  },
+  "files": [
+    "dist/**/*",
+    "main.js",
+    "package.json"
+  ],
+  "win": {
+    "icon": "public/logo.ico",
+    "target": "nsis"
+  },
+  "mac": {
+    "icon": "public/logo.icns"
+  },
+  "linux": {
+    "icon": "public/logo.png"
+  }
+}
