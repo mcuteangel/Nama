@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle with gradient -->
+  <defs>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1890ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0960a5;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="textGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#e6f3ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#cce7ff;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background circle -->
+  <rect width="32" height="32" rx="8" fill="url(#grad1)"/>
+
+  <!-- Stylized "Nama" text with fancy font -->
+  <text x="16" y="19" font-family="cursive, fantasy, 'Brush Script MT', serif" font-size="10" font-weight="bold" text-anchor="middle" fill="url(#textGrad)" textLength="28" lengthAdjust="spacingAndGlyphs">Nama</text>
+</svg>

@@ -15,7 +15,8 @@ const resources = {
   },
 };
 
-i18n
+// Initialize i18n
+const initPromise = i18n
   .use(LanguageDetector) // Detect user language
   .use(initReactI18next) // Pass i18n instance to react-i18next
   .init({
@@ -31,5 +32,13 @@ i18n
       caches: ['localStorage'], // Cache user language in localStorage
     },
   });
+
+// Dispatch event when i18n is initialized
+initPromise.then(() => {
+  const event = new CustomEvent('i18nInitialized', { 
+    detail: { i18n } 
+  });
+  document.dispatchEvent(event);
+});
 
 export default i18n;

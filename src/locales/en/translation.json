@@ -1180,5 +1180,11 @@
   },
   "notifications": {
     "navigating_to_add_group": ""
+  },
+  "app": {
+    "name": "Nama",
+    "fonts": {
+      "fallback": "cursive, fantasy, serif"
+    }
   }
 }

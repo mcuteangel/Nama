@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useTranslation } from 'react-i18next';
 import LoadingSpinner from '../common/LoadingSpinner';
+import Logo from '../Logo';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -61,9 +62,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isAdmin }) => {
     )}>
       <div className="p-4 border-b border-sidebar-border dark:border-sidebar-border flex items-center justify-between">
         {isOpen && (
-          <h2 className="text-2xl font-bold text-sidebar-primary dark:text-sidebar-primary-foreground whitespace-nowrap overflow-hidden">
-            Nama Contacts
-          </h2>
+          <div className="flex items-center gap-2">
+            <Logo size={40} />
+            <span className="text-xl font-semibold text-sidebar-primary dark:text-sidebar-primary-foreground">
+              Contacts
+            </span>
+          </div>
         )}
         <GlassButton
           variant="ghost"

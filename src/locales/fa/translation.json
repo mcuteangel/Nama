@@ -1067,8 +1067,14 @@
     "export_started": "در حال صادر کردن اطلاعات...",
     "export_success": "اطلاعات با موفقیت صادر شد",
     "export_error": "خطا در صادر کردن اطلاعات. لطفاً دوباره تلاس کنید.",
-    "navigating_to_add_contact": "در حال انتقال به صفحه افزودن مخاطب...",
-    "navigating_to_add_group": "در حال انتقال به صفحه افزودن گروه..."
+    "navigating_to_add_contact": "در حال انتقال به صفحه افزودن مخاطب در برنامه نما",
+    "navigating_to_add_group": "در حال انتقال به صفحه افزودن گروه در برنامه نما"
+  },
+  "app": {
+    "name": "نما",
+    "fonts": {
+      "fallback": "Tahoma, Arial, sans-serif"
+    }
   },
   "common_company_terms": [
     "شرکت",

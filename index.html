@@ -3,11 +3,25 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dyad-generated-app</title>
+    <title id="app-title">Loading...</title>
+    <link rel="icon" type="image/svg+xml" href="/logo.svg">
+    <link rel="alternate icon" href="/favicon.ico" type="image/x-icon">
   </head>
 
   <body>
     <div id="root"></div>
+    <script type="module">
+      // This will be updated by the app when i18n is initialized
+      document.addEventListener('i18nInitialized', (e) => {
+        const { i18n } = e.detail;
+        document.title = i18n.t('app.name');
+        
+        // Also update when language changes
+        i18n.on('languageChanged', () => {
+          document.title = i18n.t('app.name');
+        });
+      });
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
