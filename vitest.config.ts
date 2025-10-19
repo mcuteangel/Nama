@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [react()],
   test: {
     environment: 'jsdom',
-    setupFiles: './src/test/setup.ts',
+    setupFiles: ['./src/test/setup.ts', './src/setupTests.ts'],
     globals: true,
     css: true,
     // Coverage configuration
@@ -26,5 +26,10 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, './src'),
     },
+  },
+  esbuild: {
+    // https://github.com/vitest-dev/vitest/issues/4345#issuecomment-1861894437
+    loader: 'tsx',
+    include: /src\/.*\.[tj]sx?$/,
   },
 });

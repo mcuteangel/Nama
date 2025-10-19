@@ -44,9 +44,20 @@ export interface AccessibilityContextType {
   removeSkipLink: (target: string) => void;
 }
 
+const isBrowser = typeof window !== 'undefined';
+
+// Safe matchMedia function that works in both browser and test environments
+const safeMatchMedia = (query: string): { matches: boolean } => {
+  if (isBrowser && window.matchMedia) {
+    return window.matchMedia(query);
+  }
+  // Default values for test environment
+  return { matches: false };
+};
+
 export const defaultSettings: AccessibilitySettings = {
-  reduceMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
-  highContrast: window.matchMedia('(prefers-contrast: high)').matches,
+  reduceMotion: safeMatchMedia('(prefers-reduced-motion: reduce)').matches,
+  highContrast: safeMatchMedia('(prefers-contrast: high)').matches,
   screenReaderOptimized: false,
   keyboardNavigation: true,
   announceChanges: true,

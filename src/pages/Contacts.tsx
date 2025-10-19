@@ -412,6 +412,7 @@ const Contacts = React.memo(() => {
           <ModernTooltip>
             <ModernTooltipTrigger asChild>
               <GradientButton
+                data-testid="add-contact-button"
                 gradientType="primary"
                 onClick={handleAddContactClick}
                 className="w-14 h-14 rounded-full shadow-2xl hover:scale-110 transition-all duration-300 flex items-center justify-center"

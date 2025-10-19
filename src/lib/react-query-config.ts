@@ -214,6 +214,8 @@ export const queryClient = new QueryClient({
   mutationCache,
 });
 
+export { queryCache, mutationCache };
+
 // Query key factory for consistent key generation
 export const queryKeys = {
   // Contact-related queries

@@ -327,6 +327,7 @@ export const ContactListItem = React.memo<ContactListItemProps>(({
               backdropFilter: 'blur(10px)'
             }}
             onClick={handleEditClick}
+            aria-label="Edit contact"
           >
             <Edit size={24} style={{ color: designTokens.colors.primary[700] }} />
           </GlassButton>
@@ -348,6 +349,7 @@ export const ContactListItem = React.memo<ContactListItemProps>(({
               setIsDeleteDialogOpen(true);
             }}
             disabled={isDeleting || isDialogClosing}
+            aria-label="Delete contact"
           >
             {isDeleting ? (
               <LoadingSpinner size={24} />

@@ -1,5 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import '@testing-library/jest-dom/vitest';
 import CustomFieldForm from '../CustomFieldForm';
@@ -48,7 +49,11 @@ vi.mock('react-hook-form', () => ({
 
 describe('CustomFieldForm', () => {
   it('renders without crashing', () => {
-    render(<CustomFieldForm />);
+    render(
+      <MemoryRouter>
+        <CustomFieldForm />
+      </MemoryRouter>
+    );
     expect(screen.getByText('custom_field_template.add_title')).toBeInTheDocument();
   });
 });
