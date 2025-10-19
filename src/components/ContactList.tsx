@@ -10,7 +10,6 @@ import { ErrorManager } from "@/lib/error-manager";
 import EmptyState from './common/EmptyState';
 import ContactItem, { Contact } from './common/ContactItem';
 import ContactListItem from './common/ContactListItem';
-import VirtualizedContactList from './VirtualizedContactList';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useTranslation } from 'react-i18next';
 
@@ -139,19 +138,6 @@ const ContactList: React.FC<ContactListProps> = ({
             />
           ))}
         </div>
-      );
-    }
-    
-    if (contacts.length > 50) {
-      // Use virtualized list for large datasets
-      return (
-        <VirtualizedContactList
-          contacts={contacts}
-          onContactDeleted={handleContactDeleted}
-          onContactEdited={handleContactEdited}
-          height={600}
-          itemHeight={100}
-        />
       );
     }
     
