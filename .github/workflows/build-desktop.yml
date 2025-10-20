@@ -88,6 +88,18 @@ jobs:
         Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings" -Name "MaxConnectionsPerServer" -Value 100
         Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings" -Name "MaxConnectionsPer1_0Server" -Value 100
 
+        # افزایش محدودیت‌های سیستم برای فایل‌های باز
+        $regPath = "HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\I/O System"
+        if (Test-Path $regPath) {
+          Set-ItemProperty -Path $regPath -Name "PagedPoolSize" -Value 0xFFFFFFFF -Type DWORD -Force
+          Set-ItemProperty -Path $regPath -Name "NonPagedPoolSize" -Value 0xFFFFFFFF -Type DWORD -Force
+        }
+
+        # تنظیم متغیرهای محیطی برای افزایش محدودیت فایل‌ها
+        $env:UV_THREADPOOL_SIZE = 128
+        $env:NODE_OPTIONS = "--max-old-space-size=8192"
+        Write-Host "File limits increased"
+
     - name: Download web build artifacts
       uses: actions/download-artifact@v4
       with:
@@ -98,6 +110,8 @@ jobs:
       run: pnpm run build-win
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        UV_THREADPOOL_SIZE: 128
+        NODE_OPTIONS: "--max-old-space-size=8192"
 
     - name: Upload desktop build artifacts
       uses: actions/upload-artifact@v4

@@ -9,18 +9,32 @@
     "main.js",
     "package.json"
   ],
+  "externals": [
+    "lodash"
+  ],
   "win": {
     "target": "nsis",
     "verifyUpdateCodeSignature": false,
     "forceCodeSigning": false,
     "asar": false,
     "publisherName": "mcuteangel",
-    "artifactName": "${productName}-${version}-win.${ext}"
+    "artifactName": "${productName}-${version}-win.${ext}",
+    "signtool": false,
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "deleteAppDataOnUninstall": false
+    }
   },
   "mac": {
     "icon": "public/logo.icns"
   },
   "linux": {
     "icon": "public/logo.png"
-  }
+  },
+  "buildDependenciesFromSource": false,
+  "nodeGypRebuild": false,
+  "npmRebuild": false,
+  "buildVersion": "1.0.0"
 }
