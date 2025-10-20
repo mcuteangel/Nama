@@ -1,6 +1,7 @@
 {
   "name": "nama",
   "version": "1.0.0",
+  "description": "یک اپلیکیشن دسکتاپ برای مدیریت مخاطبین و وظایف روزانه",
   "main": "main.js",
   "type": "module",
   "homepage": "https://github.com/mcuteangel/Nama",

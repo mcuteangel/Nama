@@ -10,12 +10,11 @@
     "package.json"
   ],
   "win": {
-    "icon": "public/logo.ico",
-    "target": "dir",
+    "icon": "public/favicon.ico",
+    "target": "nsis",
     "verifyUpdateCodeSignature": false,
     "forceCodeSigning": false,
-    "asar": false,
-    "compression": "store"
+    "asar": true
   },
   "mac": {
     "icon": "public/logo.icns"
