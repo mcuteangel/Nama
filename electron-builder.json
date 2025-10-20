@@ -10,7 +10,6 @@
     "package.json"
   ],
   "win": {
-    "icon": "public/favicon.ico",
     "target": "nsis",
     "verifyUpdateCodeSignature": false,
     "forceCodeSigning": false,
