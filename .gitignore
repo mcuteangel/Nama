@@ -283,9 +283,9 @@ web-vitals-report/
 # package-lock.json
 # Keep pnpm-lock.yaml as this project uses pnpm
 
-# Build artifacts
-build/
-dist-electron/
+# Rust build artifacts
+src-tauri/target/
+Cargo.lock
 
 # Local development
 .local
