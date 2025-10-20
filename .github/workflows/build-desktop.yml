@@ -85,8 +85,8 @@ jobs:
       shell: powershell
       run: |
         # افزایش محدودیت فایل‌های باز برای جلوگیری از EMFILE
-        Set-ItemProperty -Path HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings -Name MaxConnectionsPerServer -Value 100
-        Set-ItemProperty -Path HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings -Name MaxConnectionsPer1_0Server -Value 100
+        Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings" -Name "MaxConnectionsPerServer" -Value 100
+        Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings" -Name "MaxConnectionsPer1_0Server" -Value 100
 
     - name: Download web build artifacts
       uses: actions/download-artifact@v4
