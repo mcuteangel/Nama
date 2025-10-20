@@ -1,5 +1,5 @@
 {
-  "appId": "com.yourapp.nama",
+  "appId": "com.MojRi.nama",
   "productName": "Nama App",
   "directories": {
     "output": "dist-electron"
@@ -9,29 +9,29 @@
     "main.js",
     "package.json"
   ],
-  "externals": [
-    "lodash"
-  ],
+  "asar": false,
   "win": {
     "target": "nsis",
     "verifyUpdateCodeSignature": false,
     "forceCodeSigning": false,
-    "asar": false,
     "publisherName": "mcuteangel",
     "artifactName": "${productName}-${version}-win.${ext}",
-    "signtool": false,
-    "nsis": {
-      "oneClick": false,
-      "perMachine": false,
-      "allowToChangeInstallationDirectory": true,
-      "deleteAppDataOnUninstall": false
-    }
+    "signingHashAlgorithms": ["sha1", "sha256"],
+    "signDlls": false
+  },
+  "nsis": {
+    "oneClick": false,
+    "perMachine": false,
+    "allowToChangeInstallationDirectory": true,
+    "deleteAppDataOnUninstall": false
   },
   "mac": {
-    "icon": "public/logo.icns"
+    "icon": "public/logo.icns",
+    "target": "dmg"
   },
   "linux": {
-    "icon": "public/logo.png"
+    "icon": "public/logo.png",
+    "target": ["AppImage", "deb"]
   },
   "buildDependenciesFromSource": false,
   "nodeGypRebuild": false,
