@@ -157,8 +157,9 @@
     "optimize:bundle": "npm run analyze && npm run test:bundle",
     "electron": "electron .",
     "electron-dev": "concurrently \"pnpm dev\" \"wait-on http://localhost:5173 && pnpm electron\"",
-    "build-electron": "pnpm build && electron-builder",
-    "build-win": "pnpm build && electron-builder --win",
-    "dist": "pnpm build && electron-builder --win --publish=never"
+    "build-electron": "node -e \"const fs = require('fs'); if (fs.existsSync('dist-electron')) fs.rmSync('dist-electron', { recursive: true, force: true });\" && pnpm build && electron-builder",
+    "build-win": "node -e \"const fs = require('fs'); if (fs.existsSync('dist-electron')) fs.rmSync('dist-electron', { recursive: true, force: true });\" && pnpm build && electron-builder --win",
+    "dist": "node -e \"const fs = require('fs'); if (fs.existsSync('dist-electron')) fs.rmSync('dist-electron', { recursive: true, force: true });\" && pnpm build && electron-builder --win --publish=never",
+    "clean-dist": "if (Test-Path dist-electron) { Remove-Item -Recurse -Force dist-electron } else { Write-Host 'dist-electron not found' }"
   }
 }

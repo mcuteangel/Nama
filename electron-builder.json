@@ -13,7 +13,9 @@
     "target": "nsis",
     "verifyUpdateCodeSignature": false,
     "forceCodeSigning": false,
-    "asar": true
+    "asar": false,
+    "publisherName": "mcuteangel",
+    "artifactName": "${productName}-${version}-win.${ext}"
   },
   "mac": {
     "icon": "public/logo.icns"
