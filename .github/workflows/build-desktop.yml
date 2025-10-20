@@ -1,4 +1,4 @@
-name: Build Desktop App
+name: Build Tauri Desktop App
 
 on:
   push:
@@ -48,7 +48,124 @@ jobs:
         name: web-build
         path: dist/
 
-  build-desktop:
+  build-tauri:
+    runs-on: ubuntu-latest
+    needs: build-web
+    permissions:
+      contents: write
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Use Node.js 20.x
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20.x
+
+    - name: Install pnpm
+      run: npm install -g pnpm
+
+    - name: Get pnpm store directory
+      shell: bash
+      run: |
+        echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+    - name: Setup pnpm cache
+      uses: actions/cache@v4
+      with:
+        path: ${{ env.STORE_PATH }}
+        key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+        restore-keys: |
+          ${{ runner.os }}-pnpm-store-
+
+    - name: Install dependencies
+      run: pnpm install --frozen-lockfile
+
+    - name: Download web build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: web-build
+        path: dist/
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+
+    - name: Setup Rust
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        targets: x86_64-unknown-linux-gnu
+
+    - name: Rust cache
+      uses: swatinem/rust-cache@v2
+      with:
+        workspaces: './src-tauri -> target'
+
+    - name: Build Tauri app for Linux
+      run: pnpm run tauri:build
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Prepare release package
+      shell: bash
+      run: |
+        # ایجاد پوشه ریلیز
+        mkdir -p release
+
+        # پیدا کردن فایل ساخته شده
+        find src-tauri/target/release/bundle -name "*.AppImage" -o -name "*.deb" | head -1 | xargs -I {} cp {} release/
+
+        # نمایش فایل‌های ساخته شده
+        ls -la release/
+
+        # ذخیره نام فایل برای استفاده بعدی
+        echo "RELEASE_FILE=$(ls release/ | head -1)" >> $GITHUB_ENV
+
+    - name: Upload release package
+      uses: actions/upload-artifact@v4
+      with:
+        name: tauri-release-package
+        path: release/
+        retention-days: 1
+
+    - name: Create GitHub Release
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v${{ github.run_number }}
+        release_name: Nama App v${{ github.run_number }}
+        body: |
+          # Nama App Desktop Release (Tauri)
+
+          **Version:** ${{ github.run_number }}
+          **Date:** $(date +'%Y-%m-%d')
+
+          ## Changes
+          - Migrated from Electron to Tauri
+          - Improved performance and smaller bundle size
+
+          ## Installation
+          - Download the appropriate file for your platform
+          - Install following the platform-specific instructions
+        draft: false
+        prerelease: false
+
+    - name: Upload Release Asset
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: release/${{ env.RELEASE_FILE }}
+        asset_name: ${{ env.RELEASE_FILE }}
+        asset_content_type: application/octet-stream
+
+  build-tauri-windows:
     runs-on: windows-latest
     needs: build-web
     permissions:
@@ -81,24 +198,92 @@ jobs:
     - name: Install dependencies
       run: pnpm install --frozen-lockfile
 
-    - name: Increase file limits (Windows)
+    - name: Download web build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: web-build
+        path: dist/
+
+    - name: Install system dependencies
       shell: powershell
       run: |
-        # افزایش محدودیت فایل‌های باز برای جلوگیری از EMFILE
-        Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings" -Name "MaxConnectionsPerServer" -Value 100
-        Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings" -Name "MaxConnectionsPer1_0Server" -Value 100
+        # Install WebView2 and other dependencies
+        choco install webview2-runtime -y
 
-        # افزایش محدودیت‌های سیستم برای فایل‌های باز
-        $regPath = "HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\I/O System"
-        if (Test-Path $regPath) {
-          Set-ItemProperty -Path $regPath -Name "PagedPoolSize" -Value 0xFFFFFFFF -Type DWORD -Force
-          Set-ItemProperty -Path $regPath -Name "NonPagedPoolSize" -Value 0xFFFFFFFF -Type DWORD -Force
+    - name: Setup Rust
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        targets: x86_64-pc-windows-msvc
+
+    - name: Rust cache
+      uses: swatinem/rust-cache@v2
+      with:
+        workspaces: './src-tauri -> target'
+
+    - name: Build Tauri app for Windows
+      run: pnpm run tauri:build
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Prepare release package
+      shell: powershell
+      run: |
+        # ایجاد پوشه ریلیز
+        $releaseDir = "$env:GITHUB_WORKSPACE\release"
+        New-Item -ItemType Directory -Force -Path $releaseDir
+
+        # پیدا کردن فایل ساخته شده
+        $msiFile = Get-ChildItem -Path "src-tauri\target\release\bundle\msi" -Filter "*.msi" | Select-Object -First 1
+        if ($msiFile) {
+          Copy-Item -Path $msiFile.FullName -Destination "$releaseDir\"
         }
 
-        # تنظیم متغیرهای محیطی برای افزایش محدودیت فایل‌ها
-        $env:UV_THREADPOOL_SIZE = 128
-        $env:NODE_OPTIONS = "--max-old-space-size=8192"
-        Write-Host "File limits increased"
+        # نمایش فایل‌های ساخته شده
+        Get-ChildItem -Path $releaseDir
+
+        # ذخیره نام فایل برای استفاده بعدی
+        $releaseFile = Get-ChildItem -Path $releaseDir | Select-Object -First 1
+        echo "RELEASE_FILE=$($releaseFile.Name)" >> $env:GITHUB_ENV
+
+    - name: Upload release package
+      uses: actions/upload-artifact@v4
+      with:
+        name: tauri-windows-release-package
+        path: release/
+        retention-days: 1
+
+  build-tauri-macos:
+    runs-on: macos-latest
+    needs: build-web
+    permissions:
+      contents: write
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Use Node.js 20.x
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20.x
+
+    - name: Install pnpm
+      run: npm install -g pnpm
+
+    - name: Get pnpm store directory
+      shell: bash
+      run: |
+        echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+    - name: Setup pnpm cache
+      uses: actions/cache@v4
+      with:
+        path: ${{ env.STORE_PATH }}
+        key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+        restore-keys: |
+          ${{ runner.os }}-pnpm-store-
+
+    - name: Install dependencies
+      run: pnpm install --frozen-lockfile
 
     - name: Download web build artifacts
       uses: actions/download-artifact@v4
@@ -106,29 +291,39 @@ jobs:
         name: web-build
         path: dist/
 
-    - name: Build Electron app for Windows
-      run: pnpm run build-win
-      env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        UV_THREADPOOL_SIZE: 128
-        NODE_OPTIONS: "--max-old-space-size=8192"
-
-    - name: Upload desktop build artifacts
-      uses: actions/upload-artifact@v4
+    - name: Setup Rust
+      uses: dtolnay/rust-toolchain@stable
       with:
-        name: desktop-app-windows
-        path: dist-electron/
+        targets: x86_64-apple-darwin
 
-    - name: Create Release (optional, only on push to main)
-      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-      uses: softprops/action-gh-release@v2
+    - name: Rust cache
+      uses: swatinem/rust-cache@v2
+      with:
+        workspaces: './src-tauri -> target'
+
+    - name: Build Tauri app for macOS
+      run: pnpm run tauri:build
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Prepare release package
+      shell: bash
+      run: |
+        # ایجاد پوشه ریلیز
+        mkdir -p release
+
+        # پیدا کردن فایل ساخته شده
+        find src-tauri/target/release/bundle -name "*.dmg" -o -name "*.app" | head -1 | xargs -I {} cp -r {} release/
+
+        # نمایش فایل‌های ساخته شده
+        ls -la release/
+
+        # ذخیره نام فایل برای استفاده بعدی
+        echo "RELEASE_FILE=$(ls release/ | head -1)" >> $GITHUB_ENV
+
+    - name: Upload release package
+      uses: actions/upload-artifact@v4
       with:
-        tag_name: v${{ github.run_number }}
-        name: Release v${{ github.run_number }}
-        body: |
-          Automated release for desktop app.
-        draft: false
-        prerelease: false
-        files: ./dist-electron/**/*
+        name: tauri-macos-release-package
+        path: release/
+        retention-days: 1

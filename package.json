@@ -2,8 +2,6 @@
   "name": "nama",
   "version": "1.0.0",
   "description": "یک اپلیکیشن دسکتاپ برای مدیریت مخاطبین و وظایف روزانه",
-  "main": "main.js",
-  "type": "module",
   "homepage": "https://github.com/mcuteangel/Nama",
   "repository": {
     "type": "git",
@@ -19,6 +17,7 @@
     "@capacitor/cli": "^7.4.2",
     "@capacitor/core": "^7.4.2",
     "@capacitor/ios": "^7.4.2",
+    
     "@google/generative-ai": "^0.24.1",
     "@hookform/resolvers": "^3.9.0",
     "@radix-ui/react-accordion": "^1.2.0",
@@ -100,6 +99,8 @@
     "@eslint/js": "^9.9.0",
     "@tailwindcss/typography": "^0.5.15",
     "@tanstack/react-query-devtools": "^5.85.5",
+    "@tauri-apps/api": "^2.8.0",
+    "@tauri-apps/cli": "^2.8.4",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.0",
     "@testing-library/react-hooks": "^8.0.1",
@@ -116,8 +117,6 @@
     "bundlewatch": "^0.4.1",
     "cypress": "^15.5.0",
     "cypress-axe": "^1.7.0",
-    "electron": "^32.0.0",
-    "electron-builder": "^25.1.8",
     "eslint": "^9.9.0",
     "eslint-plugin-react-hooks": "^5.1.0-rc.0",
     "eslint-plugin-react-refresh": "^0.4.9",
@@ -126,6 +125,7 @@
     "jsdom": "^26.1.0",
     "lighthouse": "^12.8.1",
     "postcss": "^8.4.47",
+    "rimraf": "^6.0.1",
     "rollup-plugin-visualizer": "^6.0.3",
     "tailwindcss": "^3.4.11",
     "typescript": "^5.5.3",
@@ -154,12 +154,6 @@
     "analyze:bundle": "vite-bundle-analyzer",
     "analyze:treemap": "npm run build && npx rollup-plugin-visualizer dist/bundle-analysis.html --open",
     "analyze:sizes": "npm run build",
-    "optimize:bundle": "npm run analyze && npm run test:bundle",
-    "electron": "electron .",
-    "electron-dev": "concurrently \"pnpm dev\" \"wait-on http://localhost:5173 && pnpm electron\"",
-    "build-electron": "node -e \"const fs = require('fs'); if (fs.existsSync('dist-electron')) fs.rmSync('dist-electron', { recursive: true, force: true });\" && pnpm build && electron-builder",
-    "build-win": "node -e \"const fs = require('fs'); if (fs.existsSync('dist-electron')) fs.rmSync('dist-electron', { recursive: true, force: true });\" && pnpm build && electron-builder --win",
-    "dist": "node -e \"const fs = require('fs'); if (fs.existsSync('dist-electron')) fs.rmSync('dist-electron', { recursive: true, force: true });\" && pnpm build && electron-builder --win --publish=never",
-    "clean-dist": "if (Test-Path dist-electron) { Remove-Item -Recurse -Force dist-electron } else { Write-Host 'dist-electron not found' }"
+    "tauri:dev": "tauri dev"
   }
 }
