@@ -2,14 +2,27 @@
   "appId": "com.MojRi.nama",
   "productName": "Nama App",
   "directories": {
-    "output": "dist-electron"
+    "output": "dist-electron",
+    "buildResources": "build"
   },
   "files": [
     "dist/**/*",
     "main.js",
+    "preload.js",
     "package.json"
   ],
-  "asar": false,
+  "extraResources": [
+    {
+      "from": "public",
+      "to": "public",
+      "filter": ["**/*"]
+    }
+  ],
+  "asar": true,
+  "asarUnpack": [
+    "**/node_modules/electron-updater/**/*",
+    "**/node_modules/electron/**/*"
+  ],
   "win": {
     "target": "nsis",
     "verifyUpdateCodeSignature": false,
