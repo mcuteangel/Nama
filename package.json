@@ -154,6 +154,7 @@
     "analyze:bundle": "vite-bundle-analyzer",
     "analyze:treemap": "npm run build && npx rollup-plugin-visualizer dist/bundle-analysis.html --open",
     "analyze:sizes": "npm run build",
-    "tauri:dev": "tauri dev"
+    "tauri:dev": "tauri dev",
+    "tauri:build": "tauri build"
   }
 }
