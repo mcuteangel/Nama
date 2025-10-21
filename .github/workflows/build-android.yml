@@ -125,10 +125,11 @@ jobs:
     - name: Build Android APK
       run: |
         echo "Setting environment variables..."
-        export CAPACITOR_ANDROID_KEYSTORE_PATH="${{ secrets.KEYSTORE_FILE != '' && 'android/app/my-release-key.keystore' || '' }}"
+        export CAPACITOR_ANDROID_KEYSTORE_PATH="${{ secrets.KEYSTORE_FILE && 'android/app/my-release-key.keystore' || '' }}"
         export CAPACITOR_ANDROID_KEYSTORE_PASSWORD="${{ secrets.KEYSTORE_PASSWORD }}"
         export CAPACITOR_ANDROID_KEY_ALIAS="${{ secrets.KEY_ALIAS }}"
         export CAPACITOR_ANDROID_KEY_PASSWORD="${{ secrets.KEY_PASSWORD }}"
+        export CAPACITOR_ANDROID_STUDIO_PATH="/usr/local/android-studio"
         echo "Environment variables set"
         echo "KEYSTORE_PATH: $CAPACITOR_ANDROID_KEYSTORE_PATH"
         echo "KEYSTORE_PASSWORD: $CAPACITOR_ANDROID_KEYSTORE_PASSWORD"
