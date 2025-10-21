@@ -104,13 +104,32 @@ jobs:
     - name: Fix gradlew permissions
       run: chmod +x android/gradlew
 
+    - name: Create keystore from secret
+      run: |
+        if [ -n "${{ secrets.KEYSTORE_FILE }}" ]; then
+          echo "${{ secrets.KEYSTORE_FILE }}" | base64 -d > android/app/my-release-key.keystore
+        else
+          echo "No keystore secret found, using debug signing"
+        fi
+      shell: bash
+
     - name: Setup Capacitor
       run: |
         pnpm run cap:sync
 
     - name: Build Android APK
       run: |
-        pnpm run cap:build:android
+        if [ -n "${{ secrets.KEYSTORE_FILE }}" ]; then
+          pnpm run cap:build:android
+        else
+          pnpm run cap:build:android --debug
+        fi
+      shell: bash
+      env:
+        CAPACITOR_ANDROID_KEYSTORE_PATH: ${{ secrets.KEYSTORE_FILE != '' && 'android/app/my-release-key.keystore' || '' }}
+        CAPACITOR_ANDROID_KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+        CAPACITOR_ANDROID_KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+        CAPACITOR_ANDROID_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
 
     - name: Upload APK
       uses: actions/upload-artifact@v4

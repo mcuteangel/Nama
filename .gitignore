@@ -235,6 +235,10 @@ ios/Podfile.lock
 ios/App/Pods/
 ios/App/Podfile.lock
 
+# Keystore files (sensitive)
+*.keystore
+android/app/*.keystore
+
 # Supabase
 .supabase/
 supabase/.temp/
