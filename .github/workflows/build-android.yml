@@ -124,18 +124,18 @@ jobs:
 
     - name: Build Android APK
       run: |
-        echo "Environment variables:"
+        echo "Setting environment variables..."
+        export CAPACITOR_ANDROID_KEYSTORE_PATH="${{ secrets.KEYSTORE_FILE != '' && 'android/app/my-release-key.keystore' || '' }}"
+        export CAPACITOR_ANDROID_KEYSTORE_PASSWORD="${{ secrets.KEYSTORE_PASSWORD }}"
+        export CAPACITOR_ANDROID_KEY_ALIAS="${{ secrets.KEY_ALIAS }}"
+        export CAPACITOR_ANDROID_KEY_PASSWORD="${{ secrets.KEY_PASSWORD }}"
+        echo "Environment variables set"
         echo "KEYSTORE_PATH: $CAPACITOR_ANDROID_KEYSTORE_PATH"
         echo "KEYSTORE_PASSWORD: $CAPACITOR_ANDROID_KEYSTORE_PASSWORD"
         echo "KEY_ALIAS: $CAPACITOR_ANDROID_KEY_ALIAS"
         echo "KEY_PASSWORD: $CAPACITOR_ANDROID_KEY_PASSWORD"
         pnpm run cap:build:android
       shell: bash
-      env:
-        CAPACITOR_ANDROID_KEYSTORE_PATH: ${{ secrets.KEYSTORE_FILE != '' && 'android/app/my-release-key.keystore' || '' }}
-        CAPACITOR_ANDROID_KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-        CAPACITOR_ANDROID_KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-        CAPACITOR_ANDROID_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
