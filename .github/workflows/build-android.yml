@@ -106,9 +106,12 @@ jobs:
 
     - name: Create keystore from secret
       run: |
+        echo "Checking KEYSTORE_FILE secret..."
         if [ -n "${{ secrets.KEYSTORE_FILE }}" ]; then
+          echo "KEYSTORE_FILE is set, creating keystore..."
           echo "${{ secrets.KEYSTORE_FILE }}" | base64 -d > android/app/my-release-key.keystore
           echo "Keystore created successfully"
+          ls -la android/app/my-release-key.keystore
         else
           echo "KEYSTORE_FILE secret is empty or not set"
           exit 1
@@ -121,6 +124,11 @@ jobs:
 
     - name: Build Android APK
       run: |
+        echo "Environment variables:"
+        echo "KEYSTORE_PATH: $CAPACITOR_ANDROID_KEYSTORE_PATH"
+        echo "KEYSTORE_PASSWORD: $CAPACITOR_ANDROID_KEYSTORE_PASSWORD"
+        echo "KEY_ALIAS: $CAPACITOR_ANDROID_KEY_ALIAS"
+        echo "KEY_PASSWORD: $CAPACITOR_ANDROID_KEY_PASSWORD"
         pnpm run cap:build:android
       shell: bash
       env:
