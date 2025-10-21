@@ -108,8 +108,10 @@ jobs:
       run: |
         if [ -n "${{ secrets.KEYSTORE_FILE }}" ]; then
           echo "${{ secrets.KEYSTORE_FILE }}" | base64 -d > android/app/my-release-key.keystore
+          echo "Keystore created successfully"
         else
-          echo "No keystore secret found, using debug signing"
+          echo "KEYSTORE_FILE secret is empty or not set"
+          exit 1
         fi
       shell: bash
 
@@ -119,11 +121,7 @@ jobs:
 
     - name: Build Android APK
       run: |
-        if [ -n "${{ secrets.KEYSTORE_FILE }}" ]; then
-          pnpm run cap:build:android
-        else
-          pnpm run cap:build:android --debug
-        fi
+        pnpm run cap:build:android
       shell: bash
       env:
         CAPACITOR_ANDROID_KEYSTORE_PATH: ${{ secrets.KEYSTORE_FILE != '' && 'android/app/my-release-key.keystore' || '' }}
