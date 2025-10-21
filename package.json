@@ -155,6 +155,9 @@
     "analyze:treemap": "npm run build && npx rollup-plugin-visualizer dist/bundle-analysis.html --open",
     "analyze:sizes": "npm run build",
     "tauri:dev": "tauri dev",
-    "tauri:build": "tauri build"
+    "tauri:build": "tauri build",
+    "cap:sync": "npx cap sync",
+    "cap:build:android": "npx cap build android",
+    "cap:run:android": "npx cap run android"
   }
 }
