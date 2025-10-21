@@ -13,6 +13,7 @@ if (process.env.NODE_ENV === 'development') {
 const Home = React.lazy(() => import('./pages/Home'));
 const Contacts = React.lazy(() => import('./pages/Contacts'));
 const Login = React.lazy(() => import('./pages/Login'));
+const ForgotPassword = React.lazy(() => import('./pages/ForgotPassword'));
 const AddContact = React.lazy(() => import('./pages/AddContact'));
 const ContactDetail = React.lazy(() => import('./pages/ContactDetail'));
 const EditContact = React.lazy(() => import('./pages/EditContact'));
@@ -140,6 +141,7 @@ function App() {
                 <SuspenseWrapper fallback={<LoadingMessage message={t('common.loading_page')} />}>
                   <Routes>
                     <Route path="/login" element={<Login />} />
+                    <Route path="/forgot-password" element={<ForgotPassword />} />
                     {/* Protected Routes */}
                     <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
                     <Route path="/contacts" element={<ProtectedRoute><Contacts /></ProtectedRoute>} />

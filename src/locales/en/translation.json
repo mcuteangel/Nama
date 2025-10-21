@@ -652,6 +652,19 @@
     "category_accessibility": "Accessibility",
     "category_search": "Search"
   },
+  "login": {
+    "title": "Login to Nama Contacts",
+    "email_label": "Email",
+    "password_label": "Password",
+    "email_input_placeholder": "Enter your email",
+    "password_input_placeholder": "Enter your password",
+    "button_label": "Login",
+    "social_provider_text": "Or sign in with",
+    "link_text": "Don't have an account?",
+    "unexpected_error": "An unexpected error occurred",
+    "forgot_password": "Forgot your password?",
+    "registration_tooltip": "To register a new user, use the Supabase dashboard or contact administrators through the user management section."
+  },
   "contacts": {
     "add_new_contact": "Add New Contact",
     "add_contact_description": "Add new contact information and details",
@@ -1049,13 +1062,6 @@
       "miscellaneous": "miscellaneous"
     },
     "group_suggestion_reasoning_position_similarity": "Position '{{position}}' is similar to group '{{groupName}}' ({{similarity}}% match)",
-    "smart_suggestions": "Smart Suggestions",
-    "suggestions": "suggestions",
-    "speech_recognition_not_supported": "Your browser does not support speech recognition.",
-    "speech_recognition_error": "Error occurred during speech recognition."
-  },
-  "headers": {
-    "authorization": "Authorization",
     "bearer_token": "Bearer"
   },
   "contact_list": {
@@ -1112,7 +1118,9 @@
       "calendar": "Calendar Type",
       "calendar_desc": "Change calendar type (Jalali/Gregorian)",
       "jalali": "Jalali",
-      "gregorian": "Gregorian"
+      "gregorian": "Gregorian",
+      "persian": "Persian",
+      "english": "English"
     },
     "privacy": {
       "title": "Privacy & Security",
@@ -1180,6 +1188,27 @@
   },
   "notifications": {
     "navigating_to_add_group": ""
+  },
+  "forgotPassword": {
+    "title": "Reset Password",
+    "email_label": "Email",
+    "email_placeholder": "Enter your email",
+    "submit_button": "Send Reset Email",
+    "back_to_login": "Back to Login",
+    "email_required_error": "Please enter your email.",
+    "invalid_email_error": "Please enter a valid email.",
+    "user_not_found_error": "No account found with this email.",
+    "generic_error": "An error occurred. Please try again.",
+    "success_message": "Your request has been received. If an account with this email exists, you will receive a password reset link shortly."
+  },
+  "not_found": {
+    "title": "Page Not Found",
+    "description": "The page you're looking for doesn't exist or may have been moved.",
+    "go_home": "Go to Homepage",
+    "go_back": "Go Back",
+    "try_again": "Try Again",
+    "support_message": "If you think this is a problem, please contact support.",
+    "current_path": "Current path: {{path}}"
   },
   "app": {
     "name": "Nama",

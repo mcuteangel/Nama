@@ -513,15 +513,19 @@
     "logout": "خروج",
     "logout_loading": "در حال خروج...",
     "logout_success": "با موفقیت از سیستم خارج شدید.",
-    "logout_error": "خطا در خروج از سیستم",
-    "unknown_error": "خطای نامشخص",
-    "email": "ایمیل",
-    "email_placeholder": "ایمیل را وارد کنید",
-    "password": "رمز عبور",
-    "password_placeholder": "رمز عبور را وارد کنید",
-    "first_name": "نام",
-    "first_name_placeholder": "نام را وارد کنید",
-    "last_name": "نام خانوادگی",
+    "login": {
+      "title": "ورود به Nama Contacts",
+      "email_label": "ایمیل",
+      "password_label": "رمز عبور",
+      "email_input_placeholder": "ایمیل خود را وارد کنید",
+      "password_input_placeholder": "رمز عبور خود را وارد کنید",
+      "button_label": "ورود",
+      "social_provider_text": "یا با استفاده از",
+      "link_text": "حساب کاربری ندارید؟",
+      "unexpected_error": "خطای غیرمنتظره‌ای رخ داده است",
+      "forgot_password": "رمز عبور را فراموش کرده‌اید؟",
+      "registration_tooltip": "برای ثبت نام کاربر جدید، از داشبورد Supabase یا توسط مدیران از بخش مدیریت کاربران استفاده کنید."
+    },
     "last_name_placeholder": "نام خانوادگی را وارد کنید",
     "saving": "در حال ذخیره...",
     "creating": "در حال ایجاد...",
@@ -641,15 +645,17 @@
       "any": "هر روشی"
     }
   },
-  "login": {
-    "title": "ورود به Nama Contacts",
+  "forgotPassword": {
+    "title": "بازیابی رمز عبور",
     "email_label": "ایمیل",
-    "password_label": "رمز عبور",
-    "email_input_placeholder": "ایمیل خود را وارد کنید",
-    "password_input_placeholder": "رمز عبور خود را وارد کنید",
-    "button_label": "ورود",
-    "social_provider_text": "یا با استفاده از",
-    "link_text": "حساب کاربری ندارید؟ ثبت نام کنید"
+    "email_placeholder": "ایمیل خود را وارد کنید",
+    "submit_button": "ارسال ایمیل بازیابی",
+    "back_to_login": "بازگشت به صفحه ورود",
+    "email_required_error": "لطفاً ایمیل خود را وارد کنید.",
+    "invalid_email_error": "لطفاً یک ایمیل معتبر وارد کنید.",
+    "user_not_found_error": "حسابی با این ایمیل یافت نشد.",
+    "generic_error": "خطایی رخ داده است. لطفاً دوباره تلاش کنید.",
+    "success_message": "درخواست شما دریافت شد. اگر حسابی با این ایمیل در سیستم موجود باشد، لینک بازیابی رمز عبور به زودی ارسال خواهد شد."
   },
   "headers": {
     "authorization": "احراز هویت",
@@ -801,7 +807,9 @@
       "calendar": "نوع تقویم",
       "calendar_desc": "تغییر نوع تقویم (جلالی/میلادی)",
       "jalali": "جلالی",
-      "gregorian": "میلادی"
+      "gregorian": "میلادی",
+      "persian": "فارسی",
+      "english": "انگلیسی"
     },
     "privacy": {
       "title": "حریم خصوصی و امنیت",
@@ -2351,6 +2359,19 @@
       "search_placeholder": "جستجوی مخاطبین..."
     }
   },
+  "login": {
+    "title": "به مخاطبین نما خوش آمدید",
+    "email_label": "ایمیل",
+    "password_label": "رمز عبور",
+    "email_input_placeholder": "ایمیل خود را وارد کنید",
+    "password_input_placeholder": "رمز عبور خود را وارد کنید",
+    "button_label": "ورود",
+    "social_provider_text": "یا با حساب دیگر وارد شوید",
+    "link_text": "حساب کاربری ندارید؟",
+    "unexpected_error": "خطای غیرمنتظره‌ای رخ داد",
+    "forgot_password": "رمز عبور خود را فراموش کرده‌اید؟",
+    "registration_tooltip": "برای ثبت‌نام کاربر جدید، از داشبورد Supabase استفاده کنید یا از طریق بخش مدیریت کاربران با مدیران تماس بگیرید."
+  },
   "share_statistics": {
     "copy_success": "کپی شد",
     "share_link": "اشتراک لینک",
@@ -2378,5 +2399,14 @@
     "general": "عمومی",
     "other": "متفرقه",
     "miscellaneous": "سایر"
+  },
+  "not_found": {
+    "title": "صفحه مورد نظر یافت نشد",
+    "description": "متأسفانه صفحه‌ای که به دنبال آن هستید وجود ندارد یا ممکن است آدرس آن تغییر کرده باشد.",
+    "go_home": "بازگشت به صفحه اصلی",
+    "go_back": "بازگشت",
+    "try_again": "امتحان مجدد",
+    "support_message": "اگر فکر می‌کنید این یک مشکل است، لطفاً با پشتیبانی تماس بگیرید.",
+    "current_path": "مسیر فعلی: {{path}}"
   }
 }

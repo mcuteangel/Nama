@@ -1,69 +1,83 @@
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
-import { useSession } from '@/integrations/supabase/auth';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ModernTooltip, ModernTooltipContent, ModernTooltipTrigger } from '@/components/ui/modern-tooltip';
 import { GlassButton } from "@/components/ui/glass-button";
 import { ModernCard } from '@/components/ui/modern-card';
 import { ModernInput } from '@/components/ui/modern-input';
 import { ModernButton } from '@/components/ui/modern-button';
 import IranFlag from '@/assets/icons/flags/IranFlag';
 import UKFlag from '@/assets/icons/flags/UKFlag';
-import LoadingMessage from '@/components/common/LoadingMessage';
 
-const Login = () => {
+const ForgotPassword = () => {
   const navigate = useNavigate();
-  const { session, isLoading } = useSession();
   const { i18n, t } = useTranslation();
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [message, setMessage] = useState('');
   const [error, setError] = useState('');
-
-  useEffect(() => {
-    if (!isLoading && session?.user) {
-      navigate('/');
-    }
-  }, [session, isLoading, navigate]);
 
   const handleLanguageChange = (lng: string) => {
     i18n.changeLanguage(lng);
     localStorage.setItem('i18nextLng', lng);
   };
 
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setError('');
+    setMessage('');
+
+    // اعتبارسنجی اولیه ایمیل
+    if (!email.trim()) {
+      setError(t('forgotPassword.email_required_error'));
+      setIsSubmitting(false);
+      return;
+    }
+
+    if (!validateEmail(email)) {
+      setError(t('forgotPassword.invalid_email_error'));
+      setIsSubmitting(false);
+      return;
+    }
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
       });
 
       if (error) {
-        setError(error.message);
+        // Check if error is because user doesn't exist
+        if (error.message.toLowerCase().includes('user not found') ||
+            error.message.toLowerCase().includes('email not found') ||
+            error.message.toLowerCase().includes('invalid email') ||
+            error.message.toLowerCase().includes('unable to find')) {
+          setError(t('forgotPassword.user_not_found_error'));
+        } else {
+          setError(error.message);
+        }
       } else {
-        navigate('/');
+        // Supabase usually doesn't return errors for security reasons
+        // So we'll show success message for any valid email format
+        setMessage(t('forgotPassword.success_message'));
       }
     } catch (err) {
-      setError(t('login.unexpected_error'));
+      setError(t('forgotPassword.generic_error'));
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  if (isLoading) {
-    return <LoadingMessage message={t('common.loading')} />;
-  }
-
   return (
     <div className="flex flex-col items-center justify-center p-4 h-full w-full">
       <ModernCard variant="glass" className="w-full max-w-md p-10 rounded-3xl shadow-2xl hover:shadow-3xl backdrop-blur-2xl bg-white/10 dark:bg-gray-800/10 border border-white/20 dark:border-gray-700/20 transition-all duration-500 hover:scale-[1.02]">
         <h2 className="text-2xl font-bold text-center text-gray-800 dark:text-gray-100 mb-6">
-          {t('login.title')}
+          {t('forgotPassword.title')}
         </h2>
 
         <div className="flex justify-center gap-4 mb-6">
@@ -102,35 +116,24 @@ const Login = () => {
             </div>
           )}
 
+          {message && (
+            <div className="p-3 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-800 dark:text-green-200 text-sm">
+              {message}
+            </div>
+          )}
+
           <div className="space-y-2">
             <label htmlFor="email" className="text-sm font-medium text-gray-700 dark:text-gray-300">
-              {t('login.email_label')}
+              {t('forgotPassword.email_label')}
             </label>
             <ModernInput
               id="email"
               type="email"
               variant="glass"
               inputSize="lg"
-              placeholder={t('login.email_input_placeholder')}
+              placeholder={t('forgotPassword.email_placeholder')}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              required
-              className="w-full"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label htmlFor="password" className="text-sm font-medium text-gray-700 dark:text-gray-300">
-              {t('login.password_label')}
-            </label>
-            <ModernInput
-              id="password"
-              type="password"
-              variant="glass"
-              inputSize="lg"
-              placeholder={t('login.password_input_placeholder')}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
               required
               className="w-full"
             />
@@ -147,36 +150,17 @@ const Login = () => {
             hoverEffect="lift"
             className="w-full glass-advanced border border-white/20 hover:bg-blue-50/30 dark:hover:bg-blue-900/20 hover:border-blue-200 dark:hover:border-blue-700 text-blue-900 dark:text-blue-100 font-bold drop-shadow-lg hover:drop-shadow-xl transition-all duration-500 hover:shadow-2xl hover:shadow-blue-400/30"
           >
-            {t('login.button_label')}
+            {t('forgotPassword.submit_button')}
           </ModernButton>
 
-          <div className="text-center space-y-2">
-            <ModernTooltip>
-              <ModernTooltipTrigger asChild>
-                <span className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 cursor-help transition-colors duration-200">
-                  {t('login.link_text')}
-                </span>
-              </ModernTooltipTrigger>
-              <ModernTooltipContent
-                glassEffect="advanced"
-                side="top"
-                className="max-w-xs text-center"
-              >
-                <p className="text-sm">
-                  {t('login.registration_tooltip')}
-                </p>
-              </ModernTooltipContent>
-            </ModernTooltip>
-
-            <div>
-              <button
-                type="button"
-                onClick={() => navigate('/forgot-password')}
-                className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline transition-colors duration-200"
-              >
-                {t('login.forgot_password')}
-              </button>
-            </div>
+          <div className="text-center">
+            <button
+              type="button"
+              onClick={() => navigate('/login')}
+              className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline transition-colors duration-200"
+            >
+              {t('forgotPassword.back_to_login')}
+            </button>
           </div>
         </form>
       </ModernCard>
@@ -184,4 +168,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default ForgotPassword;
