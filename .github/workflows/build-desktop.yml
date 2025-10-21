@@ -129,45 +129,9 @@ jobs:
         path: release/
         retention-days: 1
 
-    - name: Create GitHub Release
-      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: v${{ github.run_number }}
-        release_name: Nama App v${{ github.run_number }}
-        body: |
-          # Nama App Desktop Release (Tauri)
-
-          **Version:** ${{ github.run_number }}
-          **Date:** $(date +'%Y-%m-%d')
-
-          ## Changes
-          - Migrated from Electron to Tauri
-          - Improved performance and smaller bundle size
-
-          ## Installation
-          - Download the appropriate file for your platform
-          - Install following the platform-specific instructions
-        draft: false
-        prerelease: false
-
-    - name: Upload Release Asset
-      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: release/${{ env.RELEASE_FILE }}
-        asset_name: ${{ env.RELEASE_FILE }}
-        asset_content_type: application/octet-stream
-
   build-tauri-windows:
     runs-on: windows-latest
-    needs: build-web
+    needs: [build-web, build-tauri]
     permissions:
       contents: write
 
@@ -254,7 +218,7 @@ jobs:
 
   build-tauri-macos:
     runs-on: macos-latest
-    needs: build-web
+    needs: [build-web, build-tauri-windows]
     permissions:
       contents: write
 
