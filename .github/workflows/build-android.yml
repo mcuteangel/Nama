@@ -101,6 +101,9 @@ jobs:
         ndk: 25.2.9519653
         cmake: 3.22.1
 
+    - name: Fix gradlew permissions
+      run: chmod +x android/gradlew
+
     - name: Setup Capacitor
       run: |
         pnpm run cap:sync
