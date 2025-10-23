@@ -100,8 +100,10 @@ export const ContactListService = {
     searchTerm: string = '',
     selectedGroup: string = '',
     companyFilter: string = '',
-    sortOption: string = 'last_name_asc'
-  ): Promise<{ data: Contact[] | null; error: string | null }> {
+    sortOption: string = 'last_name_asc',
+    page: number = 1,
+    limit: number = 20
+  ): Promise<{ data: Contact[] | null; error: string | null; total: number }> {
     try {
       // ابتدا تمام مخاطبین را با فیلترهای اولیه دریافت می‌کنیم
       let query = supabase
@@ -172,7 +174,7 @@ export const ContactListService = {
       
       if (error) {
         console.error('خطای پایگاه داده:', error);
-        return { data: null, error: 'خطا در دریافت اطلاعات از پایگاه داده' };
+        return { data: null, error: 'خطا در دریافت اطلاعات از پایگاه داده', total: 0 };
       }
       
       // اعمال فیلتر جستجو در صورت وجود عبارت جستجو
@@ -227,12 +229,18 @@ export const ContactListService = {
       // اعمال مرتب‌سازی
       const sortedData = sortContacts(filteredData, sortOption);
       
-      return { data: sortedData, error: null };
+      // اعمال pagination
+      const startIndex = (page - 1) * limit;
+      const endIndex = startIndex + limit;
+      const paginatedData = sortedData.slice(startIndex, endIndex);
+      
+      return { data: paginatedData, error: null, total: sortedData.length };
     } catch (error) {
       console.error('خطا در پردازش لیست مخاطبین:', error);
       return { 
         data: null, 
-        error: 'خطا در پردازش لیست مخاطبین' 
+        error: 'خطا در پردازش لیست مخاطبین',
+        total: 0
       };
     }
   }

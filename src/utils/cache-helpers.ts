@@ -51,14 +51,30 @@ export function invalidateCache(cacheKey: string) {
 }
 
 /**
- * Fetches data, attempting to retrieve it from cache first.
- * If fresh cache is available, it returns immediately.
- * Otherwise, it fetches from the provided function, caches the result.
- * This function no longer handles toasts directly.
- * @param cacheKey The key for caching this specific data.
- * @param fetchFunction The asynchronous function to call to fetch the data from the source.
- * @returns A promise that resolves with the fetched data, an error, and a flag indicating if it was from cache.
+ * Invalidates all cache entries related to contacts for a specific user.
+ * @param userId The user ID to invalidate caches for.
  */
+export function invalidateAllContactCaches(userId: string) {
+  const keysToInvalidate: string[] = [];
+
+  // Get all keys from localStorage that match contact-related patterns
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key && key.includes(`contacts_list_${userId}_`)) {
+      keysToInvalidate.push(key);
+    }
+  }
+
+  // Also invalidate other related caches
+  keysToInvalidate.push(`statistics_dashboard_${userId}`);
+
+  // Remove all identified cache entries
+  keysToInvalidate.forEach(key => {
+    localStorage.removeItem(key);
+  });
+
+  console.log(`Invalidated ${keysToInvalidate.length} cache entries for user ${userId}`);
+}
 export async function fetchWithCache<T>(
   cacheKey: string,
   fetchFunction: () => Promise<{ data: T | null; error: string | null }>,

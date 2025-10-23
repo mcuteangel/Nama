@@ -2,7 +2,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { GlassButton } from "@/components/ui/glass-button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Edit, Trash2, Phone, Mail } from "lucide-react";
+import { Edit, Trash2, Phone, Mail, Check } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { ContactCrudService } from "@/services/contact-crud-service";
 import { useErrorHandler } from "@/hooks/use-error-handler";
@@ -64,6 +64,9 @@ interface ContactItemProps {
   style?: React.CSSProperties; // For virtualized lists
   enableGestures?: boolean; // Whether to enable touch gestures
   className?: string;
+  multiSelect?: boolean;
+  isSelected?: boolean;
+  onSelect?: (contactId: string, selected: boolean) => void;
 }
 
 export const ContactItem = React.memo<ContactItemProps>(({
@@ -72,7 +75,10 @@ export const ContactItem = React.memo<ContactItemProps>(({
   onContactEdited,
   style,
   enableGestures = false,
-  className = ""
+  className = "",
+  multiSelect = false,
+  isSelected = false,
+  onSelect
 }) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -102,8 +108,14 @@ export const ContactItem = React.memo<ContactItemProps>(({
   });
 
   const handleContactClick = useCallback(() => {
-    navigate(`/contacts/${contact.id}`);
-  }, [navigate, contact.id]);
+    if (multiSelect && isSelected) {
+      onSelect?.(contact.id, false);
+    } else if (multiSelect) {
+      onSelect?.(contact.id, true);
+    } else {
+      navigate(`/contacts/${contact.id}`);
+    }
+  }, [navigate, contact.id, multiSelect, isSelected, onSelect]);
 
   const handleDelete = useCallback(async (e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
@@ -165,67 +177,136 @@ export const ContactItem = React.memo<ContactItemProps>(({
     return callbacks;
   }, [handleContactClick, handleDelete, handleEditClick, isMobile]);
 
+  const checkboxStyle = {
+    base: 'absolute top-3 left-3 z-20 h-5 w-5 rounded-md border-2 transition-all duration-200 flex items-center justify-center',
+    unselected: 'border-gray-300 bg-white group-hover:border-primary-400',
+    selected: 'border-primary-500 bg-primary-500',
+    checkIcon: 'h-3.5 w-3.5 text-white transition-transform duration-200',
+    checkMark: 'h-3 w-3 text-white transition-all duration-200 scale-90 group-hover:scale-100',
+    checkMarkSelected: 'scale-100'
+  };
+
   const cardContent = useMemo(() => (
     <div
-      className={`group relative overflow-hidden rounded-2xl cursor-pointer ${className}`}
+      className={`group relative overflow-hidden rounded-3xl cursor-pointer transition-all duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-xl ${className} ${multiSelect && isSelected ? 'ring-2 ring-blue-500 bg-blue-50/50' : ''}`}
       onClick={handleContactClick}
       style={{
-        background: designTokens.colors.glass.background,
-        border: `1px solid ${designTokens.colors.glass.border}`,
-        backdropFilter: 'blur(15px)',
-        boxShadow: designTokens.shadows.glass,
-        padding: designTokens.spacing[3],
-        transition: `all ${designTokens.transitions.duration.normal} ${designTokens.transitions.easing.easeOut}`,
+        background: isSelected 
+          ? 'rgba(59, 130, 246, 0.1)' 
+          : 'rgba(255, 255, 255, 0.7)',
+        border: `1px solid ${isSelected 
+          ? designTokens.colors.primary[400] 
+          : 'rgba(0, 0, 0, 0.05)'}`,
+        backdropFilter: 'blur(12px)',
+        boxShadow: isSelected 
+          ? '0 10px 25px -5px rgba(59, 130, 246, 0.2), 0 8px 10px -6px rgba(59, 130, 246, 0.2)'
+          : '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
+        padding: designTokens.spacing[4],
+        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
         width: '100%',
         pointerEvents: isDeleteDialogOpen || isDialogClosing ? 'none' : 'auto',
-        userSelect: isDeleteDialogOpen || isDialogClosing ? 'none' : 'auto'
+        userSelect: isDeleteDialogOpen || isDialogClosing ? 'none' : 'auto',
+        willChange: 'transform, box-shadow, border-color',
+        position: 'relative',
+        overflow: 'hidden',
+        paddingRight: multiSelect ? '2.5rem' : designTokens.spacing[4],
       }}
     >
+      {/* چک‌باکس انتخابی */}
+      {multiSelect && (
+        <div 
+          className={`absolute top-3 right-3 z-20 h-6 w-6 rounded-full border-2 flex items-center justify-center transition-all duration-200 ${
+            isSelected 
+              ? 'border-primary-500 bg-primary-500' 
+              : 'border-gray-300 bg-white group-hover:border-primary-400'
+          }`}
+          onClick={(e) => {
+            e.stopPropagation();
+            onSelect?.(contact.id, !isSelected);
+          }}
+        >
+          {isSelected && (
+            <Check className="h-4 w-4 text-white transition-transform duration-200" />
+          )}
+        </div>
+      )}
       {/* Background gradient overlay */}
-      <div
-        className="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-300"
+      <div 
+        className="absolute inset-0 opacity-0 group-hover:opacity-5 transition-all duration-500 ease-out"
         style={{
-          background: designTokens.gradients.primary,
-          borderRadius: designTokens.borderRadius.xl
+          background: 'radial-gradient(circle at center, rgba(59, 130, 246, 0.2) 0%, transparent 70%)',
+          borderRadius: '1.5rem',
+          transform: 'scale(0.95) translateZ(0)',
+          transition: 'opacity 0.3s ease, transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)'
+        }}
+      />
+      <div 
+        className="absolute inset-0 border-2 border-transparent group-hover:border-blue-100 transition-all duration-300 rounded-3xl pointer-events-none"
+        style={{
+          boxShadow: 'inset 0 0 20px rgba(59, 130, 246, 0.1)'
         }}
       />
 
       <div className="relative z-10 flex items-center justify-between">
         <div className="flex items-center gap-6 flex-grow min-w-0">
-          <div className="relative">
-            <Avatar className="h-16 w-16 ring-2 transition-all duration-300 group-hover:ring-4"
-              style={{
-                border: `2px solid ${designTokens.colors.primary[300]}`,
-                boxShadow: designTokens.shadows.lg
-              }}
-            >
-              <AvatarImage src={contact?.avatar_url || undefined} alt={contact?.first_name} />
-              <AvatarFallback
+          <div className="relative group/avatar">
+            <div className="relative">
+              <Avatar 
+                className="h-16 w-16 ring-2 ring-offset-2 ring-offset-white dark:ring-offset-gray-900 transition-all duration-500 ease-out group-hover:ring-4 group-hover:ring-primary-400/50"
                 style={{
-                  background: designTokens.gradients.primary,
-                  color: 'white',
-                  fontSize: designTokens.typography.sizes.xl,
-                  fontWeight: designTokens.typography.weights.bold
+                  border: `2px solid ${designTokens.colors.primary[300]}`,
+                  boxShadow: '0 4px 20px -5px rgba(0, 0, 0, 0.1)',
+                  transform: 'translateZ(0)',
+                  transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)'
                 }}
               >
-                {avatarFallback}
-              </AvatarFallback>
-            </Avatar>
-            {/* Gender indicator */}
-            <div
-              className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full border-2 border-white flex items-center justify-center text-xs font-bold"
-              style={{
-                background: displayGender.color,
-                boxShadow: designTokens.shadows.md
-              }}
-            >
-              {displayGender.icon}
+                <AvatarImage 
+                  src={contact?.avatar_url || undefined} 
+                  alt={contact?.first_name} 
+                  className="transition-transform duration-700 group-hover/avatar:scale-110"
+                />
+                <AvatarFallback
+                  className="transition-all duration-500 group-hover/avatar:scale-110"
+                  style={{
+                    background: designTokens.gradients.primary,
+                    color: 'white',
+                    fontSize: designTokens.typography.sizes.xl,
+                    fontWeight: designTokens.typography.weights.bold,
+                    textShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                  }}
+                >
+                  {avatarFallback}
+                </AvatarFallback>
+              </Avatar>
+              
+              {/* Animated gender indicator */}
+              <div
+                className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full border-2 border-white flex items-center justify-center text-xs font-bold transform transition-all duration-300 group-hover/avatar:scale-110 group-hover/avatar:-translate-y-1"
+                style={{
+                  background: displayGender.color,
+                  boxShadow: '0 2px 10px rgba(0, 0, 0, 0.15)',
+                  zIndex: 10
+                }}
+              >
+                <span className="transition-transform duration-300 group-hover/avatar:scale-125">
+                  {displayGender.icon}
+                </span>
+              </div>
+              
+              {/* Subtle pulse effect */}
+              <div 
+                className="absolute inset-0 rounded-full bg-primary-100/30 opacity-0 group-hover/avatar:opacity-100 transition-opacity duration-700"
+                style={{
+                  animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                  transform: 'scale(1.1)'
+                }}
+              />
             </div>
           </div>
 
-          <div className="min-w-0 flex-grow">
+          <div className="min-w-0 flex-grow transition-all duration-300 group-hover:translate-x-1">
             <h3
-              className="font-semibold text-base mb-1 truncate"
+              className="font-semibold text-base mb-1.5 truncate group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors duration-300"
               style={{
                 fontFamily: designTokens.typography.fonts.primary,
                 color: designTokens.colors.gray[800],
@@ -274,6 +355,7 @@ export const ContactItem = React.memo<ContactItemProps>(({
         </div>
 
         <div className="absolute top-0 left-3 bottom-0 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-all duration-300 transform -translate-x-2 group-hover:translate-x-0" style={{ pointerEvents: 'auto' }}>
+
           <GlassButton
             variant="ghost"
             size="icon"
@@ -349,7 +431,11 @@ export const ContactItem = React.memo<ContactItemProps>(({
     t,
     handleDelete,
     isDeleteDialogOpen,
-    isDialogClosing
+    isDialogClosing,
+    multiSelect,
+    isSelected,
+    onSelect,
+    contact.id
   ]);
 
   if (!contact) return null;

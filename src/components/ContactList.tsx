@@ -3,7 +3,7 @@ import { ModernLoader } from "@/components/ui/modern-loader";
 import { ModernGrid } from "@/components/ui/modern-grid";
 import { Users } from "lucide-react";
 import { ContactListService } from "@/services/contact-list-service";
-import { fetchWithCache, invalidateCache } from "@/utils/cache-helpers";
+import { invalidateCache } from "@/utils/cache-helpers";
 import { useSession } from "@/integrations/supabase/auth";
 import { useErrorHandler } from "@/hooks/use-error-handler";
 import { ErrorManager } from "@/lib/error-manager";
@@ -25,8 +25,26 @@ interface ContactListProps {
   companyFilter: string;
   /** Sort option for contact ordering */
   sortOption: string;
+  /** Current page for pagination */
+  currentPage: number;
+  /** Items per page for pagination */
+  itemsPerPage: number;
+  /** Total number of contacts */
+  totalItems: number;
+  /** Callback to update pagination */
+  onPaginationChange: (page: number, limit: number) => void;
+  /** Callback to update total items */
+  onTotalChange: (total: number) => void;
   /** Display mode for contacts: 'grid' or 'list' */
   displayMode?: 'grid' | 'list';
+  /** Enable multi-select mode */
+  multiSelect?: boolean;
+  /** Currently selected contacts */
+  selectedContacts: Set<string>;
+  /** Callback for contact selection */
+  onSelectContact?: (contactId: string, selected: boolean) => void;
+  /** Callback for select all */
+  onSelectAll?: (selected: boolean) => void;
 }
 
 /**
@@ -38,21 +56,31 @@ const ContactList: React.FC<ContactListProps> = ({
   selectedGroup, 
   companyFilter, 
   sortOption,
-  displayMode = 'grid'
+  currentPage,
+  itemsPerPage,
+  totalItems,
+  onPaginationChange,
+  onTotalChange,
+  displayMode = 'grid',
+  multiSelect = false,
+  selectedContacts,
+  onSelectContact,
+  onSelectAll
 }) => {
   const { session, isLoading: isSessionLoading } = useSession();
   const { t } = useTranslation();
   const isMobile = useIsMobile();
   const [contacts, setContacts] = useState<Contact[]>([]);
 
-  const onSuccessContacts = useCallback((result: { data: Contact[] | null; error: string | null; fromCache: boolean }) => {
+  const onSuccessContacts = useCallback((result: { data: Contact[] | null; error: string | null; total: number }) => {
     if (result.data) {
       setContacts(result.data);
     }
-    if (result && !result.fromCache) {
-      ErrorManager.notifyUser(t('contact_list.contacts_loaded_success'), 'success');
+    if (result.total !== undefined) {
+      onTotalChange(result.total);
     }
-  }, [t]);
+    ErrorManager.notifyUser(t('contact_list.contacts_loaded_success'), 'success');
+  }, [t, onTotalChange]);
 
   const onErrorContacts = useCallback((err: Error) => {
     ErrorManager.logError(err, { component: 'ContactList', action: 'fetchContacts' });
@@ -61,7 +89,7 @@ const ContactList: React.FC<ContactListProps> = ({
   const {
     isLoading,
     executeAsync,
-  } = useErrorHandler<{ data: Contact[] | null; error: string | null; fromCache: boolean }>(null, {
+  } = useErrorHandler<{ data: Contact[] | null; error: string | null; total: number }>(null, {
     maxRetries: 3,
     retryDelay: 1000,
     showToast: false,
@@ -70,10 +98,10 @@ const ContactList: React.FC<ContactListProps> = ({
     onError: onErrorContacts,
   });
 
-  // Memoize the cache key to prevent unnecessary re-renders
-  const cacheKey = useMemo(() => {
-    return `contacts_list_${session?.user?.id}_${searchTerm}_${selectedGroup}_${companyFilter}_${sortOption}_${displayMode}`;
-  }, [session?.user?.id, searchTerm, selectedGroup, companyFilter, sortOption, displayMode]);
+  // Memoize the filter dependencies to prevent unnecessary re-renders
+  const filterDeps = useMemo(() => ({
+    searchTerm, selectedGroup, companyFilter, sortOption, currentPage, itemsPerPage, displayMode
+  }), [searchTerm, selectedGroup, companyFilter, sortOption, currentPage, itemsPerPage, displayMode]);
 
   const fetchContacts = useCallback(async () => {
     if (isSessionLoading || !session?.user) {
@@ -82,36 +110,31 @@ const ContactList: React.FC<ContactListProps> = ({
     }
 
     await executeAsync(async () => {
-      return await fetchWithCache(
-        cacheKey,
-        async () => {
-          const result = await ContactListService.getFilteredContacts(
-            session.user.id,
-            searchTerm,
-            selectedGroup,
-            companyFilter,
-            sortOption
-          );
-          // Convert to the expected format for fetchWithCache
-          return { data: result.data, error: result.error };
-        }
+      const result = await ContactListService.getFilteredContacts(
+        session.user.id,
+        searchTerm,
+        selectedGroup,
+        companyFilter,
+        sortOption,
+        currentPage,
+        itemsPerPage
       );
+      // برگرداندن نتیجه مستقیم از سرویس
+      return { data: result.data, error: result.error, total: result.total };
     });
-  }, [session, isSessionLoading, searchTerm, selectedGroup, companyFilter, sortOption, executeAsync, cacheKey]);
+  }, [session, isSessionLoading, searchTerm, selectedGroup, companyFilter, sortOption, currentPage, itemsPerPage, executeAsync]);
 
   useEffect(() => {
     fetchContacts();
   }, [fetchContacts]);
 
   const handleContactDeleted = useCallback((_deletedId: string) => {
-    invalidateCache(cacheKey);
     fetchContacts();
-  }, [cacheKey, fetchContacts]);
+  }, [fetchContacts]);
 
   const handleContactEdited = useCallback(() => {
-    invalidateCache(cacheKey);
     fetchContacts();
-  }, [cacheKey, fetchContacts]);
+  }, [fetchContacts]);
 
   // Memoize the contact list rendering to prevent unnecessary re-renders
   const contactListContent = useMemo(() => {
@@ -135,6 +158,9 @@ const ContactList: React.FC<ContactListProps> = ({
               contact={contact}
               onContactDeleted={handleContactDeleted}
               onContactEdited={handleContactEdited}
+              multiSelect={multiSelect}
+              isSelected={selectedContacts.has(contact.id)}
+              onSelect={onSelectContact}
             />
           ))}
         </div>
@@ -155,11 +181,14 @@ const ContactList: React.FC<ContactListProps> = ({
             onContactDeleted={handleContactDeleted}
             onContactEdited={handleContactEdited}
             enableGestures={isMobile}
+            multiSelect={multiSelect}
+            isSelected={selectedContacts.has(contact.id)}
+            onSelect={onSelectContact}
           />
         ))}
       </ModernGrid>
     );
-  }, [contacts, handleContactDeleted, handleContactEdited, isMobile, t, displayMode]);
+  }, [contacts, handleContactDeleted, handleContactEdited, isMobile, t, displayMode, multiSelect, selectedContacts]);
 
   if (isLoading || isSessionLoading) {
     return (

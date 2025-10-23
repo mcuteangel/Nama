@@ -8,4 +8,5 @@ export { default as GroupsList } from './GroupsList';
 export { default as GroupItem } from './GroupItem';
 export { default as GroupListItem } from './GroupListItem';
 export { default as AddGroupDialog } from './AddGroupDialog';
+export { default as GroupSelectionDialog } from './GroupSelectionDialog';
 export { default as SmartGroupManagement } from './SmartGroupManagement';

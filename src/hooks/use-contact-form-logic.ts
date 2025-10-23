@@ -3,7 +3,7 @@ import { Session } from "@supabase/supabase-js";
 import { NavigateFunction } from "react-router-dom";
 import { CustomFieldTemplate } from "@/domain/schemas/custom-field-template";
 import { ContactFormValues } from "../types/contact.ts";
-import { invalidateCache } from "@/utils/cache-helpers";
+import { invalidateCache, invalidateAllContactCaches } from "@/utils/cache-helpers";
 import { useErrorHandler } from "./use-error-handler";
 import { ErrorManager } from "@/lib/error-manager";
 import { useCallback, useRef } from "react";
@@ -26,8 +26,10 @@ export const useContactFormLogic = (
     if (!contactId) { // Only reset form for new contacts
       form.reset();
     }
-    invalidateCache(`contacts_list_${session?.user?.id}_`); // Invalidate all contact lists for this user
-    invalidateCache(`statistics_dashboard_${session?.user?.id}`); // Invalidate statistics cache
+    // Invalidate all contact-related caches for this user
+    if (session?.user?.id) {
+      invalidateAllContactCaches(session.user.id);
+    }
     if (contactId) {
       invalidateCache(`contact_detail_${contactId}`); // Invalidate single contact cache
     }

@@ -2,7 +2,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { GlassButton } from "@/components/ui/glass-button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Edit, Trash2, Phone, Mail, MapPin, Building, User } from "lucide-react";
+import { Edit, Trash2, Phone, Mail, MapPin, Building, User, Check } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { ContactCrudService } from "@/services/contact-crud-service";
 import { useErrorHandler } from "@/hooks/use-error-handler";
@@ -21,13 +21,19 @@ interface ContactListItemProps {
   onContactEdited: (id: string) => void;
   style?: React.CSSProperties; // For virtualized lists
   className?: string;
+  multiSelect?: boolean;
+  isSelected?: boolean;
+  onSelect?: (contactId: string, selected: boolean) => void;
 }
 
 export const ContactListItem = React.memo<ContactListItemProps>(({
   contact,
   onContactDeleted,
   onContactEdited,
-  className = ""
+  className = "",
+  multiSelect = false,
+  isSelected = false,
+  onSelect
 }) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -57,8 +63,14 @@ export const ContactListItem = React.memo<ContactListItemProps>(({
   });
 
   const handleContactClick = useCallback(() => {
-    navigate(`/contacts/${contact.id}`);
-  }, [navigate, contact.id]);
+    if (multiSelect && isSelected) {
+      onSelect?.(contact.id, false);
+    } else if (multiSelect) {
+      onSelect?.(contact.id, true);
+    } else {
+      navigate(`/contacts/${contact.id}`);
+    }
+  }, [navigate, contact.id, multiSelect, isSelected, onSelect]);
 
   const handleDelete = useCallback(async (e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
@@ -153,20 +165,47 @@ export const ContactListItem = React.memo<ContactListItemProps>(({
 
   const listItemContent = useMemo(() => (
     <div
-      className={`group relative overflow-hidden rounded-3xl cursor-pointer ${className}`}
+      className={`group relative overflow-hidden rounded-3xl cursor-pointer transition-all duration-300 ease-in-out ${className} ${multiSelect && isSelected ? 'ring-2 ring-blue-500 bg-blue-50/50' : ''}`}
       onClick={handleContactClick}
       style={{
-        background: designTokens.colors.glass.background,
-        border: `1px solid ${designTokens.colors.glass.border}`,
-        backdropFilter: 'blur(20px)',
-        boxShadow: designTokens.shadows.glass,
+        background: isSelected 
+          ? 'rgba(59, 130, 246, 0.1)' 
+          : 'rgba(255, 255, 255, 0.7)',
+        border: `1px solid ${isSelected 
+          ? designTokens.colors.primary[400] 
+          : 'rgba(0, 0, 0, 0.05)'}`,
+        backdropFilter: 'blur(12px)',
+        boxShadow: isSelected 
+          ? '0 10px 25px -5px rgba(59, 130, 246, 0.2), 0 8px 10px -6px rgba(59, 130, 246, 0.2)'
+          : '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
         padding: designTokens.spacing[4],
-        transition: `all ${designTokens.transitions.duration.normal} ${designTokens.transitions.easing.easeOut}`,
+        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
         width: '100%',
         pointerEvents: isDeleteDialogOpen || isDialogClosing ? 'none' : 'auto',
-        userSelect: isDeleteDialogOpen || isDialogClosing ? 'none' : 'auto'
+        userSelect: isDeleteDialogOpen || isDialogClosing ? 'none' : 'auto',
+        willChange: 'transform, box-shadow, border-color',
+        position: 'relative',
+        overflow: 'hidden',
       }}
     >
+      {/* چک‌باکس انتخابی */}
+      {multiSelect && (
+        <div 
+          className={`absolute top-3 right-3 z-20 h-6 w-6 rounded-full border-2 flex items-center justify-center transition-all duration-200 ${
+            isSelected 
+              ? 'border-primary-500 bg-primary-500' 
+              : 'border-gray-300 bg-white group-hover:border-primary-400'
+          }`}
+          onClick={(e) => {
+            e.stopPropagation();
+            onSelect?.(contact.id, !isSelected);
+          }}
+        >
+          {isSelected && (
+            <Check className="h-4 w-4 text-white transition-transform duration-200" />
+          )}
+        </div>
+      )}
       {/* Background gradient overlay */}
       <div
         className="absolute inset-0 opacity-0 group-hover:opacity-5 transition-opacity duration-300"
@@ -315,6 +354,7 @@ export const ContactListItem = React.memo<ContactListItemProps>(({
         </div>
 
         <div className="flex gap-4 flex-shrink-0" style={{ pointerEvents: 'auto' }}>
+
           <GlassButton
             variant="ghost"
             size="icon"
@@ -402,7 +442,11 @@ export const ContactListItem = React.memo<ContactListItemProps>(({
     handleDelete,
     isDeleteDialogOpen,
     isDialogClosing,
-    displayGender
+    displayGender,
+    multiSelect,
+    isSelected,
+    onSelect,
+    contact.id
   ]);
 
   return (

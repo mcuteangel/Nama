@@ -3,6 +3,7 @@ import i18n from "i18next";
 import { searchContacts } from "./searchService";
 import { sortContacts } from "@/utils/sort";
 import { DuplicateContactService } from "./duplicateService";
+import { GroupAssignmentService } from "./groupAssignmentService";
 import { ContactListResponse, DuplicatePair, DuplicateManagementStats } from "@/types/contact.types";
 
 export const ContactService = {
@@ -38,5 +39,5 @@ export const ContactService = {
   }
 };
 
-export { DuplicateContactService };
+export { DuplicateContactService, GroupAssignmentService };
 export type { DuplicatePair, DuplicateManagementStats };
