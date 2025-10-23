@@ -16,10 +16,21 @@ android {
             ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    
+    signingConfigs {
+        release {
+            storeFile file(project.hasProperty('CAPACITOR_ANDROID_KEYSTORE_PATH') ? CAPACITOR_ANDROID_KEYSTORE_PATH : 'release.keystore')
+            storePassword project.hasProperty('CAPACITOR_ANDROID_KEYSTORE_PASSWORD') ? CAPACITOR_ANDROID_KEYSTORE_PASSWORD : ''
+            keyAlias project.hasProperty('CAPACITOR_ANDROID_KEY_ALIAS') ? CAPACITOR_ANDROID_KEY_ALIAS : ''
+            keyPassword project.hasProperty('CAPACITOR_ANDROID_KEY_PASSWORD') ? CAPACITOR_ANDROID_KEY_PASSWORD : ''
+        }
+    }
+    
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
 }

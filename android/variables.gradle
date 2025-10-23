@@ -1,3 +1,18 @@
+// Read .env.signing file
+def envFile = new File("${rootDir}/../.env.signing")
+if (envFile.exists()) {
+    envFile.eachLine { line ->
+        if (line.trim() && !line.startsWith('#')) {
+            def (key, value) = line.split('=', 2)
+            if (key && value) {
+                // Remove quotes if present
+                value = value.replaceAll('^"|"$', '')
+                project.ext.set(key, value)
+            }
+        }
+    }
+}
+
 ext {
     minSdkVersion = 23
     compileSdkVersion = 35
@@ -13,4 +28,12 @@ ext {
     androidxJunitVersion = '1.2.1'
     androidxEspressoCoreVersion = '3.6.1'
     cordovaAndroidVersion = '10.1.1'
+    
+    // Default signing config
+    if (!project.hasProperty('CAPACITOR_ANDROID_KEYSTORE_PATH')) {
+        CAPACITOR_ANDROID_KEYSTORE_PATH = "${rootDir}/app/release.keystore"
+        CAPACITOR_ANDROID_KEYSTORE_PASSWORD = ""
+        CAPACITOR_ANDROID_KEY_ALIAS = ""
+        CAPACITOR_ANDROID_KEY_PASSWORD = ""
+    }
 }

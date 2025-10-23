@@ -291,9 +291,5 @@ web-vitals-report/
 src-tauri/target/
 Cargo.lock
 
-# Local development
-.local
-*.local
-.kilocode/mcp.json
-.qoder/rules/language.md
-.qoder/rules/rules.md
+# Signing configuration (sensitive)
+.env.signing
