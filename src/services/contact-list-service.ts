@@ -161,7 +161,13 @@ export const ContactListService = {
 
       // اعمال فیلتر گروه در صورت انتخاب
       if (selectedGroup) {
-        query = query.filter('contact_groups.group_id', 'eq', selectedGroup);
+        if (selectedGroup === 'ungrouped') {
+          // فیلتر برای مخاطبینی که هیچ گروهی ندارند
+          query = query.is('contact_groups', null);
+        } else {
+          // فیلتر برای مخاطبینی که در گروه انتخابی هستند
+          query = query.filter('contact_groups.group_id', 'eq', selectedGroup);
+        }
       }
 
       // اعمال فیلتر شرکت در صورت وجود
@@ -171,14 +177,29 @@ export const ContactListService = {
 
       // دریافت داده‌ها از دیتابیس
       const { data, error } = await query;
-      
+
       if (error) {
         console.error('خطای پایگاه داده:', error);
         return { data: null, error: 'خطا در دریافت اطلاعات از پایگاه داده', total: 0 };
       }
-      
-      // اعمال فیلتر جستجو در صورت وجود عبارت جستجو
+
+      // اعمال فیلتر گروه در صورت انتخاب (پس از دریافت داده‌ها برای دقت بیشتر)
       let filteredData = data as Contact[];
+      if (selectedGroup && selectedGroup !== 'all' && selectedGroup !== 'ungrouped') {
+        const beforeFilter = filteredData.length;
+        filteredData = filteredData.filter(contact =>
+          contact.contact_groups?.some(group => group.group_id === selectedGroup)
+        );
+        const afterFilter = filteredData.length;
+        console.log(`فیلتر گروه ${selectedGroup}: ${beforeFilter} -> ${afterFilter} مخاطب`);
+      } else if (selectedGroup === 'ungrouped') {
+        const beforeFilter = filteredData.length;
+        filteredData = filteredData.filter(contact =>
+          !contact.contact_groups || contact.contact_groups.length === 0
+        );
+        const afterFilter = filteredData.length;
+        console.log(`فیلتر بدون گروه: ${beforeFilter} -> ${afterFilter} مخاطب`);
+      }
       
       const trimmedSearch = searchTerm.trim();
       if (trimmedSearch.length >= 2) {
