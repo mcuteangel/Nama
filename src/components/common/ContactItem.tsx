@@ -1,9 +1,8 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useIsMobile } from '@/hooks/use-mobile';
-import StandardizedDeleteDialog from './StandardizedDeleteDialog';
 import TouchGestureHandler from '../TouchGestureHandler';
-import { GestureCallbacks } from '../TouchGestureHandler.types';
+import { GestureCallbacks } from './contact-item/types';
 import {
   ContactAvatar,
   ContactInfo,
@@ -56,7 +55,7 @@ export const ContactItem = React.memo<ContactItemProps>(({
   // Touch gesture callbacks for mobile
   const gestureCallbacks = useMemo(() => {
     const callbacks: GestureCallbacks = {
-      onTap: contactItemLogic.handleContactClick,
+      onTap: () => contactItemLogic.handleContactClick(),
       onLongPress: () => {
         // Show action menu on long press
       },
@@ -121,31 +120,29 @@ export const ContactItem = React.memo<ContactItemProps>(({
           />
 
           <div className={contactItemConstants.layout.info}>
-            <h3 style={contactItemConstants.typography.style}>
-              {contact?.first_name} {contact?.last_name}
-            </h3>
-
             <ContactInfo
               displayPhoneNumber={contactDisplay.displayPhoneNumber}
               displayEmail={contactDisplay.displayEmail}
+              displayPosition={contactDisplay.displayPosition}
+              displayCompany={contactDisplay.displayCompany}
+              displayAddress={contactDisplay.displayAddress}
+              displayGroups={contactDisplay.displayGroups}
+              fullName={contactDisplay.fullName}
+              avatarFallback={contactDisplay.avatarFallback}
+              displayGender={contactDisplay.displayGender}
             />
           </div>
         </div>
 
         <ContactActions
           onEdit={contactItemLogic.handleEditClick}
-          onDelete={() => contactItemLogic.handleDialogOpenChange(true)}
+          onDelete={contactItemLogic.handleDelete}
+          onDialogOpenChange={contactItemLogic.handleDialogOpenChange}
           isDeleting={contactItemLogic.isDeleting}
+          isDeleteDialogOpen={contactItemLogic.isDeleteDialogOpen}
           isDialogClosing={contactItemLogic.isDialogClosing}
-        />
-
-        <StandardizedDeleteDialog
-          open={contactItemLogic.isDeleteDialogOpen}
-          onOpenChange={contactItemLogic.handleDialogOpenChange}
-          onConfirm={contactItemLogic.handleDelete}
-          title={t('contacts.confirm_delete_title')}
-          description={t('contacts.confirm_delete_description')}
-          isDeleting={contactItemLogic.isDeleting}
+          deleteTitle={t('contacts.confirm_delete_title')}
+          deleteDescription={t('contacts.confirm_delete_description')}
         />
       </div>
     </div>
@@ -159,10 +156,13 @@ export const ContactItem = React.memo<ContactItemProps>(({
     contactItemLogic.isDeleteDialogOpen,
     contactItemLogic.isDialogClosing,
     contactItemLogic.isDeleting,
+    contactDisplay.displayPosition,
+    contactDisplay.displayCompany,
+    contactDisplay.displayAddress,
+    contactDisplay.displayGroups,
+    contactDisplay.fullName,
     contactDisplay.avatarFallback,
     contactDisplay.displayGender,
-    contactDisplay.displayPhoneNumber,
-    contactDisplay.displayEmail,
     contactItemConstants,
     multiSelect,
     isSelected,

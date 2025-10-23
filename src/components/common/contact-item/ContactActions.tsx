@@ -1,54 +1,80 @@
 import React from 'react';
 import { Edit, Trash2 } from "lucide-react";
 import { GlassButton } from "@/components/ui/glass-button";
+import { designTokens } from '@/lib/design-tokens';
 import LoadingSpinner from '../LoadingSpinner';
+import StandardizedDeleteDialog from '../StandardizedDeleteDialog';
 
 interface ContactActionsProps {
   onEdit: () => void;
   onDelete: () => void;
+  onDialogOpenChange: (open: boolean) => void;
   isDeleting: boolean;
+  isDeleteDialogOpen: boolean;
   isDialogClosing: boolean;
+  deleteTitle: string;
+  deleteDescription: string;
 }
 
 export const ContactActions: React.FC<ContactActionsProps> = ({
   onEdit,
   onDelete,
+  onDialogOpenChange,
   isDeleting,
-  isDialogClosing
+  isDeleteDialogOpen,
+  isDialogClosing,
+  deleteTitle,
+  deleteDescription
 }) => {
   return (
-    <div className="absolute top-0 left-3 bottom-0 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-all duration-300 transform -translate-x-2 group-hover:translate-x-0" style={{ pointerEvents: 'auto' }}>
-
+    <div className="flex gap-4 flex-shrink-0" style={{ pointerEvents: 'auto' }}>
       <GlassButton
         variant="ghost"
         size="icon"
-        className="w-9 h-9 hover:scale-105 rounded-xl shadow-md backdrop-blur-md border-0 hover:shadow-lg transition-all duration-200"
+        className="opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110 rounded-2xl"
         style={{
-          background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.95), rgba(37, 99, 235, 0.95))',
-          boxShadow: '0 6px 20px -6px rgba(59, 130, 246, 0.4)'
+          background: 'rgba(59, 130, 246, 0.15)',
+          border: `2px solid ${designTokens.colors.primary[300]}`,
+          width: '44px',
+          height: '44px',
+          backdropFilter: 'blur(10px)'
         }}
         onClick={onEdit}
+        aria-label="Edit contact"
       >
-        <Edit size={15} style={{ color: 'white' }} />
+        <Edit size={24} style={{ color: designTokens.colors.primary[700] }} />
       </GlassButton>
 
       <GlassButton
         variant="ghost"
         size="icon"
-        className="w-9 h-9 hover:scale-105 rounded-xl shadow-md backdrop-blur-md border-0 hover:shadow-lg transition-all duration-200"
+        className="opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110 rounded-2xl"
         style={{
-          background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.95), rgba(220, 38, 38, 0.95))',
-          boxShadow: '0 6px 20px -6px rgba(239, 68, 68, 0.4)'
+          background: 'rgba(239, 68, 68, 0.15)',
+          border: `2px solid ${designTokens.colors.error[300]}`,
+          width: '44px',
+          height: '44px',
+          backdropFilter: 'blur(10px)'
         }}
-        onClick={onDelete}
+        onClick={() => onDialogOpenChange(true)}
         disabled={isDeleting || isDialogClosing}
+        aria-label="Delete contact"
       >
         {isDeleting ? (
-          <LoadingSpinner size={16} className="text-white" />
+          <LoadingSpinner size={24} />
         ) : (
-          <Trash2 size={15} style={{ color: 'white' }} />
+          <Trash2 size={24} style={{ color: designTokens.colors.error[700] }} />
         )}
       </GlassButton>
+
+      <StandardizedDeleteDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={onDialogOpenChange}
+        onConfirm={onDelete}
+        title={deleteTitle}
+        description={deleteDescription}
+        isDeleting={isDeleting}
+      />
     </div>
   );
 };
