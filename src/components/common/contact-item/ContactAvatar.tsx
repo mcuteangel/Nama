@@ -1,7 +1,8 @@
 import React from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { FaMale, FaFemale, FaGenderless } from 'react-icons/fa';
 import { designTokens } from '@/lib/design-tokens';
-import { GenderDisplay } from './types';
+import { GenderDisplay } from '@/types/contact.types';
 
 interface ContactAvatarProps {
   contact: {
@@ -39,14 +40,16 @@ export const ContactAvatar: React.FC<ContactAvatarProps> = ({
       </Avatar>
       {/* Gender indicator */}
       <div
-        className="absolute -bottom-2 -right-2 w-7 h-7 rounded-full border-3 border-white flex items-center justify-center text-sm font-bold"
+        className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full border-2 border-white flex items-center justify-center text-xs"
         style={{
-          background: displayGender.icon === '♂' ? designTokens.colors.primary[500] : designTokens.colors.secondary[500],
-          boxShadow: designTokens.shadows.lg
+          background: displayGender.color,
+          boxShadow: designTokens.shadows.md
         }}
         title={displayGender.label}
       >
-        {typeof displayGender.icon === 'string' ? displayGender.icon : '⚲'}
+        {displayGender.icon === 'male' && <FaMale className="w-3 h-3 text-white" />}
+        {displayGender.icon === 'female' && <FaFemale className="w-3 h-3 text-white" />}
+        {displayGender.icon === 'neutral' && <FaGenderless className="w-3 h-3 text-white" />}
       </div>
     </div>
   );

@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { FaMale, FaFemale, FaGenderless } from 'react-icons/fa';
 import { designTokens } from '@/lib/design-tokens';
 import { Contact, GenderDisplay } from '@/types/contact.types';
 
@@ -61,13 +62,28 @@ export const useContactDisplay = (contact: Contact) => {
 
   const displayGender = useMemo((): GenderDisplay => {
     if (contact.gender === 'male') {
-      return { icon: '♂', color: designTokens.colors.primary[500] };
+      return {
+        icon: 'male',
+        color: designTokens.colors.primary[500],
+        label: t('contacts.gender_male'),
+        gender: contact.gender
+      };
     } else if (contact.gender === 'female') {
-      return { icon: '♀', color: designTokens.colors.secondary[500] };
+      return {
+        icon: 'female',
+        color: designTokens.colors.secondary[500],
+        label: t('contacts.gender_female'),
+        gender: contact.gender
+      };
     } else {
-      return { icon: '⚲', color: designTokens.colors.gray[500] };
+      return {
+        icon: 'neutral',
+        color: designTokens.colors.gray[500],
+        label: t('contacts.gender_neutral'),
+        gender: contact.gender
+      };
     }
-  }, [contact.gender]);
+  }, [contact.gender, t]);
 
   return {
     displayPhoneNumber,

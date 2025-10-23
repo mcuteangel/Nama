@@ -10,8 +10,36 @@ export const ContactInfo: React.FC<ContactDisplayData> = ({
   displayCompany,
   displayAddress,
   displayGroups,
-  fullName
+  fullName,
+  displayMode = 'list'
 }) => {
+  // Grid mode: Show only avatar and company name
+  if (displayMode === 'grid') {
+    return (
+      <div className="min-w-0 flex-grow flex flex-col items-center justify-center space-y-4">
+        {/* Row 2: Name */}
+        <h3
+          className="font-semibold text-base truncate text-center mt-2"
+          style={{
+            fontFamily: designTokens.typography.fonts.primary,
+            color: designTokens.colors.gray[800]
+          }}
+        >
+          {fullName}
+        </h3>
+
+        {/* Row 3: Main phone number */}
+        <div className="flex items-center gap-2 text-sm">
+          <Phone size={14} style={{ color: designTokens.colors.primary[600] }} />
+          <span className="font-medium truncate" style={{ color: designTokens.colors.gray[700] }}>
+            {displayPhoneNumber}
+          </span>
+        </div>
+      </div>
+    );
+  }
+
+  // List mode: Show all information
   return (
     <div className="min-w-0 flex-grow space-y-4">
       {/* Name and groups in same row */}
@@ -55,10 +83,10 @@ export const ContactInfo: React.FC<ContactDisplayData> = ({
       </div>
 
       {/* Contact details in a compact horizontal layout */}
-      <div className="flex flex-wrap items-center gap-4 text-sm">
-        <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center gap-4 text-sm overflow-hidden">
+        <div className="flex items-center gap-2 min-w-0">
           <Phone size={16} style={{ color: designTokens.colors.primary[600] }} />
-          <span className="font-medium" style={{ color: designTokens.colors.gray[700] }}>
+          <span className="font-medium truncate" style={{ color: designTokens.colors.gray[700] }}>
             {displayPhoneNumber}
           </span>
         </div>
@@ -66,9 +94,9 @@ export const ContactInfo: React.FC<ContactDisplayData> = ({
         {displayEmail && (
           <>
             <span className="text-gray-400">•</span>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 min-w-0">
               <Mail size={16} style={{ color: designTokens.colors.secondary[600] }} />
-              <span className="font-medium" style={{ color: designTokens.colors.gray[700] }}>
+              <span className="font-medium truncate" style={{ color: designTokens.colors.gray[700] }}>
                 {displayEmail}
               </span>
             </div>
@@ -78,11 +106,11 @@ export const ContactInfo: React.FC<ContactDisplayData> = ({
         {(displayPosition || displayCompany) && (
           <>
             <span className="text-gray-400">•</span>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 min-w-0">
               {displayPosition && (
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1 min-w-0">
                   <User size={14} style={{ color: designTokens.colors.success[600] }} />
-                  <span className="font-medium" style={{ color: designTokens.colors.gray[700] }}>
+                  <span className="font-medium truncate" style={{ color: designTokens.colors.gray[700] }}>
                     {displayPosition}
                   </span>
                 </div>
@@ -90,9 +118,9 @@ export const ContactInfo: React.FC<ContactDisplayData> = ({
               {displayCompany && (
                 <>
                   {displayPosition && <span className="text-gray-400 mx-1">@</span>}
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-1 min-w-0">
                     <Building size={14} style={{ color: designTokens.colors.warning[600] }} />
-                    <span className="font-medium" style={{ color: designTokens.colors.gray[700] }}>
+                    <span className="font-medium truncate" style={{ color: designTokens.colors.gray[700] }}>
                       {displayCompany}
                     </span>
                   </div>
@@ -105,9 +133,9 @@ export const ContactInfo: React.FC<ContactDisplayData> = ({
         {displayAddress && (
           <>
             <span className="text-gray-400">•</span>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 min-w-0">
               <MapPin size={16} style={{ color: designTokens.colors.error[600] }} />
-              <span className="font-medium" style={{ color: designTokens.colors.gray[700] }}>
+              <span className="font-medium truncate" style={{ color: designTokens.colors.gray[700] }}>
                 {displayAddress}
               </span>
             </div>

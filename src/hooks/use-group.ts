@@ -3,15 +3,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { useErrorHandler } from './use-error-handler';
 import { PhoneNumber, EmailAddress } from '@/types/contact.types';
 
-interface GroupContact {
-  id: string;
-  first_name: string | null;
-  last_name: string | null;
-  avatar_url: string | null;
-  phone_numbers: PhoneNumber[];
-  email_addresses?: EmailAddress[];
-}
-
 // Define a simplified contact interface for preview purposes
 interface ContactPreview {
   id: string;
@@ -21,6 +12,7 @@ interface ContactPreview {
   email?: string;
   phone_number?: string;
   phone_numbers?: PhoneNumber[];
+  gender?: string | null;
   name?: string; // For backward compatibility
 }
 
@@ -75,6 +67,7 @@ export const useGroup = (groupId: string | undefined) => {
           first_name,
           last_name,
           avatar_url,
+          gender,
           phone_numbers (
             id,
             phone_number,
@@ -96,11 +89,12 @@ export const useGroup = (groupId: string | undefined) => {
 
       const formattedData = {
         ...groupData,
-        contacts: (contactsData as GroupContact[]).map((contact) => ({
+        contacts: (contactsData as any[]).map((contact) => ({
           id: contact.id,
           first_name: contact.first_name || '',
           last_name: contact.last_name || '',
           avatar_url: contact.avatar_url || null,
+          gender: contact.gender || null,
           phone_number: contact.phone_numbers?.[0]?.phone_number || '',
           phone_numbers: contact.phone_numbers || [],
           email: contact.email_addresses?.[0]?.email_address || undefined

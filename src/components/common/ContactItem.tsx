@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { designTokens } from '@/lib/design-tokens';
 import TouchGestureHandler from '../TouchGestureHandler';
 import { GestureCallbacks } from './contact-item/types';
 import {
@@ -24,6 +25,7 @@ interface ContactItemProps {
   multiSelect?: boolean;
   isSelected?: boolean;
   onSelect?: (contactId: string, selected: boolean) => void;
+  displayMode?: 'grid' | 'list'; // Display mode for different layouts
 }
 
 export const ContactItem = React.memo<ContactItemProps>(({
@@ -35,7 +37,8 @@ export const ContactItem = React.memo<ContactItemProps>(({
   className = "",
   multiSelect = false,
   isSelected = false,
-  onSelect
+  onSelect,
+  displayMode = 'list'
 }) => {
   const { t } = useTranslation();
   const isMobile = useIsMobile();
@@ -85,6 +88,8 @@ export const ContactItem = React.memo<ContactItemProps>(({
           ? contactItemConstants.cardStyles.boxShadow.selected
           : contactItemConstants.cardStyles.boxShadow.unselected,
         padding: contactItemConstants.cardStyles.padding,
+        height: contactItemConstants.cardStyles.height,
+        aspectRatio: contactItemConstants.cardStyles.aspectRatio,
         transition: contactItemConstants.cardStyles.transition,
         width: '100%',
         pointerEvents: contactItemLogic.isDeleteDialogOpen || contactItemLogic.isDialogClosing ? contactItemConstants.cardStyles.pointerEvents.disabled : contactItemConstants.cardStyles.pointerEvents.normal,
@@ -112,38 +117,71 @@ export const ContactItem = React.memo<ContactItemProps>(({
       <div className={contactItemConstants.borderOverlay.className} style={contactItemConstants.borderOverlay.style} />
 
       <div className={contactItemConstants.layout.container}>
-        <div className={contactItemConstants.layout.content}>
+        {/* Row 1: Avatar and groups */}
+        <div className="flex items-center justify-center gap-3 w-full">
           <ContactAvatar
             contact={contact}
             avatarFallback={contactDisplay.avatarFallback}
             displayGender={contactDisplay.displayGender}
           />
 
-          <div className={contactItemConstants.layout.info}>
-            <ContactInfo
-              displayPhoneNumber={contactDisplay.displayPhoneNumber}
-              displayEmail={contactDisplay.displayEmail}
-              displayPosition={contactDisplay.displayPosition}
-              displayCompany={contactDisplay.displayCompany}
-              displayAddress={contactDisplay.displayAddress}
-              displayGroups={contactDisplay.displayGroups}
-              fullName={contactDisplay.fullName}
-              avatarFallback={contactDisplay.avatarFallback}
-              displayGender={contactDisplay.displayGender}
-            />
-          </div>
+          {/* Groups inline with avatar */}
+          {displayMode === 'grid' && contactDisplay.displayGroups.length > 0 && (
+            <div className="flex gap-1">
+              {contactDisplay.displayGroups.slice(0, 2).map((group, index) => (
+                <span
+                  key={index}
+                  className="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold text-white"
+                  style={{
+                    background: group.color || designTokens.colors.gray[600],
+                    fontFamily: designTokens.typography.fonts.secondary,
+                    fontSize: '10px'
+                  }}
+                  title={group.name}
+                >
+                  {group.name}
+                </span>
+              ))}
+              {contactDisplay.displayGroups.length > 2 && (
+                <span
+                  className="text-xs text-gray-500 font-medium"
+                  style={{ fontFamily: designTokens.typography.fonts.secondary }}
+                >
+                  +{contactDisplay.displayGroups.length - 2}
+                </span>
+              )}
+            </div>
+          )}
         </div>
 
-        <ContactActions
-          onEdit={contactItemLogic.handleEditClick}
-          onDelete={contactItemLogic.handleDelete}
-          onDialogOpenChange={contactItemLogic.handleDialogOpenChange}
-          isDeleting={contactItemLogic.isDeleting}
-          isDeleteDialogOpen={contactItemLogic.isDeleteDialogOpen}
-          isDialogClosing={contactItemLogic.isDialogClosing}
-          deleteTitle={t('contacts.confirm_delete_title')}
-          deleteDescription={t('contacts.confirm_delete_description')}
-        />
+        <div className={contactItemConstants.layout.info}>
+          <ContactInfo
+            displayPhoneNumber={contactDisplay.displayPhoneNumber}
+            displayEmail={contactDisplay.displayEmail}
+            displayPosition={contactDisplay.displayPosition}
+            displayCompany={contactDisplay.displayCompany}
+            displayAddress={contactDisplay.displayAddress}
+            displayGroups={displayMode === 'grid' ? [] : contactDisplay.displayGroups} // Don't show groups in grid mode here
+            fullName={contactDisplay.fullName}
+            avatarFallback={contactDisplay.avatarFallback}
+            displayGender={contactDisplay.displayGender}
+            displayMode={displayMode}
+          />
+        </div>
+
+        {/* Center the actions */}
+        <div className="flex justify-center mt-2">
+          <ContactActions
+            onEdit={contactItemLogic.handleEditClick}
+            onDelete={contactItemLogic.handleDelete}
+            onDialogOpenChange={contactItemLogic.handleDialogOpenChange}
+            isDeleting={contactItemLogic.isDeleting}
+            isDeleteDialogOpen={contactItemLogic.isDeleteDialogOpen}
+            isDialogClosing={contactItemLogic.isDialogClosing}
+            deleteTitle={t('contacts.confirm_delete_title')}
+            deleteDescription={t('contacts.confirm_delete_description')}
+          />
+        </div>
       </div>
     </div>
   ), [
@@ -166,13 +204,14 @@ export const ContactItem = React.memo<ContactItemProps>(({
     contactItemConstants,
     multiSelect,
     isSelected,
-    t
+    t,
+    displayMode
   ]);
 
   if (!contact) return null;
 
   return (
-    <div style={style} className="px-0 sm:px-2">
+    <div style={style} className="px-0">
       {enableGestures && isMobile ? (
         <TouchGestureHandler callbacks={gestureCallbacks}>
           {cardContent}

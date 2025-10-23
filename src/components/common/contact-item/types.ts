@@ -1,8 +1,4 @@
-export interface GenderDisplay {
-  icon: string;
-  color: string;
-  label?: string;
-}
+import { GenderDisplay } from '@/types/contact.types';
 
 export interface CheckboxStyle {
   base: string;
@@ -26,6 +22,7 @@ export interface ContactDisplayData {
   fullName: string;
   avatarFallback: string;
   displayGender: GenderDisplay;
+  displayMode?: 'grid' | 'list';
 }
 
 export interface ContactItemProps {
@@ -53,6 +50,7 @@ export interface ContactItemProps {
   multiSelect?: boolean;
   isSelected?: boolean;
   onSelect?: (contactId: string, selected: boolean) => void;
+  displayMode?: 'grid' | 'list';
 }
 
 export interface GestureCallbacks {

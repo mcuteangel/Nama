@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { ModernLoader } from "@/components/ui/modern-loader";
-import { ModernGrid } from "@/components/ui/modern-grid";
+import { ResponsiveGrid } from "@/components/ui/modern-grid";
 import { Users } from "lucide-react";
 import { ContactListService } from "@/services/contact-list-service";
 import { useSession } from "@/integrations/supabase/auth";
@@ -154,6 +154,7 @@ const ContactList: React.FC<ContactListProps> = ({
               multiSelect={multiSelect}
               isSelected={selectedContacts.has(contact.id)}
               onSelect={onSelectContact}
+              displayMode="list"
             />
           ))}
         </div>
@@ -162,9 +163,13 @@ const ContactList: React.FC<ContactListProps> = ({
     
     // Use regular grid for small datasets with better UX
     return (
-      <ModernGrid
-        cols={1}
-        gap="sm"
+      <ResponsiveGrid
+        breakpoints={{
+          sm: 2,  // کمتر از 640px: 2 ستون
+          md: 3,  // 768px+: 3 ستون
+          lg: 4,  // 1024px+: 4 ستون
+          xl: 5   // 1280px+: 5 ستون
+        }}
         className="w-full"
       >
         {contacts.map((contact) => (
@@ -177,9 +182,10 @@ const ContactList: React.FC<ContactListProps> = ({
             multiSelect={multiSelect}
             isSelected={selectedContacts.has(contact.id)}
             onSelect={onSelectContact}
+            displayMode="grid"
           />
         ))}
-      </ModernGrid>
+      </ResponsiveGrid>
     );
   }, [contacts, handleContactDeleted, handleContactEdited, isMobile, t, displayMode, multiSelect, selectedContacts]);
 

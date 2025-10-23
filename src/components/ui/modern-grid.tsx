@@ -187,7 +187,7 @@ export function ResponsiveGrid({
 
   return (
     <div
-      className={cn('grid gap-6', responsiveClasses, className)}
+      className={cn('grid gap-4 items-stretch', responsiveClasses, className)}
       {...props}
     >
       {children}

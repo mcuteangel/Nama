@@ -10,7 +10,7 @@
 @layer components {
   /* Contact List Component Styles */
   .contact-list-container {
-    @apply w-full space-y-4 px-4 sm:px-6 md:space-y-6;
+    @apply w-full space-y-4 px-0 sm:px-0 md:space-y-6 m-[-0.5rem];
   }
   
   .loading-container {

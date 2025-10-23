@@ -21,6 +21,7 @@ interface ContactListItemProps {
   multiSelect?: boolean;
   isSelected?: boolean;
   onSelect?: (contactId: string, selected: boolean) => void;
+  displayMode?: 'grid' | 'list';
 }
 
 export const ContactListItem = React.memo<ContactListItemProps>(({
@@ -30,7 +31,8 @@ export const ContactListItem = React.memo<ContactListItemProps>(({
   className = "",
   multiSelect = false,
   isSelected = false,
-  onSelect
+  onSelect,
+  displayMode = 'list'
 }) => {
   const { t } = useTranslation();
   const isMobile = useIsMobile();
@@ -123,6 +125,7 @@ export const ContactListItem = React.memo<ContactListItemProps>(({
 
           <ContactInfo
             {...displayData}
+            displayMode={displayMode}
           />
         </div>
 
@@ -149,15 +152,15 @@ export const ContactListItem = React.memo<ContactListItemProps>(({
     isDeleteDialogOpen,
     isDialogClosing,
     handleDialogOpenChange,
-    displayData.displayGender,
     multiSelect,
     isSelected,
     handleCheckboxChange,
-    t
+    t,
+    displayMode
   ]);
 
   return (
-    <div className="px-0 sm:px-2">
+    <div className="px-0">
       {isMobile ? (
         <TouchGestureHandler callbacks={gestureCallbacks}>
           {listItemContent}

@@ -15,8 +15,9 @@ import { useAppSettings } from '@/hooks/use-app-settings';
 import { designTokens } from '@/lib/design-tokens';
 import { GlassButton, GradientButton } from '@/components/ui/glass-button';
 import { useToast } from '@/components/ui/use-toast';
-import PageHeader from '@/components/ui/PageHeader';
+import { ResponsiveGrid } from '@/components/ui/modern-grid';
 import { useState } from 'react';
+import PageHeader from '@/components/ui/PageHeader';
 
 // Define a simplified contact interface for preview purposes (matching use-group.ts)
 interface ContactPreview {
@@ -27,6 +28,7 @@ interface ContactPreview {
   email?: string;
   phone_number?: string;
   phone_numbers?: PhoneNumber[];
+  gender?: string | null;
   name?: string; // For backward compatibility
 }
 
@@ -64,7 +66,7 @@ const mapToContact = (contact: ContactPreview): Contact => {
     id: contact.id,
     first_name: contact.first_name || '',
     last_name: contact.last_name || '',
-    gender: 'not_specified', // Default value since gender is not in ContactData
+    gender: contact.gender || null, // Extract gender from ContactPreview
     position: null, // Not in ContactData
     company: null, // Not in ContactData
     street: null, // Not in ContactData
@@ -378,7 +380,15 @@ const GroupDetail = () => {
             {/* Contacts List */}
             <div className="p-6">
               {group.contacts.length > 0 ? (
-                <div className="grid gap-3">
+                <ResponsiveGrid
+                  breakpoints={{
+                    sm: 2,
+                    md: 3,
+                    lg: 4,
+                    xl: 5
+                  }}
+                  className="w-full"
+                >
                   {group.contacts.map((contact, index) => (
                     <motion.div
                       key={contact.id}
@@ -394,17 +404,18 @@ const GroupDetail = () => {
                         y: -2,
                         transition: { duration: 0.2 }
                       }}
-                      className="group relative bg-gradient-to-br from-white/10 to-white/5 dark:from-gray-800/40 dark:to-gray-900/20 rounded-2xl p-3 hover:from-white/15 hover:to-white/8 dark:hover:from-gray-800/60 dark:hover:to-gray-900/40 transition-all duration-300 border border-white/20 dark:border-gray-700/40 hover:border-white/30 dark:hover:border-gray-600/60 hover:shadow-lg hover:shadow-black/5 dark:hover:shadow-white/5"
+                      className="group relative"
                     >
                       <ContactItem
                         contact={mapToContact(contact)}
                         onContactDeleted={handleContactDeleted}
                         onContactEdited={handleContactEdited}
+                        displayMode="grid"
                         className="hover:bg-transparent"
                       />
                     </motion.div>
                   ))}
-                </div>
+                </ResponsiveGrid>
               ) : (
                 <div className="text-center py-16">
                   <motion.div

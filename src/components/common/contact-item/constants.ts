@@ -18,6 +18,8 @@ export const contactItemConstants = {
       unselected: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)'
     },
     padding: designTokens.spacing[4],
+    height: '180px', // ارتفاع بیشتر برای ساختار سه ردیفی
+    aspectRatio: '4/3', // نسبت تصویر برای کارت های grid
     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
     pointerEvents: {
       disabled: 'none',
@@ -40,9 +42,9 @@ export const contactItemConstants = {
     }
   },
   layout: {
-    container: 'relative z-10 flex items-center justify-between',
-    content: 'flex items-center gap-6 flex-grow min-w-0',
-    info: 'min-w-0 flex-grow transition-all duration-300 group-hover:translate-x-1'
+    container: 'relative z-10 flex flex-col h-full justify-center items-center',
+    content: 'flex flex-col items-center justify-center gap-2 flex-grow min-w-0',
+    info: 'min-w-0 flex-grow transition-all duration-300 text-center'
   },
   typography: {
     name: 'font-semibold text-base mb-1.5 truncate group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors duration-300',
