@@ -204,9 +204,23 @@
   "groups": {
     "title": "مدیریت گروه‌ها",
     "description": "ایجاد، ویرایش و حذف گروه‌های مخاطبین",
+    "select_group": "انتخاب گروه",
+    "select_group_for_contacts": "انتخاب گروه برای {{count}} مخاطب",
+    "no_groups_found": "هیچ گروهی یافت نشد",
+    "no_groups_found_desc": "شما هنوز گروهی ایجاد نکرده‌اید. برای شروع یک گروه جدید بسازید.",
+    "contact_count": "{{count}} مخاطب",
+    "contacts_added_to_group": "{{count}} مخاطب به گروه {{groupName}} اضافه شد",
+    "selected_group": "گروه انتخاب شده",
     "add_new": "افزودن گروه جدید",
     "add_group": "افزودن گروه",
+    "add_to_group": "افزودن به گروه",
+    "selected_contacts_count": "{{count}} مخاطب انتخاب شده",
+    "deselect_all": "حذف انتخاب‌ها",
+    "deselect_all_contacts": "حذف تمام انتخاب‌ها",
+    "delete_selected": "حذف مخاطبان انتخاب شده",
+    "delete_selected_contacts": "حذف مخاطبان انتخاب شده",
     "all_groups": "همه گروه‌ها",
+    "ungrouped": "بدون گروه",
     "existing_groups": "گروه‌های موجود",
     "not_found": "گروه مورد نظر یافت نشد",
     "not_found_description": "گروهی که به دنبال آن هستید وجود ندارد یا حذف شده است.",
@@ -214,6 +228,7 @@
     "groups_list_description": "لیست تمام گروه‌های شما",
     "login_required_title": "ورود الزامی است",
     "login_required": "برای ایجاد گروه جدید باید وارد حساب کاربری خود شوید.",
+    "some_contacts_failed": "{{count}} مخاطب نتوانست به گروه اضافه شود",
     "create_new_group_desc": "یک گروه جدید بسازید",
     "color_picker": "انتخاب رنگ",
     "smart_suggestions": "پیشنهاد هوشمند",
@@ -457,7 +472,8 @@
     "loading": {
       "title": "در حال بارگذاری...",
       "please_wait": "لطفاً صبر کنید",
-      "contact_details": "در حال بارگذاری جزئیات مخاطب..."
+      "contact_details": "در حال بارگذاری جزئیات مخاطب...",
+      "groups": "در حال بارگذاری گروه‌ها..."
     },
     "count": "تعداد",
     "export_csv": "خروجی به CSV",
@@ -474,15 +490,26 @@
     "confirm_clear_storage": "آیا از پاک کردن تمام اطلاعات ذخیره شده محلی اطمینان دارید؟ این کار شما را از سیستم خارج خواهد کرد.",
     "clear_storage": "پاک کردن حافظه محلی",
     "loading_page": "در حال بارگذاری صفحه...",
+    "loading_groups": "در حال بارگذاری گروه‌ها...",
     "created_on": "تاریخ ایجاد",
     "field": "فیلد",
     "auth_required": "برای دسترسی به این صفحه باید وارد شوید",
     "success": "عملیات با موفقیت انجام شد",
     "first_page": "صفحه اول",
     "last_page": "صفحه آخر",
-    "previous": "قبلی",
-    "next": "بعدی",
-    "showing_page": "نمایش {{current}} تا {{last}} از {{total}} مورد",
+    "pagination": {
+      "items_per_page": {
+        "10": "۱۰",
+        "20": "۲۰",
+        "50": "۵۰",
+        "100": "۱۰۰"
+      },
+      "per_page": "در صفحه",
+      "page_info": "صفحه {{current}} از {{total}}",
+      "previous": "قبلی",
+      "next": "بعدی",
+      "showing_page": "نمایش {{current}} تا {{last}} از {{total}} مورد"
+    },
     "search": "جستجو...",
     "advanced_settings": "تنظیمات پیشرفته",
     "hide_advanced": "مخفی کردن پیشرفته",
@@ -490,6 +517,8 @@
     "remove": "حذف",
     "refresh": "بارگذاری مجدد",
     "edit": "ویرایش",
+    "edit_contact": "ویرایش مخاطب",
+    "delete_contact": "حذف مخاطب",
     "discard": "حذف",
     "expand": "مشاهده جزئیات",
     "collapse": "بستن",
@@ -557,7 +586,7 @@
     "unexpected_error": "خطای غیرمنتظره‌ای رخ داده است. لطفاً دوباره تلاش کنید.",
     
     "reload_page": "بارگذاری مجدد صفحه",
-    "contacts": "مخاطبین",
+    "contacts_list": "مخاطبین",
     "delete": "حذف",
     "phone_numbers": "شماره‌های تلفن",
     "email_addresses": "آدرس‌های ایمیل",
@@ -604,6 +633,13 @@
       "generic": "خطایی رخ داد",
       "color_load_failed": "خطا در بارگذاری رنگ‌ها",
       "auth_required": "برای انجام این عملیات باید وارد سیستم شوید.",
+      "contact_verification_error": "خطا در تأیید اطلاعات مخاطبین",
+      "some_contacts_not_found": "برخی از مخاطبین یافت نشدند",
+      "group_not_found": "گروه مورد نظر یافت نشد",
+      "assignment_check_error": "خطا در بررسی تخصیص‌های گروهی",
+      "assignment_insert_error": "خطا در ثبت تخصیص‌های گروهی",
+      "assignment_delete_error": "خطا در حذف تخصیص‌های گروهی",
+      "group_operation_failed": "عملیات گروهی با خطا مواجه شد",
       "no_active_session": "هیچ نشست فعالی یافت نشد. کاربر باید وارد سیستم شده باشد.",
       "no_active_session_list_gemini": "هیچ نشست فعالی یافت نشد. کاربر باید وارد سیستم شده باشد تا مدل‌های Gemini را لیست کند.",
       "no_active_session_test_gemini": "هیچ نشست فعالی یافت نشد. کاربر باید وارد سیستم شده باشد تا اتصال Gemini را تست کند.",
@@ -817,7 +853,7 @@
       "visibility_desc": "کنترل اینکه چه کسانی می‌توانند اطلاعات پروفایل شما را ببینند",
       "public": "عمومی",
       "private": "خصوصی",
-      "contacts": "فقط مخاطبین",
+      "contacts_only": "فقط مخاطبین",
       "two_factor": "احراز هویت دو مرحله‌ای",
       "two_factor_desc": "افزودن لایه امنیتی اضافی به حساب شما"
     },
@@ -1201,6 +1237,7 @@
   },
   "errors": {
     "max_retries_exceeded": "حداکثر تعداد تلاش‌ها به پایان رسید. لطفاً دوباره امتحان کنید.",
+    "group_assignment_failed": "خطا در انتساب مخاطبین به گروه",
     "color_load_failed": "خطا در بارگذاری رنگ‌ها",
     "invalid_phone_format": "فرمت شماره تلفن نامعتبر است. لطفاً شماره را به درستی وارد کنید.",
     "invalid_image_url": "آدرس تصویر نامعتبر است",
@@ -1367,8 +1404,13 @@
       "deleted": "حذف شد"
     }
   },
-  "contact_list": {
-    "contact_deleted_success": "مخاطب با موفقیت حذف شد.",
+  "contacts": {
+    "search_placeholder": "جستجوی مخاطبین...",
+    "total_contacts": "{{count}} مخاطب",
+    "no_contacts_found": "هیچ مخاطبی یافت نشد",
+    "add_new_contact": "افزودن مخاطب جدید",
+    "add_contact_description": "اطلاعات و جزئیات مخاطب جدید را وارد کنید",
+    "contact_deleted_success": "مخاطب با موفقیت حذف شد",
     "error_deleting_contact": "خطا در حذف مخاطب",
     "contacts_loaded_success": "مخاطبین با موفقیت بارگذاری شدند",
     "error_loading_contacts": "خطا در بارگذاری مخاطبین",
@@ -1378,6 +1420,9 @@
     "no_phone": "بدون شماره",
     "male": "مرد",
     "female": "زن",
+    "management": "مدیریت مخاطبین",
+    "management_description": "ثبت، جستجو و سازماندهی مخاطبین شما",
+    "bulk_delete_message": "حذف {{count}} مخاطب انتخابی",
     "unknown": "نامشخص",
     "no_name": "بدون نام",
     "no_data_available": "داده‌ای برای نمایش وجود ندارد",
@@ -1401,6 +1446,8 @@
     "create": "ایجاد",
     "close": "بستن",
     "add_new_group": "افزودن گروه جدید",
+    "multi_select": "انتخاب چندتایی",
+    "exit_multi_select": "خروج از حالت انتخاب چندتایی",
     "add_group": "افزودن گروه",
     "back_to_contacts": "بازگشت به مخاطبین",
     "back_to_contacts_list": "بازگشت به لیست مخاطبین",
@@ -1772,10 +1819,7 @@
     "category_accessibility": "دسترس‌پذیری",
     "category_search": "جستجو"
   },
-  "contacts": {
-    "add_new_contact": "افزودن مخاطب جدید",
-    "add_contact_description": "اطلاعات و جزئیات مخاطب جدید را وارد کنید",
-    "contact_deleted_success": "مخاطب با موفقیت حذف شد",
+  "contacts_section": {
     "contact_updated_success": "مخاطب با موفقیت به‌روزرسانی شد",
     "management": "مدیریت مخاطبین",
     "management_description": "ثبت، جستجو و سازماندهی مخاطبین شما",
@@ -2352,9 +2396,7 @@
       "all_colors": "همه رنگ‌ها",
       "filter_by_color": "فیلتر بر اساس رنگ"
     },
-    "contacts": {
-      "management": "مدیریت مخاطبین",
-      "management_description": "ثبت، جستجو و سازماندهی مخاطبین شما",
+    "contacts_management": {
       "company_placeholder": "فیلتر بر اساس شرکت",
       "search_placeholder": "جستجوی مخاطبین..."
     }

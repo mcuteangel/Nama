@@ -21,7 +21,7 @@ export const ContactsMultiSelectActions: React.FC<ContactsMultiSelectActionsProp
     <div className={`flex items-center justify-between gap-4 ${className || ''}`}>
       <div className="flex items-center gap-4">
         <span className="text-sm font-medium" style={{ color: designTokens.colors.gray[700] }}>
-          {selectedContactsCount} مخاطب انتخاب شده
+          {t('groups.selected_contacts_count', { count: selectedContactsCount })}
         </span>
         <ModernTooltip>
           <ModernTooltipTrigger asChild>
@@ -36,12 +36,12 @@ export const ContactsMultiSelectActions: React.FC<ContactsMultiSelectActionsProp
                 transition: `all ${designTokens.transitions.duration.normal} ${designTokens.transitions.easing.easeOut}`
               }}
             >
-              <Square size={14} />
-              <span className="hidden sm:inline">لغو انتخاب همه</span>
+              <Square size={16} />
+              <span className="hidden sm:inline">{t('groups.deselect_all')}</span>
             </GlassButton>
           </ModernTooltipTrigger>
           <ModernTooltipContent>
-            <p>لغو انتخاب همه مخاطبین</p>
+            <p>{t('groups.deselect_all_contacts')}</p>
           </ModernTooltipContent>
         </ModernTooltip>
       </div>
@@ -61,11 +61,11 @@ export const ContactsMultiSelectActions: React.FC<ContactsMultiSelectActionsProp
               }}
             >
               <Trash2 size={16} />
-              <span className="hidden sm:inline">حذف</span>
+              <span className="hidden sm:inline">{t('groups.delete_selected')}</span>
             </GlassButton>
           </ModernTooltipTrigger>
           <ModernTooltipContent>
-            <p>حذف مخاطبین انتخابی</p>
+            <p>{t('groups.delete_selected_contacts')}</p>
           </ModernTooltipContent>
         </ModernTooltip>
 
@@ -84,11 +84,11 @@ export const ContactsMultiSelectActions: React.FC<ContactsMultiSelectActionsProp
               }}
             >
               <Users size={16} />
-              <span className="hidden sm:inline">افزودن به گروه</span>
+              <span className="hidden sm:inline">{t('groups.add_to_group')}</span>
             </GlassButton>
           </ModernTooltipTrigger>
           <ModernTooltipContent>
-            <p>افزودن به گروه</p>
+            <p>{t('groups.add_to_group')}</p>
           </ModernTooltipContent>
         </ModernTooltip>
       </div>

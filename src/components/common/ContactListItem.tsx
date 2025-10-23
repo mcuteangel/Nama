@@ -42,7 +42,7 @@ export const ContactListItem = React.memo<ContactListItemProps>(({
   const [isDialogClosing, setIsDialogClosing] = useState(false);
 
   const onSuccessDelete = useCallback(() => {
-    ErrorManager.notifyUser(t('contact_list.contact_deleted_success'), 'success');
+    ErrorManager.notifyUser(t('contacts.contact_deleted_success'), 'success');
     onContactDeleted(contact.id);
   }, [contact.id, onContactDeleted, t]);
 
@@ -57,7 +57,7 @@ export const ContactListItem = React.memo<ContactListItemProps>(({
     maxRetries: 3,
     retryDelay: 1000,
     showToast: true,
-    customErrorMessage: t('contact_list.error_deleting_contact'),
+    customErrorMessage: t('contacts.error_deleting_contact'),
     onSuccess: onSuccessDelete,
     onError: onErrorDelete,
   });
@@ -107,7 +107,7 @@ export const ContactListItem = React.memo<ContactListItemProps>(({
   const displayPhoneNumber = useMemo(() => {
     return contact.phone_numbers.length > 0
       ? contact.phone_numbers[0].phone_number
-      : t('contact_list.no_phone');
+      : t('contacts.no_phone');
   }, [contact.phone_numbers, t]);
 
   const displayEmail = useMemo(() => {
@@ -145,11 +145,11 @@ export const ContactListItem = React.memo<ContactListItemProps>(({
 
   const displayGender = useMemo(() => {
     if (contact.gender === 'male') {
-      return { icon: '♂', label: t('contact_list.male') };
+      return { icon: '♂', label: t('contacts.male') };
     } else if (contact.gender === 'female') {
-      return { icon: '♀', label: t('contact_list.female') };
+      return { icon: '♀', label: t('contacts.female') };
     } else {
-      return { icon: '⚲', label: t('contact_list.unknown') };
+      return { icon: '⚲', label: t('contacts.unknown') };
     }
   }, [contact.gender, t]);
 
@@ -160,7 +160,7 @@ export const ContactListItem = React.memo<ContactListItemProps>(({
   }, [contact?.first_name, contact?.last_name]);
 
   const fullName = useMemo(() => {
-    return `${contact?.first_name || ''} ${contact?.last_name || ''}`.trim() || t('contact_list.no_name');
+    return `${contact?.first_name || ''} ${contact?.last_name || ''}`.trim() || t('contacts.no_name');
   }, [contact?.first_name, contact?.last_name, t]);
 
   const listItemContent = useMemo(() => (
@@ -367,7 +367,7 @@ export const ContactListItem = React.memo<ContactListItemProps>(({
               backdropFilter: 'blur(10px)'
             }}
             onClick={handleEditClick}
-            aria-label="Edit contact"
+            aria-label={t('common.edit_contact')}
           >
             <Edit size={24} style={{ color: designTokens.colors.primary[700] }} />
           </GlassButton>
@@ -389,7 +389,7 @@ export const ContactListItem = React.memo<ContactListItemProps>(({
               setIsDeleteDialogOpen(true);
             }}
             disabled={isDeleting || isDialogClosing}
-            aria-label="Delete contact"
+            aria-label={t('common.delete_contact')}
           >
             {isDeleting ? (
               <LoadingSpinner size={24} />
@@ -416,8 +416,8 @@ export const ContactListItem = React.memo<ContactListItemProps>(({
               }
             }}
             onConfirm={handleDelete}
-            title={t('contact_list.confirm_delete_title')}
-            description={t('contact_list.confirm_delete_description')}
+            title={t('contacts.confirm_delete_title')}
+            description={t('contacts.confirm_delete_description')}
             isDeleting={isDeleting}
           />
         </div>

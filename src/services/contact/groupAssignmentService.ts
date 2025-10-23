@@ -28,14 +28,14 @@ export class GroupAssignmentService {
       if (contactError) {
         return {
           success: false,
-          error: contactError.message || i18n.t('errors.contact_verification_error')
+          error: contactError.message || i18n.t('common.errors.contact_verification_error')
         };
       }
 
       if (!existingContacts || existingContacts.length !== contactIds.length) {
         return {
           success: false,
-          error: i18n.t('errors.some_contacts_not_found')
+          error: i18n.t('common.errors.some_contacts_not_found')
         };
       }
 
@@ -50,7 +50,7 @@ export class GroupAssignmentService {
       if (groupError || !group) {
         return {
           success: false,
-          error: i18n.t('errors.group_not_found')
+          error: i18n.t('common.errors.group_not_found')
         };
       }
 
@@ -64,7 +64,7 @@ export class GroupAssignmentService {
       if (assignmentError) {
         return {
           success: false,
-          error: assignmentError.message || i18n.t('errors.assignment_check_error')
+          error: assignmentError.message || i18n.t('common.errors.assignment_check_error')
         };
       }
 
@@ -86,7 +86,7 @@ export class GroupAssignmentService {
         if (insertError) {
           return {
             success: false,
-            error: insertError.message || i18n.t('errors.assignment_insert_error')
+            error: insertError.message || i18n.t('common.errors.assignment_insert_error')
           };
         }
       }
@@ -128,7 +128,7 @@ export class GroupAssignmentService {
       if (error) {
         return {
           success: false,
-          error: error.message || i18n.t('errors.assignment_delete_error')
+          error: error.message || i18n.t('common.errors.assignment_delete_error')
         };
       }
 

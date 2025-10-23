@@ -1,7 +1,6 @@
 import React from 'react';
 import ContactList from '@/components/ContactList';
 import SuspenseWrapper from '@/components/common/SuspenseWrapper';
-import { designTokens } from '@/lib/design-tokens';
 import type { ContactsListContainerProps } from '@/types/contact-page.types';
 
 export const ContactsListContainer: React.FC<ContactsListContainerProps> = ({

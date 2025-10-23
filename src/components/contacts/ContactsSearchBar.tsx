@@ -11,16 +11,12 @@ import type { ContactsSearchBarProps } from '@/types/contact-page.types';
 export const ContactsSearchBar: React.FC<ContactsSearchBarProps> = ({
   searchTerm,
   multiSelectMode,
-  selectedContactsCount,
   isExporting,
   session,
   onSearchChange,
   onToggleMultiSelect,
-  onDeselectAll,
   onAddContact,
   onExport,
-  onBulkDelete,
-  onBulkGroup,
   className,
 }) => {
   const { t } = useTranslation();
@@ -32,7 +28,7 @@ export const ContactsSearchBar: React.FC<ContactsSearchBarProps> = ({
         <div className="relative flex-grow max-w-md">
           <ModernInput
             type="text"
-            placeholder={t('pages.contacts.search_placeholder')}
+            placeholder={t('contacts.search_placeholder')}
             className="w-full pl-12 pr-4 py-3 rounded-xl focus:ring-4 focus:ring-blue-500/30"
             style={{
               background: 'rgba(255,255,255,0.1)',

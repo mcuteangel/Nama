@@ -3,7 +3,6 @@ import { ModernLoader } from "@/components/ui/modern-loader";
 import { ModernGrid } from "@/components/ui/modern-grid";
 import { Users } from "lucide-react";
 import { ContactListService } from "@/services/contact-list-service";
-import { invalidateCache } from "@/utils/cache-helpers";
 import { useSession } from "@/integrations/supabase/auth";
 import { useErrorHandler } from "@/hooks/use-error-handler";
 import { ErrorManager } from "@/lib/error-manager";
@@ -58,15 +57,11 @@ const ContactList: React.FC<ContactListProps> = ({
   sortOption,
   currentPage,
   itemsPerPage,
-  totalItems,
-  onPaginationChange,
   onTotalChange,
   displayMode = 'grid',
   multiSelect = false,
   selectedContacts,
-  onSelectContact,
-  onSelectAll
-}) => {
+  onSelectContact}) => {
   const { session, isLoading: isSessionLoading } = useSession();
   const { t } = useTranslation();
   const isMobile = useIsMobile();
@@ -79,7 +74,7 @@ const ContactList: React.FC<ContactListProps> = ({
     if (result.total !== undefined) {
       onTotalChange(result.total);
     }
-    ErrorManager.notifyUser(t('contact_list.contacts_loaded_success'), 'success');
+    ErrorManager.notifyUser(t('contacts.contacts_loaded_success'), 'success');
   }, [t, onTotalChange]);
 
   const onErrorContacts = useCallback((err: Error) => {
@@ -93,15 +88,12 @@ const ContactList: React.FC<ContactListProps> = ({
     maxRetries: 3,
     retryDelay: 1000,
     showToast: false,
-    customErrorMessage: t('contact_list.error_loading_contacts' ),
+    customErrorMessage: t('contacts.error_loading_contacts'),
     onSuccess: onSuccessContacts,
     onError: onErrorContacts,
   });
 
   // Memoize the filter dependencies to prevent unnecessary re-renders
-  const filterDeps = useMemo(() => ({
-    searchTerm, selectedGroup, companyFilter, sortOption, currentPage, itemsPerPage, displayMode
-  }), [searchTerm, selectedGroup, companyFilter, sortOption, currentPage, itemsPerPage, displayMode]);
 
   const fetchContacts = useCallback(async () => {
     if (isSessionLoading || !session?.user) {

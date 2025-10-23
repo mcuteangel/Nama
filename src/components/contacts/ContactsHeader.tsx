@@ -8,8 +8,8 @@ export const ContactsHeader: React.FC<ContactsHeaderProps> = ({ className }) => 
 
   return (
     <PageHeader
-      title={t('pages.contacts.management')}
-      description={t('pages.contacts.management_description')}
+      title={t('contacts.management')}
+      description={t('contacts.management_description')}
       showBackButton={false}
       className={className}
     />

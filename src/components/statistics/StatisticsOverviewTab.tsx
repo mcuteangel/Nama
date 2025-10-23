@@ -56,7 +56,7 @@ const StatisticsOverviewTab: React.FC<StatisticsOverviewTabProps> = ({
         <Card className="relative overflow-hidden bg-gradient-to-br from-red-50/50 via-white/80 to-red-50/30 backdrop-blur-sm border-0 shadow-xl rounded-2xl">
           <CardContent className="flex items-center justify-center h-[300px] p-4">
             <div className="text-center text-slate-500">
-              <p className="text-sm font-medium">{t('contact_list.error_loading_gender_statistics')}</p>
+              <p className="text-sm font-medium">{t('contacts.error_loading_gender_statistics')}</p>
               <p className="text-xs mt-1">{error}</p>
             </div>
           </CardContent>
@@ -64,8 +64,8 @@ const StatisticsOverviewTab: React.FC<StatisticsOverviewTabProps> = ({
         <Card className="relative overflow-hidden bg-gradient-to-br from-red-50/50 via-white/80 to-red-50/30 backdrop-blur-sm border-0 shadow-xl rounded-2xl">
           <CardContent className="flex items-center justify-center h-[300px] p-4">
             <div className="text-center text-slate-500">
-              <p className="text-sm font-medium">{t('contact_list.error_loading_contact_methods')}</p>
-              <p className="text-xs mt-1">{t('contact_list.no_data_available')}</p>
+              <p className="text-sm font-medium">{t('contacts.error_loading_contact_methods')}</p>
+              <p className="text-xs mt-1">{t('contacts.no_data_available')}</p>
             </div>
           </CardContent>
         </Card>

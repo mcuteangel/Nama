@@ -52,7 +52,7 @@ export const ContactsFilters: React.FC<ContactsFiltersProps> = ({
                   }}
                 >
                   <ModernSelectItem value="all">{t('groups.all_groups')}</ModernSelectItem>
-                  <ModernSelectItem value="ungrouped">{t('groups.ungrouped') || 'بدون گروه'}</ModernSelectItem>
+                  <ModernSelectItem value="ungrouped">{t('groups.ungrouped')}</ModernSelectItem>
                   {groups.map((group) => (
                     <ModernSelectItem key={group.id} value={group.id}>
                       {group.name}
@@ -73,7 +73,7 @@ export const ContactsFilters: React.FC<ContactsFiltersProps> = ({
             <div className="flex items-center gap-2">
               <ModernInput
                 type="text"
-                placeholder={t('pages.contacts.company_placeholder')}
+                placeholder={t('contact_form.company')}
                 className="w-full sm:w-48 rounded-xl focus:ring-4 focus:ring-blue-500/30 text-gray-800 dark:text-gray-100 rtl:text-right ltr:text-left"
                 style={{
                   background: 'rgba(255,255,255,0.1)',

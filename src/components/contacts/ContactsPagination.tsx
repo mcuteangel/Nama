@@ -3,6 +3,7 @@ import { ModernSelect, ModernSelectContent, ModernSelectItem, ModernSelectTrigge
 import { GlassButton } from '@/components/ui/glass-button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { designTokens } from '@/lib/design-tokens';
+import { useTranslation } from 'react-i18next';
 import type { ContactsPaginationProps } from '@/types/contact-page.types';
 
 export const ContactsPagination: React.FC<ContactsPaginationProps> = ({
@@ -14,8 +15,10 @@ export const ContactsPagination: React.FC<ContactsPaginationProps> = ({
   onItemsPerPageChange,
   className,
 }) => {
+  const { t } = useTranslation();
+  
   if (totalItems === 0) return null;
-
+  
   const totalPages = Math.ceil(totalItems / itemsPerPage);
 
   return (
@@ -33,14 +36,14 @@ export const ContactsPagination: React.FC<ContactsPaginationProps> = ({
             <ModernSelectValue />
           </ModernSelectTrigger>
           <ModernSelectContent className="rtl:text-left ltr:text-right rtl:right-0 ltr:left-0 w-20" position="popper">
-            <ModernSelectItem value="10">۱۰</ModernSelectItem>
-            <ModernSelectItem value="20">۲۰</ModernSelectItem>
-            <ModernSelectItem value="50">۵۰</ModernSelectItem>
-            <ModernSelectItem value="100">۱۰۰</ModernSelectItem>
+            <ModernSelectItem value="10">{t('common.pagination.items_per_page.10')}</ModernSelectItem>
+            <ModernSelectItem value="20">{t('common.pagination.items_per_page.20')}</ModernSelectItem>
+            <ModernSelectItem value="50">{t('common.pagination.items_per_page.50')}</ModernSelectItem>
+            <ModernSelectItem value="100">{t('common.pagination.items_per_page.100')}</ModernSelectItem>
           </ModernSelectContent>
         </ModernSelect>
         <span className="text-xs text-gray-600 dark:text-gray-400">
-          در صفحه
+          {t('common.pagination.per_page')}
         </span>
       </div>
 
@@ -101,7 +104,10 @@ export const ContactsPagination: React.FC<ContactsPaginationProps> = ({
 
       {/* Page info */}
       <div className="text-xs text-gray-600 dark:text-gray-400">
-        صفحه {currentPage} از {Math.max(1, totalPages)}
+        {t('common.pagination.page_info', {
+          current: currentPage,
+          total: Math.max(1, totalPages)
+        })}
       </div>
     </div>
   );

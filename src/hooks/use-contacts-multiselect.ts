@@ -53,7 +53,7 @@ export const useContactsMultiSelect = ({
     if (selectedContacts.size === 0) return;
 
     // TODO: Implement bulk delete with confirmation dialog
-    toast.info(`حذف ${selectedContacts.size} مخاطب انتخابی`);
+    toast.info(t('contacts.bulk_delete_message', { count: selectedContacts.size }));
 
     // For now, just clear selection
     setSelectedContacts(new Set());

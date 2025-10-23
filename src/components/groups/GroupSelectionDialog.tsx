@@ -130,7 +130,7 @@ const GroupSelectionDialog: React.FC<GroupSelectionDialogProps> = ({
                               {group.name}
                             </div>
                             <div className="text-xs text-gray-500 dark:text-gray-400">
-                              {group.contact_count || 0} مخاطب
+                              {t('groups.contact_count', { count: group.contact_count || 0 })}
                             </div>
                           </div>
                         </div>
