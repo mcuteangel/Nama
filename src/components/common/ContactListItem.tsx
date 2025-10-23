@@ -11,7 +11,7 @@ import LoadingSpinner from './LoadingSpinner';
 import TouchGestureHandler from '../TouchGestureHandler';
 import { GestureCallbacks } from '../TouchGestureHandler.types';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { Contact } from './ContactItem';
+import { Contact } from '@/types/contact.types';
 import { designTokens } from '@/lib/design-tokens';
 import StandardizedDeleteDialog from './StandardizedDeleteDialog';
 

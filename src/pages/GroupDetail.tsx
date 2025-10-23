@@ -2,9 +2,9 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useGroup } from '@/hooks/use-group';
 import { useGroups } from '@/hooks/use-groups';
 import LoadingMessage from '@/components/common/LoadingMessage';
-import ContactItem, { Contact } from '@/components/common/ContactItem';
+import ContactItem from '@/components/common/ContactItem';
 import StandardizedDeleteDialog from '@/components/common/StandardizedDeleteDialog';
-import { PhoneNumber } from '@/types/contact.types';
+import { PhoneNumber, Contact } from '@/types/contact.types';
 import { motion } from 'framer-motion';
 import { Users, Calendar, Edit, Trash2, Palette } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
@@ -73,6 +73,8 @@ const mapToContact = (contact: ContactPreview): Contact => {
     zip_code: null, // Not in ContactData
     country: null, // Not in ContactData
     notes: null, // Not in ContactData
+    created_at: new Date().toISOString(), // Default value
+    updated_at: new Date().toISOString(), // Default value
     phone_numbers: phoneNumbers.filter(Boolean).map((p: PhoneNumber) => ({
       id: p.id || `temp-${Math.random().toString(36).substr(2, 9)}`,
       phone_number: p.phone_number || '',
@@ -80,7 +82,9 @@ const mapToContact = (contact: ContactPreview): Contact => {
       extension: p.extension || null
     })),
     email_addresses: [],
+    social_links: [],
     contact_groups: [],
+    custom_fields: [],
     avatar_url: contact.avatar_url || null
   };
 

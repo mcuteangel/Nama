@@ -7,10 +7,11 @@ import { useSession } from "@/integrations/supabase/auth";
 import { useErrorHandler } from "@/hooks/use-error-handler";
 import { ErrorManager } from "@/lib/error-manager";
 import EmptyState from './common/EmptyState';
-import ContactItem, { Contact } from './common/ContactItem';
+import ContactItem from './common/ContactItem';
 import ContactListItem from './common/ContactListItem';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useTranslation } from 'react-i18next';
+import { Contact } from '@/types/contact.types';
 
 /**
  * Props for the ContactList component

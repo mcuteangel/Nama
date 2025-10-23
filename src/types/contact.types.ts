@@ -1,4 +1,9 @@
 // انواع داده‌های مرتبط با مخاطبین
+export interface GenderDisplay {
+  icon: string;
+  color: string;
+}
+
 export interface PhoneNumber {
   id: string;
   phone_number: string;
