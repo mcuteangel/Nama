@@ -357,7 +357,9 @@
     "failed_save_learned_name": "Failed to save learned name",
     "failed_save_gender_preferences": "Failed to save gender preferences",
     "failed_load_persian_names": "Failed to load Persian names data",
-    "failed_load_persian_names_with_status": "Failed to load Persian names. Status: {{status}}"
+    "failed_load_persian_names_with_status": "Failed to load Persian names. Status: {{status}}",
+    "database_fetch_error": "Error fetching data from database",
+    "contact_list_processing_error": "Error processing contact list"
   },
   "actions": {
     "add_new_group": "Add New Group",
@@ -413,7 +415,10 @@
     "avatar_removed": "Avatar removed successfully",
     "connection_test_start": "Starting connection test...",
     "connection_success": "✅ Successful connection - {{count}} users found",
-    "connection_error": "❌ Error: {{error}}"
+    "connection_error": "❌ Error: {{error}}",
+    "group_filter_log": "Group filter {{group}}: {{before}} -> {{after}} contacts",
+    "ungrouped_filter_log": "Ungrouped filter: {{before}} -> {{after}} contacts",
+    "search_match_found_log": "Search match found"
   },
   "loading_messages": {
     "uploading_image": "Uploading image...",
@@ -552,7 +557,9 @@
     "error": "Error",
     "success": "Success",
     "skip_to_content": "Skip to main content",
-    "skip_to_navigation": "Skip to navigation"
+    "skip_to_navigation": "Skip to navigation",
+    "edit_contact": "Edit contact",
+    "delete_contact": "Delete contact"
   },
   "theme_options": {
     "light": "Light",
@@ -669,7 +676,10 @@
     "add_new_contact": "Add New Contact",
     "add_contact_description": "Add new contact information and details",
     "contact_deleted_success": "Contact removed from group successfully",
-    "contact_updated_success": "Contact updated successfully"
+    "contact_updated_success": "Contact updated successfully",
+    "contact_created_success": "Contact created successfully",
+    "contact_update_error": "Error updating contact",
+    "contact_create_error": "Error creating contact"
   },
   "custom_field_management": {
     "title": "Custom Field Management",

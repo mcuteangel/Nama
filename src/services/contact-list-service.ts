@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import i18n from '@/integrations/i18n';
 
 // Define proper types for the contact data as returned by Supabase
 interface PhoneNumber {
@@ -179,8 +180,8 @@ export const ContactListService = {
       const { data, error } = await query;
 
       if (error) {
-        console.error('خطای پایگاه داده:', error);
-        return { data: null, error: 'خطا در دریافت اطلاعات از پایگاه داده', total: 0 };
+        console.error(i18n.t('errors.database_fetch_error'), error);
+        return { data: null, error: i18n.t('errors.database_fetch_error'), total: 0 };
       }
 
       // اعمال فیلتر گروه در صورت انتخاب (پس از دریافت داده‌ها برای دقت بیشتر)
@@ -191,14 +192,21 @@ export const ContactListService = {
           contact.contact_groups?.some(group => group.group_id === selectedGroup)
         );
         const afterFilter = filteredData.length;
-        console.log(`فیلتر گروه ${selectedGroup}: ${beforeFilter} -> ${afterFilter} مخاطب`);
+        console.log(i18n.t('system_messages.group_filter_log', {
+          group: selectedGroup,
+          before: beforeFilter,
+          after: afterFilter
+        }));
       } else if (selectedGroup === 'ungrouped') {
         const beforeFilter = filteredData.length;
         filteredData = filteredData.filter(contact =>
           !contact.contact_groups || contact.contact_groups.length === 0
         );
         const afterFilter = filteredData.length;
-        console.log(`فیلتر بدون گروه: ${beforeFilter} -> ${afterFilter} مخاطب`);
+        console.log(i18n.t('system_messages.ungrouped_filter_log', {
+          before: beforeFilter,
+          after: afterFilter
+        }));
       }
       
       const trimmedSearch = searchTerm.trim();
@@ -229,7 +237,7 @@ export const ContactListService = {
           
           // لاگ برای دیباگ
           if (isMatch) {
-            console.log('مورد مطابقت یافت شد:', {
+            console.log(i18n.t('system_messages.search_match_found_log'), {
               id: contact.id,
               name: `${contact.first_name} ${contact.last_name}`,
               company: contact.company,
@@ -257,10 +265,10 @@ export const ContactListService = {
       
       return { data: paginatedData, error: null, total: sortedData.length };
     } catch (error) {
-      console.error('خطا در پردازش لیست مخاطبین:', error);
+      console.error(i18n.t('errors.contact_list_processing_error'), error);
       return { 
         data: null, 
-        error: 'خطا در پردازش لیست مخاطبین',
+        error: i18n.t('errors.contact_list_processing_error'),
         total: 0
       };
     }

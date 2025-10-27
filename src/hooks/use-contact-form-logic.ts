@@ -1,6 +1,7 @@
 import { UseFormReturn } from "react-hook-form";
 import { Session } from "@supabase/supabase-js";
 import { NavigateFunction } from "react-router-dom";
+import { useTranslation } from 'react-i18next';
 import { CustomFieldTemplate } from "@/domain/schemas/custom-field-template";
 import { ContactFormValues } from "../types/contact.ts";
 import { invalidateCache, invalidateAllContactCaches } from "@/utils/cache-helpers";
@@ -17,12 +18,14 @@ export const useContactFormLogic = (
   form: UseFormReturn<ContactFormValues>,
   availableTemplates: CustomFieldTemplate[] = []
 ) => {
+  const { t } = useTranslation();
+
   // Use a ref to prevent multiple submissions
   const isSubmittingRef = useRef(false);
 
   const onSuccessCallback = useCallback(() => {
     console.log("useContactFormLogic: onSuccessCallback triggered.");
-    ErrorManager.notifyUser(contactId ? "مخاطب با موفقیت به‌روزرسانی شد!" : "مخاطب با موفقیت ذخیره شد!", 'success');
+    ErrorManager.notifyUser(contactId ? t('contacts.contact_updated_success') : t('contacts.contact_created_success'), 'success');
     if (!contactId) { // Only reset form for new contacts
       form.reset();
     }
@@ -42,12 +45,12 @@ export const useContactFormLogic = (
 
     console.log("useContactFormLogic: Navigating to /");
     navigate("/"); // Navigate back to contacts list after success
-  }, [contactId, form, session, navigate]);
+  }, [contactId, form, session, navigate, t]);
 
   const onErrorCallback = useCallback((error: Error) => {
     console.error("useContactFormLogic: onErrorCallback triggered.", error);
     ErrorManager.logError(error, { component: "useContactFormLogic", action: contactId ? "updateContact" : "createContact" });
-  }, [contactId]);
+  }, [contactId, t]);
 
   const {
     executeAsync: executeSave,
@@ -60,7 +63,7 @@ export const useContactFormLogic = (
     maxRetries: 3,
     retryDelay: 1000,
     showToast: true,
-    customErrorMessage: contactId ? 'خطایی در به‌روزرسانی مخاطب رخ داد' : 'خطایی در ذخیره مخاطب رخ داد',
+    customErrorMessage: contactId ? t('contacts.contact_update_error') : t('contacts.contact_create_error'),
     onSuccess: onSuccessCallback,
     onError: onErrorCallback,
   });

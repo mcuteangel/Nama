@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Edit, Trash2 } from "lucide-react";
 import { GlassButton } from "@/components/ui/glass-button";
 import { designTokens } from '@/lib/design-tokens';
@@ -26,6 +27,7 @@ export const ContactActions: React.FC<ContactActionsProps> = ({
   deleteTitle,
   deleteDescription
 }) => {
+  const { t } = useTranslation();
   return (
     <div className="flex gap-4 flex-shrink-0" style={{ pointerEvents: 'auto' }}>
       <GlassButton
@@ -40,7 +42,7 @@ export const ContactActions: React.FC<ContactActionsProps> = ({
           backdropFilter: 'blur(10px)'
         }}
         onClick={onEdit}
-        aria-label="Edit contact"
+        aria-label={t('accessibility.edit_contact')}
       >
         <Edit size={24} style={{ color: designTokens.colors.primary[700] }} />
       </GlassButton>
@@ -58,7 +60,7 @@ export const ContactActions: React.FC<ContactActionsProps> = ({
         }}
         onClick={() => onDialogOpenChange(true)}
         disabled={isDeleting || isDialogClosing}
-        aria-label="Delete contact"
+        aria-label={t('accessibility.delete_contact')}
       >
         {isDeleting ? (
           <LoadingSpinner size={24} />

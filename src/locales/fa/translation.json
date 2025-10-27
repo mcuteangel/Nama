@@ -1340,7 +1340,8 @@
     "error_loading_contact_details": "خطا در بارگذاری اطلاعات مخاطب",
     "unknown_error": "خطای ناشناخته",
     "contact_id_not_found": "شناسه مخاطب برای ویرایش یافت نشد",
-    "generic_error": "خطای عمومی رخ داده است"
+    "generic_error": "خطای عمومی رخ داده است",
+    "contact_list_processing_error": "خطا در پردازش لیست مخاطبین"
   },
   "tag_input": {
     "label": "تگ‌ها",
@@ -1411,9 +1412,10 @@
     "add_new_contact": "افزودن مخاطب جدید",
     "add_contact_description": "اطلاعات و جزئیات مخاطب جدید را وارد کنید",
     "contact_deleted_success": "مخاطب با موفقیت حذف شد",
-    "error_deleting_contact": "خطا در حذف مخاطب",
-    "contacts_loaded_success": "مخاطبین با موفقیت بارگذاری شدند",
-    "error_loading_contacts": "خطا در بارگذاری مخاطبین",
+    "contact_updated_success": "مخاطب با موفقیت به‌روزرسانی شد",
+    "contact_created_success": "مخاطب با موفقیت ایجاد شد",
+    "contact_update_error": "خطا در به‌روزرسانی مخاطب",
+    "contact_create_error": "خطا در ایجاد مخاطب",
     "error_loading_statistics": "خطا در بارگذاری آمار",
     "error_loading_gender_statistics": "خطا در بارگذاری آمار جنسیت",
     "error_loading_contact_methods": "خطا در بارگذاری روش‌های ارتباط",
@@ -1491,7 +1493,10 @@
     "avatar_removed": "آواتار با موفقیت حذف شد",
     "connection_test_start": "در حال شروع تست اتصال...",
     "connection_success": "✅ اتصال موفق - {{count}} کاربر یافت شد",
-    "connection_error": "❌ خطا: {{error}}"
+    "connection_error": "❌ خطا: {{error}}",
+    "group_filter_log": "فیلتر گروه {{group}}: {{before}} -> {{after}} مخاطب",
+    "ungrouped_filter_log": "فیلتر بدون گروه: {{before}} -> {{after}} مخاطب",
+    "search_match_found_log": "مورد مطابقت یافت شد"
   },
   "loading_messages": {
     "uploading_image": "در حال آپلود تصویر...",
@@ -1759,7 +1764,9 @@
     "retry_save": "تلاش مجدد برای ذخیره",
     "remove_email_address": "حذف آدرس ایمیل",
     "remove_phone_number": "حذف شماره تلفن",
-    "remove_social_link": "حذف لینک شبکه اجتماعی"
+    "remove_social_link": "حذف لینک شبکه اجتماعی",
+    "edit_contact": "ویرایش مخاطب",
+    "delete_contact": "حذف مخاطب"
   },
   "theme_options": {
     "light": "روشن",

@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FaMale, FaFemale, FaGenderless } from 'react-icons/fa';
 import { designTokens } from '@/lib/design-tokens';
 import { Contact, GenderDisplay } from '@/types/contact.types';
 
@@ -57,7 +56,7 @@ export const useContactDisplay = (contact: Contact) => {
   }, [contact?.first_name, contact?.last_name]);
 
   const fullName = useMemo(() => {
-    return `${contact?.first_name || ''} ${contact?.last_name || ''}`.trim() || t('contacts.no_name');
+    return `${contact?.first_name || ''} ${contact?.last_name || ''}`.trim() || t('common.names');
   }, [contact?.first_name, contact?.last_name, t]);
 
   const displayGender = useMemo((): GenderDisplay => {
@@ -65,21 +64,21 @@ export const useContactDisplay = (contact: Contact) => {
       return {
         icon: 'male',
         color: designTokens.colors.primary[500],
-        label: t('contacts.gender_male'),
+        label: t('common.gender.male'),
         gender: contact.gender
       };
     } else if (contact.gender === 'female') {
       return {
         icon: 'female',
         color: designTokens.colors.secondary[500],
-        label: t('contacts.gender_female'),
+        label: t('common.gender.female'),
         gender: contact.gender
       };
     } else {
       return {
         icon: 'neutral',
         color: designTokens.colors.gray[500],
-        label: t('contacts.gender_neutral'),
+        label: t('common.gender.unknown'),
         gender: contact.gender
       };
     }

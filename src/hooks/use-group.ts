@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useErrorHandler } from './use-error-handler';
-import { PhoneNumber, EmailAddress } from '@/types/contact.types';
+import { PhoneNumber } from '@/types/contact.types';
 
 // Define a simplified contact interface for preview purposes
 interface ContactPreview {
