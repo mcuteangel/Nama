@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { useDebounce } from '@/hooks/use-performance';
 import type { ContactFilters, SortOption } from '@/types/contact-page.types';
 
