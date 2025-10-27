@@ -10,3 +10,6 @@ export { default as GroupListItem } from './GroupListItem';
 export { default as AddGroupDialog } from './AddGroupDialog';
 export { default as GroupSelectionDialog } from './GroupSelectionDialog';
 export { default as SmartGroupManagement } from './SmartGroupManagement';
+export { default as GroupInfoCard } from './GroupInfoCard';
+export { default as GroupContactsSection } from './GroupContactsSection';
+export { default as GroupActions } from './GroupActions';
